@@ -456,7 +456,7 @@ class Home_Page extends React.Component {
                           
                             <div className="download_section position-relative pt-5 text-center">
                                 <h2 className="bold mb-5 text-center">Download the App</h2>
-                                <p className="normal_font_size">Choose and book 100+ services and track them on Jiffy App</p>
+                                <p className="normal_font_size">Choose and book 100+ services and track them on Gigzzy App</p>
                                 <img alt='' className="mr-3" src={require("../../../image/play_store.png")} />
                                 <img alt='' className="ml-3" src={require("../../../image/app_store.png")} />
                             </div>
