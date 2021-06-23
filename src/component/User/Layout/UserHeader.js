@@ -76,7 +76,7 @@ const UserHeader =() => {
                 className="d-flex align-items-center px-3"
                 onClick={() => { open_new_tab('/provider_login') }}>
                 <Icon type="shop" theme="twoTone" twoToneColor="#52c41a" />
-                <span className="primary_color">Became a Provider</span>
+                <span className="primary_color">Become a Provider</span>
             </Menu.Item>
 
         </Menu>
