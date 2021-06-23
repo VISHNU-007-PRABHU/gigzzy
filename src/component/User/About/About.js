@@ -179,7 +179,7 @@ class About extends React.Component {
                         <div className="spy_section ant-col ant-col-24 mb-5">
                             <Affix className="ant-col ant-col-24 text-center">
                                 <Scrollspy className="ant-col ant-col-24" items={['section-1', 'section-2', 'section-3', 'section-4']} currentClassName="is-current">
-                                    <li><a href="#section-1">Why Jiffy</a></li>
+                                    <li><a href="#section-1">Why Gigzzy</a></li>
                                     <li><a href="#section-2">How it Works</a></li>
                                     <li><a href="#section-3">FAQ's</a></li>
                                     <li><a href="#section-4">Hiring Guide</a></li>
@@ -303,7 +303,7 @@ class About extends React.Component {
                                 </div>
                             </div>
                             <div id="section-1" className="why_jiffy position-relative pt-5 container text-center">
-                                <h2 className="bold mb-5 text-center">Why Jiffy</h2>
+                                <h2 className="bold mb-5 text-center">Why Gigzzy</h2>
                                 <p className="normal_font_size">
                                     We provide trained and verified packers & movers in Delhi with insurance of up t INR 10,000. Our 4-t rated experts use top quality packaging material for damage free shifting. Book our quality oriented and time-hound experts for hassle-free packing and moving to Chennai. Book packers & movers in Chennai now!
                                     </p>
