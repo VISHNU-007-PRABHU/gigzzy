@@ -88,7 +88,7 @@ const UserHeader =() => {
             <Header className="white user_header px-0">
                 <Row>
                     <Col lg={{ span: 20, offset: 2 }} className="px-1">
-                        <img src={main} alt={'Jiffy'} className='w-75x object_fit cursor_point' onClick={() => { history.push('/') }} />
+                        <img src={main} height="75" width="75" alt={'Jiffy'} className='object_fit cursor_point' onClick={() => { history.push('/') }} />
                         <div className='float-right cursor_point'>
                             <Dropdown overlay={menu} placement="bottomRight">
                                 <Avatar
