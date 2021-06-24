@@ -1,7 +1,7 @@
 import React from "react";
 import 'antd/dist/antd.css';
 import { Button, Row, Col, Typography, Form, Input } from 'antd';
-import jiffy from '../../../image/main.png';
+import jiffy from '../../../image/gigzzypro.png';
 import main from '../../../image/main.png';
 import ReactPhoneInput from "react-phone-input-2";
 import OtpInput from 'react-otp-input';

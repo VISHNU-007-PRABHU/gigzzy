@@ -6,7 +6,7 @@ import { split } from 'apollo-link';
 import { getMainDefinition } from 'apollo-utilities';
 
 // const uri_link = 'localhost:8844';
-// const uri_link = '192.168.0.33:8844';
+// const uri_link = '192.168.0.33:8844';  GX5wA]6e~/@T&2>]
 const uri_link='gigzzy.com';
 const uri = `https://${uri_link}`;
 

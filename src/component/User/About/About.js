@@ -305,8 +305,10 @@ class About extends React.Component {
                             <div id="section-1" className="why_jiffy position-relative pt-5 container text-center">
                                 <h2 className="bold mb-5 text-center">Why Gigzzy</h2>
                                 <p className="normal_font_size">
-                                    We provide trained and verified packers & movers in Delhi with insurance of up t INR 10,000. Our 4-t rated experts use top quality packaging material for damage free shifting. Book our quality oriented and time-hound experts for hassle-free packing and moving to Chennai. Book packers & movers in Chennai now!
-                                    </p>
+                                Availability of on demand specialized and credentialed  skill sets at an affordable rate.
+                                Large workforce pool to choose from<br/>
+                                Background checks on regulatory compliance on all partners   <br/>                                 
+                                </p>
                             </div>
                             <div id="section-2" className="feature_section pt-5 container mb-5">
                                 <h2 className="bold mb-5 text-center">How it Works</h2>
@@ -323,7 +325,7 @@ class About extends React.Component {
                                     </Col>
                                     <Col sm={{ span: 8 }} className="px-1">
                                         <div className="image_head"><img alt='' src={require("../../../image/like.png")} /></div>
-                                        <p className="normal_font_size my-3 bold">Hazzle Free Services</p>
+                                        <p className="normal_font_size my-3 bold">Hustle Free Services</p>
                                         <label>Super convenient, guaranteed service from booking to delivery</label>
                                     </Col>
                                 </Row>

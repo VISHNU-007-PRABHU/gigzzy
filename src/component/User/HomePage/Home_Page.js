@@ -392,7 +392,7 @@ class Home_Page extends React.Component {
                             <div className="second_category position-relative pt-5">
                                 {this.state.trending_booking.length > 0 ?
                                     <>
-                                        <h2 className="bold mb-5 text-center">Trending and Event Services</h2>
+                                        <h2 className="bold mb-5 text-center">Trending Gigzzy Services</h2>
                                         <OwlCarousel
                                             className="owl-theme cursor_point"
                                             items={5}
@@ -474,7 +474,7 @@ class Home_Page extends React.Component {
                                     </Col>
                                     <Col sm={{ span: 8 }} className="px-1">
                                         <div className="image_head"><img alt='' src={require("../../../image/like.png")} /></div>
-                                        <p className="normal_font_size my-3 bold">Hazzle Free Services</p>
+                                        <p className="normal_font_size my-3 bold">Hustle Free Services</p>
                                         <label>Super convenient, guaranteed service from booking to delivery</label>
                                     </Col>
                                 </Row>
