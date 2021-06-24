@@ -82,7 +82,7 @@ class Profile extends React.Component {
             return;
         }
 
-        if (info.file.status === 'done') {
+        if (info.file.status) {
             console.log(info.file.originFileObj);
             this.getBase64(info.file.originFileObj, imageUrl =>
                 this.setState({

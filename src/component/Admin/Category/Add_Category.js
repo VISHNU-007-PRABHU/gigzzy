@@ -84,7 +84,8 @@ class Add_Category extends React.Component {
     }
 
      beforeUpload = (file) => {
-        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' ;
+        console.log("Add_Category -> beforeUpload -> isJpgOrPng", isJpgOrPng)
         if (!isJpgOrPng) {
             message.error('You can only upload JPG/PNG file!');
         }
@@ -96,11 +97,12 @@ class Add_Category extends React.Component {
     }
 
      handleChange = info => {
+     console.log("Add_Category -> info", info)
         if (info.file.status === 'uploading') {
             this.setState({ loading: true });
             return;
         }
-        if (info.file.status === 'done') {
+        if (info.file.status) {
             console.log(info.file.originFileObj);
             this.setState({ file: info.file.originFileObj });
             this.getBase64(info.file.originFileObj, imageUrl =>

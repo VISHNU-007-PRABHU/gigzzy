@@ -141,7 +141,7 @@ class Add_Provider extends React.Component {
             this.setState({ loading: true });
             return;
         }
-        if (info.file.status === 'done') {
+        if (info.file.status) {
             console.log(info.file.originFileObj);
             this.setState({ file: info.file.originFileObj });
             this.getBase64(info.file.originFileObj, imageUrl =>
