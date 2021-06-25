@@ -1,12 +1,12 @@
 body {
   margin: 0;
-  font-family: 'Muli' !important;
-  -webkit-font-smoothing: Muli !important;
-  -moz-osx-font-smoothing: Muli !important;
+  font-family: 'Baloo Tamma 2' !important;
+  -webkit-font-smoothing: Baloo Tamma 2 !important;
+  -moz-osx-font-smoothing: Baloo Tamma 2 !important;
 }
 
 code {
-  font-family: "Muli" !important;
+  font-family: "Baloo Tamma 2" !important;
 }
 
 .ant-btn-primary {
