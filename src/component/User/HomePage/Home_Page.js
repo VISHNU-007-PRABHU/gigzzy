@@ -279,7 +279,7 @@ class Home_Page extends React.Component {
                                                         onSelect={(value) => { this.setState({ category_values: value }) }}
                                                         onSearch={this.category_search}
                                                         onFocus={this.category_search}
-                                                        placeholder="Search for a Services"
+                                                        placeholder="Search for Services"
                                                         value={this.state.category_values}
                                                         dataSource={this.state.auto_complete_data.map((data, index) => {
                                                             console.log(data);

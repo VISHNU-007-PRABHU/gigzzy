@@ -14,7 +14,7 @@ const UserFooter = () => {
           >
             <div>
               <ul>
-                <li>Company</li>
+                <li><h5 style={{color:"green"}}>Company</h5></li>
                 <li>
                   <Link to="/about" target="_blank" className="mr-1">
                     About Us
@@ -39,11 +39,7 @@ const UserFooter = () => {
             </div>
             <div>
               <ul>
-                <li>
-                  <Link to="/about" target="_blank" className="mr-1">
-                    Legal
-                  </Link>
-                </li>
+              <li><h5 style={{color:"green"}}>Leagal</h5></li>
                 <li>
                   <Link to="/terms" target="_blank" className="mr-1">
                     Terms & Condition
@@ -63,11 +59,7 @@ const UserFooter = () => {
             </div>
             <div>
               <ul>
-                <li>
-                  <Link to="/about" target="_blank" className="mr-1">
-                    Resources
-                  </Link>
-                </li>
+              <li><h5 style={{color:"green"}}>Resources</h5></li>
                 <li>
                   <Link to="/provider_login" target="_blank" className="mr-1">
                     Pro Login
@@ -83,11 +75,16 @@ const UserFooter = () => {
                     Hiring Guide
                   </Link>
                 </li>
+                <li>
+                  <Link to="/about#section-3" target="_blank" className="mr-1">
+                    FAQs
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <ul>
-                <li>Contact Us</li>
+              <li><h5 style={{color:"green"}}>Contact Us</h5></li>
                 <li>info@gigzzy.com</li>
                 <li>Tel +254 733 494 363</li>
               </ul>

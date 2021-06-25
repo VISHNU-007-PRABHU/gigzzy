@@ -16,9 +16,9 @@ module.exports.adminlogin = async (_, args) => {
     const preview_admin = await Admin_model.find({});
     if (preview_admin.length == 0) {
         const frist_admin_data = {
-            email: 'support@jiffy.com',
-            password: 'jiffy',
-            user_name: 'jiffy',
+            email: 'info@gigzzy.com',
+            password: 'gizzy',
+            user_name: 'gizzy',
         }
         let add_frist_admin = new Admin_model(frist_admin_data);
         const save = await add_frist_admin.save();

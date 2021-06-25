@@ -1,5 +1,5 @@
 import React from 'react'
-import { Layout, Row, Col, Avatar, Menu, Icon, Dropdown ,Skeleton} from 'antd';
+import { Layout, Row,Button, Col, Avatar, Menu, Icon, Dropdown ,Skeleton} from 'antd';
 import main from '../../../image/Gigzzy.png';
 import useReactRouter from 'use-react-router';
 import { GET_SETTING } from '../../../graphql/Admin/static';
@@ -97,6 +97,12 @@ const UserHeader =() => {
                                     icon={<Icon type="user" style={{ verticalAlign: "baseline" }} />}
                                     src={JSON.parse(localStorage.getItem('user')) ? JSON.parse(localStorage.getItem('user')).img_url : ""} />
                             </Dropdown>
+                            {/* <div >
+                            <Button onClick={() => { open_new_tab('/provider_login') }}>Pro Login</Button>{"  "}
+                            <Button onClick={() => { history.push('/login') }} style={{backgroundColor:"black",color:"white"}}>Login</Button>
+                            </div> */}
+                            
+
                         </div>
                     </Col>
                 </Row>
