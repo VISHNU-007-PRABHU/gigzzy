@@ -63,21 +63,19 @@ const UserHeader =() => {
                 <Icon type="logout" />
                 Logout
             </Menu.Item>
-            <Menu.Item
+            {/* <Menu.Item
                 className={localStorage.getItem('userLogin') === 'success' ? 'd-none' : "d-flex align-items-center px-3"}
                 onClick={() => { history.push('/login') }}>
                 <Icon type="login" />
                 Login
             </Menu.Item>
-
-
             <Menu.Divider />
             <Menu.Item
                 className="d-flex align-items-center px-3"
                 onClick={() => { open_new_tab('/provider_login') }}>
                 <Icon type="shop" theme="twoTone" twoToneColor="#52c41a" />
                 <span className="primary_color">Become a Provider</span>
-            </Menu.Item>
+            </Menu.Item> */}
 
         </Menu>
     );
@@ -90,19 +88,19 @@ const UserHeader =() => {
                     <Col lg={{ span: 20, offset: 2 }} className="px-1">
                         <img src={main} height="75" width="75" alt={'Jiffy'} className='object_fit cursor_point' onClick={() => { history.push('/') }} />
                         <div className='float-right cursor_point'>
+                            {localStorage.getItem('userLogin') === 'success' ?
                             <Dropdown overlay={menu} placement="bottomRight">
                                 <Avatar
                                     shape='circle'
                                     className="ant-dropdown-link avatar_shadow"
                                     icon={<Icon type="user" style={{ verticalAlign: "baseline" }} />}
                                     src={JSON.parse(localStorage.getItem('user')) ? JSON.parse(localStorage.getItem('user')).img_url : ""} />
-                            </Dropdown>
-                            {/* <div >
+                            </Dropdown> :
+                            <div >
                             <Button onClick={() => { open_new_tab('/provider_login') }}>Pro Login</Button>{"  "}
                             <Button onClick={() => { history.push('/login') }} style={{backgroundColor:"black",color:"white"}}>Login</Button>
-                            </div> */}
-                            
-
+                            </div>
+                            }
                         </div>
                     </Col>
                 </Row>

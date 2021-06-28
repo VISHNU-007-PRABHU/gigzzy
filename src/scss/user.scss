@@ -68,7 +68,7 @@ body {
 }
 
 .clearfix .ant-upload-list {
-    min-height: 300px;
+    min-height: 230px;
     overflow: auto;
     max-height: 280px;
     justify-content: center;
@@ -87,9 +87,14 @@ body {
 .clearfix .ant-upload-select-picture-card {
     width: 1em;
     height: 1em;
-    border-radius: 2em;
     float: none !important;
     margin: 2em auto;
+}
+.btnn{
+    margin: 0em 0em 1em 16em !important;
+    float: none !important;
+    width: 5em !important;
+    height: 2rem !important
 }
 
 .ant-select-auto-complete.ant-select .ant-input {

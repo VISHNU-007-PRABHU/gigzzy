@@ -1,6 +1,30 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Layout, Row, Col } from "antd";
+import {
+  EmailShareButton,
+  TwitterIcon,
+  FacebookIcon,
+  WhatsappIcon,
+  FacebookShareCount,
+  HatenaShareButton,
+  InstapaperShareButton,
+  LineShareButton,
+  LinkedinShareButton,
+  LivejournalShareButton,
+  MailruShareButton,
+  OKShareButton,
+  PinterestShareButton,
+  PocketShareButton,
+  RedditShareButton,
+  TelegramShareButton,
+  TumblrShareButton,
+  TwitterShareButton,
+  ViberShareButton,
+  VKShareButton,
+  WhatsappShareButton,
+  WorkplaceShareButton
+} from "react-share";
 const { Footer } = Layout;
 
 const UserFooter = () => {
@@ -14,7 +38,7 @@ const UserFooter = () => {
           >
             <div>
               <ul>
-                <li><h5 style={{color:"green"}}>Company</h5></li>
+                <li><h6 style={{color:"green"}}>Company</h6></li>
                 <li>
                   <Link to="/about" target="_blank" className="mr-1">
                     About Us
@@ -39,14 +63,14 @@ const UserFooter = () => {
             </div>
             <div>
               <ul>
-              <li><h5 style={{color:"green"}}>Leagal</h5></li>
+              <li><h6 style={{color:"green"}}>Legal</h6></li>
                 <li>
                   <Link to="/terms" target="_blank" className="mr-1">
                     Terms & Condition
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about" target="_blank" className="mr-1">
+                  <Link to="/client" target="_blank" className="mr-1">
                     Client Guarantee
                   </Link>
                 </li>
@@ -59,7 +83,7 @@ const UserFooter = () => {
             </div>
             <div>
               <ul>
-              <li><h5 style={{color:"green"}}>Resources</h5></li>
+              <li><h6 style={{color:"green"}}>Resources</h6></li>
                 <li>
                   <Link to="/provider_login" target="_blank" className="mr-1">
                     Pro Login
@@ -67,11 +91,11 @@ const UserFooter = () => {
                 </li>
                 <li>
                   <Link to="/about#section-2" target="_blank" className="mr-1">
-                    why Gigzzy
+                    Why Gigzzy
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about#section-3" target="_blank" className="mr-1">
+                  <Link to="/about#section-5" target="_blank" className="mr-1">
                     Hiring Guide
                   </Link>
                 </li>
@@ -84,9 +108,10 @@ const UserFooter = () => {
             </div>
             <div>
               <ul>
-              <li><h5 style={{color:"green"}}>Contact Us</h5></li>
+              <li><h6 style={{color:"green"}}>Contact Us</h6></li>
                 <li>info@gigzzy.com</li>
                 <li>Tel +254 733 494 363</li>
+                <li><TwitterIcon size={32} round={true} /><FacebookIcon size={32} round={true} /><WhatsappIcon size={32} round={true} /></li>
               </ul>
             </div>
           </Col>

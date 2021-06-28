@@ -470,7 +470,7 @@ class Home_Page extends React.Component {
                                     <Col sm={{ span: 8 }} className="px-1">
                                         <div className="image_head"><img alt='' src={require("../../../image/budget-management.png")} /></div>
                                         <p className="normal_font_size my-3 bold">Matched to Your Needs</p>
-                                        <label>We match you with the right professionals with the right budget</label>
+                                        <label>We match you with the right professional within your budget.</label>
                                     </Col>
                                     <Col sm={{ span: 8 }} className="px-1">
                                         <div className="image_head"><img alt='' src={require("../../../image/like.png")} /></div>
