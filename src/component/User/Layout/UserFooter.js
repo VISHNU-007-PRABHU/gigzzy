@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import { Layout, Row, Col } from "antd";
 import {
   EmailShareButton,
+  FacebookShareButton,
   TwitterIcon,
   FacebookIcon,
   WhatsappIcon,
+  LinkedinIcon,
   FacebookShareCount,
   HatenaShareButton,
   InstapaperShareButton,
@@ -79,6 +81,11 @@ const UserFooter = () => {
                     Privacy Policy
                   </Link>
                 </li>
+                <li>
+                  <Link to="/conduct" target="_blank" className="mr-1">
+                    Gigzzy Conduct
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
@@ -90,17 +97,17 @@ const UserFooter = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about#section-2" target="_blank" className="mr-1">
+                  <Link to="/why_gigzzy" target="_blank" className="mr-1">
                     Why Gigzzy
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about#section-5" target="_blank" className="mr-1">
+                  <Link to="/hiring_guide" target="_blank" className="mr-1">
                     Hiring Guide
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about#section-3" target="_blank" className="mr-1">
+                  <Link to="/faq" target="_blank" className="mr-1">
                     FAQs
                   </Link>
                 </li>
@@ -111,9 +118,10 @@ const UserFooter = () => {
               <li><h6 style={{color:"green"}}>Contact Us</h6></li>
                 <li>info@gigzzy.com</li>
                 <li>Tel +254 733 494 363</li>
-                <li><TwitterIcon size={32} round={true} /><FacebookIcon size={32} round={true} /><WhatsappIcon size={32} round={true} /></li>
+                <li><LinkedinIcon size={32} round={true} /><FacebookShareButton url={"https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fgithub.com&quote=GitHub"} size={32} round={true} /><WhatsappIcon size={32} round={true} /></li>
               </ul>
             </div>
+            <FacebookShareCount  />
           </Col>
         </Row>
       </Footer>

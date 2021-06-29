@@ -209,11 +209,11 @@ class Add_Subcategory extends React.Component {
                                     </Row>
                                     <Row className="py-3" gutter={12}>
                                         <Col className="" lg={12}>
-                                            <Form.Item label="Limit (Per Day)">
+                                            <Form.Item label="Limit (Per Job)">
                                                 {form.getFieldDecorator("hour_limit", {
                                                      initialValue: this.state.update_data.hour_limit,
                                                     rules: [{ required: true,message:'Hour Limit is required' }]
-                                                })(<Input placeholder="Limit (Per Day)" />)}
+                                                })(<Input placeholder="Limit (Per Jon)" />)}
                                             </Form.Item>
                                         </Col>
                                         <Col className="" lg={12}>

@@ -49,6 +49,10 @@ import { CHECK_DEMO } from './graphql/User/login';
 import { Alert_msg } from './component/Comman/alert_msg';
 import Privacy from './component/Comman/Privacy';
 import Clints from './component/Comman/client'
+import Gigzzyconduct from './component/Comman/gigzzy_contact'
+import why_gigzzy from './component/User/About/why_gigzzy';
+import Hiring_guide from './component/User/About/Hiring_guide';
+import Faq from './component/User/About/Faq';
 
 function PrivateRoute({ component: Component, ...rest }) {
   return (
@@ -172,8 +176,14 @@ ReactDOM.render(
           <Route exact path="/signup" component={Email_Login} />
           <Route exact path="/about" component={About_Page} />
           <Route exact path="/terms" component={Terms_Page} />
+          <Route exact path="/why_gigzzy" component={why_gigzzy}/>
+          <Route exact path="/hiring_guide" component={Hiring_guide}/>
+          <Route exact path="/faq" component={Faq}/>
+
+
           <Route exact path='/policy'component={Privacy}/>
           <Route exact path='/client'component={Clints}/>
+          <Route exact path='/conduct'component={Gigzzyconduct}/>
           <UserRoute exact path="/profile" component={Profile_Page} />
           <UserRoute exact path="/description/:id" component={Description_Page} />
           <UserRoute exact path="/bookings" component={Bookings_Page} />

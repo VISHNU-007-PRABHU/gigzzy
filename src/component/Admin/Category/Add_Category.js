@@ -208,11 +208,11 @@ class Add_Category extends React.Component {
                                     </Row>
                                     <Row className={this.state.is_parent?"py-3 d-none":"py-3"} gutter={12}>
                                         <Col className="" lg={12}>
-                                            <Form.Item label="Limit (Per day)">
+                                            <Form.Item label="Limit (Per Job)">
                                                 {form.getFieldDecorator("hour_limit", {
                                                      initialValue: this.state.update_data.hour_limit,
                                                      rules: this.state.is_parent?[{ required : false}]:[{ required: true,message:'Hour Limit is required' }]
-                                                })(<Input placeholder="Limit (Per day" />)}
+                                                })(<Input placeholder="Limit (Per Job" />)}
                                             </Form.Item>
                                         </Col>
                                         <Col className="" lg={12}>

@@ -144,7 +144,7 @@ class EditableTable extends React.Component {
                 }
             },
             {
-                title: 'Limit(Per Day)',
+                title: 'Limit(Per Job)',
                 dataIndex: '',
                 width: '5%',
                 render: (text, record) => {
