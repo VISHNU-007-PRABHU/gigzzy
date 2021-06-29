@@ -268,7 +268,9 @@ module.exports.updateCategory = async (parent, args, { file }) => {
 module.exports.updatesubCategory = async (_, args, { file }) => {
     //console.log(args.file);
     if (args.subCategory_name) {
+        console.log("args==>",args.subCategory_name)
         var pre_name = await subCategory_model.find({ subCategory_name: args.subCategory_name,delete:0 });
+        console.log("prename",pre_name.length)
         if (pre_name.length >= 1) {
             return { ...args, ...{ info: { "msg": "This Sub Category name was already selected", status: 'failed' } } };
         }
