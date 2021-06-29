@@ -118,10 +118,31 @@ const UserFooter = () => {
               <li><h6 style={{color:"green"}}>Contact Us</h6></li>
                 <li>info@gigzzy.com</li>
                 <li>Tel +254 733 494 363</li>
-                <li><LinkedinIcon size={32} round={true} /><FacebookShareButton url={"https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fgithub.com&quote=GitHub"} size={32} round={true} /><WhatsappIcon size={32} round={true} /></li>
+                <li>
+                <FacebookShareButton
+                    url="https://web.facebook.com/gigzzy"
+                    // quote={props.joke.setup + props.joke.punchline}
+                    hashtag="#programing joke"
+                  >
+                    <FacebookIcon logoFillColor="white"  size={32} round={true}/>
+                  </FacebookShareButton>{"    "}
+                  <LinkedinShareButton
+                    url="https://www.linkedin.com/company/gigzzy-africa/about/?viewAsMember=true"
+                    // quote={props.joke.setup + props.joke.punchline}
+                    hashtag="#programing joke"
+                  >
+                    <LinkedinIcon logoFillColor="white"  size={32} round={true}/>
+                  </LinkedinShareButton>{"     "}
+                  <WhatsappShareButton
+                    // url="https://www.linkedin.com/company/gigzzy-africa/about/?viewAsMember=true"
+                    // quote={props.joke.setup + props.joke.punchline}
+                    hashtag="#programing joke"
+                  >
+                    <WhatsappIcon logoFillColor="white"  size={32} round={true}/>
+                  </WhatsappShareButton>
+                </li>
               </ul>
             </div>
-            <FacebookShareCount  />
           </Col>
         </Row>
       </Footer>
