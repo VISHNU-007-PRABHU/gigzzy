@@ -197,14 +197,14 @@ const PORT = 8990;
 
 
 
-// const httpServer = https.createServer(
-//   {
-//     key:  fs.readFileSync(process.env.HTTPS_KEY),
-//     cert:  fs.readFileSync(process.env.HTTPS_CERT)
-//   },
-//   app
-// )
-const httpServer = http.createServer(app);
+const httpServer = https.createServer(
+  {
+    key:  fs.readFileSync('/etc/nginx/gigzzy_com.key'),
+    cert:  fs.readFileSync('/etc/nginx/gigzzy_com_chain.crt')
+  },
+  app
+)
+// const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 httpServer.listen(PORT, () => {
   console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`)
