@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Layout, Row, Col } from "antd";
+import { Layout, Row, Col, Icon } from "antd";
 import {
   EmailShareButton,
   FacebookShareButton,
@@ -8,24 +8,9 @@ import {
   FacebookIcon,
   WhatsappIcon,
   LinkedinIcon,
-  FacebookShareCount,
-  HatenaShareButton,
-  InstapaperShareButton,
-  LineShareButton,
   LinkedinShareButton,
-  LivejournalShareButton,
-  MailruShareButton,
-  OKShareButton,
-  PinterestShareButton,
-  PocketShareButton,
-  RedditShareButton,
-  TelegramShareButton,
-  TumblrShareButton,
   TwitterShareButton,
-  ViberShareButton,
-  VKShareButton,
   WhatsappShareButton,
-  WorkplaceShareButton
 } from "react-share";
 const { Footer } = Layout;
 
@@ -40,19 +25,21 @@ const UserFooter = () => {
           >
             <div>
               <ul>
-                <li><h6 style={{color:"green"}}>Company</h6></li>
                 <li>
-                  <Link to="/about" target="_blank" className="mr-1">
-                    About Us
-                  </Link>
+                  <h6 style={{ color: "green" }}>Company</h6>
                 </li>
+                {/* <li>
+                  <Link  target="_blank" className="mr-1">
+                    About
+                  </Link>
+                </li> */}
                 <li>
-                  <Link to="/about" target="_blank" className="mr-1">
+                  <Link target="_blank" className="mr-1">
                     Blog
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about" target="_blank" className="mr-1">
+                  <Link target="_blank" className="mr-1">
                     Careers
                   </Link>
                 </li>
@@ -65,7 +52,9 @@ const UserFooter = () => {
             </div>
             <div>
               <ul>
-              <li><h6 style={{color:"green"}}>Legal</h6></li>
+                <li>
+                  <h6 style={{ color: "green" }}>Legal</h6>
+                </li>
                 <li>
                   <Link to="/terms" target="_blank" className="mr-1">
                     Terms & Condition
@@ -90,7 +79,9 @@ const UserFooter = () => {
             </div>
             <div>
               <ul>
-              <li><h6 style={{color:"green"}}>Resources</h6></li>
+                <li>
+                  <h6 style={{ color: "green" }}>Resources</h6>
+                </li>
                 <li>
                   <Link to="/provider_login" target="_blank" className="mr-1">
                     Pro Login
@@ -115,31 +106,54 @@ const UserFooter = () => {
             </div>
             <div>
               <ul>
-              <li><h6 style={{color:"green"}}>Contact Us</h6></li>
+                <li>
+                  <h6 style={{ color: "green" }}>Contact Us</h6>
+                </li>
                 <li>info@gigzzy.com</li>
                 <li>Tel +254 733 494 363</li>
                 <li>
-                <FacebookShareButton
+                  <FacebookShareButton
                     url="https://web.facebook.com/gigzzy"
-                    // quote={props.joke.setup + props.joke.punchline}
                     hashtag="#programing joke"
                   >
-                    <FacebookIcon logoFillColor="white"  size={32} round={true}/>
-                  </FacebookShareButton>{"    "}
+                    <FacebookIcon
+                      logoFillColor="white"
+                      size={32}
+                      round={true}
+                    />
+                  </FacebookShareButton>
+                  {"    "}
+                  <TwitterShareButton
+                    url="https://twitter.com/Gigzzyafrica"
+                    hashtag="#programing joke"
+                  >
+                    <TwitterIcon logoFillColor="white" size={32} round={true} />
+                  </TwitterShareButton>
+                  {"    "}
                   <LinkedinShareButton
                     url="https://www.linkedin.com/company/gigzzy-africa/about/?viewAsMember=true"
-                    // quote={props.joke.setup + props.joke.punchline}
                     hashtag="#programing joke"
                   >
-                    <LinkedinIcon logoFillColor="white"  size={32} round={true}/>
-                  </LinkedinShareButton>{"     "}
+                    <LinkedinIcon
+                      logoFillColor="white"
+                      size={32}
+                      round={true}
+                    />
+                  </LinkedinShareButton>
+                  {"     "}
                   <WhatsappShareButton
-                    // url="https://www.linkedin.com/company/gigzzy-africa/about/?viewAsMember=true"
-                    // quote={props.joke.setup + props.joke.punchline}
+                    url="https://www.whatsapp.com/"
                     hashtag="#programing joke"
                   >
-                    <WhatsappIcon logoFillColor="white"  size={32} round={true}/>
+                    <WhatsappIcon
+                      logoFillColor="white"
+                      size={32}
+                      round={true}
+                    />
                   </WhatsappShareButton>
+                  {/* <a >
+                  <Icon style={{width:40,height:50,fontSize:30}} type="instagram" />
+                  </a> */}
                 </li>
               </ul>
             </div>

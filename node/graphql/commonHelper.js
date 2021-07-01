@@ -51,6 +51,26 @@ module.exports.push_notifiy = async (message) => {
   });
 };
 
+//============================smsapi===================//
+const c={
+  apiKey:'f540f924836a040b4ca223a7503114e4fdf667bdcb131d91c1c1e04ba95e79d1',
+  username:'vijayaraj s'
+}
+const a=require('africastalking')(c)
+const sms=a.SMS
+module.exports.send_sms=async(data,res)=>{
+  const tot=req.body.number
+  const messgae=req.body.text
+  sms.send({tot:`+254{to}`,messgae}).then(suc=>{
+    console.log("suc")
+    res.json(suc)
+  }).catch(e=>{
+    console.log(e)
+  })
+
+}
+//============================smsapi===================//
+
 module.exports.send_mail = async (email, otp) => {
   // console.log('vis',email,otp);
   const transporter = nodemailer.createTransport({
@@ -58,8 +78,8 @@ module.exports.send_mail = async (email, otp) => {
     port: 465,
     secure:true,
     auth: {
-      user: 'picvi.acc@gmail.com',
-      pass: 'yumcyizjbsevpscg'
+      user: 'emepedia2020@gmail.com',
+      pass: '@Vinya2017'
     },
     tls: {
       // do not fail on invalid certs
@@ -69,9 +89,9 @@ module.exports.send_mail = async (email, otp) => {
   let mailOptions = {
     from: 'waioztechnology@gmail.com',
     to: email, // list of receivers
-    subject: "JIFFY OTP ✔", // Subject line
+    subject: "GIGZZY OTP ✔", // Subject line
     text: "OTP?", // plain text body
-    html: `<b>JIFFY OTP : ${otp} </b>` // html body
+    html: `<b>GIGZZY OTP : ${otp} </b>` // html body
     // subject:strtr(admin_email.subject, req.data), // Subject line
     // html: mail_content // html body
   };
@@ -101,7 +121,7 @@ module.exports.send_mail_1 = async (email, msg) => {
   let mailOptions = {
     from: 'waioztechnology@gmail.com',
     to: email, // list of receivers
-    subject: "JIFFY ✔", // Subject line
+    subject: "GIGZZY ✔", // Subject line
     text: "Admin change proof status?", // plain text body
     html: `<b> ${msg} </b>` // html body
     // subject:strtr(admin_email.subject, req.data), // Subject line
