@@ -248,11 +248,11 @@ module.exports.updateCategory = async (parent, args, { file }) => {
         }
     }
     if (args.base_price) {
-        var base_price = args.base_price.replace("$", "");
+        var base_price = args.base_price.replace("KSh", "");
         args.base_price = String(parseFloat(base_price).toFixed(2))
     }
     if (args.hour_price) {
-        var hour_price = args.hour_price.replace("$", "");
+        var hour_price = args.hour_price.replace("KSh", "");
         args.hour_price = String(parseFloat(hour_price).toFixed(2))
     }
     var result = await Category_model.update({ _id: args._id }, args);
@@ -301,11 +301,11 @@ module.exports.updatesubCategory = async (_, args, { file }) => {
         }
     }
     if (args.base_price) {
-        var base_price = args.base_price.replace("$", "");
+        var base_price = args.base_price.replace("KSh", "");
         args.base_price = String(parseFloat(base_price).toFixed(2))
     }
     if (args.hour_price) {
-        var hour_price = args.hour_price.replace("$", "");
+        var hour_price = args.hour_price.replace("KSh", "");
         args.hour_price = String(parseFloat(hour_price).toFixed(2))
     }
     var result = await subCategory_model.update({ _id: args._id }, args);
