@@ -26,7 +26,7 @@ import Static from './component/Admin/Static/Static';
 import Add_Static from './component/Admin/Static/Add_static';
 import User_Login from './component/User/Login/User_Login';
 import Home_Page from './component/User/HomePage/Home_Page';
-import About_Page from './component/User/About/About';
+import About from './component/Comman/about';
 import Profile_Page from './component/User/Profile/Profile';
 import Bookings_Page from './component/User/Book/Bookings';
 import Terms_Page from './component/Comman/Terms';
@@ -174,7 +174,7 @@ ReactDOM.render(
           <Route exact path="/login" component={User_Login} />
           <Route exact path="/Confrim_password/:id" component={ConfrimPassword} />
           <Route exact path="/signup" component={Email_Login} />
-          <Route exact path="/about" component={About_Page} />
+          <Route exact path="/about" component={About} />
           <Route exact path="/terms" component={Terms_Page} />
           <Route exact path="/why_gigzzy" component={why_gigzzy}/>
           <Route exact path="/hiring_guide" component={Hiring_guide}/>

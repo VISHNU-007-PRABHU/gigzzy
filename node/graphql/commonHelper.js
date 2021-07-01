@@ -87,7 +87,7 @@ module.exports.send_mail = async (email, otp) => {
       }
   });
   let mailOptions = {
-    from: 'waioztechnology@gmail.com',
+    from: 'info@gigzzy.com',
     to: email, // list of receivers
     subject: "GIGZZY OTP ✔", // Subject line
     text: "OTP?", // plain text body
@@ -114,8 +114,8 @@ module.exports.send_mail_1 = async (email, msg) => {
     port: 25,
     service: 'gmail',
     auth: {
-      user: 'picvi.acc@gmail.com',
-      pass: 'yumcyizjbsevpscg'
+      user: 'emepedia2020@gmail.com',
+      pass: '@Vinya2017'
     }
   });
   let mailOptions = {

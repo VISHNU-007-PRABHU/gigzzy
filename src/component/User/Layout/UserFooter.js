@@ -28,11 +28,11 @@ const UserFooter = () => {
                 <li>
                   <h6 style={{ color: "green" }}>Company</h6>
                 </li>
-                {/* <li>
-                  <Link  target="_blank" className="mr-1">
+                <li>
+                  <Link to="/about" target="_blank" className="mr-1">
                     About
                   </Link>
-                </li> */}
+                </li>
                 <li>
                   <Link target="_blank" className="mr-1">
                     Blog
