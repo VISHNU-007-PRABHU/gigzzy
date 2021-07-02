@@ -14,6 +14,7 @@ const { resolvers } = require('./node/graphql/resolver');
 const moment = require('moment');
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true, parameterLimit: 5000000 }));
+app.use(express.json());
 const getSymbolFromCurrency = require('currency-symbol-map')
 const fs = require('fs');
 const cwd = process.cwd();
@@ -147,11 +148,37 @@ existsSync(path.join(__dirname, "./node/images/subcategory")) || mkdirSync(path.
 app.use("/images", express.static(path.join(__dirname, "./node/images")));
 app.use("/document", express.static(path.join(__dirname, "./node/document")));
 
+app.post('/confirmation', async (req, res, next) => {
+  try {
+    console.log(req.body,"ops confirmation")
+    return res.send({ status: true, message: "we reviced confirmation" })
+  } catch (error) {
+    return res.send(error.message)
+  }
+})
+app.post('/validation', async (req, res, next) => {
+  try {
+    console.log(req.body,"ops validation")
+    return res.send({ status: true, message: "we reviced validation" })
+  } catch (error) {
+    return res.send(error.message)
+  }
+})
+
+app.post('/cancelled', async (req, res, next) => {
+  try {
+    console.log(req.body,"ops cancelled")
+    return res.send({ status: true, message: "we reviced cancelled" })
+  } catch (error) {
+    return res.send(error.message)
+  }
+})
+
 app.use(async (req, res, next) => {
   const url = req.url;
   console.log(url);
   const uriArray = url.split('/');
-  if (uriArray[1] !== 'graphql') {
+  if (uriArray[1] !== 'graphql' && uriArray[1] !== "confirmation" && uriArray[1] !== "validation" && uriArray[1] !== "cancelled") {
     console.log("react run");
     const readFile = util.promisify(fs.readFile)
     try {
