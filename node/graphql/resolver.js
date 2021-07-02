@@ -734,7 +734,7 @@ const resolvers = {
                     try {
                         // safaricom payemnt
                         var charge ={
-                            status = "succeeded"
+                            status : "succeeded"
                         }
                         // var charge = await stripe.refunds.create(refund_data)
                     } catch (err) {
