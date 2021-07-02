@@ -1,6 +1,29 @@
 import gql from "graphql-tag";
 
 
+export const GET_CATEGORY_PAGINATION = gql`
+ query GETCATEGORYPAGINATION($limit: Int,$page:Int,$data:JSON){
+    get_category(limit:$limit,page:$page,data:$data) {
+        pageInfo{
+            totalDocs
+            page
+        }
+        data{
+            _id
+            category_type
+            category_name
+            is_parent
+            small_img_url
+            base_price
+            child_category{
+                _id
+                subCategory_name
+            }	
+        }
+    }
+}
+`;
+
 export const GET_CATEGORY = gql`
  query GETCATEGORY{
     category{
@@ -8,7 +31,6 @@ export const GET_CATEGORY = gql`
         category_type
         category_name
         is_parent
-        img_url
         small_img_url
         base_price
         child_category{
@@ -25,7 +47,6 @@ query SEARCH_CATEGORY($_id:ID,$data:JSON) {
         _id
         category_name
         description
-        img_url
         small_img_url
         certificates
         is_parent
@@ -69,7 +90,6 @@ query FINDCATEGORY($_id:ID,$category_type:Int) {
     category(_id:$_id,category_type:$category_type) {
         _id
         category_name
-        img_url
         small_img_url
         is_parent
         description
@@ -103,20 +123,18 @@ query GETTRENDING{
       category_name
       category_type
       subCategory_name
-      img_url
       small_img_url
       is_parent
     }
 }`
 
-export const GET_FUTURE= gql`
+export const GET_FUTURE = gql`
 query GETFUTURE{
     get_is_future {
       _id
       category_name
       category_type
       subCategory_name
-      img_url
       small_img_url
       is_parent
     }

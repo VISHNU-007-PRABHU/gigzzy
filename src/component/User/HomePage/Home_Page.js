@@ -3,29 +3,32 @@
 import React, { Suspense } from "react";
 import 'antd/dist/antd.css';
 import { Modal, Carousel, Layout, Icon, Form, Input, AutoComplete, Button, Typography, Row, Col, Card, Avatar, List, Skeleton } from 'antd';
-import { GET_CATEGORY, SEARCH_CATEGORY, FIND_CATEGORY, GET_FUTURE, GET_TRENDING } from '../../../graphql/User/home_page';
+import { GET_CATEGORY_PAGINATION, SEARCH_CATEGORY, FIND_CATEGORY, GET_FUTURE, GET_TRENDING } from '../../../graphql/User/home_page';
 import { My_APPOINTMENTS } from '../../../graphql/User/booking';
 import { client } from "../../../apollo";
 import '../../../scss/user.scss';
 import OwlCarousel from 'react-owl-carousel';
 import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import PlacesAutocomplete, {
     geocodeByAddress,
     getLatLng,
 } from 'react-places-autocomplete';
+import $ from 'jquery';
+
 const { Content } = Layout;
 const UserHeader = React.lazy(() => import('../Layout/UserHeader'));
 const UserFooter = React.lazy(() => import('../Layout/UserFooter'));
-
-// /Home_Page.js
-
 
 class Home_Page extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
+            categoryloading: false,
             location_modal: false,
             service_modal: false,
             item: null,
@@ -97,6 +100,9 @@ class Home_Page extends React.Component {
             my_booking: [],
             category_values: '',
             center: [9.9252, 78.1198],
+            current_page: 1,
+            slied: 1,
+            total: 0
         };
     }
     componentDidMount() {
@@ -108,6 +114,7 @@ class Home_Page extends React.Component {
     setLocationModal(location_modal) {
         this.setState({ location_modal });
     }
+
 
     my_booking = async () => {
         if (localStorage.getItem('userLogin') === 'success') {
@@ -142,14 +149,46 @@ class Home_Page extends React.Component {
     };
 
     fetch_category = async () => {
+        this.setState({ categoryloading: true });
+        let input = {};
         await client.query({
-            query: GET_CATEGORY,
+            query: GET_CATEGORY_PAGINATION,
+            variables: { data: input, limit: 6, page: 1 },
             fetchPolicy: 'no-cache',
         }).then(result => {
-            console.log(result);
-            this.setState({ category_data: result.data.category });
+            console.log(result.data.get_category.pageInfo.totalDocs)
+            this.setState({
+                total: result.data.get_category.pageInfo.totalDocs,
+                current_page: result.data.get_category.pageInfo.page,
+                categoryloading: false,
+                category_data: result.data.get_category.data
+            });
         });
     }
+
+    handleTableChange = async () => {
+        let totalpage = Number(Number(this.setState.total) / 6)
+        console.log(this.state.total)
+        console.log(this.state.current_page)
+        if (totalpage < this.state.current_page) {
+            return false
+        }
+        this.setState({ categoryloading: true });
+        await client.query({
+            query: GET_CATEGORY_PAGINATION,
+            variables: { limit: 6, page: Number(this.state.current_page + 1), data: {} },
+            fetchPolicy: 'no-cache',
+        }).then(result => {
+            this.setState({
+                total: result.data.get_category.pageInfo.totalDocs,
+                current_page: result.data.get_category.pageInfo.page,
+                categoryloading: false,
+                category_data: [...this.state.category_data, ...result.data.get_category.data],
+            });
+        });
+    };
+
+
 
     fetch_trending = async value => {
         const { data } = await client.query({
@@ -177,7 +216,6 @@ class Home_Page extends React.Component {
                 query: SEARCH_CATEGORY,
                 variables: { data: { value: value } },
             });
-            console.log(data);
             this.setState({ auto_complete_data: data ? data.search_category : [] })
         }
     };
@@ -240,9 +278,21 @@ class Home_Page extends React.Component {
         }
     }
     render() {
+        const settings = {
+            dots: false,
+            infinite: false,
+            speed: 500,
+            slidesToShow: 5,
+            slidesToScroll: this.state.slied,
+            beforeChange: (current, next) => {
+                if (current < next) {
+                    this.handleTableChange()
+                }
+            }
+        };
         return (
             <Layout className="white">
-                <Suspense fallback={<p className="container mt-2" style={{backgroundColor:"#eae5e5",width:'100%',height:"30px"}}></p>}>
+                <Suspense fallback={<p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>}>
                     <UserHeader />
                 </Suspense>
 
@@ -346,7 +396,7 @@ class Home_Page extends React.Component {
                             </div>
                             <div className="featured_category container position-relative">
                                 {this.state.category_data.length > 0 ?
-                                    <OwlCarousel className="owl-theme cursor_point" items={5} dots={false} nav={true} navText={this.state.nav_text} responsive={this.state.responsive} margin={10}>
+                                    <Slider className="owl-theme cursor_point" {...settings}>
                                         {this.state.category_data.map((data, i) =>
                                             <div className={"item"} key={i} onClick={() => { this.book_category(data._id, data.category_type, data.is_parent) }}>
                                                 <Avatar size={100} src={data.small_img_url} className='mx-auto d-block' />
@@ -355,7 +405,7 @@ class Home_Page extends React.Component {
                                                 <p className="text-center py-4">{data.category_name}</p>
                                             </div>
                                         )}
-                                    </OwlCarousel>
+                                    </Slider>
                                     : ""}
 
                                 <Modal footer={<></>} title="List subcategory based on category" className="new_modal" centered visible={this.state.service_modal} onOk={() => { this.setState({ service_modal: 0 }) }} onCancel={() => { this.setState({ service_modal: 0 }) }}>
@@ -453,7 +503,7 @@ class Home_Page extends React.Component {
                                     </> : <></>
                                 }
                             </div>
-                          
+
                             <div className="download_section position-relative pt-5 text-center">
                                 <h2 className="bold mb-5 text-center">Download the App</h2>
                                 <p className="normal_font_size">Choose and book 100+ services and track them on Gigzzy App</p>
