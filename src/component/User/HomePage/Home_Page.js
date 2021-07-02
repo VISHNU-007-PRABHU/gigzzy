@@ -515,7 +515,7 @@ class Home_Page extends React.Component {
                                     <Col sm={{ span: 8 }} className="px-1">
                                         <div className="image_head"><img alt='' src={require("../../../image/quality.png")} /></div>
                                         <p className="normal_font_size my-3 bold">High Quality & Trusted Professionals</p>
-                                        <label>We Provide only verified, background checked and high quality profiessionals</label>
+                                        <label>We Provide only verified, background checked and high quality Professionals</label>
                                     </Col>
                                     <Col sm={{ span: 8 }} className="px-1">
                                         <div className="image_head"><img alt='' src={require("../../../image/budget-management.png")} /></div>

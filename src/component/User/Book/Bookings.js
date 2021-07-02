@@ -365,7 +365,7 @@ class Bookings extends React.Component {
                                 <Card.Grid className='w-100 cursor_point' onClick={() => { this.handleModeChange("10") }}>
                                     <Row>
                                         <Col span={20}>
-                                            <span className={this.state.mode_state === 'Pending' ? "primary_color bold" : "bold"}>Pending</span>
+                                            <span className={this.state.mode_state === 'Pending' ? "primary_color bold" : "bold"}>Incoming</span>
                                         </Col>
                                         <Col span={4}>
                                             <span className={this.state.mode_state === 'Pending' ? "primary_color float-right" : "float-right"}> <Icon type="hourglass" /> </span>
@@ -519,11 +519,11 @@ class Bookings extends React.Component {
                                         <p className="m-0 normal_font_size ">Amount paid</p>
                                         <label class="ml-auto">{this.state.particular_booking[0].base_price}</label>
                                     </div>
-                                    <div className={this.state.particular_booking[0]?.extra_price.replace("$", '') > 0 ? "price_section px-3 d-flex" : "d-none"}>
+                                    <div className={this.state.particular_booking[0]?.extra_price.replace("Ksh", '') > 0 ? "price_section px-3 d-flex" : "d-none"}>
                                         <p className="m-0 normal_font_size ">Extra Price</p>
                                         <label class="ml-auto">{this.state.particular_booking[0].extra_price}</label>
                                     </div>
-                                    <div className={this.state.particular_booking[0]?.extra_hour_price.replace("$", '') > 0 ? "price_section px-3 d-flex" : "d-none"}>
+                                    <div className={this.state.particular_booking[0]?.extra_hour_price.replace("Ksh", '') > 0 ? "price_section px-3 d-flex" : "d-none"}>
                                         <p className="m-0 normal_font_size ">Extra Hour Price</p>
                                         <label class="ml-auto">{this.state.particular_booking[0].extra_hour_price}</label>
                                     </div>
@@ -532,7 +532,7 @@ class Bookings extends React.Component {
                                         <p className="m-0 normal_font_size ">Bill Total</p>
                                         <label class="ml-auto bold">{this.state.particular_booking[0].total}</label>
                                     </div>
-                                    <div className={this.state.particular_booking[0]?.final_payment.replace("$", '') > 0 ? "price_section px-3 d-flex" : "d-none"}>
+                                    <div className={this.state.particular_booking[0]?.final_payment.replace("Ksh", '') > 0 ? "price_section px-3 d-flex" : "d-none"}>
                                         <p className="m-0 normal_font_size ">To be paid</p>
                                         <label class="ml-auto bold">{this.state.particular_booking[0].final_payment}</label>
                                     </div>
