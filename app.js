@@ -25,7 +25,6 @@ dotenv.config();
 //   locales: ['en', 'es'],
 //   directory: __dirname + '/locales'
 // });
-
 class refDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
@@ -38,7 +37,26 @@ class refDirective extends SchemaDirectiveVisitor {
     };
   }
 }
-
+class ImgSizeDirective extends SchemaDirectiveVisitor {
+  visitFieldDefinition(field) {
+    const { resolve = defaultFieldResolver } = field;
+    const { format } = this.args;
+    field.resolve = async function (...args) {
+      const imgurl = await resolve.apply(this, args);
+      if (imgurl) {
+        if (format && format == "small") {
+          return `${imgurl}_small.jpg`;
+        } else {
+          return imgurl
+        }
+      } else {
+        return '';
+      }
+    };
+    // The formatted Date becomes a String, so the field type must change:
+    field.type = GraphQLString;
+  }
+}
 class DateFormatDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
@@ -107,6 +125,7 @@ const server = new ApolloServer({
     ref: refDirective,
     date: DateFormatDirective,
     upper: UpperCaseDirective,
+    imgSize: ImgSizeDirective
   },
   subscriptions: {
     onConnect: () => console.log('Connected to websocket'),
@@ -151,7 +170,7 @@ app.use('/static', express.static(__dirname + '/public'));
 
 app.post('/confirmation', async (req, res, next) => {
   try {
-    console.log(req.body,"ops confirmation")
+    console.log(req.body, "ops confirmation")
     return res.send({ status: true, message: "we reviced confirmation" })
   } catch (error) {
     return res.send(error.message)
@@ -159,7 +178,7 @@ app.post('/confirmation', async (req, res, next) => {
 })
 app.post('/validation', async (req, res, next) => {
   try {
-    console.log(req.body,"ops validation")
+    console.log(req.body, "ops validation")
     return res.send({ status: true, message: "we reviced validation" })
   } catch (error) {
     return res.send(error.message)
@@ -168,7 +187,7 @@ app.post('/validation', async (req, res, next) => {
 
 app.post('/cancelled', async (req, res, next) => {
   try {
-    console.log(req.body,"ops cancelled")
+    console.log(req.body, "ops cancelled")
     return res.send({ status: true, message: "we reviced cancelled" })
   } catch (error) {
     return res.send(error.message)
@@ -207,9 +226,9 @@ app.use(cors({ origin: 'http://localhost:3000' }));
 
 
 mongoose.connect('mongodb://localhost/gigzzy').then(() => {
-console.log("Connected to Database");
+  console.log("Connected to Database");
 }).catch((err) => {
-    console.log("Not Connected to Database ERROR! ", err);
+  console.log("Not Connected to Database ERROR! ", err);
 });
 
 

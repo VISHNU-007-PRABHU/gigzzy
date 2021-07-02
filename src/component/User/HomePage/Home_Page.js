@@ -349,9 +349,9 @@ class Home_Page extends React.Component {
                                     <OwlCarousel className="owl-theme cursor_point" items={5} dots={false} nav={true} navText={this.state.nav_text} responsive={this.state.responsive} margin={10}>
                                         {this.state.category_data.map((data, i) =>
                                             <div className={"item"} key={i} onClick={() => { this.book_category(data._id, data.category_type, data.is_parent) }}>
-                                                <Avatar size={100} src={data.img_url} className='mx-auto d-block' />
+                                                <Avatar size={100} src={data.small_img_url} className='mx-auto d-block' />
 
-                                                {/* <img src={data.img_url} className="mx-auto w-auto" /> */}
+                                                {/* <img src={data.small_img_url} className="mx-auto w-auto" /> */}
                                                 <p className="text-center py-4">{data.category_name}</p>
                                             </div>
                                         )}
@@ -366,7 +366,7 @@ class Home_Page extends React.Component {
                                         dataSource={this.state.child_data}
                                         renderItem={item => (
                                             <List.Item style={{ cursor: 'pointer' }} onClick={() => { this._subcategory_book(item) }}>
-                                                <Typography.Text ><Avatar src={item.img_url} /></Typography.Text>
+                                                <Typography.Text ><Avatar src={item.small_img_url} /></Typography.Text>
                                                 <Typography.Text className="px-4">{item.subCategory_name}</Typography.Text>
                                             </List.Item>
                                         )}
@@ -381,7 +381,7 @@ class Home_Page extends React.Component {
                                         <OwlCarousel className="owl-theme cursor_point" items={5} dots={false} nav={true} navText={this.state.nav_text} responsive={this.state.responsive_first_category} margin={30}>
                                             {this.state.future_data.map((data, i) =>
                                                 <div className={"item"} key={i} onClick={() => { this.book_category(data._id, data.category_type, data.is_parent) }}>
-                                                    <img alt='' src={data.img_url} className="mx-auto" />
+                                                    <img alt='' src={data.small_img_url} className="mx-auto" />
                                                     <p className="text-center py-4">{data.category_type === 1 ? data.category_name : data.subCategory_name}</p>
                                                 </div>
                                             )}
@@ -403,7 +403,7 @@ class Home_Page extends React.Component {
                                             margin={30}>
                                             {this.state.trending_booking.map((data, i) =>
                                                 <div className={`item item${i}`} key={i} onClick={() => { this._trending_book(data) }}>
-                                                    <img alt='' src={data.img_url} className="mx-auto" />
+                                                    <img alt='' src={data.small_img_url} className="mx-auto" />
                                                     <p className="text-center py-4">
                                                         {data.category_type === 1 ? data.category_name : data.subCategory_name}
                                                     </p>
@@ -431,7 +431,7 @@ class Home_Page extends React.Component {
                                                             <div className="primary_color">{data.base_price}</div>
                                                         </Col>
                                                         <Col xs={6} md={4}>
-                                                            <img alt='' className="w-100 h-100" src={data.booking_category[0].category_type === 1 ? data.booking_category[0].img_url : data.booking_category[0].booking_parent_category[0].img_url} />
+                                                            <img alt='' className="w-100 h-100" src={data.booking_category[0].category_type === 1 ? data.booking_category[0].small_img_url : data.booking_category[0].booking_parent_category[0].small_img_url} />
                                                         </Col>
                                                     </Row>
                                                     <Row className="d-flex my-3 p-1" style={{
@@ -440,7 +440,7 @@ class Home_Page extends React.Component {
                                                     }}>
 
                                                         <Col xs={4} md={4} >
-                                                            <img alt='' className="w-100 h-100" src={data.booking_provider[0].img_url} />
+                                                            <img alt='' className="w-100 h-100" src={data.booking_provider[0].small_img_url} />
                                                         </Col>
                                                         <Col xs={20} md={20} className="py-3 pl-4 d-flex justify-content-between">
                                                             <p className="m-0">{data.booking_provider[0].name}</p>

@@ -10,6 +10,7 @@ const typeDefs = gql `
     directive @currency(defaultFormat: String = "KES") on FIELD_DEFINITION
     directive @upper on FIELD_DEFINITION
     directive @date(format: String) on FIELD_DEFINITION
+    directive @imgSize(format: String) on FIELD_DEFINITION
 
     type Subscription {
         messageSent(limit: Int,page:Int,user_id:ID,provider_id:ID,booking_id:ID):Chat
@@ -27,7 +28,7 @@ const typeDefs = gql `
         user(_id:ID): [Detail]
         user_search(data:JSON):[Detail]
         check_demo_app(_id:ID):Detail
-        category(_id:ID,is_parent:Boolean,category_type:Int):[Category]
+        category(_id:ID,is_parent:Boolean,category_type:Int):[Category] 
         sub_category(category_id:ID,_id:ID):[subCategory]
         status(user_id:ID):[Status]
         details(_id:ID):[Detail]
@@ -366,7 +367,8 @@ const typeDefs = gql `
         hour_limit:String
         service_fee:String
         description:String
-        img_url:String
+        img_url:String 
+        small_img_url:String @imgSize(format:"small")
         url:String
         is_parent:Boolean
         sub_category(category_id:ID,_id:ID):[subCategory]
@@ -408,6 +410,7 @@ const typeDefs = gql `
         hour_price:String  @currency
         hour_limit:String
         img_url:String
+        small_img_url:String @imgSize(format:"small")
         service_fee:String 
         description:String
         created_at:String

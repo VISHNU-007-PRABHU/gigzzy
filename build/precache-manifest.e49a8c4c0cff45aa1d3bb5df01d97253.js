@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "a4d81ea02f2ca0dac1da91b3a2f1fe31",
+    "revision": "359a9bb365c8130125a0b3ce6b4fe0fe",
     "url": "/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/css/7.adf2b809.chunk.css"
   },
   {
-    "revision": "142134ef76fe0dc90e29",
+    "revision": "7056344245657da13edd",
     "url": "/static/css/main.d839f206.chunk.css"
   },
   {
@@ -48,16 +48,16 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/9.b044aec0.chunk.js"
   },
   {
-    "revision": "142134ef76fe0dc90e29",
-    "url": "/static/js/main.3f50db8b.chunk.js"
+    "revision": "7056344245657da13edd",
+    "url": "/static/js/main.e1edbb0b.chunk.js"
   },
   {
     "revision": "ebcdcb08dc9bb7ed4a3a",
     "url": "/static/js/runtime~main.858052c8.js"
   },
   {
-    "revision": "ec60c0874ff357fd6bf28da6c348b78b",
-    "url": "/static/media/Gigzzy.ec60c087.png"
+    "revision": "613b99694464c404c9acf4003083168e",
+    "url": "/static/media/Gigzzy.613b9969.png"
   },
   {
     "revision": "3e2074676586b45449dcf05cdca01ca6",
@@ -68,16 +68,16 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/media/gigzzypro.f24c9cae.png"
   },
   {
-    "revision": "05865d4f0f161de52f31c55efc757cdd",
-    "url": "/static/media/handyman.05865d4f.jpg"
+    "revision": "018dfbf7ecb4f4d0e720ca04bc73fcf0",
+    "url": "/static/media/handyman.018dfbf7.jpg"
   },
   {
-    "revision": "3f7f40b64b5ca89f288c22f8e10b1164",
-    "url": "/static/media/handyman2.3f7f40b6.jpg"
+    "revision": "f5f904a6806a0db8497d0dfe9f70bc4f",
+    "url": "/static/media/handyman2.f5f904a6.jpg"
   },
   {
-    "revision": "906a6fbbb7e3d96fa103c01c2f476611",
-    "url": "/static/media/handyman3.906a6fbb.jpg"
+    "revision": "c0ffe352c874081526f4348ef1888631",
+    "url": "/static/media/handyman3.c0ffe352.jpg"
   },
   {
     "revision": "c57228a882cbf3bfe440b15d20efd7ce",

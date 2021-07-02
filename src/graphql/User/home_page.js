@@ -9,6 +9,7 @@ export const GET_CATEGORY = gql`
         category_name
         is_parent
         img_url
+        small_img_url
         base_price
         child_category{
             _id
@@ -25,6 +26,7 @@ query SEARCH_CATEGORY($_id:ID,$data:JSON) {
         category_name
         description
         img_url
+        small_img_url
         certificates
         is_parent
         base_price
@@ -68,6 +70,7 @@ query FINDCATEGORY($_id:ID,$category_type:Int) {
         _id
         category_name
         img_url
+        small_img_url
         is_parent
         description
         child_category{
@@ -87,6 +90,7 @@ query FINDSUBCATEGORY($_id:ID) {
         _id
         subCategory_name
         img_url
+        small_img_url
         description
     }
 }
@@ -100,6 +104,7 @@ query GETTRENDING{
       category_type
       subCategory_name
       img_url
+      small_img_url
       is_parent
     }
 }`
@@ -112,6 +117,7 @@ query GETFUTURE{
       category_type
       subCategory_name
       img_url
+      small_img_url
       is_parent
     }
 }`

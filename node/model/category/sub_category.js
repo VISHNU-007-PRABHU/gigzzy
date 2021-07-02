@@ -40,6 +40,14 @@ sub_categorySchema.virtual('img_url').get(function () {
   }
 });
 
+sub_categorySchema.virtual('small_img_url').get(function () {
+  if (this.image) {
+    return commonHelper.getBaseurl() + '/images/subcategory/' + this.image
+  } else {
+    return commonHelper.no_image;
+  }
+});
+
 
 sub_categorySchema.virtual('uid').get(function () {
   return this._id;

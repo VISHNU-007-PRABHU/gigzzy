@@ -18,6 +18,7 @@ query GETSUBCATEGORY($limit: Int,$page:Int,$data:JSON) {
         service_fee
         description
         img_url
+        small_img_url
         category{
             category_name
         }
