@@ -147,6 +147,7 @@ existsSync(path.join(__dirname, "./node/images/subcategory")) || mkdirSync(path.
 
 app.use("/images", express.static(path.join(__dirname, "./node/images")));
 app.use("/document", express.static(path.join(__dirname, "./node/document")));
+app.use('/static', express.static(__dirname + '/public'));
 
 app.post('/confirmation', async (req, res, next) => {
   try {
@@ -189,13 +190,6 @@ app.use(async (req, res, next) => {
     } catch (error) {
       return res.send(error.message)
     }
-  } else if (uriArray[1] == "document") {
-    // const readFile = util.promisify(fs.readFile)
-    // try {
-    //   res.download('document/penalty.xlsx');
-    // } catch (error) {
-    //   return res.send(error.message)
-    // }
   }
   else if (uriArray[1] == 'node') {
     try {
