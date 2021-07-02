@@ -732,7 +732,11 @@ const resolvers = {
                     }
 
                     try {
-                        var charge = await stripe.refunds.create(refund_data)
+                        // safaricom payemnt
+                        var charge ={
+                            status = "succeeded"
+                        }
+                        // var charge = await stripe.refunds.create(refund_data)
                     } catch (err) {
                         return [{ msg: "refund error", status: 'failed' }];
                     };
@@ -1034,11 +1038,16 @@ const resolvers = {
                     args['provider_fee'] = provider_fee
                     args['total'] = amount;
                     try {
-                        var charge = await stripe.charges.create({
-                            "amount": Number(amount) * 100,
-                            "currency": "USD",
-                            "source": args.stripe_token
-                        });
+                        var charge = {
+                            status:"succeeded",
+                            paid: true,
+                            id:"896897"
+                        };
+                        // var charge = await stripe.charges.create({
+                        //     "amount": Number(amount) * 100,
+                        //     "currency": "USD",
+                        //     "source": args.stripe_token
+                        // });
                     } catch (err) {
                         return [{ msg: "Payment failed", status: 'failed' }]
                     }
@@ -1136,7 +1145,11 @@ const resolvers = {
                     } else {
 
                     }
-                    const charge = await stripe.refunds.create(refund_data);
+                    // const charge = await stripe.refunds.create(refund_data);
+                    var charge ={
+                        status:"succeeded",
+                        refunded:true
+                    }
                     if (charge.status == "succeeded" && charge.refunded == true) {
                         await Booking_model.update({ _id: args.booking_id }, { booking_status: 11, job_status: 11, payment_status: 2 }, { new: true });
                         await Payout_model.remove({ booking_id: args.booking_id });
@@ -1179,15 +1192,19 @@ const resolvers = {
                         let provider_fee = Number(final_job.provider_fee) - Number(admin_fee);     //store provider fee ...
                         args['admin_fee'] = Number(final_job.admin_fee) + Number(admin_fee);
                         args['provider_fee'] = provider_fee;
-
-                        await stripe.charges.create(
-                            {
-                                "amount": parseFloat(Number(final_job.final_payment) * 100).toFixed(),
-                                "currency": "USD",
-                                "source": args.stripe_token
-                            }).then(async (charge, err) => {
-                                console.log(charge);
-                                console.log(err);
+                        var charge = {
+                            status:"succeeded",
+                            paid: true,
+                            id:"896897"
+                        };
+                        // await stripe.charges.create(
+                        //     {
+                        //         "amount": parseFloat(Number(final_job.final_payment) * 100).toFixed(),
+                        //         "currency": "USD",
+                        //         "source": args.stripe_token
+                        //     }).then(async (charge, err) => {
+                        //         console.log(charge);
+                        //         console.log(err);
                                 if (charge.status == "succeeded" && charge.paid == true) {
                                     var update_booking = await Booking_model.update({ _id: args.booking_id },
                                         {
@@ -1237,9 +1254,9 @@ const resolvers = {
                                     }
                                     res = [{ job_status: 14, msg: "job is completed failed", status: 'failed' }];
                                 }
-                            }).catch(err => {
-                                // console.log("Error:", err);
-                            });
+                            // }).catch(err => {
+                            //     // console.log("Error:", err);
+                            // });
                         return res;
                     } else {
                         await Booking_model.update({ _id: args.booking_id }, { payment_status: 5, booking_status: 14, job_status: 14 }, { new: true });
