@@ -52,7 +52,7 @@ class Invoice extends React.Component {
             <div className=" col-xs-12 col-md-12 col-sm-12 invoice_body_color  " >
                 <div className="col-xs-12 col-md-12 col-sm-12 col-lg-6 main_content mx-lg-auto">
                     <div className="invoice_header mt-1">
-                        <p><img src={main} alt={'Jiffy'} className='w-50x object_fit cursor_point' /></p>
+                        <p><img src={main} alt={'gigzzy'} className='w-50x object_fit cursor_point' /></p>
                         <div className="invoice_info">
                             <div>INVOICE NO <b>{booking[0] ? booking[0].booking_ref : ""}</b></div>
                             <div> <small>{booking[0] ? booking[0].booking_date : ""}</small></div>
@@ -60,7 +60,7 @@ class Invoice extends React.Component {
                     </div>
                     <div className="user_batch mx-3">
                         <p><b>{booking_user[0] ? booking_user[0].name : ""}</b></p>
-                        <p>Thanks for using jiffy</p>
+                        <p>Thanks for using gigzzy</p>
                     </div>
                     <div className="total_fare">
                         <h5>TOTAL FARE</h5>
@@ -162,7 +162,7 @@ class Invoice extends React.Component {
                     <div className="invoice_footer col-xs-12 m-3">
                         <hr />
                         <p>	Thanks,</p>
-                        Jiffy Team
+                        gigzzy Team
 	                            </div>
                 </div>
             </div>

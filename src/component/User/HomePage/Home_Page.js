@@ -283,6 +283,32 @@ class Home_Page extends React.Component {
             infinite: false,
             speed: 500,
             slidesToShow: 5,
+            slidesToScroll: 1,
+            responsive: [
+                {
+                    breakpoint: 1024,
+                    settings: {
+                        slidesToShow: 3,
+                        slidesToScroll: 3,
+                        infinite: true,
+                        dots: true
+                    }
+                },
+                {
+                    breakpoint: 600,
+                    settings: {
+                        slidesToShow: 2,
+                        slidesToScroll: 2
+                    }
+                },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1
+                    }
+                }
+            ],
             slidesToScroll: this.state.slied,
             beforeChange: (current, next) => {
                 if (current < next) {
@@ -316,7 +342,7 @@ class Home_Page extends React.Component {
                                         <div className="d-flex h-100 align-items-center">
                                             <div className="banner_center w-100">
                                                 <h3 className="white-text bold">Your Service Expert in <br /> {this.state.home_page_city} </h3>
-                                                <p className="normal_font_size white-text">Get instant access to reliable and affordable services</p>
+                                                <p className="normal_font_size white-text">Get instant access to reliable and affordable Gigzzy service providers.</p>
                                                 <Col sm={{ span: 4 }} xs={{ span: 22 }} className="mr-4 mb-4">
                                                     <Button icon="environment" className="px-1 jiffy_btn h-50x normal_font_size w-100 text-left" onClick={() => this.setLocationModal(true)}>
                                                         {this.state.home_page_city}
