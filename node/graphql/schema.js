@@ -23,7 +23,7 @@ const typeDefs = gql `
         demo_account(_id:ID):Detail
     }
     type Query {
-
+        testmail:Detail
         user(_id:ID): [Detail]
         user_search(data:JSON):[Detail]
         check_demo_app(_id:ID):Detail

@@ -172,6 +172,7 @@ const resolvers = {
     Query: {
 
         // get data using pagination  
+        testmail:commonHelper.sendmail,
         get_user: userResolver.get_user,
         user_search: userResolver.user_search,
         get_category: categoryResolver.get_category,
