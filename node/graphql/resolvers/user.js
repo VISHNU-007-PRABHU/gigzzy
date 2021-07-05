@@ -7,6 +7,7 @@ const { createWriteStream, existsSync, mkdirSync, fs } = require("fs");
 const path = require("path");
 const express = require("express");
 var commonHelper = require('../commonHelper');
+var saf = require('../safaricom');
 var CronJob = require('cron').CronJob;
 const dotenv = require('dotenv');
 dotenv.config();
@@ -148,6 +149,12 @@ module.exports.find_payout_provider = async (parent, args, context, info) => {
     return result;
 };
 
+module.exports.testinfmail = async (parent, args, context, info) => {
+    //console.log('payout provider');
+    //console.log(parent);
+    await saf.safaricom_lipesa_simulate()
+    return {msg:'asdasd'};
+};
 // get user based on pagination
 module.exports.get_user = async (parent, args, context, info) => {
     var limit = args.limit || 10;

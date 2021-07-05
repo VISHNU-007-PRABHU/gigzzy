@@ -2,7 +2,7 @@
 
 import React, { Suspense } from "react";
 import 'antd/dist/antd.css';
-import { Modal, Carousel, Layout, Icon, Form, Input, AutoComplete, Button, Typography, Row, Col, Card, Avatar, List, Skeleton } from 'antd';
+import { Modal, Spin, Carousel, Layout, Icon, Form, Input, AutoComplete, Button, Typography, Row, Col, Card, Avatar, List, Skeleton } from 'antd';
 import { GET_CATEGORY_PAGINATION, SEARCH_CATEGORY, FIND_CATEGORY, GET_FUTURE, GET_TRENDING } from '../../../graphql/User/home_page';
 import { My_APPOINTMENTS } from '../../../graphql/User/booking';
 import { client } from "../../../apollo";
@@ -17,7 +17,14 @@ import PlacesAutocomplete, {
     geocodeByAddress,
     getLatLng,
 } from 'react-places-autocomplete';
-import $ from 'jquery';
+import { layoutGenerator } from 'react-break';
+
+const layout = layoutGenerator({
+    mobile: 0,
+    phablet: 480,
+    tablet: 600,
+    desktop: 1024,
+  });
 
 const { Content } = Layout;
 const UserHeader = React.lazy(() => import('../Layout/UserHeader'));
@@ -28,6 +35,7 @@ class Home_Page extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            item_count: 5,
             categoryloading: false,
             location_modal: false,
             service_modal: false,
@@ -101,7 +109,6 @@ class Home_Page extends React.Component {
             category_values: '',
             center: [9.9252, 78.1198],
             current_page: 1,
-            slied: 1,
             total: 0
         };
     }
@@ -149,42 +156,60 @@ class Home_Page extends React.Component {
     };
 
     fetch_category = async () => {
+        const OnMobile = window.innerWidth ;
+        if(OnMobile >= 600 && OnMobile < 1024){
+            await this.setState({
+                item_count:3
+            })
+        }else if(OnMobile < 600 && OnMobile >= 480){
+            await this.setState({
+                item_count:2
+            })
+        }else if(OnMobile < 480){
+            await this.setState({ item_count:1 })
+        }
         this.setState({ categoryloading: true });
         let input = {};
         await client.query({
             query: GET_CATEGORY_PAGINATION,
-            variables: { data: input, limit: 6, page: 1 },
+            variables: { data: input, limit: this.state.item_count, page: 1 },
             fetchPolicy: 'no-cache',
         }).then(result => {
-            console.log(result.data.get_category.pageInfo.totalDocs)
             this.setState({
                 total: result.data.get_category.pageInfo.totalDocs,
                 current_page: result.data.get_category.pageInfo.page,
                 categoryloading: false,
                 category_data: result.data.get_category.data
             });
+            console.log(this.state.category_data)
         });
     }
 
-    handleTableChange = async () => {
-        let totalpage = Number(Number(this.setState.total) / 6)
-        console.log(this.state.total)
-        console.log(this.state.current_page)
-        if (totalpage < this.state.current_page) {
+    handleTableChange = async (page) => {
+        let totalpage = Math.floor(Number(this.state.total) / this.state.item_count)
+        console.log(totalpage,this.state.current_page)
+        if (this.state.current_page < 0 || (totalpage <= this.state.current_page && page === "forward")) {
             return false
         }
-        this.setState({ categoryloading: true });
+        this.setState({ categoryloading: true });   
+        let Cpage = 0
+        if (page === "forward") {
+            Cpage = Number(this.state.current_page + 1)
+        } else {
+            Cpage = Number(this.state.current_page - 1)
+        }
         await client.query({
             query: GET_CATEGORY_PAGINATION,
-            variables: { limit: 6, page: Number(this.state.current_page + 1), data: {} },
+            variables: { limit: this.state.item_count, page: Cpage, data: {} },
             fetchPolicy: 'no-cache',
         }).then(result => {
             this.setState({
                 total: result.data.get_category.pageInfo.totalDocs,
                 current_page: result.data.get_category.pageInfo.page,
                 categoryloading: false,
-                category_data: [...this.state.category_data, ...result.data.get_category.data],
+                category_data: result.data.get_category.data,
             });
+            console.log(this.state.category_data)
         });
     };
 
@@ -280,10 +305,12 @@ class Home_Page extends React.Component {
     render() {
         const settings = {
             dots: false,
-            infinite: false,
+            infinite: true,
+            arrows: false,
             speed: 500,
             slidesToShow: 5,
-            slidesToScroll: 1,
+            slidesToScroll: 5,
+            lazyLoad: true,
             responsive: [
                 {
                     breakpoint: 1024,
@@ -309,12 +336,6 @@ class Home_Page extends React.Component {
                     }
                 }
             ],
-            slidesToScroll: this.state.slied,
-            beforeChange: (current, next) => {
-                if (current < next) {
-                    this.handleTableChange()
-                }
-            }
         };
         return (
             <Layout className="white">
@@ -328,13 +349,13 @@ class Home_Page extends React.Component {
                             <div className="banner_section">
                                 <Carousel autoplay effect="fade">
                                     <div>
-                                        <img alt='' src={require("../../../image/handyman.jpg")} />
+                                        <img alt='' src={require("../../../image/handyman.jpg")} loading="lazy" class="lazyload" />
                                     </div>
                                     <div>
-                                        <img alt='' src={require("../../../image/handyman2.jpg")} />
+                                        <img alt='' src={require("../../../image/handyman2.jpg")} loading="lazy" class="lazyload" />
                                     </div>
                                     <div>
-                                        <img alt='' src={require("../../../image/handyman3.jpg")} />
+                                        <img alt='' src={require("../../../image/handyman3.jpg")} loading="lazy" class="lazyload" />
                                     </div>
                                 </Carousel>
                                 <div className="banner_inner">
@@ -421,17 +442,28 @@ class Home_Page extends React.Component {
                                 </div>
                             </div>
                             <div className="featured_category container position-relative">
+                                <div className="d-flex justify-content-around position-absolute w-100 owl-stage-outer">
+                                    <Spin size="large" spinning={this.state.categoryloading} />
+                                </div>
                                 {this.state.category_data.length > 0 ?
-                                    <Slider className="owl-theme cursor_point" {...settings}>
-                                        {this.state.category_data.map((data, i) =>
-                                            <div className={"item"} key={i} onClick={() => { this.book_category(data._id, data.category_type, data.is_parent) }}>
-                                                <Avatar size={100} src={data.small_img_url} className='mx-auto d-block' />
-
-                                                {/* <img src={data.small_img_url} className="mx-auto w-auto" /> */}
-                                                <p className="text-center py-4">{data.category_name}</p>
+                                    <>
+                                        <Slider className="owl-theme cursor_point" {...settings}>
+                                            {this.state.category_data.map((data, i) =>
+                                                <div className={"item"} key={i} onClick={() => { this.book_category(data._id, data.category_type, data.is_parent) }}>
+                                                    <Avatar size={100} src={data.small_img_url} className='mx-auto d-block' />
+                                                    <p className="text-center py-4">{data.category_name}</p>
+                                                </div>
+                                            )}
+                                        </Slider>
+                                        <div class="owl-carousel owl-theme cursor_point d-flex justify-content-between mt-n5 position-absolute w-100">
+                                            <div class="owl-nav">
+                                                <button onClick={()=>{this.handleTableChange('back',)}} type="button" role="presentation" class="owl-prev">
+                                                </button>
+                                                <button onClick={()=>{this.handleTableChange('forward')}} type="button" role="presentation" class="owl-next">
+                                                </button>
                                             </div>
-                                        )}
-                                    </Slider>
+                                        </div>
+                                    </>
                                     : ""}
 
                                 <Modal footer={<></>} title="List subcategory based on category" className="new_modal" centered visible={this.state.service_modal} onOk={() => { this.setState({ service_modal: 0 }) }} onCancel={() => { this.setState({ service_modal: 0 }) }}>
@@ -457,7 +489,7 @@ class Home_Page extends React.Component {
                                         <OwlCarousel className="owl-theme cursor_point" items={5} dots={false} nav={true} navText={this.state.nav_text} responsive={this.state.responsive_first_category} margin={30}>
                                             {this.state.future_data.map((data, i) =>
                                                 <div className={"item"} key={i} onClick={() => { this.book_category(data._id, data.category_type, data.is_parent) }}>
-                                                    <img alt='' src={data.small_img_url} className="mx-auto" />
+                                                    <img alt='' src={data.small_img_url} className="mx-auto lazyload" loading="lazy" />
                                                     <p className="text-center py-4">{data.category_type === 1 ? data.category_name : data.subCategory_name}</p>
                                                 </div>
                                             )}
@@ -479,7 +511,7 @@ class Home_Page extends React.Component {
                                             margin={30}>
                                             {this.state.trending_booking.map((data, i) =>
                                                 <div className={`item item${i}`} key={i} onClick={() => { this._trending_book(data) }}>
-                                                    <img alt='' src={data.small_img_url} className="mx-auto" />
+                                                    <img alt='' src={data.small_img_url} className="mx-auto lazyload" loading="lazy" />
                                                     <p className="text-center py-4">
                                                         {data.category_type === 1 ? data.category_name : data.subCategory_name}
                                                     </p>
@@ -507,7 +539,7 @@ class Home_Page extends React.Component {
                                                             <div className="primary_color">{data.base_price}</div>
                                                         </Col>
                                                         <Col xs={6} md={4}>
-                                                            <img alt='' className="w-100 h-100" src={data.booking_category[0].category_type === 1 ? data.booking_category[0].small_img_url : data.booking_category[0].booking_parent_category[0].small_img_url} />
+                                                            <img alt='' loading="lazy" className="lazyload w-100 h-100" src={data.booking_category[0].category_type === 1 ? data.booking_category[0].small_img_url : data.booking_category[0].booking_parent_category[0].small_img_url} />
                                                         </Col>
                                                     </Row>
                                                     <Row className="d-flex my-3 p-1" style={{
@@ -516,7 +548,7 @@ class Home_Page extends React.Component {
                                                     }}>
 
                                                         <Col xs={4} md={4} >
-                                                            <img alt='' className="w-100 h-100" src={data.booking_provider[0].small_img_url} />
+                                                            <img alt='' loading="lazy" className="lazyload w-100 h-100" src={data.booking_provider[0].small_img_url} />
                                                         </Col>
                                                         <Col xs={20} md={20} className="py-3 pl-4 d-flex justify-content-between">
                                                             <p className="m-0">{data.booking_provider[0].name}</p>
@@ -533,23 +565,23 @@ class Home_Page extends React.Component {
                             <div className="download_section position-relative pt-5 text-center">
                                 <h2 className="bold mb-5 text-center">Download the App</h2>
                                 <p className="normal_font_size">Choose and book 100+ services and track them on Gigzzy App</p>
-                                <img alt='' className="mr-3" src={require("../../../image/play_store.png")} />
-                                <img alt='' className="ml-3" src={require("../../../image/app_store.png")} />
+                                <img alt='' loading="lazy" className="lazyload mr-3" src={require("../../../image/play_store.png")} />
+                                <img alt='' loading="lazy" className="lazyload ml-3" src={require("../../../image/app_store.png")} />
                             </div>
                             <div className="feature_section pt-5 container mb-5">
                                 <Row>
                                     <Col sm={{ span: 8 }} className="px-1">
-                                        <div className="image_head"><img alt='' src={require("../../../image/quality.png")} /></div>
+                                        <div className="image_head"><img alt='' loading="lazy" className="lazyload" src={require("../../../image/quality.png")} /></div>
                                         <p className="normal_font_size my-3 bold">High Quality & Trusted Professionals</p>
                                         <label>We Provide only verified, background checked and high quality Professionals</label>
                                     </Col>
                                     <Col sm={{ span: 8 }} className="px-1">
-                                        <div className="image_head"><img alt='' src={require("../../../image/budget-management.png")} /></div>
+                                        <div className="image_head"><img alt='' loading="lazy" className="lazyload" src={require("../../../image/budget-management.png")} /></div>
                                         <p className="normal_font_size my-3 bold">Matched to Your Needs</p>
                                         <label>We match you with the right professional within your budget.</label>
                                     </Col>
                                     <Col sm={{ span: 8 }} className="px-1">
-                                        <div className="image_head"><img alt='' src={require("../../../image/like.png")} /></div>
+                                        <div className="image_head"><img alt='' loading="lazy" className="lazyload" src={require("../../../image/like.png")} /></div>
                                         <p className="normal_font_size my-3 bold">Hustle Free Services</p>
                                         <label>Super convenient, guaranteed service from booking to delivery</label>
                                     </Col>
