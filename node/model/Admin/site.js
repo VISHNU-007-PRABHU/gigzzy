@@ -16,15 +16,15 @@ var schemaOptions = {
 };
 
 var siteSchema = new mongoose.Schema({
-  site_name: { type: String , default:"jiffy" },
-  site_email: { type: String ,default:"support@jiffy.com" },
+  site_name: { type: String , default:"gigzzy" },
+  site_email: { type: String ,default:"info@gigzzy.com" },
   img_logo: { type: String ,default:""},
   copyrights_content: { type: String,default:"Copy Right" },
   playstore_link: { type: String, default:""},
   appstore_link: { type: String ,default:""},
-  contact_number: { type: String ,default:"9894177165"},
-  contact_email: { type: String,default:"support@jiffy.com" },
-  site_currency: { type: String ,default:"INR"},
+  contact_number: { type: String ,default:" +254 733 494 363"},
+  contact_email: { type: String,default:"info@gigzzy.com" },
+  site_currency: { type: String ,default:"KSH"},
   created_at: { type: String },
   update_at: { type: String },
   img_icon: { type: String,default:"" },

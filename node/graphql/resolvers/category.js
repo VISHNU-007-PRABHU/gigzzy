@@ -1,6 +1,7 @@
 const model = require('../../model_data');
 const _ = require('lodash');
 const moment = require('moment');
+var Jimp = require('jimp');
 
 var Category_model = model.category;
 var subCategory_model = model.sub_category;
@@ -91,7 +92,7 @@ module.exports.subcategory = async (parent, args, context, info) => {
 };
 
 module.exports.child_category = async (parent, args, context, info) => {
-    const result = await subCategory_model.find({ category_id: parent._id, is_block: false,delete:0 })
+    const result = await subCategory_model.find({ category_id: parent._id, is_block: false, delete: 0 })
     // console.log(result);
     return result;
 };
@@ -137,7 +138,7 @@ module.exports.addCategory = async (_, args, { file }) => {
     //console.log("add category");
     //console.log(args);
     if (args.category_name) {
-        var pre_name = await Category_model.find({ category_name: args.category_name,delete:0 });
+        var pre_name = await Category_model.find({ category_name: args.category_name, delete: 0 });
         if (pre_name.length != 0) {
             return { ...args, ...{ info: { "msg": "This Category name was already selected", status: 'failed' } } };
         }
@@ -150,6 +151,15 @@ module.exports.addCategory = async (_, args, { file }) => {
                 .on("close", res)
         );
         args['image'] = file_name;
+        var file_resize = await Jimp.read(path.join(__dirname, "../../images/category", file_name))
+        .then(image => {
+            image.resize(260, Jimp.AUTO)
+                .quality(30)
+                .write(path.join(__dirname, "../../images/category", file_name + "_small.jpg"));
+        })
+        .catch(err => {
+            // Handle an exception.
+        });
         delete args.file
     }
 
@@ -176,10 +186,10 @@ module.exports.addCategory = async (_, args, { file }) => {
 
 //  add sub category
 module.exports.addsubCategory = async (_, args, { file }) => {
-    console.log("add sub category");
-    console.log(args);
+    // console.log("add sub category");
+    // console.log(args);
     if (args.subCategory_name) {
-        var pre_name = await subCategory_model.find({ subCategory_name: args.subCategory_name,delete:0 });
+        var pre_name = await subCategory_model.find({ subCategory_name: args.subCategory_name, delete: 0 });
         if (pre_name.length != 0) {
             return { ...args, ...{ info: { "msg": "This Sub Category name was already selected", status: 'failed' } } };
         }
@@ -192,6 +202,15 @@ module.exports.addsubCategory = async (_, args, { file }) => {
                 .on("close", res)
         );
         args['image'] = file_name;
+        var file_resize = await Jimp.read(path.join(__dirname, "../../images/subcategory", file_name))
+        .then(image => {
+            image.resize(260, Jimp.AUTO)
+                .quality(30)
+                .write(path.join(__dirname, "../../images/subcategory", file_name + "_small.jpg"));
+        })
+        .catch(err => {
+            // Handle an exception.
+        });
         delete args.file
     }
     if (args.base_price) {
@@ -217,7 +236,7 @@ module.exports.updateCategory = async (parent, args, { file }) => {
     //console.log(args);
     var fs = require('fs');
     if (args.category_name) {
-        var pre_name = await Category_model.find({ category_name: args.category_name,delete:0 });
+        var pre_name = await Category_model.find({ category_name: args.category_name, delete: 0 });
         if (pre_name.length > 1) {
             return { ...args, ...{ info: { "msg": "This Category name was already selected", status: 'failed' } } };
         }
@@ -232,6 +251,15 @@ module.exports.updateCategory = async (parent, args, { file }) => {
                     .on("close", res)
             );
             args['image'] = file_name;
+            var file_resize = await Jimp.read(path.join(__dirname, "../../images/category", file_name))
+            .then(image => {
+                image.resize(260, Jimp.AUTO)
+                    .quality(30)
+                    .write(path.join(__dirname, "../../images/category", file_name + "_small.jpg"));
+            })
+            .catch(err => {
+                // Handle an exception.
+            });
             delete args.file;
             // delete the old file
             await Category_model.find({ _id: args._id }, (err, data) => {
@@ -268,8 +296,8 @@ module.exports.updateCategory = async (parent, args, { file }) => {
 module.exports.updatesubCategory = async (_, args, { file }) => {
     //console.log(args.file);
     if (args.subCategory_name) {
-        var pre_name = await subCategory_model.find({ subCategory_name: args.subCategory_name,delete:0 });
-        if (pre_name.length >1) {
+        var pre_name = await subCategory_model.find({ subCategory_name: args.subCategory_name, delete: 0 });
+        if (pre_name.length > 1) {
             return { ...args, ...{ info: { "msg": "This Sub Category name was already selected", status: 'failed' } } };
         }
     }
@@ -283,6 +311,15 @@ module.exports.updatesubCategory = async (_, args, { file }) => {
                     .on("close", res)
             );
             args['image'] = file_name;
+            var file_resize = await Jimp.read(path.join(__dirname, "../../images/subcategory", file_name))
+                .then(image => {
+                    image.resize(260, Jimp.AUTO)
+                        .quality(30)
+                        .write(path.join(__dirname, "../../images/subcategory", file_name + "_small.jpg"));
+                })
+                .catch(err => {
+                    // Handle an exception.
+                });
             delete args.file
 
             // delete the old file

@@ -27,7 +27,7 @@ class AdminSider extends React.Component {
           <div className="logo">
             <img
               src={main}
-              alt={"Jiffy"}
+              alt={"gigzzy"}
               onClick={() => {
                 this.props.history.push("/admin-dashboard");
               }}

@@ -42,6 +42,15 @@ categorySchema.virtual('img_url').get(function () {
   }
 });
 
+
+categorySchema.virtual('small_img_url').get(function () {
+  if (this.image) {
+    return commonHelper.getBaseurl() + '/images/category/' + this.image
+  } else {
+    return commonHelper.no_image;
+  }
+});
+
 categorySchema.virtual('child', {
   ref: 'sub_category',
   localField: '_id',

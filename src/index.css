@@ -1,12 +1,12 @@
 body {
   margin: 0;
-  font-family: 'Baloo Tamma 2' !important;
-  -webkit-font-smoothing: Baloo Tamma 2 !important;
-  -moz-osx-font-smoothing: Baloo Tamma 2 !important;
+  font-family: "BalooTamma2", cursive !important;
+  -webkit-font-smoothing: "BalooTamma2", cursive !important;
+  -moz-osx-font-smoothing: "BalooTamma2", cursive !important;
 }
 
 code {
-  font-family: "Baloo Tamma 2" !important;
+  font-family: "BalooTamma2" !important;
 }
 
 .ant-btn-primary {

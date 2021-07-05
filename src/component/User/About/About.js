@@ -223,7 +223,7 @@ class About extends React.Component {
                                         <div className="d-flex h-100 align-items-center">
                                             <div className="banner_center w-100 text-center">
                                                 <h3 className="white-text bold px-2">Your Service Expert in {this.state.home_page_city} </h3>
-                                                <p className="white-text normal_font_size mb-5 px-2">Get instant access to reliable and affordable services</p>
+                                                <p className="white-text normal_font_size mb-5 px-2">Get instant access to reliable and affordable Gigzzy service providers.</p>
                                                 <Col sm={{ span: 4, offset: 3 }} xs={{ span: 22, offset: 1 }} className="mr-4 mb-4">
                                                     <Button icon="environment" className="px-1 jiffy_btn h-50x normal_font_size w-100 text-left" onClick={() => this.setLocationModal(true)}>
                                                         {this.state.home_page_city}
@@ -318,7 +318,7 @@ class About extends React.Component {
                                     <Col sm={{ span: 8 }} className="px-1">
                                         <div className="image_head"><img alt='' src={require("../../../image/quality.png")} /></div>
                                         <p className="normal_font_size my-3 bold">High Quality & Trusted Professionals</p>
-                                        <label>We Provide only verified, background checked and high quality profiessionals</label>
+                                        <label>We Provide only verified, background checked and high quality Professionals</label>
                                     </Col>
                                     <Col sm={{ span: 8 }} className="px-1">
                                         <div className="image_head"><img alt='' src={require("../../../image/budget-management.png")} /></div>

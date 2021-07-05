@@ -3,29 +3,32 @@
 import React, { Suspense } from "react";
 import 'antd/dist/antd.css';
 import { Modal, Carousel, Layout, Icon, Form, Input, AutoComplete, Button, Typography, Row, Col, Card, Avatar, List, Skeleton } from 'antd';
-import { GET_CATEGORY, SEARCH_CATEGORY, FIND_CATEGORY, GET_FUTURE, GET_TRENDING } from '../../../graphql/User/home_page';
+import { GET_CATEGORY_PAGINATION, SEARCH_CATEGORY, FIND_CATEGORY, GET_FUTURE, GET_TRENDING } from '../../../graphql/User/home_page';
 import { My_APPOINTMENTS } from '../../../graphql/User/booking';
 import { client } from "../../../apollo";
 import '../../../scss/user.scss';
 import OwlCarousel from 'react-owl-carousel';
 import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import PlacesAutocomplete, {
     geocodeByAddress,
     getLatLng,
 } from 'react-places-autocomplete';
+import $ from 'jquery';
+
 const { Content } = Layout;
 const UserHeader = React.lazy(() => import('../Layout/UserHeader'));
 const UserFooter = React.lazy(() => import('../Layout/UserFooter'));
-
-// /Home_Page.js
-
 
 class Home_Page extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
+            categoryloading: false,
             location_modal: false,
             service_modal: false,
             item: null,
@@ -97,6 +100,9 @@ class Home_Page extends React.Component {
             my_booking: [],
             category_values: '',
             center: [9.9252, 78.1198],
+            current_page: 1,
+            slied: 1,
+            total: 0
         };
     }
     componentDidMount() {
@@ -108,6 +114,7 @@ class Home_Page extends React.Component {
     setLocationModal(location_modal) {
         this.setState({ location_modal });
     }
+
 
     my_booking = async () => {
         if (localStorage.getItem('userLogin') === 'success') {
@@ -142,14 +149,46 @@ class Home_Page extends React.Component {
     };
 
     fetch_category = async () => {
+        this.setState({ categoryloading: true });
+        let input = {};
         await client.query({
-            query: GET_CATEGORY,
+            query: GET_CATEGORY_PAGINATION,
+            variables: { data: input, limit: 6, page: 1 },
             fetchPolicy: 'no-cache',
         }).then(result => {
-            console.log(result);
-            this.setState({ category_data: result.data.category });
+            console.log(result.data.get_category.pageInfo.totalDocs)
+            this.setState({
+                total: result.data.get_category.pageInfo.totalDocs,
+                current_page: result.data.get_category.pageInfo.page,
+                categoryloading: false,
+                category_data: result.data.get_category.data
+            });
         });
     }
+
+    handleTableChange = async () => {
+        let totalpage = Number(Number(this.setState.total) / 6)
+        console.log(this.state.total)
+        console.log(this.state.current_page)
+        if (totalpage < this.state.current_page) {
+            return false
+        }
+        this.setState({ categoryloading: true });
+        await client.query({
+            query: GET_CATEGORY_PAGINATION,
+            variables: { limit: 6, page: Number(this.state.current_page + 1), data: {} },
+            fetchPolicy: 'no-cache',
+        }).then(result => {
+            this.setState({
+                total: result.data.get_category.pageInfo.totalDocs,
+                current_page: result.data.get_category.pageInfo.page,
+                categoryloading: false,
+                category_data: [...this.state.category_data, ...result.data.get_category.data],
+            });
+        });
+    };
+
+
 
     fetch_trending = async value => {
         const { data } = await client.query({
@@ -177,7 +216,6 @@ class Home_Page extends React.Component {
                 query: SEARCH_CATEGORY,
                 variables: { data: { value: value } },
             });
-            console.log(data);
             this.setState({ auto_complete_data: data ? data.search_category : [] })
         }
     };
@@ -240,9 +278,47 @@ class Home_Page extends React.Component {
         }
     }
     render() {
+        const settings = {
+            dots: false,
+            infinite: false,
+            speed: 500,
+            slidesToShow: 5,
+            slidesToScroll: 1,
+            responsive: [
+                {
+                    breakpoint: 1024,
+                    settings: {
+                        slidesToShow: 3,
+                        slidesToScroll: 3,
+                        infinite: true,
+                        dots: true
+                    }
+                },
+                {
+                    breakpoint: 600,
+                    settings: {
+                        slidesToShow: 2,
+                        slidesToScroll: 2
+                    }
+                },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1
+                    }
+                }
+            ],
+            slidesToScroll: this.state.slied,
+            beforeChange: (current, next) => {
+                if (current < next) {
+                    this.handleTableChange()
+                }
+            }
+        };
         return (
             <Layout className="white">
-                <Suspense fallback={<p className="container mt-2" style={{backgroundColor:"#eae5e5",width:'100%',height:"30px"}}></p>}>
+                <Suspense fallback={<p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>}>
                     <UserHeader />
                 </Suspense>
 
@@ -266,7 +342,7 @@ class Home_Page extends React.Component {
                                         <div className="d-flex h-100 align-items-center">
                                             <div className="banner_center w-100">
                                                 <h3 className="white-text bold">Your Service Expert in <br /> {this.state.home_page_city} </h3>
-                                                <p className="normal_font_size white-text">Get instant access to reliable and affordable services</p>
+                                                <p className="normal_font_size white-text">Get instant access to reliable and affordable Gigzzy service providers.</p>
                                                 <Col sm={{ span: 4 }} xs={{ span: 22 }} className="mr-4 mb-4">
                                                     <Button icon="environment" className="px-1 jiffy_btn h-50x normal_font_size w-100 text-left" onClick={() => this.setLocationModal(true)}>
                                                         {this.state.home_page_city}
@@ -346,16 +422,16 @@ class Home_Page extends React.Component {
                             </div>
                             <div className="featured_category container position-relative">
                                 {this.state.category_data.length > 0 ?
-                                    <OwlCarousel className="owl-theme cursor_point" items={5} dots={false} nav={true} navText={this.state.nav_text} responsive={this.state.responsive} margin={10}>
+                                    <Slider className="owl-theme cursor_point" {...settings}>
                                         {this.state.category_data.map((data, i) =>
                                             <div className={"item"} key={i} onClick={() => { this.book_category(data._id, data.category_type, data.is_parent) }}>
-                                                <Avatar size={100} src={data.img_url} className='mx-auto d-block' />
+                                                <Avatar size={100} src={data.small_img_url} className='mx-auto d-block' />
 
-                                                {/* <img src={data.img_url} className="mx-auto w-auto" /> */}
+                                                {/* <img src={data.small_img_url} className="mx-auto w-auto" /> */}
                                                 <p className="text-center py-4">{data.category_name}</p>
                                             </div>
                                         )}
-                                    </OwlCarousel>
+                                    </Slider>
                                     : ""}
 
                                 <Modal footer={<></>} title="List subcategory based on category" className="new_modal" centered visible={this.state.service_modal} onOk={() => { this.setState({ service_modal: 0 }) }} onCancel={() => { this.setState({ service_modal: 0 }) }}>
@@ -366,7 +442,7 @@ class Home_Page extends React.Component {
                                         dataSource={this.state.child_data}
                                         renderItem={item => (
                                             <List.Item style={{ cursor: 'pointer' }} onClick={() => { this._subcategory_book(item) }}>
-                                                <Typography.Text ><Avatar src={item.img_url} /></Typography.Text>
+                                                <Typography.Text ><Avatar src={item.small_img_url} /></Typography.Text>
                                                 <Typography.Text className="px-4">{item.subCategory_name}</Typography.Text>
                                             </List.Item>
                                         )}
@@ -381,7 +457,7 @@ class Home_Page extends React.Component {
                                         <OwlCarousel className="owl-theme cursor_point" items={5} dots={false} nav={true} navText={this.state.nav_text} responsive={this.state.responsive_first_category} margin={30}>
                                             {this.state.future_data.map((data, i) =>
                                                 <div className={"item"} key={i} onClick={() => { this.book_category(data._id, data.category_type, data.is_parent) }}>
-                                                    <img alt='' src={data.img_url} className="mx-auto" />
+                                                    <img alt='' src={data.small_img_url} className="mx-auto" />
                                                     <p className="text-center py-4">{data.category_type === 1 ? data.category_name : data.subCategory_name}</p>
                                                 </div>
                                             )}
@@ -403,7 +479,7 @@ class Home_Page extends React.Component {
                                             margin={30}>
                                             {this.state.trending_booking.map((data, i) =>
                                                 <div className={`item item${i}`} key={i} onClick={() => { this._trending_book(data) }}>
-                                                    <img alt='' src={data.img_url} className="mx-auto" />
+                                                    <img alt='' src={data.small_img_url} className="mx-auto" />
                                                     <p className="text-center py-4">
                                                         {data.category_type === 1 ? data.category_name : data.subCategory_name}
                                                     </p>
@@ -431,7 +507,7 @@ class Home_Page extends React.Component {
                                                             <div className="primary_color">{data.base_price}</div>
                                                         </Col>
                                                         <Col xs={6} md={4}>
-                                                            <img alt='' className="w-100 h-100" src={data.booking_category[0].category_type === 1 ? data.booking_category[0].img_url : data.booking_category[0].booking_parent_category[0].img_url} />
+                                                            <img alt='' className="w-100 h-100" src={data.booking_category[0].category_type === 1 ? data.booking_category[0].small_img_url : data.booking_category[0].booking_parent_category[0].small_img_url} />
                                                         </Col>
                                                     </Row>
                                                     <Row className="d-flex my-3 p-1" style={{
@@ -440,7 +516,7 @@ class Home_Page extends React.Component {
                                                     }}>
 
                                                         <Col xs={4} md={4} >
-                                                            <img alt='' className="w-100 h-100" src={data.booking_provider[0].img_url} />
+                                                            <img alt='' className="w-100 h-100" src={data.booking_provider[0].small_img_url} />
                                                         </Col>
                                                         <Col xs={20} md={20} className="py-3 pl-4 d-flex justify-content-between">
                                                             <p className="m-0">{data.booking_provider[0].name}</p>
@@ -453,7 +529,7 @@ class Home_Page extends React.Component {
                                     </> : <></>
                                 }
                             </div>
-                          
+
                             <div className="download_section position-relative pt-5 text-center">
                                 <h2 className="bold mb-5 text-center">Download the App</h2>
                                 <p className="normal_font_size">Choose and book 100+ services and track them on Gigzzy App</p>
@@ -465,7 +541,7 @@ class Home_Page extends React.Component {
                                     <Col sm={{ span: 8 }} className="px-1">
                                         <div className="image_head"><img alt='' src={require("../../../image/quality.png")} /></div>
                                         <p className="normal_font_size my-3 bold">High Quality & Trusted Professionals</p>
-                                        <label>We Provide only verified, background checked and high quality profiessionals</label>
+                                        <label>We Provide only verified, background checked and high quality Professionals</label>
                                     </Col>
                                     <Col sm={{ span: 8 }} className="px-1">
                                         <div className="image_head"><img alt='' src={require("../../../image/budget-management.png")} /></div>

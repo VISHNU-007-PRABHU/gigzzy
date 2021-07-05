@@ -14,6 +14,7 @@ const { resolvers } = require('./node/graphql/resolver');
 const moment = require('moment');
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true, parameterLimit: 5000000 }));
+app.use(express.json());
 const getSymbolFromCurrency = require('currency-symbol-map')
 const fs = require('fs');
 const cwd = process.cwd();
@@ -24,7 +25,6 @@ dotenv.config();
 //   locales: ['en', 'es'],
 //   directory: __dirname + '/locales'
 // });
-
 class refDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
@@ -37,7 +37,26 @@ class refDirective extends SchemaDirectiveVisitor {
     };
   }
 }
-
+class ImgSizeDirective extends SchemaDirectiveVisitor {
+  visitFieldDefinition(field) {
+    const { resolve = defaultFieldResolver } = field;
+    const { format } = this.args;
+    field.resolve = async function (...args) {
+      const imgurl = await resolve.apply(this, args);
+      if (imgurl) {
+        if (format && format == "small") {
+          return `${imgurl}_small.jpg`;
+        } else {
+          return imgurl
+        }
+      } else {
+        return '';
+      }
+    };
+    // The formatted Date becomes a String, so the field type must change:
+    field.type = GraphQLString;
+  }
+}
 class DateFormatDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
@@ -106,6 +125,7 @@ const server = new ApolloServer({
     ref: refDirective,
     date: DateFormatDirective,
     upper: UpperCaseDirective,
+    imgSize: ImgSizeDirective
   },
   subscriptions: {
     onConnect: () => console.log('Connected to websocket'),
@@ -146,12 +166,39 @@ existsSync(path.join(__dirname, "./node/images/subcategory")) || mkdirSync(path.
 
 app.use("/images", express.static(path.join(__dirname, "./node/images")));
 app.use("/document", express.static(path.join(__dirname, "./node/document")));
+app.use('/static', express.static(__dirname + '/public'));
+
+app.post('/confirmation', async (req, res, next) => {
+  try {
+    console.log(req.body, "ops confirmation")
+    return res.send({ status: true, message: "we reviced confirmation" })
+  } catch (error) {
+    return res.send(error.message)
+  }
+})
+app.post('/validation', async (req, res, next) => {
+  try {
+    console.log(req.body, "ops validation")
+    return res.send({ status: true, message: "we reviced validation" })
+  } catch (error) {
+    return res.send(error.message)
+  }
+})
+
+app.post('/cancelled', async (req, res, next) => {
+  try {
+    console.log(req.body, "ops cancelled")
+    return res.send({ status: true, message: "we reviced cancelled" })
+  } catch (error) {
+    return res.send(error.message)
+  }
+})
 
 app.use(async (req, res, next) => {
   const url = req.url;
   console.log(url);
   const uriArray = url.split('/');
-  if (uriArray[1] !== 'graphql') {
+  if (uriArray[1] !== 'graphql' && uriArray[1] !== "confirmation" && uriArray[1] !== "validation" && uriArray[1] !== "cancelled") {
     console.log("react run");
     const readFile = util.promisify(fs.readFile)
     try {
@@ -162,13 +209,6 @@ app.use(async (req, res, next) => {
     } catch (error) {
       return res.send(error.message)
     }
-  } else if (uriArray[1] == "document") {
-    // const readFile = util.promisify(fs.readFile)
-    // try {
-    //   res.download('document/penalty.xlsx');
-    // } catch (error) {
-    //   return res.send(error.message)
-    // }
   }
   else if (uriArray[1] == 'node') {
     try {
@@ -186,9 +226,9 @@ app.use(cors({ origin: 'http://localhost:3000' }));
 
 
 mongoose.connect('mongodb://localhost/gigzzy').then(() => {
-console.log("Connected to Database");
+  console.log("Connected to Database");
 }).catch((err) => {
-    console.log("Not Connected to Database ERROR! ", err);
+  console.log("Not Connected to Database ERROR! ", err);
 });
 
 
