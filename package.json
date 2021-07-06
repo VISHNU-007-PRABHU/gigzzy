@@ -6,7 +6,7 @@
     "scripts": {
         "watch-serve": "nodemon app.js",
         "watch-app": "react-scripts start",
-        "build-app": "react-scripts --max_old_space_size=4096 build",
+        "build-app": "react-scripts --max_old_space_size=4096 build && compress-cra",
         "test": "react-scripts test",
         "styleguide": "styleguidist server",
         "styleguide:build": "styleguidist build"
@@ -37,6 +37,7 @@
         "bootstrap": "^4.3.1",
         "buffer": "^5.2.1",
         "chart.js": "^2.8.0",
+        "compress-create-react-app": "^1.0.6",
         "cors": "^2.8.5",
         "cron": "^1.8.2",
         "currency-symbol-map": "^4.0.4",
@@ -47,6 +48,7 @@
         "expect.js": "^0.3.1",
         "express": "^4.17.1",
         "express-graphql": "^0.7.1",
+        "express-static-gzip": "^2.1.1",
         "fcm-node": "^1.5.2",
         "google-map-react": "^1.1.5",
         "google-maps-react": "^2.0.2",

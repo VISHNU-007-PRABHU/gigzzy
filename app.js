@@ -19,6 +19,7 @@ const getSymbolFromCurrency = require('currency-symbol-map')
 const fs = require('fs');
 const cwd = process.cwd();
 const dotenv = require('dotenv');
+const expressStaticGzip = require('express-static-gzip');
 // const i18n = require("i18n");
 dotenv.config();
 // i18n.configure({
@@ -152,7 +153,18 @@ const server = new ApolloServer({
 
 server.applyMiddleware({ app });
 
-app.use('/', express.static('./build'));
+const buildPath = path.join(__dirname, '..', 'build');
+console.log("buildPath")
+console.log("buildPath", buildPath)
+app.use(
+  '/',
+  expressStaticGzip('./build', {
+    enableBrotli: true,
+    orderPreference: ['br', 'gz']
+  })
+);
+
+// app.use('/', express.static('./build'));
 
 existsSync(path.join(__dirname, "./node/images")) || mkdirSync(path.join(__dirname, "./node/images"));
 existsSync(path.join(__dirname, "./node/images/provider")) || mkdirSync(path.join(__dirname, "./node/images/provider"));
@@ -167,6 +179,7 @@ existsSync(path.join(__dirname, "./node/images/subcategory")) || mkdirSync(path.
 app.use("/images", express.static(path.join(__dirname, "./node/images")));
 app.use("/document", express.static(path.join(__dirname, "./node/document")));
 app.use('/static', express.static(__dirname + '/public'));
+
 
 app.post('/confirmation', async (req, res, next) => {
   try {
