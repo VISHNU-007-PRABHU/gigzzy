@@ -17,6 +17,7 @@ var staticResolver = require('./resolvers/static');
 var settingResolver = require('./resolvers/setting');
 const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
+const safaricom = require('../graphql/safaricom');
 dotenv.config();
 
 var Detail_model = model.detail;
@@ -172,7 +173,6 @@ const resolvers = {
     Query: {
         testmail:userResolver.testinfmail,
         // get data using pagination  
-        testmail:commonHelper.sendmail,
         get_user: userResolver.get_user,
         user_search: userResolver.user_search,
         get_category: categoryResolver.get_category,
@@ -1044,6 +1044,7 @@ const resolvers = {
                             paid: true,
                             id:"896897"
                         };
+                        let chargeStatus = await safaricom.safaricom_lipesa_simulate()
                         // var charge = await stripe.charges.create({
                         //     "amount": Number(amount) * 100,
                         //     "currency": "USD",

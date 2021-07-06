@@ -32,6 +32,13 @@ module.exports.getPaymenturl = () => {
 module.exports.siteUrl = () => {
   return env.APP_URL;
 };
+module.exports.mpesaURL = () => {
+  if(env.MPESA){
+    return env.MPESA_PRODUCTION;
+  }else{
+    return env.MPESA_SANDBOX;
+  }
+};
 module.exports.prepareUploadFolder = (path) => {
   const pathExist = fs.existsSync(path);
   if (!pathExist) {

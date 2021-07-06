@@ -1,6 +1,9 @@
 const dotenv = require('dotenv');
 dotenv.config();
 let unirest = require('unirest');
+const commonHelper = require('./commonHelper')
+const moment = require('moment')
+
 /**
  * 
  * @param {*} data 
@@ -20,7 +23,7 @@ module.exports.safaricom_payment_authorization = async (data) => {
             .headers(headers)
             .send()
             .end(async res => {
-                // console.log(res.raw_body);
+                console.log(res.raw_body);
                 return { status: true, msg: "safaricom payment authorization success" }
             });
     } catch (error) {
@@ -102,137 +105,39 @@ module.exports.safaricom_ctob_simulate = async (data) => {
 
 module.exports.safaricom_lipesa_simulate = async (data) => {
     try {
-        /*
-This code uses callbacks to handle asynchronous function responses.
-It currently demonstrates using an async-await pattern.
-AWS supports both the async-await and promises patterns.
-For more information, see the following:
-https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
-https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises
-https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/calling-services-asynchronously.html
-https://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-handler.html
-*/
-
-        "use strict";
-        const nodemailer = require("nodemailer");
-
-        // If you're using Amazon SES in a region other than US West (Oregon),
-        // replace email-smtp.us-west-2.amazonaws.com with the Amazon SES SMTP
-        // endpoint in the appropriate AWS Region.
-        const smtpEndpoint = "email-smtp.us-east-2.amazonaws.com";
-
-        // The port to use when connecting to the SMTP server.
-        const port = 587;
-
-        // Replace sender@example.com with your "From" address.
-        // This address must be verified with Amazon SES.
-        const senderAddress = "Mary Major <vijayaraj@waioz.com>";
-
-        // Replace recipient@example.com with a "To" address. If your account
-        // is still in the sandbox, this address must be verified. To specify
-        // multiple addresses, separate each address with a comma.
-        var toAddresses = "vishnu@waioz.com";
-
-        // CC and BCC addresses. If your account is in the sandbox, these
-        // addresses have to be verified. To specify multiple addresses, separate
-        // each address with a comma.
-        var ccAddresses = "cc-recipient0@example.com,cc-recipient1@example.com";
-        var bccAddresses = "bcc-recipient@example.com";
-
-        // Replace smtp_username with your Amazon SES SMTP user name.
-        const smtpUsername = "AKIA3FIPGWKBWRXCMHPQ";
-
-        // Replace smtp_password with your Amazon SES SMTP password.
-        const smtpPassword = "BFOsoC8dh/K6MTPTPbbvsRFVoutGri8VJkd7j9M6Uo6d";
-
-        // (Optional) the name of a configuration set to use for this message.
-        var configurationSet = "ConfigSet";
-
-        // The subject line of the email
-        var subject = "Amazon SES test (Nodemailer)";
-
-        // The email body for recipients with non-HTML email clients.
-        var body_text = `Amazon SES Test (Nodemailer)
----------------------------------
-This email was sent through the Amazon SES SMTP interface using Nodemailer.
-`;
-
-        // The body of the email for recipients whose email clients support HTML content.
-        var body_html = `<html>
-        <head></head>
-        <body>
-        <h1>Gigzzy email testing from waioz</h1>
-        <p>Thanks</p>
-        </body>
-        </html>`;
-
-        // The message tags that you want to apply to the email.
-        var tag0 = "key0=value0";
-        var tag1 = "key1=value1";
-
-        async function main() {
-
-            // Create the SMTP transport.
-            let transporter = nodemailer.createTransport({
-                host: smtpEndpoint,
-                port: port,
-                secure: false, // true for 465, false for other ports
-                auth: {
-                    user: smtpUsername,
-                    pass: smtpPassword
-                }
-            });
-
-            // Specify the fields in the email.
-            let mailOptions = {
-                from: senderAddress,
-                to: toAddresses,
-                subject: subject,
-                text: body_text,
-                html: body_html,
-                // Custom headers for configuration set and message tags.
-                headers: {
-                    'X-SES-MESSAGE-TAGS': tag0,
-                    'X-SES-MESSAGE-TAGS': tag1
-                }
-            };
-
-            // Send the email.
-            let info = await transporter.sendMail(mailOptions)
-
-            console.log("Message sent! Message ID: ", info.messageId);
+        let PhoneNumber ="254708374149"
+        let url = `https://${commonHelper.mpesaURL}/mpesa/stkpush/v1/processrequest`
+        let timeStamp =  moment().format('YYYYMMDDHHmmss')
+        let passKey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
+        let encodeString =`${process.env.MPESA_SHORT_CODE}${passKey}${timeStamp}`
+        let password = Buffer.from(encodeString).toString('base64')
+        let request_data = {
+            "BusinessShortCode": process.env.MPESA_SHORT_CODE,
+            "Password": password,
+            "Timestamp":timeStamp,
+            "TransactionType": "CustomerPayBillOnline",
+            "Amount": "1",
+            "PartyA": PhoneNumber,
+            "PartyB": process.env.MPESA_PARTYB,
+            "PhoneNumber": PhoneNumber,
+            "CallBackURL": `${process.env.APP_URL}/confimation`,
+            "AccountReference": "CompanyXLTD",
+            "TransactionDesc": "Payment of X"
         }
-
-        main().catch(console.error);
-
-
-        // let url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
-        // let request_data = {
-        //     "BusinessShortCode": "174379",
-        //     "Password": "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjEwNjMwMTE0ODUw",
-        //     "Timestamp": "20160216165627",
-        //     "TransactionType": "CustomerPayBillOnline",
-        //     "Amount": "1",
-        //     "PartyA": "254721236262",
-        //     "PartyB": "174379",
-        //     "PhoneNumber": "254708374149",
-        //     "CallBackURL": `${process.env.APP_URL}/confimation`,
-        //     "AccountReference": "Test",
-        //     "TransactionDesc": "Test"
-        // }
-        // let req = unirest('POST', url)
-        //     .headers({
-        //         'Content-Type': 'application/json',
-        //         'Authorization': 'Bearer 7vlhEMUahXwCM6a3m1TTXLwprJee'
-        //     })
-        //     .send(JSON.stringify(request_data))
-        //     .end(res => {
-        //         console.log(res.raw_body);
-        //         return { status: true, msg: "safaricom lipesa success" }
-        //     });
+        console.log("module.exports.safaricom_lipesa_simulate -> request_data", request_data)
+        let req = unirest('POST', url)
+            .headers({
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer    '
+            })
+            .send(JSON.stringify(request_data))
+            .end(res => {
+                console.log(res.raw_body);
+                return { status: true, msg: "safaricom lipesa success" }
+            });
     } catch (error) {
         console.log("module.exports.safaricom_payment_authorization -> error", error)
-        return { status: false, msg: "error in safaricom lipesa simulate url" }
+        return { status: false, msg: "Invalid Mpesa express request" }
     }
 }
 
