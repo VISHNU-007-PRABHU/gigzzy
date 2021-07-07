@@ -281,7 +281,7 @@ class Booking_Detail extends React.Component {
                                     <Col span={24}>
                                         <div className="d-flex in_card justify-content-between">
                                             <div>
-                                                Base Fare
+                                                Base Price
                                                  </div>
                                             <div>
                                                 {booking[0] ? booking[0].base_price : ""}
@@ -293,7 +293,7 @@ class Booking_Detail extends React.Component {
                                     <Col span={24}>
                                         <div className="d-flex in_card justify-content-between">
                                             <div>
-                                                Extra Fare
+                                                Extra Price
                                                  </div>
                                             <div>
                                                 {booking[0] ? booking[0].extra_price : ""}

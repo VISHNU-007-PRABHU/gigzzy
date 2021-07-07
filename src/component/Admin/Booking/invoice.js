@@ -72,7 +72,7 @@ class Invoice extends React.Component {
                             <p className="title">Fare Breakup</p>
                             <ul>
                                 <li>
-                                    <label>Base Fare</label>
+                                    <label>Base Price</label>
                                     <span>{booking[0] ? booking[0].base_price : ""}</span>
                                 </li>
                                 {/* <li>
@@ -80,7 +80,7 @@ class Invoice extends React.Component {
                                             <span>ad</span>
                                         </li> */}
                                 <li>
-                                    <label>Extra Fare </label>
+                                    <label>Extra Price </label>
                                     <span>{booking[0] ? booking[0].extra_price : ""}</span>
                                 </li>
                             </ul>
