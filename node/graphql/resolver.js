@@ -668,7 +668,6 @@ const resolvers = {
         manage_booking: async (parent, args) => {
             //console.log("m_b");
             //console.log(args);
-            var stripe = require('stripe')(process.env.SECRET_KEY);
             let booking_detail = await Booking_model.findOne({ _id: args.booking_id });
 
             // role 2 === provider && role 1 === User //
@@ -1040,34 +1039,39 @@ const resolvers = {
                     args['total'] = amount;
                     console.log("osp")
                     try {
-                        var charge = await safaricom.safaricom_lipesa_simulate()
+                        var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number)
                         console.log("charge", charge)
-                        if (charge.status == true && charge.data.ResponseCode === 0) {
-                            // update charge amount 
+                        if (charge.status == true && charge.data.ResponseCode === '0') {
+                            // update charge amount
+                            console.log(charge.data.MerchantRequestID, args.booking_id)
                             var update_booking = await Booking_model.update({ _id: args.booking_id }, {
                                 accept_date: moment.utc().format(),
                                 admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
                                 provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
                                 total: String(parseFloat(args.total).toFixed(2)),
                                 booking_status: 50, // 50 means waiting booking
+                                phone_number:args.phone_number,
                                 // job_status: 10,
                                 // payment_status: 1,
                                 MerchantRequestID: charge.data.MerchantRequestID || 0,
                                 CheckoutRequestID: charge.data.CheckoutRequestID || 0
                             }, { new: true });
+                            var findBooking = await Booking_model.find({ _id: args.booking_id });
+                            data = {
+                                user_parent: true,
+                                ...findBooking,
+                                msg: "user accept the job ",
+                                status: 'success',
+                                msg_status: 'to_provider'
+                            }
+                            // console.log("data", data)
+                            return [data]
+                        }else{
+                            return [{ msg: "Payment failed", status: 'failed' }]
                         }
-                        var findBooking = await Booking_model.find({ _id: args.booking_id });
-                        data = {
-                            user_parent: true,
-                            ...findBooking,
-                            msg: "user accept the job ",
-                            status: 'success',
-                            msg_status: 'to_provider'
-                        }
-                        // console.log("data", data)
-                        return [data]
+                       
                     } catch (err) {
-                        return ({ msg: "Payment failed", status: 'failed' })
+                        return [{ msg: "Payment failed", status: 'failed' }]
                     }
 
 
@@ -1407,19 +1411,39 @@ const remove_demo_acount = new CronJob('* * * * * *', async () => {
     }
 });
 
-const confrimation_call = async function (body) {
+module.exports.confrimation_call = async (body) => {
     return new Promise(async function (resolve, reject) {
         try {
             console.log(body)
             let CheckoutRequestID = body.CheckoutRequestID
-            let update_details = {
-                job_status: 10,
-                booking_status: 10,
-                payment_status: 1,
+            let ResultCode = body["stkCallback"]["ResultCode"]
+            let update_details = { 
+                payment_message :""
             }
-            console.log("CheckoutRequestID", CheckoutRequestID)
-            let booking_detail = await Booking_model.find({ CheckoutRequestID })
-            let booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
+            update_details['resultcode']= ResultCode;
+            if(ResultCode == 1032){
+                update_details['payment_message'] = "You cancelled the MPESA request."
+            }else if(ResultCode == 2001){
+                update_details['payment_message'] = "The PIN you entered was incorrect."
+            }else if(ResultCode == 1037 ){
+                update_details['payment_message'] = "The MPESA request timed out."
+            }else if(ResultCode == 1 ){
+                update_details['payment_message'] = "Insufficient funds"
+            }
+            if(ResultCode != 0){
+                update_details['job_status'] = 11;
+                update_details['booking_status']= 11;
+                let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
+                return resolve({ status: true, msg: "Payment failed !" })
+            }
+            
+            update_details['job_status'] = 10;
+            update_details['booking_status']= 10;
+            update_details['TransactionDate']=  body["stkCallback"]["ResultCode"]["Item"][3]["Value"];
+            update_details['payment_message'] = "Payment success !"
+
+            let booking_detail = await Booking_model.findOne({ CheckoutRequestID })
+            let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
 
             let update_provider_data = {
                 provider_id: booking_detail.provider_id,
@@ -1431,7 +1455,7 @@ const confrimation_call = async function (body) {
             const save = await update_provider.save();
             let data = {
                 user_parent: true,
-                ...booking_detail._doc,
+                ...booking_detail,
                 msg: "user accept the job ",
                 status: 'success',
                 msg_status: 'to_provider'

@@ -69,12 +69,17 @@ var bookingSchema = new Schema({
   booking_alert: { type: Number, default: 0 },
   end_date: Date,
   accept_date: Date,
+  phone_number:{type:String,default:""},
   user_msg_is_read:{type:Number,default:0},
   provider_msg_is_read:{type:Number,default:0},
   user_msg_count:{type:Number,default:0},
   provider_msg_count:{type:String,default:""},
   MerchantRequestID:{ type: String, default: "" },
-
+  CheckoutRequestID:{ type: String, default: "" },
+  resultcode:{ type: String, default: 0 },
+  TransactionDate:Date,
+  MpesaReceiptNumber:{ type: String, default: 0 },
+  payment_message:{type:String,default:""},
 }, schemaOptions);
 
 bookingSchema.virtual('uid').get(function () {

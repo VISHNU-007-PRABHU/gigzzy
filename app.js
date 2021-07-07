@@ -10,7 +10,7 @@ const https = require('https');
 const { ApolloServer, gql, SchemaDirectiveVisitor } = require('apollo-server-express');
 const { defaultFieldResolver, GraphQLString } = require('graphql');
 const { typeDefs } = require('./node/graphql/schema');
-const { resolvers } = require('./node/graphql/resolver');
+const { resolvers,confrimation_call } = require('./node/graphql/resolver');
 const moment = require('moment');
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true, parameterLimit: 5000000 }));
@@ -184,11 +184,12 @@ app.use('/static', express.static(__dirname + '/public'));
 app.post('/confirmation', async (req, res, next) => {
   try {
     console.log(req.body, "ops confirmation")
-    let confirm_data = await resolvers.confrimation_call(req.body)
+    let confirm_data = await confrimation_call(req.body)
     console.log("confirm_data", confirm_data)
     return res.send({ status: true, message: "we reviced confirmation" })
   } catch (error) {
-    return res.send(error.message)
+    // return res.send(error)
+    return res.send({ status: true, message: "we reviced confirmation but error in code" })
   }
 })
 app.post('/validation', async (req, res, next) => {
