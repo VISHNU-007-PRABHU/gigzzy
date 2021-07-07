@@ -237,7 +237,7 @@ class Add_Subcategory extends React.Component {
                                                 {form.getFieldDecorator("service_fee", {
                                                     initialValue: this.state.update_data.service_fee,
                                                     rules: [{ required: true ,message: 'Service Fee is required'}]
-                                                })(<Input placeholder="service Fee" />)}
+                                                })(<Input placeholder="service Fee" addonAfter="%" />)}
                                             </Form.Item>
                                         </Col>
                                         <Col span={24}>

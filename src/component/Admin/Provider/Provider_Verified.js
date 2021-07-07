@@ -88,7 +88,7 @@ class Provider_Verified extends React.Component {
                                 >
                                     <Row gutter={12}>
                                         <Col lg={12} md={24}>
-                                            <Card loading={this.state.loading} title="Personal Document" bordered={false} style={{ borderRadius: "1em", boxShadow: "1px 1px 8px 0px" }}>
+                                            <Card loading={this.state.loading} title="Identification Documents" bordered={false} style={{ borderRadius: "1em", boxShadow: "1px 1px 8px 0px" }}>
                                                 {this.state.data[0] ?
                                                     <ProviderImg img={this.state.data[0]?.personal_document_url} />
                                                     : ''}

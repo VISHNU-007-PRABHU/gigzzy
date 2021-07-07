@@ -187,7 +187,7 @@ class EditableTable extends React.Component {
                 },
             },
             {
-                title: <span>Future</span>,
+                title: <span>Featured</span>,
                 width: '5',
                 render: (text, record) => {
                     return <span title="Future">{
