@@ -73,7 +73,7 @@ var bookingSchema = new Schema({
   user_msg_is_read:{type:Number,default:0},
   provider_msg_is_read:{type:Number,default:0},
   user_msg_count:{type:Number,default:0},
-  provider_msg_count:{type:String,default:""},
+  provider_msg_count:{type:String,default:0},
   MerchantRequestID:{ type: String, default: "" },
   CheckoutRequestID:{ type: String, default: "" },
   resultcode:{ type: String, default: 0 },

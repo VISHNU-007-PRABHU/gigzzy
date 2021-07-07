@@ -201,6 +201,8 @@ const resolvers = {
         payout_setting_detail: settingResolver.payout_setting_detail,
         user_address: userResolver.user_address,
         get_my_appointments: async (parent, args, context, info) => {
+            try{
+
             var data = {}
             //console.log(args);
             var limit = args.limit || 10;
@@ -225,9 +227,13 @@ const resolvers = {
                 }
             }
             const result = await Booking_model.find(data).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
+            console.log("result", result)
             var total = await Booking_model.count(data);
             var pageInfo = { totalDocs: total, page: args.page }
             return { data: result, pageInfo };
+        }catch(error){
+        return { data: [], pageInfo:{totalDocs:0} };
+        }
         },
 
         checkOtp: userResolver.checkOtp,
@@ -1071,6 +1077,7 @@ const resolvers = {
                         }
                        
                     } catch (err) {
+                        console.log("err", err)
                         return [{ msg: "Payment failed", status: 'failed' }]
                     }
 
@@ -1415,7 +1422,7 @@ module.exports.confrimation_call = async (body) => {
     return new Promise(async function (resolve, reject) {
         try {
             console.log(body)
-            let CheckoutRequestID = body.CheckoutRequestID
+            let CheckoutRequestID = body["stkCallback"]["CheckoutRequestID"]
             let ResultCode = body["stkCallback"]["ResultCode"]
             let update_details = { 
                 payment_message :""
@@ -1439,11 +1446,13 @@ module.exports.confrimation_call = async (body) => {
             
             update_details['job_status'] = 10;
             update_details['booking_status']= 10;
-            update_details['TransactionDate']=  body["stkCallback"]["ResultCode"]["Item"][3]["Value"];
+            // update_details['TransactionDate']=  body["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"];
             update_details['payment_message'] = "Payment success !"
 
             let booking_detail = await Booking_model.findOne({ CheckoutRequestID })
-            let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
+            console.log("module.exports.confrimation_call -> update_details", update_details,CheckoutRequestID)
+            let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID:CheckoutRequestID }, update_details)
+            console.log("module.exports.confrimation_call -> update_booking_detail", update_booking_detail)
 
             let update_provider_data = {
                 provider_id: booking_detail.provider_id,
@@ -1451,31 +1460,34 @@ module.exports.confrimation_call = async (body) => {
                 amount: String(booking_detail.provider_fee),
                 booking_status: 10
             };
+            console.log("module.exports.confrimation_call -> update_provider_data", update_provider_data)
             const update_provider = new Payout_model(update_provider_data);
             const save = await update_provider.save();
             let data = {
                 user_parent: true,
-                ...booking_detail,
+                ...booking_detail.data._doc,
                 msg: "user accept the job ",
                 status: 'success',
                 msg_status: 'to_provider'
             }
             // ================= push_notifiy (to provider) ================== //
             let user_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
-            var message = {
-                to: user_detail.device_id,
-                notification: {
-                    title: 'Accept',
-                    body: "User Accept The Job",
-                    click_action: ".activities.HomeActivity",
-                },
-                data: {
-                    my_key: commonHelper.pending,
-                    my_another_key: commonHelper.pending,
-                    booking_id: args.booking_id
-                }
-            };
-            var msg = await commonHelper.push_notifiy(message);
+            if(user_detail &&  user_detail.device_id){
+                var message = {
+                    to: user_detail.device_id,
+                    notification: {
+                        title: 'Accept',
+                        body: "User Accept The Job",
+                        click_action: ".activities.HomeActivity",
+                    },
+                    data: {
+                        my_key: commonHelper.pending,
+                        my_another_key: commonHelper.pending,
+                        booking_id: booking_detail.booking_id
+                    }
+                };
+                var msg = await commonHelper.push_notifiy(message);
+            }
             // ================= push_notifiy ================== //
             const result = await Booking_model.find({ provider_id: booking_detail.provider_id, booking_status: 10 }).sort({ created_at: -1 });
             var appointments_details = await pubsub.publish(APPOINTMENTS, { get_my_appointments: result });
@@ -1483,6 +1495,7 @@ module.exports.confrimation_call = async (body) => {
             return resolve({ status: true, msg: "Payment Is success !", data })
 
         } catch (error) {
+            console.log("module.exports.confrimation_call -> error", error)
             return reject({ status: false, msg: "Payment Is Failed" })
         }
     });

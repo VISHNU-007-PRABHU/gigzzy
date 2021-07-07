@@ -185,10 +185,10 @@ app.post('/confirmation', async (req, res, next) => {
   try {
     console.log(req.body, "ops confirmation")
     let confirm_data = await confrimation_call(req.body)
-    console.log("confirm_data", confirm_data)
+    // console.log("confirm_data", confirm_data)
     return res.send({ status: true, message: "we reviced confirmation" })
   } catch (error) {
-    // return res.send(error)
+    return res.send(error)
     return res.send({ status: true, message: "we reviced confirmation but error in code" })
   }
 })
