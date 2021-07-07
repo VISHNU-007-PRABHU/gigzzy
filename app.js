@@ -184,6 +184,8 @@ app.use('/static', express.static(__dirname + '/public'));
 app.post('/confirmation', async (req, res, next) => {
   try {
     console.log(req.body, "ops confirmation")
+    let confirm_data = await resolvers.confrimation_call(req.body)
+    console.log("confirm_data", confirm_data)
     return res.send({ status: true, message: "we reviced confirmation" })
   } catch (error) {
     return res.send(error.message)

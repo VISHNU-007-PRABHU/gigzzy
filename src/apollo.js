@@ -5,15 +5,18 @@ import { WebSocketLink } from 'apollo-link-ws';
 import { split } from 'apollo-link';
 import { getMainDefinition } from 'apollo-utilities';
 
+const ssl = 'https'
+const socket_ssl = 'wss'
+
 // const uri_link = 'localhost:8990';
 // const uri_link = '192.168.0.33:8844';  GX5wA]6e~/@T&2>]
 const uri_link='gigzzy.com';
-const uri = `https://${uri_link}`;
+const uri = `${ssl}://${uri_link}`;
 
-const links = createUploadLink({ uri: `https://${uri_link}/graphql`, });
+const links = createUploadLink({ uri: `${ssl}://${uri_link}/graphql`, });
 
 const wsLink = new WebSocketLink({
-    uri:`wss://${uri_link}/graphql`,
+    uri:`${socket_ssl}://${uri_link}/graphql`,
     options: {
       reconnect: true,
     }
