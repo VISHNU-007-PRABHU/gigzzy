@@ -70,9 +70,9 @@ const africa = require("africastalking")(credentials);
 const sms = africa.SMS;
 module.exports.send_sms = async () => {
   const options = {
-    to: ['+918526475450', '+917639381739'],
+    to: '+254722343343',
     message: " I work all night and sleep all day",
-    from:"sample"
+    from:"vijayaraj"
 }
   sms
     .send(options)
@@ -80,7 +80,7 @@ module.exports.send_sms = async () => {
       console.log("suc==>",suc);
     })
     .catch((e) => {
-      console.log(e);
+      console.log("e===>",err);
     });
 };
 //============================smsapi===================//

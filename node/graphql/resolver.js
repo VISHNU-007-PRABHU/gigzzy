@@ -171,7 +171,7 @@ const resolvers = {
     // graphql query (find) function
 
     Query: {
-        testmail: userResolver.testinfmail,
+        testmail: commonHelper.send_sms,
         // get data using pagination  
         get_user: userResolver.get_user,
         user_search: userResolver.user_search,
