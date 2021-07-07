@@ -1056,7 +1056,16 @@ const resolvers = {
                                 CheckoutRequestID: charge.data.CheckoutRequestID || 0
                             }, { new: true });
                         }
-
+                        var findBooking = await Booking_model.find({ _id: args.booking_id });
+                        data = {
+                            user_parent: true,
+                            ...findBooking,
+                            msg: "user accept the job ",
+                            status: 'success',
+                            msg_status: 'to_provider'
+                        }
+                        // console.log("data", data)
+                        return [data]
                     } catch (err) {
                         return ({ msg: "Payment failed", status: 'failed' })
                     }
@@ -1410,7 +1419,7 @@ const confrimation_call = async function (body) {
             }
             console.log("CheckoutRequestID", CheckoutRequestID)
             let booking_detail = await Booking_model.find({ CheckoutRequestID })
-            let booking_detail = await Booking_model.updateOne({ CheckoutRequestID },update_details)
+            let booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
 
             let update_provider_data = {
                 provider_id: booking_detail.provider_id,
