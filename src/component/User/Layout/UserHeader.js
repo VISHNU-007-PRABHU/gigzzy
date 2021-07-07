@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import {
   Layout,
@@ -20,6 +20,7 @@ import { useQuery } from "@apollo/react-hooks";
 const { Header } = Layout;
 
 const UserHeader = () => {
+  const location = useLocation();
   const { loading, error, data } = useQuery(GET_SETTING, {});
   const { history } = useReactRouter();
   if (loading)
@@ -41,6 +42,7 @@ const UserHeader = () => {
     console.log(url);
     window.open(url);
   };
+ 
 
   const menu = (
     <Menu>
@@ -151,13 +153,15 @@ const UserHeader = () => {
                 history.push("/");
               }}
             />{"    "}
-              <Button style={{margin:'0px 0px 0px 10px'}}
+
+              {location.pathname==="/about" ? "": <Button style={{margin:'0px 0px 0px 10px'}}
                     onClick={() => {
                       open_new_tab("/about");
                     }}
                   >
                    About us
-                  </Button>
+                  </Button>}
+
             <div className="float-right cursor_point">
               {localStorage.getItem("userLogin") === "success" ? (
                 <Dropdown overlay={menu} placement="bottomRight">
