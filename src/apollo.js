@@ -7,7 +7,8 @@ import { getMainDefinition } from 'apollo-utilities';
 
 const ssl = 'https'
 const socket_ssl = 'wss'
-
+// const ssl = 'http'
+// const socket_ssl = 'ws'
 // const uri_link = 'localhost:8990';
 // const uri_link = '192.168.0.33:8844';  GX5wA]6e~/@T&2>]
 const uri_link='gigzzy.com';
