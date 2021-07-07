@@ -1,19 +1,18 @@
 import React, { Component } from 'react';
 import { withRouter } from "react-router-dom";
-import {
-    CardElement,
-    injectStripe,
-    StripeProvider,
-    Elements,
-} from 'react-stripe-elements';
 import { ACCEPT_JOB_MSG } from '../../../graphql/User/booking';
 import { client } from '../../../apollo';
 import { Form, Button, Spin } from 'antd';
 import { Alert_msg } from '../../Comman/alert_msg';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css'
 class _CardForm extends Component {
     state = {
         errorMessage: '',
         loading: false,
+        phone_number: '',
+        country_code: '',
+        m_no:'',
     };
 
     handleChange = ({ error }) => {
@@ -26,20 +25,21 @@ class _CardForm extends Component {
 
     handleSubmit = async (evt) => {
         evt.preventDefault();
-        // console.log(this.props.stripe)
+        let phone_number = `${this.state.m_no}${this.state.country_code}`
+        if (phone_number) {
+            this.setState({
+                errorMessage: "Please enter correct phone number"
+            });
+            return false
+        }
         this.setState({ loading: true });
-        // if (this.props.stripe) {
-        // await this.props.stripe.createToken().then(async result => {
-        //     if (result.error) {
-        //         this.setState({ errorMessage: result.error.message, loading: false });
-        //     } else {
+
         await client.mutate({
             mutation: ACCEPT_JOB_MSG,
-            variables: { booking_status: 10, booking_id: this.props.data._id, role: 1, stripe_token: "result.token.id" },
+            variables: { booking_status: 10, booking_id: this.props.data._id, role: 1, phone_number: phone_number },
             fetchPolicy: 'no-cache',
         }).then(result => {
             this.setState({ loading: false });
-            // console.log(result);
             if (result.data.manage_booking[0].status === "success") {
                 Alert_msg({ msg: "Job Booking Success", status: "success" });
                 this.props.history.push('/bookings')
@@ -54,32 +54,48 @@ class _CardForm extends Component {
     //     Alert_msg({ msg: "Stripe is not working now ...", status: "failed" });
     // }
 
-render() {
-    return (
-        <div className="CardDemo w-100">
-            <Spin spinning={this.state.loading} className="d-flex justify-content-center mt-4" size="large" >
-                {/* <Form onSubmit={this.handleSubmit}> */}
-                {/* <label className="w-100">
-                            Card details
-                      <CardElement
-                                onChange={this.handleChange}
-                                {...createOptions()}
-                            />
-                        </label>
-                        <div className="error" role="alert">
-                            {this.state.errorMessage}
-                        </div>
-                        <div className="d-flex mx-auto">
-                        </div> */}
-                {/* </Form> */}
-                <Button onClick={this.handleSubmit} className="d-flex mx-auto" type="primary" htmlType="submit">
-                    Accept and Pay
-                </Button>
-            </Spin>
-        </div>
-    );
-}
+    render() {
+        return (
+            <div className="CardDemo w-100">
+                <Spin spinning={this.state.loading} className="d-flex justify-content-center mt-4" size="large" >
+
+                    <label className="w-100">
+                        Mpesa phone number
+                    </label>
+                    <PhoneInput
+                        searchStyle={{ backgroundColor: 'white' }}
+                        placeholder="phone no"
+                        inputClass="input_border"
+                        buttonClass="input_border"
+                        inputStyle={{ height: '46px' }}
+                        country={'ke'}
+                        mask={{ in: '..........' }}
+                        onKeyDown={(event) => {
+                            if (event.keyCode == 13) {
+                                this.handleSubmit();
+                            }
+                        }}
+                        value={this.state.m_no}
+                        onChange={(value, data, event) => {
+                            console.log("render -> value", value)
+                            console.log("render -> m_no: value.replace(/[^0-9]+/g, '').slice(data.dialCode.length)",  value.replace(/[^0-9]+/g, '').slice(data.dialCode.length))
+                            console.log("render -> data.dialCode", data.dialCode)
+                            this.setState({
+                                m_no: value.replace(/[^0-9]+/g, '').slice(data.dialCode.length),
+                                country_code: data.dialCode
+                            });
+                        }} />
+                    <div className="error" role="alert">
+                        {this.state.errorMessage}
+                    </div>
+                    <Button onClick={this.handleSubmit} className="d-flex mx-auto" type="primary" htmlType="submit">
+                        Accept and Pay
+                    </Button>
+                </Spin>
+            </div>
+        );
+    }
 
 }
 
-export default Form.create()(_CardForm);
+export default Form.create()(withRouter(_CardForm));

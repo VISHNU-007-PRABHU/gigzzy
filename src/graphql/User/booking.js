@@ -141,14 +141,14 @@ mutation AcceptJobMutation($role: Int
   $booking_id: ID
   $provider_id: ID
   $booking_status:Int
-  $stripe_token : String
+  $phone_number : String
 ){
   manage_booking(
     role:$role
     booking_id: $booking_id
     provider_id: $provider_id
     booking_status: $booking_status
-    stripe_token : $stripe_token
+    phone_number : $phone_number
   ){
     status
     msg

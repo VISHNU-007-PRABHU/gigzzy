@@ -105,10 +105,12 @@ module.exports.safaricom_ctob_simulate = async (data) => {
     }
 }
 
-module.exports.safaricom_lipesa_simulate = async (data) => {
+module.exports.safaricom_lipesa_simulate = async (PhoneNumber) => {
     return new Promise(async function (resolve, reject) {
         try {
-            let PhoneNumber = "254708374149"
+            if(!PhoneNumber){
+                return reject({ status: false, msg: "Invailed phone number" })
+            }
             let url = `https://${commonHelper.mpesaURL()}/mpesa/stkpush/v1/processrequest`
             let timeStamp = moment().format('YYYYMMDDHHmmss')
             let passKey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
