@@ -25,8 +25,8 @@ class _CardForm extends Component {
 
     handleSubmit = async (evt) => {
         evt.preventDefault();
-        let phone_number = `${this.state.m_no}${this.state.country_code}`
-        if (phone_number) {
+        let phone_number = `${this.state.country_code}${this.state.m_no}`
+        if (!phone_number) {
             this.setState({
                 errorMessage: "Please enter correct phone number"
             });
