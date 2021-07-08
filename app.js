@@ -192,6 +192,7 @@ app.post('/confirmation', async (req, res, next) => {
     return res.send({ status: true, message: "we reviced confirmation but error in code" })
   }
 })
+
 app.post('/validation', async (req, res, next) => {
   try {
     console.log(req.body, "ops validation")

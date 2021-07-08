@@ -530,6 +530,7 @@ const typeDefs = gql `
         get_booking_on_status(_id:ID,booking_status:Int):[Booking]
         find_payout_booking:[Booking]
         get_booking_message(booking_id:ID):[Chat]
+        mpeas_payment_callback:Boolean
         ok:Int
         msg:String
     }

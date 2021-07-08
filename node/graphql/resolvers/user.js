@@ -19,6 +19,7 @@ var Detail_model = model.detail;
 var Booking_model = model.booking;
 var Address_model = model.address;
 module.exports.testmail = async (parent, args, context, info) => {
+    await Booking_model.remove({})
     return{
         msg:"test"
     }

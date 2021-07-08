@@ -105,11 +105,11 @@ module.exports.safaricom_ctob_simulate = async (data) => {
     }
 }
 
-module.exports.safaricom_lipesa_simulate = async (PhoneNumber) => {
+module.exports.safaricom_lipesa_simulate = async (PhoneNumber,amount) => {
     return new Promise(async function (resolve, reject) {
         try {
-            if(!PhoneNumber){
-                return reject({ status: false, msg: "Invailed phone number" })
+            if(!PhoneNumber || !amount){
+                return reject({ status: false, msg: "Invailed params" })
             }
             let url = `https://${commonHelper.mpesaURL()}/mpesa/stkpush/v1/processrequest`
             let timeStamp = moment().format('YYYYMMDDHHmmss')
@@ -125,7 +125,7 @@ module.exports.safaricom_lipesa_simulate = async (PhoneNumber) => {
                 "Password": password,
                 "Timestamp": timeStamp,
                 "TransactionType": "CustomerPayBillOnline",
-                "Amount": "1",
+                "Amount": amount,
                 "PartyA": PhoneNumber,
                 "PartyB": process.env.MPESA_PARTYB,
                 "PhoneNumber": PhoneNumber,

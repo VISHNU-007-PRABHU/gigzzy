@@ -175,7 +175,7 @@ class Bookings extends React.Component {
                 this.booking_subcription(result.data.booking[0]._id);
             });
         }
-        if (this.state.particular_booking[0]?.payment_status === 4) {
+        if (this.state.particular_booking[0]?.payment_status === 4 && !this.state.particular_booking[0]?.mpeas_payment_callback) {
             this.setState({ accept_pay_modal: 1, booking_detail: option })
         } else {
             console.log(this.state.particular_booking[0].booking_status, 'vis');

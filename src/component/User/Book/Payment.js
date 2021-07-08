@@ -88,7 +88,7 @@ class _CardForm extends Component {
                     <div className="error" role="alert">
                         {this.state.errorMessage}
                     </div>
-                    <Button onClick={this.handleSubmit} className="d-flex mx-auto" type="primary" htmlType="submit">
+                    <Button onClick={this.handleSubmit} className="mt-3 mx-auto" type="primary" htmlType="submit">
                         Accept and Pay
                     </Button>
                 </Spin>
