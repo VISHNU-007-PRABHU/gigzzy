@@ -12,7 +12,7 @@ class _CardForm extends Component {
         loading: false,
         phone_number: '',
         country_code: '',
-        m_no:'',
+        m_no: '',
     };
 
     handleChange = ({ error }) => {
@@ -78,7 +78,7 @@ class _CardForm extends Component {
                         value={this.state.m_no}
                         onChange={(value, data, event) => {
                             console.log("render -> value", value)
-                            console.log("render -> m_no: value.replace(/[^0-9]+/g, '').slice(data.dialCode.length)",  value.replace(/[^0-9]+/g, '').slice(data.dialCode.length))
+                            console.log("render -> m_no: value.replace(/[^0-9]+/g, '').slice(data.dialCode.length)", value.replace(/[^0-9]+/g, '').slice(data.dialCode.length))
                             console.log("render -> data.dialCode", data.dialCode)
                             this.setState({
                                 m_no: value.replace(/[^0-9]+/g, '').slice(data.dialCode.length),
@@ -88,9 +88,11 @@ class _CardForm extends Component {
                     <div className="error" role="alert">
                         {this.state.errorMessage}
                     </div>
-                    <Button onClick={this.handleSubmit} className="mt-3 mx-auto" type="primary" htmlType="submit">
-                        Accept and Pay
-                    </Button>
+                    <div className="d-flex justify-content-center">
+                        <Button onClick={this.handleSubmit} className="mt-3 mx-auto" type="primary" htmlType="submit">
+                            Accept and Pay
+                        </Button>
+                    </div>
                 </Spin>
             </div>
         );

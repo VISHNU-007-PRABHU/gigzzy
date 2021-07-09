@@ -182,7 +182,7 @@ class Description extends React.Component {
 
         console.log(this.props.location);
         this.setState({ user: JSON.parse(localStorage.getItem('user')).name });
-        Geocode.setApiKey("AIzaSyCSU1q0Xi_lp-pgthdS370X33k3eza9Bu0");
+        Geocode.setApiKey("AIzaSyDYRYnxipjEBUNazDUwUa_8BDvm8ON7TIk");
         await Geocode.fromLatLng(this.props.location.state.location[0], this.props.location.state.location[1]).then(
             response => {
                 const address = response.results[0].formatted_address;
@@ -283,7 +283,7 @@ class Description extends React.Component {
             lat: mouse.lat,
             lng: mouse.lng
         });
-        Geocode.setApiKey("AIzaSyCSU1q0Xi_lp-pgthdS370X33k3eza9Bu0");
+        Geocode.setApiKey("AIzaSyDYRYnxipjEBUNazDUwUa_8BDvm8ON7TIk");
         // Get address from latidude & longitude.
         await Geocode.fromLatLng(mouse.lat, mouse.lng).then(
             response => {
@@ -564,7 +564,7 @@ class Description extends React.Component {
                                             </div>
                                             <div style={{ height: '200px', width: '100%' }}>
                                                 <GoogleMapReact
-                                                    bootstrapURLKeys={{ key: 'AIzaSyCSU1q0Xi_lp-pgthdS370X33k3eza9Bu0' }}
+                                                    bootstrapURLKeys={{ key: 'AIzaSyDYRYnxipjEBUNazDUwUa_8BDvm8ON7TIk' }}
                                                     center={this.state.add_booking[0] ?.location.coordinates}
                                                     defaultZoom={18}
                                                     options={createMapOptions}
@@ -594,7 +594,7 @@ class Description extends React.Component {
                                             </div>
                                             <div style={{ height: '200px', width: '100%' }}>
                                                 <GoogleMapReact
-                                                    bootstrapURLKeys={{ key: 'AIzaSyCSU1q0Xi_lp-pgthdS370X33k3eza9Bu0' }}
+                                                    bootstrapURLKeys={{ key: 'AIzaSyDYRYnxipjEBUNazDUwUa_8BDvm8ON7TIk' }}
                                                     defaultCenter={this.props.center}
                                                     defaultZoom={this.props.zoom}
                                                     options={createMapOptions}

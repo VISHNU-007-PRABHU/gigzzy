@@ -17,7 +17,7 @@ import '../../../scss/Category.scss';
 import { Alert_msg } from '../../Comman/alert_msg';
 const { Content } = Layout;
 const { Title } = Typography;
-Geocode.setApiKey("AIzaSyCSU1q0Xi_lp-pgthdS370X33k3eza9Bu0");
+Geocode.setApiKey("AIzaSyDYRYnxipjEBUNazDUwUa_8BDvm8ON7TIk");
 
 
 class Add_User extends React.Component {
