@@ -18,7 +18,7 @@ import Geocode from "react-geocode";
 const { Content } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
-Geocode.setApiKey("AIzaSyAGrEFJAlE0jS2JyTyTZ83sz9Oz2-e-NvE");
+Geocode.setApiKey("AIzaSyCSU1q0Xi_lp-pgthdS370X33k3eza9Bu0");
 
 
 class Add_Provider extends React.Component {
