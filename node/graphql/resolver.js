@@ -561,8 +561,6 @@ const resolvers = {
         pay_admin_to_provider: bookingResolver.pay_admin_to_provider,
         //add new booking
         add_booking: async (parent, args, context, info) => {
-            console.log(__dirname);
-            console.log(args);
             var img = [];
             if (args.file != '' && args.file != undefined) {
                 for (let i = 0; i < args.file.length; i++) {
@@ -635,6 +633,10 @@ const resolvers = {
             args['base_price'] = String(parseFloat(category.base_price).toFixed(2));
             args['hour_price'] = String(parseFloat(category.hour_price).toFixed(2));
             args['hour_limit'] = category.hour_limit;
+            args['day_price'] = String(parseFloat(category.day_price).toFixed(2));
+            args['day_limit'] = category.day_limit;
+            args['price_type'] = category.price_type;
+
             args['booking_ref'] = String(Math.floor(1000 + Math.random() * 9000));
             args['job_status'] = 12;
             let add_booking = new Booking_model(args);
@@ -911,7 +913,7 @@ const resolvers = {
                     }
                 } else if (args.booking_status == 13) {
                     var end_data = {}
-                    //console.log("sdjf")
+                    // provider end the job (13)
                     end_data = { job_status: 13, booking_status: 13, jobEnd_time: moment.utc().format() };
                     var end_result = await Booking_model.update({ _id: args.booking_id }, end_data, { new: true });
                     var job_result = await Booking_model.findOne({ _id: args.booking_id });
@@ -926,24 +928,38 @@ const resolvers = {
                         var final_payment = Number(final_payment);
                         var provider_fee = Number(job_result.provider_fee);
                         var extra_hour_price = Number(job_result.extra_hour_price);
-                        if (hour > 0) {
-                            // console.log("hujbs");
-                            let hour_amount = Number(hour) * Number(job_result.hour_price);                  // extra hour *  hour fee
-                            provider_fee += Number(hour_amount);                                         // update provider fee (add hour fee in provider amount)
-                            total += Number(hour_amount);
-                            final_payment += Number(hour_amount);                                        // update total fee (add hour fee in total amount)
-                            extra_hour_price += Number(hour_amount);
+                        if(job_result.price_type === "day"){
+                            // day vice job
+                            var process_days = parseInt(duration.asDays());
+                            if(process_days > 0){
+                                var days = (Number(process_days)+1) - Number(job_result.day_limit);           //extra day
+                                console.log("days", days)
+                                let day_amount = Number(days) * Number(job_result.day_price);                  // extra day *  hour fee
+                                console.log("day_amount", day_amount)
+                                provider_fee += Number(day_amount);                                         // update provider fee (add hour fee in provider amount)
+                                total += Number(day_amount);
+                                final_payment += Number(day_amount);                                        // update total fee (add hour fee in total amount)
+                                extra_hour_price += Number(day_amount);
+                            }
+                        }else if(job_result.price_type === "hour"){
+                            if (hour > 0) {
+                                // console.log("hujbs");
+                                let hour_amount = Number(hour) * Number(job_result.hour_price);                  // extra hour *  hour fee
+                                provider_fee += Number(hour_amount);                                         // update provider fee (add hour fee in provider amount)
+                                total += Number(hour_amount);
+                                final_payment += Number(hour_amount);                                        // update total fee (add hour fee in total amount)
+                                extra_hour_price += Number(hour_amount);
+                            }
+                            if (job_minutes > 0) {
+                                // console.log("sknkj");
+                                let one_minutes_fee = Number(job_result.job_hour_price) / 60;                   //calculate 1 minutes base fee
+                                let minutes_amount = job_minutes * one_minutes_fee;                                 // extra minutes *  1 minutes fee
+                                provider_fee += Number(minutes_amount);                          // update provider fee (add minutes fee in provider amount)
+                                total += Number(minutes_amount);                                 // update total fee (add minutes fee in total amount)
+                                final_payment += Number(minutes_amount);                                // update final_payment fee (add hour fee in total amount)
+                                extra_hour_price += Number(minutes_amount);
+                            }
                         }
-                        if (job_minutes > 0) {
-                            // console.log("sknkj");
-                            let one_minutes_fee = Number(job_result.job_hour_price) / 60;                   //calculate 1 minutes base fee
-                            let minutes_amount = job_minutes * one_minutes_fee;                                 // extra minutes *  1 minutes fee
-                            provider_fee += Number(minutes_amount);                          // update provider fee (add minutes fee in provider amount)
-                            total += Number(minutes_amount);                                 // update total fee (add minutes fee in total amount)
-                            final_payment += Number(minutes_amount);                                // update final_payment fee (add hour fee in total amount)
-                            extra_hour_price += Number(minutes_amount);
-                        }
-
                         // console.log(job_result.total);
                         if (Number(total) > (job_result.total)) {
                             await Booking_model.update({ _id: args.booking_id }, {

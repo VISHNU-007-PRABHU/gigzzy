@@ -36,11 +36,14 @@ var bookingSchema = new Schema({
   end_date: String,
   data: [{}],
   base_price: { type: String, default: 0.00 },
-  hour_price: { type: String, default: 0.00 },
+  hour_price: { type: String, default: "0.00" },
   extra_price: { type: String, default: 0.00 },
   extra_price_reason: { type: [String] },
   total: { type: String, default: 0.00 },
-  hour_limit: { type: String, default: 0 },
+  hour_limit: { type: String, default: "0" },
+  price_type: { type: String, default: "job" },
+  day_price: { type: String, default: "0.00" },
+  day_limit: { type: String, default: "0" },
   service_fee: { type: String, default: 0.00 },
   admin_fee: { type: String, default: 0.00 },    //admin fee
   provider_fee: { type: String, default: 0.00 }, //provider fee

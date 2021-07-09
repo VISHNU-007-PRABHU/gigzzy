@@ -163,7 +163,7 @@ class EditableTable extends React.Component {
                 dataIndex: '',
                 width: '10%',
                 render: (text, record) => {
-                    return <span title="Hours Price">{record.hour_price}</span>;
+                    return <span title="Hours Price">{record?.day_price}</span>;
                 }
             },
             {

@@ -61,7 +61,7 @@ function Appointments(props) {
                                                                 <Badge className="px-1" count={data?.user_msg_count} />
                                                             </div>
                                                             <div className="bold" style={{ fontSize: '16px' }}>
-                                                                {data.booking_category[0].category_type === 1 ? data.booking_category[0].category_name : data.booking_category[0].subCategory_name}
+                                                                {data.booking_category[0]?.category_type === 1 ? data.booking_category[0]?.category_name : data.booking_category[0]?.subCategory_name}
                                                             </div>
                                                             <div className="m-0">
                                                                 {data.booking_date}
@@ -71,7 +71,7 @@ function Appointments(props) {
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <img style={{ borderRadius: '1em', boxShadow: '1px 1px 9px grey' }} height="90" width="100" alt='' src={data.booking_category[0].category_type === 1 ? data.booking_category[0].img_url : data.booking_category[0].booking_parent_category[0].img_url} />
+                                                            <img style={{ borderRadius: '1em', boxShadow: '1px 1px 9px grey' }} height="90" width="100" alt='' src={data.booking_category[0]?.category_type === 1 ? data.booking_category[0]?.img_url : data.booking_category[0]?.booking_parent_category[0]?.img_url} />
                                                         </div>
                                                     </Col>
                                                 </Row>

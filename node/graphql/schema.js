@@ -365,6 +365,9 @@ const typeDefs = gql `
         base_price:String  @currency
         hour_price:String  @currency
         hour_limit:String
+        day_price:String  @currency
+        day_limit:String
+        price_type:String
         service_fee:String
         description:String
         img_url:String 
@@ -409,6 +412,9 @@ const typeDefs = gql `
         base_price:String  @currency
         hour_price:String  @currency
         hour_limit:String
+        day_price:String  @currency
+        day_limit:String
+        price_type:String
         img_url:String
         small_img_url:String @imgSize(format:"small")
         service_fee:String 
@@ -574,16 +580,16 @@ const typeDefs = gql `
         reset_password(email:String,password:String,role:Int,id:ID):Detail
         change_parent_bolck(_id:ID,is_block:Boolean):Category
         addStatus( user_id: ID,availability:String, proof_status:String,phone_verification:String, email_verification:String,last_verification:String,lastEmail_verification:String,):Status!
-        addCategory(category_name:String,file:Upload,description:String,base_price:String,hour_price:String,hour_limit:String,service_fee:String,is_parent:Boolean,certificates:[ID]): Category
-        addsubCategory(file: Upload,category_id:ID,subCategory_name:String,base_price:String,hour_price:String,hour_limit:String,service_fee:String,description:String,certificates:[ID]):subCategory
+        addCategory(category_name:String,file:Upload,description:String,base_price:String,hour_price:String,day_price:String,hour_limit:String,day_limit:String,price_type:String,service_fee:String,is_parent:Boolean,certificates:[ID]): Category
+        addsubCategory(file: Upload,category_id:ID,subCategory_name:String,base_price:String,hour_price:String,day_price:String,hour_limit:String,day_limit:String,price_type:String,service_fee:String,description:String,certificates:[ID]):subCategory
         addDetails(_id:ID,email:String,password:String,name:String,address:String,rating:Float,comments:String,lat:Float,lng:Float,profile:String,availability:String,Upload_percentage:String,device_id:String):Detail
         addUser(role:Int,_id:ID,option:String,country_code:String,phone_no:String,email:String,old_password:String,password:String,name:String,provider_subCategoryID:[ID],lat:Float,lng:Float,bank_name:String,ifsc_code:String,account_no:String,device_id:String): Detail!
         addProvider_Category(user_id: ID,provider_subCategoryID:[ID]):Detail
         add_providerDocument(user_id:ID,file:[Upload],option:String):Detail
         delete_providerDocument(user_id:ID,filename:String,option:String):Detail
-        updateCategory(_id:ID,is_block:Boolean,is_future:Boolean,category_name:String,file:Upload,description:String,base_price:String,hour_price:String,hour_limit:String,service_fee:String,is_parent:Boolean,certificates:[ID]):Category
+        updateCategory(_id:ID,is_block:Boolean,is_future:Boolean,category_name:String,file:Upload,description:String,base_price:String,day_price:String,hour_price:String,price_type:String,day_limit:String,hour_limit:String,service_fee:String,is_parent:Boolean,certificates:[ID]):Category
         update_profile(file:Upload,_id:ID):Detail
-        updatesubCategory(_id:ID,is_block:Boolean,is_future:Boolean,file: Upload,_id:ID,category_id:ID,subCategory_name:String,base_price:String,hour_price:String,hour_limit:String,service_fee:String,description:String,certificates:[ID]):subCategory
+        updatesubCategory(_id:ID,is_block:Boolean,is_future:Boolean,file: Upload,_id:ID,category_id:ID,subCategory_name:String,base_price:String,day_price:String,hour_price:String,price_type:String,day_limit:String,hour_limit:String,service_fee:String,description:String,certificates:[ID]):subCategory
         updateAvailability(user_id: ID,weekday:JSON):Detail
         removeAvailability(user_id: ID,weekday:JSON):Detail
         change_proofStatus(user_id: ID,proof_status:String):Detail

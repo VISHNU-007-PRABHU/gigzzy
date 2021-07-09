@@ -1,8 +1,8 @@
 import gql from "graphql-tag";
 
 export const ADD_CATEGORY = gql`
-    mutation ADDCATEGORY($category_name: String,$description: String,$file:Upload,$base_price: String,$hour_price: String,$hour_limit: String,$service_fee: String,$certificates: [ID],$is_parent:Boolean) {
-        addCategory(category_name:$category_name,description:$description,file: $file,base_price: $base_price,hour_price: $hour_price,hour_limit: $hour_limit,service_fee: $service_fee,certificates: $certificates,is_parent:$is_parent){
+    mutation ADDCATEGORY($category_name: String,$description: String,$file:Upload,$base_price: String,$hour_price: String,$hour_limit: String,$day_price: String,$day_limit: String,$service_fee: String,$price_type:String,$certificates: [ID],$is_parent:Boolean) {
+        addCategory(category_name:$category_name,description:$description,file: $file,base_price: $base_price,hour_price: $hour_price,hour_limit: $hour_limit,day_price:$day_price,day_limit:$day_limit,price_type:$price_type,service_fee: $service_fee,certificates: $certificates,is_parent:$is_parent){
             category_name
             _id
             description
@@ -14,8 +14,8 @@ export const ADD_CATEGORY = gql`
 `;
 
 export const UPDATE_CATEGORY = gql`
-    mutation update_Category($_id:ID,$is_block:Boolean,$is_future:Boolean,$category_name:String,$file:Upload,$description:String,$base_price: String,$hour_price: String,$hour_limit: String,$service_fee: String,$is_parent: Boolean,$certificates: [ID]){
-        updateCategory(_id:$_id,is_block:$is_block,is_future:$is_future,category_name:$category_name,file:$file,description:$description,base_price: $base_price,hour_price: $hour_price,hour_limit: $hour_limit,service_fee: $service_fee,certificates: $certificates,is_parent:$is_parent){
+    mutation update_Category($_id:ID,$is_block:Boolean,$is_future:Boolean,$category_name:String,$file:Upload,$description:String,$base_price: String,$hour_price: String,$hour_limit: String,$day_price: String,$day_limit: String,$service_fee: String,$price_type:String,$is_parent: Boolean,$certificates: [ID]){
+        updateCategory(_id:$_id,is_block:$is_block,is_future:$is_future,category_name:$category_name,file:$file,description:$description,base_price: $base_price,hour_price: $hour_price,hour_limit: $hour_limit,day_price:$day_price,day_limit:$day_limit,price_type:$price_type,service_fee: $service_fee,certificates: $certificates,is_parent:$is_parent){
             info
         }
     }
@@ -64,6 +64,9 @@ query FINDCATEGORY($_id:ID) {
         base_price
         hour_price
         hour_limit
+        day_price
+        day_limit
+        price_type
         service_fee
         img_url
         Certificate{

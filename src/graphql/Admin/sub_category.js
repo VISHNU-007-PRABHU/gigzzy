@@ -12,6 +12,9 @@ query GETSUBCATEGORY($limit: Int,$page:Int,$data:JSON) {
         subCategory_name
         base_price
         hour_price
+        day_price
+        day_limit
+        price_type
         is_future
         is_block
         hour_limit
@@ -55,8 +58,8 @@ export const SUBCATEGORY_NAME = gql`
 `;
 
 export const ADD_SUBCATEGORY = gql`
-    mutation ADDSUBCATEGORY($file: Upload,$category_id: ID,$subCategory_name: String,$base_price: String,$hour_price: String,$hour_limit: String,$service_fee: String,$description: String,$certificates: [ID],) {   
-        addsubCategory(file:$file,category_id: $category_id,subCategory_name: $subCategory_name,base_price: $base_price,hour_price: $hour_price,hour_limit: $hour_limit,service_fee: $service_fee
+    mutation ADDSUBCATEGORY($file: Upload,$category_id: ID,$subCategory_name: String,$base_price: String,$hour_price: String,$hour_limit: String,$day_price: String,$day_limit: String,$price_type: String,$service_fee: String,$description: String,$certificates: [ID],) {   
+        addsubCategory(file:$file,category_id: $category_id,subCategory_name: $subCategory_name,base_price: $base_price,hour_price: $hour_price,hour_limit: $hour_limit,day_price:$day_price,day_limit:$day_limit,price_type:$price_type,service_fee: $service_fee
         ,description: $description,certificates: $certificates,){
             info
         }
@@ -64,8 +67,8 @@ export const ADD_SUBCATEGORY = gql`
 `;
 
 export const UPDATE_SUBCATEGORY = gql`
-    mutation UPDATESUBCATEGORY($_id:ID,$is_block:Boolean,$is_future:Boolean,$file: Upload,$category_id: ID,$subCategory_name: String,$base_price: String,$hour_price: String,$hour_limit: String,$service_fee: String,$description: String,$certificates: [ID],) {   
-        updatesubCategory(_id:$_id,is_block:$is_block,is_future:$is_future,file:$file,category_id: $category_id,subCategory_name: $subCategory_name,base_price: $base_price,hour_price: $hour_price,hour_limit: $hour_limit,service_fee: $service_fee
+    mutation UPDATESUBCATEGORY($_id:ID,$is_block:Boolean,$is_future:Boolean,$file: Upload,$category_id: ID,$subCategory_name: String,$base_price: String,$hour_price: String,$day_price: String,$day_limit: String,$hour_limit: String,$service_fee: String,$description: String,$certificates: [ID],$price_type:String) {   
+        updatesubCategory(_id:$_id,is_block:$is_block,is_future:$is_future,file:$file,category_id: $category_id,subCategory_name: $subCategory_name,base_price: $base_price,hour_price: $hour_price,hour_limit: $hour_limit,day_price:$day_price,day_limit:$day_limit,price_type:$price_type,service_fee: $service_fee
         ,description: $description,certificates: $certificates,){
             info
         }
@@ -82,6 +85,9 @@ query FINDSUBCATEGORY($_id:ID) {
         base_price
         hour_price
         hour_limit
+        day_price
+        day_limit
+        price_type
         service_fee
         description
         img_url
