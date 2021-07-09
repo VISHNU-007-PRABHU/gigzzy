@@ -34,14 +34,14 @@ siteSchema.virtual('site_logo').get(function () {
   if (this.img_logo) {
     return commonHelper.getBaseurl() + '/images/public/' + this.img_logo
   } else {
-    return env.APP_URL + '/images/public/no_img.jpg';
+    return env.APP_URL + '/images/public/no_img.png';
   }
 });
 siteSchema.virtual('site_icon').get(function () {
   if (this.img_icon) {
     return commonHelper.getBaseurl() + '/images/public/' + this.img_icon
   } else {
-    return env.APP_URL + '/images/public/no_img.jpg';
+    return env.APP_URL + '/images/public/no_img.png';
   }
 });
 

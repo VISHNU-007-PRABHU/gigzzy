@@ -177,7 +177,7 @@ ReactDOM.render(
           <Route exact path="/about" component={About} />
           <Route exact path="/terms" component={Terms_Page} />
           <Route exact path="/why_gigzzy" component={why_gigzzy}/>
-          <Route exact path="/hiring_guide" component={Hiring_guide}/>
+          <Route exact path="/professional_screening_process" component={Hiring_guide}/>
           <Route exact path="/faq" component={Faq}/>
 
 

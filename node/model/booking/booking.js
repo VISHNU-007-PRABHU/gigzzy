@@ -108,7 +108,7 @@ bookingSchema.virtual('user_image_url').get(function () {
     return img
   } else {
     var img = [];
-    var data = commonHelper.getBaseurl() + '/images/public/no_img.jpg';
+    var data = commonHelper.getBaseurl() + '/images/public/no_img.png';
     img.push(data);
     return img;
   }

@@ -540,6 +540,9 @@ class Bookings extends React.Component {
                                 <div className={this.state.accept_pay_modal ? "price_section px-3 d-flex" : "d-none"}>
                                     <CompletePayment handleResult={this.handleResult} data={this.state.particular_booking[0] ? this.state.particular_booking[0] : ""} />
                                 </div>
+                                <div className={this.state.particular_booking[0]?.mpeas_payment_callback ? "d-flex" : "d-none"}>
+                                        <p> Waiting for your payment is processing.</p>                 
+                                </div>
                                 <div className={this.state.complete_button ? "price_section px-3 d-flex" : "d-none"}>
                                     <Button type="primary" className="w-100 mt-3" onClick={() => { this.complete_job(this.state.particular_booking[0]._id) }}>Complete</Button>
                                 </div>

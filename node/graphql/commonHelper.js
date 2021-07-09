@@ -18,7 +18,7 @@ module.exports.chat = 4;
 module.exports.booking_view = 5;
 
 module.exports.no_image = () => {
-  return env.APP_URL + "/images/public/no_img.jpg";
+  return env.APP_URL + "/images/public/no_img.png";
 };
 module.exports.siteName = () => {
   return env.APP_NAME;

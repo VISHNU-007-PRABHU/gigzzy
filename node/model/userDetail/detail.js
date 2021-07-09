@@ -65,7 +65,7 @@ detailSchema.virtual('img_url').get(function () {
   if (this.image) {
     return commonHelper.getBaseurl() + '/images/user/profile/' + this.image
   } else {
-    return env.APP_URL + '/images/public/no_img.jpg';
+    return env.APP_URL + '/images/public/no_img.png';
 
   }
 });
@@ -80,7 +80,7 @@ detailSchema.virtual('personal_document_url').get(function () {
     return img
   } else {
     var img = [];
-    var data = commonHelper.getBaseurl() + '/images/public/no_img.jpg';
+    var data = commonHelper.getBaseurl() + '/images/public/no_img.png';
     img.push(data);
     return img;
   }
@@ -96,7 +96,7 @@ detailSchema.virtual('professional_document_url').get(function () {
     return img
   } else {
     var img = [];
-    var data = commonHelper.getBaseurl() + '/images/public/no_img.jpg';
+    var data = commonHelper.getBaseurl() + '/images/public/no_img.png';
     img.push(data);
     return img;
   }

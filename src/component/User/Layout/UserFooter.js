@@ -93,8 +93,8 @@ const UserFooter = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/hiring_guide" target="_blank" className="mr-1">
-                    Hiring Guide
+                  <Link to="/professional_screening_process" target="_blank" className="mr-1">
+                      Professional Screening Process
                   </Link>
                 </li>
                 <li>

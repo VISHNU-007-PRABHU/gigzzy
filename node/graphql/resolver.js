@@ -1410,10 +1410,16 @@ module.exports.confrimation_call = async (body) => {
             let pre_booking_detail = await Booking_model.findOne({ CheckoutRequestID }).lean()
 
             if (ResultCode != 0) {
-                update_details['job_status'] = 11;
-                update_details['booking_status'] = 11;
-                let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
-                return resolve({ status: true, msg: "Payment failed !" })
+                if(pre_booking_detail.booking_status === 13){
+                    update_details['mpeas_payment_callback'] = false;
+                    let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
+                    return resolve({ status: true, msg: "Final Payment failed !" })
+                }else{
+                    update_details['job_status'] = 11;
+                    update_details['booking_status'] = 11;
+                    let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
+                    return resolve({ status: true, msg: "Payment failed !" })
+                }
             }
 
             if(pre_booking_detail.booking_status === 13){
@@ -1502,18 +1508,5 @@ module.exports.confrimation_call = async (body) => {
 
 remove_demo_acount.start();
 module.exports.resolvers = resolvers;
-
-
-
-// } else {
-//     data = {
-//         user_parent: true,
-//         ...booking_detail._doc,
-//         msg: "Payment Is Failed",
-//     }
-//     res = [{ job_status: 14, msg: "job is completed failed", status: 'failed' }];
-// }
-//     });
-// };
 
 
