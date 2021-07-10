@@ -67,7 +67,7 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([PROOF_STATUS]),
                 (payload, variables) => {
-                    console.log(payload);
+                    // console.log(payload);
                     if (payload.proof_status._id == variables._id) {
                         return true;
                     }
@@ -227,7 +227,7 @@ const resolvers = {
                     }
                 }
                 const result = await Booking_model.find(data).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
-                console.log("result", result)
+                // console.log("result", result)
                 var total = await Booking_model.count(data);
                 var pageInfo = { totalDocs: total, page: args.page }
                 return { data: result, pageInfo };
@@ -371,7 +371,7 @@ const resolvers = {
                         if (!check_category) {
                             args.proof_status = 0;
                             var msg = "please wait for admin confrimation in new category";
-                            console.log('true')
+                            // console.log('true')
                             // ================= push_notifiy ================== //
                             var message = {
                                 to: user_deails.device_id,
@@ -565,8 +565,6 @@ const resolvers = {
             if (args.file != '' && args.file != undefined) {
                 for (let i = 0; i < args.file.length; i++) {
                     const { createReadStream, filename } = await args.file[i];
-                    console.log("vishnu")
-                    console.log(filename);
                     if (filename != undefined) {
                         var file_name = moment().unix() + "_" + filename;
                         await new Promise(res =>
@@ -933,9 +931,7 @@ const resolvers = {
                             var process_days = parseInt(duration.asDays());
                             if(process_days > 0){
                                 var days = (Number(process_days)+1) - Number(job_result.day_limit);           //extra day
-                                console.log("days", days)
                                 let day_amount = Number(days) * Number(job_result.day_price);                  // extra day *  hour fee
-                                console.log("day_amount", day_amount)
                                 provider_fee += Number(day_amount);                                         // update provider fee (add hour fee in provider amount)
                                 total += Number(day_amount);
                                 final_payment += Number(day_amount);                                        // update total fee (add hour fee in total amount)
@@ -1089,12 +1085,12 @@ const resolvers = {
                             // console.log("data", data)
                             return [data]
                         } else {
-                            return [{ msg: "Payment failed", status: 'failed' }]
+                            return [{ msg: "Payment charge failed", status: 'failed' }]
                         }
 
                     } catch (err) {
                         console.log("err", err)
-                        return [{ msg: "Payment failed", status: 'failed' }]
+                        return [{ msg: "Booking Payment failed", status: 'failed' }]
                     }
 
 
@@ -1170,7 +1166,7 @@ const resolvers = {
                     var final_job = await Booking_model.findOne({ _id: args.booking_id });
                     // console.log(final_job);
                     // console.log(Number(final_job.final_payment));
-                    console.log(parseFloat(Number(final_job.final_payment) * 100).toFixed(0));
+                    // console.log(parseFloat(Number(final_job.final_payment) * 100).toFixed(0));
                     if (final_job.payment_status == 4) {
                         var res = []
                         let admin_fee = (final_job.service_fee / 100) * final_job.final_payment;              // store admin fee  ....
@@ -1429,12 +1425,12 @@ module.exports.confrimation_call = async (body) => {
                 if(pre_booking_detail.booking_status === 13){
                     update_details['mpeas_payment_callback'] = false;
                     let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
-                    return resolve({ status: true, msg: "Final Payment failed !" })
+                    return resolve({ status: true, msg: "Mpesa Final Payment failed !" })
                 }else{
                     update_details['job_status'] = 11;
                     update_details['booking_status'] = 11;
                     let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
-                    return resolve({ status: true, msg: "Payment failed !" })
+                    return resolve({ status: true, msg: "Mpesa Payment failed !" })
                 }
             }
 
