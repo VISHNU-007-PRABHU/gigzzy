@@ -24,11 +24,13 @@ var safaricom_payment_authorization =async function (data){
                 .send()
                 .end(async res => {
                     if (res.error) {
+                        console.log("mpesa res.error", res.error)
                         return reject({ status: false, msg: "error in safaricom payment authorization" })
                     }
                     return resolve({ status: true, msg: "success in safaricom payment authorization", data: JSON.parse(res.raw_body) })
                 });
         } catch (error) {
+            console.log("mpesa authu error", error)
             return reject({ status: false, msg: "error in safaricom payment authorization" })
         }
     })
