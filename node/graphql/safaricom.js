@@ -143,6 +143,7 @@ module.exports.safaricom_lipesa_simulate = async (PhoneNumber,amount) => {
                 .send(JSON.stringify(request_data))
                 .end((res) => {
                     if (res.error) {
+                        console.log("module.exports.safaricom_lipesa_simulate -> res.error", res.error)
                         return reject({ status: false, msg: "safaricom Mpesa express failed" })
                     }
                     return resolve({ status: true, msg: "safaricom lipesa success", data: JSON.parse(res.raw_body) })
