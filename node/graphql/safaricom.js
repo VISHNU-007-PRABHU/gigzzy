@@ -131,7 +131,7 @@ module.exports.safaricom_lipesa_simulate = async (PhoneNumber, amount) => {
                 "PartyA": PhoneNumber,
                 "PartyB": process.env.MPESA_PARTYB,
                 "PhoneNumber": PhoneNumber,
-                "CallBackURL": `${process.env.MPESA_CALLBACK_URL}/confimation`,
+                "CallBackURL": `${process.env.MPESA_CALLBACK_URL}/confirmation`,
                 "AccountReference": "CompanyXLTD",
                 "TransactionDesc": "Payment of X"
             }
