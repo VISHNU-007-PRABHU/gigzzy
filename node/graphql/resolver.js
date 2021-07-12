@@ -1403,6 +1403,7 @@ const remove_demo_acount = new CronJob('* * * * * *', async () => {
 module.exports.confrimation_call = async (body) => {
     return new Promise(async function (resolve, reject) {
         try {
+            console.log("module.exports.confrimation_call -> body", body)
             let CheckoutRequestID = body["stkCallback"]["CheckoutRequestID"]
             let ResultCode = body["stkCallback"]["ResultCode"]
             let update_details = {
