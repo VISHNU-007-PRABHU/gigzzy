@@ -182,6 +182,7 @@ app.use('/static', express.static(__dirname + '/public'));
 app.post('/confirmation', async (req, res, next) => {
   try {
     console.log(req.body, "ops confirmation")
+    console.log(req.body['Result']['stkCallback'])
     let confirm_data = await confrimation_call(req.body)
     // console.log("confirm_data", confirm_data)
     return res.send({ status: true, message: "we reviced confirmation" })
@@ -204,6 +205,8 @@ app.post('/validation', async (req, res, next) => {
 app.post('/cancelled', async (req, res, next) => {
   try {
     console.log(req.body, "ops cancelled")
+    console.log(req.body['Result']['ReferenceData']['ReferenceItem'], "ops cancelled")
+
     return res.send({ status: true, message: "we reviced cancelled" })
   } catch (error) {
     return res.send(error.message)
