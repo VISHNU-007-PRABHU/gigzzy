@@ -210,6 +210,13 @@ app.post('/confirmation', async (req, res, next) => {
     return res.send({ status: true, message: "we reviced confirmation" })
   } catch (error) {
     console.log("confirmation error", error)
+
+    fs.writeFile("./testresponse_error", JSON.stringify(error), function(err) {
+      if(err) {
+          return console.log(err);
+      }
+      console.log("The file was saved!");
+  }); 
     return res.send(error)
     return res.send({ status: true, message: "we reviced confirmation but error in code" })
   }
