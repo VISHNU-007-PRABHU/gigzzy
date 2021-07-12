@@ -1439,11 +1439,13 @@ module.exports.confrimation_call = async (body) => {
                 update_details['payment_status']= 5,
                 update_details['booking_status']= 14,
                 update_details['job_status']= 14,
+                update_details['MpesaReceiptNumber'] = body["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"];
                 update_details['TransactionDate']=  body["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"];
                 update_details['payment_message'] = "job is completed successfully !"
             }else{
                 update_details['job_status'] = 10;
                 update_details['booking_status'] = 10;
+                update_details['MpesaReceiptNumber'] = body["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"];
                 update_details['TransactionDate']=  body["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"];
                 update_details['payment_message'] = "Payment success !"
             }
