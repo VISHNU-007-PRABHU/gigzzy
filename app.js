@@ -182,8 +182,44 @@ app.use('/static', express.static(__dirname + '/public'));
 app.post('/confirmation', async (req, res, next) => {
   try {
     console.log(req.body, "ops confirmation")
-    console.log(req.body['Result']['stkCallback'])
+    var json = JSON.stringify(req.body);
+
+    fs.writeFile("./testresponse", json, function(err) {
+      if(err) {
+          return console.log(err);
+      }
+      console.log("The file was saved!");
+  }); 
+    console.log(req.body['stkCallback'])
+    console.log(req.body['CallbackMetadata'])
+
+    fs.writeFile("./testresponse_depth", JSON.stringify(req.body['stkCallback']), function(err) {
+      if(err) {
+          return console.log(err);
+      }
+      console.log("The file was saved!");
+  }); 
+  fs.writeFile("./testresponse_depth_test", JSON.stringify(req.body['CallbackMetadata']), function(err) {
+    if(err) {
+        return console.log(err);
+    }
+    console.log("The file was saved!");
+}); 
     let confirm_data = await confrimation_call(req.body)
+    // console.log("confirm_data", confirm_data)
+    return res.send({ status: true, message: "we reviced confirmation" })
+  } catch (error) {
+    console.log("confirmation error", error)
+    return res.send(error)
+    return res.send({ status: true, message: "we reviced confirmation but error in code" })
+  }
+})
+
+app.post('/refund_confirmation', async (req, res, next) => {
+  try {
+    console.log(req.body, "refund_confirmation confirmation")
+    console.log(req.body['Result']['stkCallback'])
+    // let confirm_data = await confrimation_call(req.body)
     // console.log("confirm_data", confirm_data)
     return res.send({ status: true, message: "we reviced confirmation" })
   } catch (error) {
