@@ -188,6 +188,7 @@ app.post('/confirmation', async (req, res, next) => {
     // console.log("confirm_data", confirm_data)
     return res.send({ status: true, message: "we reviced confirmation" })
   } catch (error) {
+    console.log("confirmation error", error)
     return res.send(error)
     return res.send({ status: true, message: "we reviced confirmation but error in code" })
   }
