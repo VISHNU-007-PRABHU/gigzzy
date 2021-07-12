@@ -124,8 +124,6 @@ bookingSchema.virtual('start_job_image_url').get(function () {
       var data = commonHelper.getBaseurl() + '/images/booking/' + this.start_job_image[i]
       img.push(data);
     }
-    console.log("str 0");
-    console.log(img);
     return img
   } else {
     var img = [];

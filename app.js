@@ -107,7 +107,7 @@ class currencyDirective extends SchemaDirectiveVisitor {
       const date = await resolve.call(this, source, otherArgs, context, info);
       // If a format argument was not provided, default to the optional
       // defaultFormat argument taken by the @date directive:
-      console.log(`${getSymbolFromCurrency(format || defaultFormat)}${date}`);
+      // console.log(`${getSymbolFromCurrency(format || defaultFormat)}${date}`);
       return `${getSymbolFromCurrency(format || defaultFormat)}${date}`;
     };
 
@@ -154,8 +154,6 @@ const server = new ApolloServer({
 server.applyMiddleware({ app });
 
 const buildPath = path.join(__dirname, '..', 'build');
-console.log("buildPath")
-console.log("buildPath", buildPath)
 app.use(
   '/',
   expressStaticGzip('./build', {
@@ -214,10 +212,10 @@ app.post('/cancelled', async (req, res, next) => {
 
 app.use(async (req, res, next) => {
   const url = req.url;
-  console.log(url);
+  // console.log(url);
   const uriArray = url.split('/');
   if (uriArray[1] !== 'graphql' && uriArray[1] !== "confirmation" && uriArray[1] !== "validation" && uriArray[1] !== "cancelled") {
-    console.log("react run");
+    // console.log("react run");
     const readFile = util.promisify(fs.readFile)
     try {
 
@@ -230,7 +228,7 @@ app.use(async (req, res, next) => {
   }
   else if (uriArray[1] == 'node') {
     try {
-      console.log(cwd + url);
+      // console.log(cwd + url);
     } catch (error) {
       return res.send(error.message)
     }

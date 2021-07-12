@@ -26,7 +26,6 @@ const messageSchema = mongoose.Schema({
 messageSchema.pre('save', function (next) {
     // get the current date
     var currentDate = moment.utc();
-    console.log(currentDate);
     this.updated_at = currentDate;
     if (!this.created_at) {
           this.created_at = currentDate;
