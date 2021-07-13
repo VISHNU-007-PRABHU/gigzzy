@@ -15,8 +15,8 @@ var serverKey =
 var fcm = new FCM(serverKey);
 const env = process.env;
 const africa = require("africastalking")({
-  apiKey: "ae2349e17fddbb993e1316693d2bf577a201391481b3baa36df8830579737906",
-  username: "sandbox",
+  apiKey: process.env.AFRICASTALKING_API_KEY,
+  username: process.env.AFRICASTALKING_API_USERNAME,
 });
 const sms = africa.SMS;
 
@@ -97,7 +97,6 @@ module.exports.send_sms = async (phone_no, msg) => {
 //============================smsapi===================//
 
 
-//============================mailapi==================//
 module.exports.send_mail = async (email, otp) => {
   // Create the SMTP transport.
   let transporter = nodemailer.createTransport({
@@ -124,44 +123,6 @@ module.exports.send_mail = async (email, otp) => {
   let info = await transporter.sendMail(mailOptions)
   console.log("Message sent! Message ID: ", info.messageId);
 }
-//==================================================================//
-
-module.exports.sendmail = async (email, otp) => {
-  // console.log('vis',email,otp);
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: true,
-    auth: {
-      user: "emepedia2020@gmail.com",
-      pass: "@Vinya2017",
-    },
-    tls: {
-      // do not fail on invalid certs
-      rejectUnauthorized: false,
-    },
-  });
-  let mailOptions = {
-    from: "info@gigzzy.com",
-    to: email, // list of receivers
-    subject: "GIGZZY OTP ✔", // Subject line
-    text: "OTP?", // plain text body
-    html: `<b>GIGZZY OTP : ${otp} </b>`, // html body
-    // subject:strtr(admin_email.subject, req.data), // Subject line
-    // html: mail_content // html body
-  };
-
-  await transporter.sendMail(mailOptions, (error, info) => {
-    console.log(error, info, mailOptions);
-    if (error) {
-      console.error(error);
-      return false;
-    } else {
-      console.error(info);
-      return true;
-    }
-  });
-};
 
 
 module.exports.send_mail_1 = async (email, msg) => {
