@@ -159,9 +159,9 @@ module.exports.safaricom_lipesa_simulate = async (PhoneNumber, amount) => {
 module.exports.safaricom_refund_simulate = async (PhoneNumber, amount,transactionID) => {
     return new Promise(async function (resolve, reject) {
         try {
-            if (!PhoneNumber || !amount) {
-                return reject({ status: false, msg: "Invailed params" })
-            }
+            // if (!PhoneNumber || !amount) {
+            //     return reject({ status: false, msg: "Invailed params" })
+            // }
             let url = `https://${commonHelper.mpesaURL()}/mpesa/reversal/v1/request`
             let timeStamp = moment().format('YYYYMMDDHHmmss')
             let passKey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
@@ -170,30 +170,22 @@ module.exports.safaricom_refund_simulate = async (PhoneNumber, amount,transactio
             if (token && !token.status) {
                 return reject({ status: false, msg: "safaricom Mpesa express failed" })
             }
-            let password = Buffer.from(encodeString).toString('base64')
+            let password = Buffer.from(`${process.env.MPESA_CONSUMERKEY}:${process.env.MPESA_CONSUMERSECRET}`).toString('base64')
+
             let request_data = {
-                "Initiator": "",
-                "SecurityCredential": "",
-                "CommandID": "",
-                "TransactionID": transactionID,
-                "Amount":amount,
-                "ReceiverParty": "",
-                "ReceiverIdentifierType": "",
-                "QueueTimeOutURL":  `${process.env.MPESA_CALLBACK_URL}/refund_timeout`,
-                "ResultURL":  `${process.env.MPESA_CALLBACK_URL}/refund_confimation`,
+                "Initiator": "testapi",
+                "SecurityCredential": password,
+                "CommandID": "TransactionReversal",
+                "TransactionID": "transactionID",
+                "Amount":"1",
+                "ReceiverParty": "174379",
+                "ReceiverIdentifierType": "11",
+                // "QueueTimeOutURL":  `${process.env.MPESA_CALLBACK_URL}/refund_timeout`,
+                // "ResultURL":  `${process.env.MPESA_CALLBACK_URL}/refund_confimation`,
+                "QueueTimeOutURL":  `https://mydomain.com/Reversal/queue/`,
+                "ResultURL":  `https://mydomain.com/Reversal/queue/`,
                 "Remarks": "test refund",
                 "Occassion": "Test occassion",
-                "BusinessShortCode": process.env.MPESA_SHORT_CODE,
-                "Password": password,
-                "Timestamp": timeStamp,
-                "TransactionType": "CustomerPayBillOnline",
-                "Amount": amount,
-                "PartyA": PhoneNumber,
-                "PartyB": process.env.MPESA_PARTYB,
-                "PhoneNumber": PhoneNumber,
-                "CallBackURL":"",
-                "AccountReference": "CompanyXLTD",
-                "TransactionDesc": "Payment of X"
             }
             let req = unirest('POST', url)
                 .headers({
@@ -203,14 +195,14 @@ module.exports.safaricom_refund_simulate = async (PhoneNumber, amount,transactio
                 .send(JSON.stringify(request_data))
                 .end((res) => {
                     if (res.error) {
-                        console.log("module.exports.safaricom_lipesa_simulate -> res.error", res.error)
-                        return reject({ status: false, msg: "safaricom Mpesa express failed" })
+                        console.log("module.exports.safaricom_refund_simulate -> res.error", res.error)
+                        return reject({ status: false, msg: "safaricom mpesa refund failed" })
                     }
-                    return resolve({ status: true, msg: "safaricom lipesa success", data: JSON.parse(res.raw_body) })
+                    return resolve({ status: true, msg: "safaricom refund success", data: JSON.parse(res.raw_body) })
                 });
         } catch (error) {
-            console.log("module.exports.safaricom_lipesa_simulate -> error", error)
-            return reject({ status: false, msg: "Invalid Mpesa express request" })
+            console.log("module.exports.safaricom_refund_simulate -> error", error)
+            return reject({ status: false, msg: "Invalid Mpesa refund request" })
         }
     })
 }

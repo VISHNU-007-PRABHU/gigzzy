@@ -131,7 +131,6 @@ const server = new ApolloServer({
   subscriptions: {
     onConnect: () => console.log('Connected to websocket'),
     onDisconnect: () => {
-      console.log("Disconnected.");
     },
     uploads: {
       maxFileSize: 10000000, // 10 MB
@@ -181,44 +180,12 @@ app.use('/static', express.static(__dirname + '/public'));
 
 app.post('/confirmation', async (req, res, next) => {
   try {
-    console.log(req.body, "ops confirmation")
-    var json = JSON.stringify(req.body);
-
-    fs.writeFile("./testresponse", json, function(err) {
-      if(err) {
-          return console.log(err);
-      }
-      console.log("The file was saved!");
-  }); 
-    console.log(req.body['stkCallback'])
-    console.log(req.body['CallbackMetadata'])
-
-    fs.writeFile("./testresponse_depth", JSON.stringify(req.body['stkCallback']), function(err) {
-      if(err) {
-          return console.log(err);
-      }
-      console.log("The file was saved!");
-  }); 
-  fs.writeFile("./testresponse_depth_test", JSON.stringify(req.body['CallbackMetadata']), function(err) {
-    if(err) {
-        return console.log(err);
-    }
-    console.log("The file was saved!");
-}); 
     let confirm_data = await confrimation_call(req.body)
-    // console.log("confirm_data", confirm_data)
+    console.log("confirm_data", confirm_data)
     return res.send({ status: true, message: "we reviced confirmation" })
   } catch (error) {
     console.log("confirmation error", error)
-
-    fs.writeFile("./testresponse_error", JSON.stringify(error), function(err) {
-      if(err) {
-          return console.log(err);
-      }
-      console.log("The file was saved!");
-  }); 
     return res.send(error)
-    return res.send({ status: true, message: "we reviced confirmation but error in code" })
   }
 })
 
@@ -288,7 +255,6 @@ app.use(cors({ origin: 'http://localhost:3000' }));
 
 
 mongoose.connect('mongodb://localhost/gigzzy').then(() => {
-  console.log("Connected to Database");
 }).catch((err) => {
   console.log("Not Connected to Database ERROR! ", err);
 });

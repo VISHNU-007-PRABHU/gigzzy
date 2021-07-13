@@ -171,7 +171,7 @@ const resolvers = {
     // graphql query (find) function
 
     Query: {
-        testmail: userResolver.testmail,
+        testmail: userResolver.testinfmail,
         // get data using pagination  
         get_user: userResolver.get_user,
         user_search: userResolver.user_search,
@@ -1404,21 +1404,13 @@ module.exports.confrimation_call = async (body) => {
     return new Promise(async function (resolve, reject) {
         try {
             console.log("module.exports.confrimation_call -> body", body)
-            let CheckoutRequestID = body["stkCallback"]["CheckoutRequestID"]
+            let CheckoutRequestID = body["Body"]["stkCallback"]["CheckoutRequestID"]
             let ResultCode = body["stkCallback"]["ResultCode"]
             let update_details = {
                 payment_message: ""
             }
             update_details['resultcode'] = ResultCode;
-            if (ResultCode == 1032) {
-                update_details['payment_message'] = "You cancelled the MPESA request."
-            } else if (ResultCode == 2001) {
-                update_details['payment_message'] = "The PIN you entered was incorrect."
-            } else if (ResultCode == 1037) {
-                update_details['payment_message'] = "The MPESA request timed out."
-            } else if (ResultCode == 1) {
-                update_details['payment_message'] = "Insufficient funds"
-            }
+            update_details['payment_message'] = body["Body"]["stkCallback"]["ResultDesc"]
 
             let pre_booking_detail = await Booking_model.findOne({ CheckoutRequestID }).lean()
 
@@ -1439,15 +1431,13 @@ module.exports.confrimation_call = async (body) => {
                 update_details['payment_status']= 5,
                 update_details['booking_status']= 14,
                 update_details['job_status']= 14,
-                update_details['MpesaReceiptNumber'] = body["CallbackMetadata"]["Item"][1]["Value"];
-                update_details['TransactionDate']=  body["CallbackMetadata"]["Item"][3]["Value"];
-                update_details['payment_message'] = "job is completed successfully !"
+                update_details['MpesaReceiptNumber'] = body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"];
+                update_details['TransactionDate']=  body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"];
             }else{
                 update_details['job_status'] = 10;
                 update_details['booking_status'] = 10;
-                update_details['MpesaReceiptNumber'] = body["CallbackMetadata"]["Item"][1]["Value"];
-                update_details['TransactionDate']=  body["CallbackMetadata"]["Item"][3]["Value"];
-                update_details['payment_message'] = "Payment success !"
+                update_details['MpesaReceiptNumber'] = body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"];
+                update_details['TransactionDate']=  body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"];
             }
             
 
