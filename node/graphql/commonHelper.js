@@ -136,10 +136,10 @@ module.exports.send_mail_1 = async (email, msg) => {
   };
   await transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      //console.error(error);
+      console.log(error,"send email error");
       return false;
     } else {
-      // console.error(info);
+      console.log(info,"send email success");
       return true;
     }
   });
