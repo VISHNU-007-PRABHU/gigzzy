@@ -5,10 +5,30 @@ var nodemailer = require("nodemailer");
 var sesTransport = require("nodemailer-ses-transport");
 const dotenv = require('dotenv');
 dotenv.config();
+const smtpEndpoint = process.env.smtpEndpoint;
+const port = process.env.AWS_PORT;
+const senderAddress = process.env.senderAddress;
+const smtpUsername = process.env.smtpUsername;
+const smtpPassword = process.env.smtpPassword;
 var serverKey =
   "AAAAuHbsbq4:APA91bFf9VkaLpuWm0vfMTfDIofpl8Lz4ySnkJfW8w0tvZss0CR5ozVQ97As7hVVL4k0nN-rANxTvRLBxRH3XuEXkHICQi8FKcV6fuqJpqcRsI0YF4XuFODcojoqKZaJ-uz9H_to-9U2";
 var fcm = new FCM(serverKey);
 const env = process.env;
+const africa = require("africastalking")({
+  apiKey: "ae2349e17fddbb993e1316693d2bf577a201391481b3baa36df8830579737906",
+  username: "sandbox",
+});
+const sms = africa.SMS;
+
+const transporter = nodemailer.createTransport({
+  host: smtpEndpoint,
+  port: port,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: smtpUsername,
+    pass: smtpPassword
+  }
+});
 
 module.exports.home = 0;
 module.exports.pending = 1;
@@ -33,9 +53,9 @@ module.exports.siteUrl = () => {
   return env.APP_URL;
 };
 module.exports.mpesaURL = () => {
-  if(env.MPESA){
+  if (env.MPESA) {
     return env.MPESA_PRODUCTION;
-  }else{
+  } else {
     return env.MPESA_SANDBOX;
   }
 };
@@ -49,12 +69,8 @@ module.exports.prepareUploadFolder = (path) => {
 };
 
 module.exports.push_notifiy = async (message) => {
-  //console.log("push work");
-  // console.log(message);
   return await fcm.send(message, function (err, response) {
     if (err) {
-      // console.log(err);
-      //console.log("Something has gone wrong!");
     } else {
       console.log("Successfully sent with response: ", response);
     }
@@ -62,54 +78,27 @@ module.exports.push_notifiy = async (message) => {
 };
 
 //============================smsapi===================//
-const credentials = {
-  apiKey: "ae2349e17fddbb993e1316693d2bf577a201391481b3baa36df8830579737906",
-  username: "sandbox",
-};
-const africa = require("africastalking")(credentials);
-const sms = africa.SMS;
-module.exports.send_sms = async () => {
+module.exports.send_sms = async (phone_no, msg) => {
+  let message = msg || "Gigzzy sms notification"
   const options = {
-    to: '+254722343343',
-    message: " I work all night and sleep all day",
-    from:"vijayaraj"
-}
+    to: `+${phone_no}`,
+    message: message,
+    from: "Gigzzy"
+  }
   sms
     .send(options)
     .then((suc) => {
-      console.log("suc==>",suc);
+      console.log("send sms ==>", suc);
     })
-    .catch((e) => {
-      console.log("e===>",err);
+    .catch((err) => {
+      console.log("send sms ===>", err);
     });
 };
 //============================smsapi===================//
+
+
 //============================mailapi==================//
-
-
-
-const smtpEndpoint = process.env.smtpEndpoint;
-const port = process.env.AWS_PORT;
-const senderAddress = process.env.senderAddress;
-var toAddresses = "vijayaraj@waioz.com";
-const smtpUsername = process.env.smtpUsername;
-const smtpPassword = process.env.smtpPassword;
-// var subject = "Amazon SES test (Nodemailer)";
-var body_text = `Amazon SES Test (Nodemailer)
----------------------------------
-This email was sent through the Amazon SES SMTP interface using Nodemailer.
-`;
-var body_html = `<html>
-<head></head>
-<body>
-  <h1>Amazon SES Test (Nodemailer)</h1>
-  <p>This email was sent with <a href='https://aws.amazon.com/ses/'>Amazon SES</a>
-        using <a href='https://nodemailer.com'>Nodemailer</a> for Node.js.</p>
-</body>
-</html>`;
-
-module.exports.sendmail=async(data,email)=>{
-  console.log(email)
+module.exports.send_mail = async (email, otp) => {
   // Create the SMTP transport.
   let transporter = nodemailer.createTransport({
     host: smtpEndpoint,
@@ -120,25 +109,24 @@ module.exports.sendmail=async(data,email)=>{
       pass: smtpPassword
     }
   });
+  var subject = "GIGZZY OTP ✔";
+  var text = "OTP?";
+  var body_html = `<b>GIGZZY OTP : ${otp} </b>`;
 
-  // Specify the fields in the email.
   let mailOptions = {
     from: senderAddress,
     to: email,
-    subject: data.subject,
-    text: body_text,
+    subject: subject,
+    text: text,
     html: body_html,
   };
-
   // Send the email.
   let info = await transporter.sendMail(mailOptions)
-
   console.log("Message sent! Message ID: ", info.messageId);
 }
-
 //==================================================================//
 
-module.exports.send_mail = async (email, otp) => {
+module.exports.sendmail = async (email, otp) => {
   // console.log('vis',email,otp);
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -174,24 +162,16 @@ module.exports.send_mail = async (email, otp) => {
     }
   });
 };
+
+
 module.exports.send_mail_1 = async (email, msg) => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 25,
-    service: "gmail",
-    auth: {
-      user: "emepedia2020@gmail.com",
-      pass: "@Vinya2017",
-    },
-  });
+ 
   let mailOptions = {
-    from: "waioztechnology@gmail.com",
+    from: senderAddress,
     to: email, // list of receivers
     subject: "GIGZZY ✔", // Subject line
     text: "Admin change proof status?", // plain text body
     html: `<b> ${msg} </b>`, // html body
-    // subject:strtr(admin_email.subject, req.data), // Subject line
-    // html: mail_content // html body
   };
   await transporter.sendMail(mailOptions, (error, info) => {
     if (error) {

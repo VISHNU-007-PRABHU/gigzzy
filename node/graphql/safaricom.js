@@ -176,18 +176,18 @@ module.exports.safaricom_refund_simulate = async (PhoneNumber, amount,transactio
                 "Initiator": "testapi",
                 "SecurityCredential": password,
                 "CommandID": "TransactionReversal",
-                "TransactionID": "transactionID",
+                "TransactionID": "PGD6A6SKXY",
                 "Amount":"1",
-                "ReceiverParty": "174379",
-                "ReceiverIdentifierType": "11",
+                "ReceiverParty": "600982",
+                "ReceiverIdentifierType": "4",
                 // "QueueTimeOutURL":  `${process.env.MPESA_CALLBACK_URL}/refund_timeout`,
                 // "ResultURL":  `${process.env.MPESA_CALLBACK_URL}/refund_confimation`,
-                "QueueTimeOutURL":  `https://mydomain.com/Reversal/queue/`,
-                "ResultURL":  `https://mydomain.com/Reversal/queue/`,
+                "QueueTimeOutURL":  `https://gigzzy.com/cancelled`,
+                "ResultURL":  `https://gigzzy.com/cancelled`,
                 "Remarks": "test refund",
                 "Occassion": "Test occassion",
             }
-            let req = unirest('POST', url)
+            let req = unirest('GET', url)
                 .headers({
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token.data.access_token}`

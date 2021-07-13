@@ -471,81 +471,84 @@ const resolvers = {
         reset_password: userResolver.reset_password,
         admin_add_user: userResolver.admin_add_user,
         admin_update_user: admin_update_user = async (_, args) => {
-
-            //console.log(args);
-            if (args.lat && args.lng) {
-                args.location = { type: 'Point', coordinates: [args.lng, args.lat] };
-            }
-            if (args.country_code == '' || args.country_code == null) {
-                delete args.country_code;
-            }
-            if (args.demo != '' && typeof args.demo != "undefined" && args.demo != null && args.demo != false) {
-                args.Upload_percentage = "50%";
-                args.otp_verification = 1;
-                args.email_otp_verification = 1;
-                args.email_otp = String(Math.floor(100000 + Math.random() * 900000))
-                args.otp = String(Math.floor(100000 + Math.random() * 900000))
-                args.last_email_otp_verification = moment.utc().format();
-                args.last_otp_verification = moment.utc().valueOf();
-                // args.demo_end_time = moment.utc().add(5, 'minutes');
-                args.demo_end_time = moment.utc().add(4, 'days').format("YYYY-MM-DD");
-            }
-            var data = await Detail_model.findOne({ _id: args._id });
-            if (args.phone_no != '' && args.phone_no != null && typeof args.phone_no != "undefined") {
-                const find_pn = await Detail_model.find({ delete: 0, phone_no: args.phone_no, role: args.role, _id: { $ne: args._id } });
-                if (find_pn.length > 0) {
-                    return { msg: "mobile no exists", status: 'failed' }
+            try {
+                //console.log(args);
+                if (args.lat && args.lng) {
+                    args.location = { type: 'Point', coordinates: [args.lng, args.lat] };
                 }
-            }
-            if (args.email != '') {
-                if (args.email != null) {
-                    if (args.email != undefined) {
-                        const find_email = await Detail_model.find({ delete: 0, email: args.email, role: args.role, _id: { $ne: args._id } });
-                        if (find_email.length > 0) {
-                            return { msg: "Email already exists", status: 'failed' }
+                if (args.country_code == '' || args.country_code == null) {
+                    delete args.country_code;
+                }
+                if (args.demo != '' && typeof args.demo != "undefined" && args.demo != null && args.demo != false) {
+                    args.Upload_percentage = "50%";
+                    args.otp_verification = 1;
+                    args.email_otp_verification = 1;
+                    args.email_otp = String(Math.floor(100000 + Math.random() * 900000))
+                    args.otp = String(Math.floor(100000 + Math.random() * 900000))
+                    args.last_email_otp_verification = moment.utc().format();
+                    args.last_otp_verification = moment.utc().valueOf();
+                    // args.demo_end_time = moment.utc().add(5, 'minutes');
+                    args.demo_end_time = moment.utc().add(4, 'days').format("YYYY-MM-DD");
+                }
+
+                var data = await Detail_model.findOne({ _id: args._id });
+                if (args.phone_no != '' && args.phone_no != null && typeof args.phone_no != "undefined") {
+                    const find_pn = await Detail_model.find({ delete: 0, phone_no: args.phone_no, role: args.role, _id: { $ne: args._id } });
+                    if (find_pn.length > 0) {
+                        return { info:{msg: "mobile no exists", status: 'failed' }}
+                    }
+                }
+
+                if (args.email) {
+                    const find_email = await Detail_model.find({ delete: 0, email: args.email, role: args.role, _id: { $ne: args._id } });
+                    if (find_email.length > 0) {
+                        return { info:{msg: "Email already exists", status: 'failed'}}
+                    }
+                }
+
+                var user_deails = await Detail_model.findOne({ _id: args._id });
+                var preview_data = user_deails.provider_subCategoryID;
+                var check_category = false;
+                if (Array.isArray(args.provider_subCategoryID)) {
+                    for (let i = 0; i < args.provider_subCategoryID.length; i++) {
+                        check_category = preview_data.includes(args.provider_subCategoryID[i]);
+                        if (!check_category) {
+                            args.proof_status = 0;
+                            var msg = "please wait for admin confrimation in new category";
+                            console.log('true')
+                            // ================= push_notifiy ================== //
+                            var message = {
+                                to: user_deails.device_id,
+                                collapse_key: 'your_collapse_key',
+                                notification: {
+                                    title: "Proof Status",
+                                    body: msg,
+                                    click_action: ".activities.HomeActivity",
+                                },
+                                data: {
+                                    my_key: commonHelper.on_going,
+                                    my_another_key: commonHelper.on_going
+                                }
+                            };
+                            var msg_notification = await commonHelper.push_notifiy(message);
+                            // ================= push_notifiy ================== //  
+                            var send_verification = await commonHelper.send_mail_1(user_deails.email, msg);
+                            await pubsub.publish(PROOF_STATUS, { proof_status: 0, _id: args._id });
+                            break;
                         }
                     }
                 }
-            }
-            var user_deails = await Detail_model.findOne({ _id: args._id });
-            var preview_data = user_deails.provider_subCategoryID;
-            var check_category = false;
-            if (Array.isArray(args.provider_subCategoryID)) {
-                for (let i = 0; i < args.provider_subCategoryID.length; i++) {
-                    check_category = preview_data.includes(args.provider_subCategoryID[i]);
-                    if (!check_category) {
-                        args.proof_status = 0;
-                        var msg = "please wait for admin confrimation in new category";
-                        console.log('true')
-                        // ================= push_notifiy ================== //
-                        var message = {
-                            to: user_deails.device_id,
-                            collapse_key: 'your_collapse_key',
-                            notification: {
-                                title: "Proof Status",
-                                body: msg,
-                                click_action: ".activities.HomeActivity",
-                            },
-                            data: {
-                                my_key: commonHelper.on_going,
-                                my_another_key: commonHelper.on_going
-                            }
-                        };
-                        var msg_notification = await commonHelper.push_notifiy(message);
-                        // ================= push_notifiy ================== //  
-                        // var send_verification = await commonHelper.send_mail_1(user.email, msg);
-                        await pubsub.publish(PROOF_STATUS, { proof_status: 0, _id: args._id });
-                        break;
-                    }
+
+                // args.last_otp_verification = moment.utc().valueOf();
+                // args.last_email_otp_verification = moment.utc().valueOf();
+                const update_user = await Detail_model.updateOne({ _id: args._id }, args);
+                //console.log(update_user);
+                if (update_user.n == update_user.nModified) {
+                    return { ...args, ...{ info: { "msg": "Update Process Success", status: 'success' } } };
+                } else {
+                    return { ...args, ...{ info: { "msg": "Update Process Failed !", status: 'failed' } } };
                 }
-            }
-            // args.last_otp_verification = moment.utc().valueOf();
-            // args.last_email_otp_verification = moment.utc().valueOf();
-            const update_user = await Detail_model.updateOne({ _id: args._id }, args);
-            //console.log(update_user);
-            if (update_user.n == update_user.nModified) {
-                return { ...args, ...{ info: { "msg": "Update Process Success", status: 'success' } } };
-            } else {
+            } catch (error) {
                 return { ...args, ...{ info: { "msg": "Update Process Failed !", status: 'failed' } } };
             }
         },
@@ -926,18 +929,18 @@ const resolvers = {
                         var final_payment = Number(final_payment);
                         var provider_fee = Number(job_result.provider_fee);
                         var extra_hour_price = Number(job_result.extra_hour_price);
-                        if(job_result.price_type === "day"){
+                        if (job_result.price_type === "day") {
                             // day vice job
                             var process_days = parseInt(duration.asDays());
-                            if(process_days > 0){
-                                var days = (Number(process_days)+1) - Number(job_result.day_limit);           //extra day
+                            if (process_days > 0) {
+                                var days = (Number(process_days) + 1) - Number(job_result.day_limit);           //extra day
                                 let day_amount = Number(days) * Number(job_result.day_price);                  // extra day *  hour fee
                                 provider_fee += Number(day_amount);                                         // update provider fee (add hour fee in provider amount)
                                 total += Number(day_amount);
                                 final_payment += Number(day_amount);                                        // update total fee (add hour fee in total amount)
                                 extra_hour_price += Number(day_amount);
                             }
-                        }else if(job_result.price_type === "hour"){
+                        } else if (job_result.price_type === "hour") {
                             if (hour > 0) {
                                 // console.log("hujbs");
                                 let hour_amount = Number(hour) * Number(job_result.hour_price);                  // extra hour *  hour fee
@@ -1057,7 +1060,7 @@ const resolvers = {
                     args['total'] = amount;
                     console.log("osp")
                     try {
-                        var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number,String(amount))
+                        var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(amount))
                         console.log("charge", charge)
                         if (charge.status == true && charge.data.ResponseCode === '0') {
                             // update charge amount
@@ -1177,7 +1180,7 @@ const resolvers = {
                         try {
                             let final_amount = Number(final_job.final_payment)
 
-                            var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number,String(final_amount))
+                            var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(final_amount))
 
                             if (charge.status == true && charge.data.ResponseCode === '0') {
                                 // update charge amount
@@ -1186,7 +1189,7 @@ const resolvers = {
                                     admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
                                     provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
                                     phone_number: args.phone_number,
-                                    mpeas_payment_callback:true,
+                                    mpeas_payment_callback: true,
                                     // job_status: 10,
                                     // payment_status: 1,
                                     MerchantRequestID: charge.data.MerchantRequestID || 0,
@@ -1196,7 +1199,7 @@ const resolvers = {
                                 return [{ job_status: 14, msg: "job is completed successfully", status: 'success' }];
 
                             } else {
-                                 return [{ job_status: 14, msg: "job is completed failed", status: 'failed' }];
+                                return [{ job_status: 14, msg: "job is completed failed", status: 'failed' }];
 
                             }
 
@@ -1414,11 +1417,11 @@ module.exports.confrimation_call = async (body) => {
 
             let pre_booking_detail = await Booking_model.findOne({ CheckoutRequestID }).lean()
             if (ResultCode != 0) {
-                if(pre_booking_detail.booking_status === 13){
+                if (pre_booking_detail.booking_status === 13) {
                     update_details['mpeas_payment_callback'] = false;
                     let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
                     return resolve({ status: true, msg: "Mpesa Final Payment failed !" })
-                }else{
+                } else {
                     update_details['job_status'] = 11;
                     update_details['booking_status'] = 11;
                     let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
@@ -1426,26 +1429,26 @@ module.exports.confrimation_call = async (body) => {
                 }
             }
 
-            if(pre_booking_detail.booking_status === 13){
-                update_details['payment_status']= 5,
-                update_details['booking_status']= 14,
-                update_details['job_status']= 14,
-                update_details['MpesaReceiptNumber'] = body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"];
-                update_details['TransactionDate']=  body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"];
-            }else{
+            if (pre_booking_detail.booking_status === 13) {
+                update_details['payment_status'] = 5,
+                    update_details['booking_status'] = 14,
+                    update_details['job_status'] = 14,
+                    update_details['MpesaReceiptNumber'] = body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"];
+                update_details['TransactionDate'] = body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"];
+            } else {
                 update_details['job_status'] = 10;
                 update_details['booking_status'] = 10;
                 update_details['MpesaReceiptNumber'] = body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"];
-                update_details['TransactionDate']=  body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"];
+                update_details['TransactionDate'] = body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"];
             }
-            
+
 
             let booking_detail = await Booking_model.findOne({ CheckoutRequestID })
             let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID: CheckoutRequestID }, update_details)
 
-            if(pre_booking_detail.booking_status === 16){
+            if (pre_booking_detail.booking_status === 16) {
                 var pay_detail = await Payout_model.update({ booking_id: booking_detail.booking_id }, { booking_status: 14 });
-            }else{
+            } else {
                 let update_provider_data = {
                     provider_id: booking_detail.provider_id,
                     booking_id: booking_detail._id,
@@ -1455,7 +1458,7 @@ module.exports.confrimation_call = async (body) => {
                 const update_provider = new Payout_model(update_provider_data);
                 const save = await update_provider.save();
             }
-          
+
             // ================= push_notifiy (to provider) ================== //
             let user_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
             if (user_detail && user_detail.device_id) {
@@ -1487,9 +1490,9 @@ module.exports.confrimation_call = async (body) => {
             var msg = await commonHelper.push_notifiy(message);
             // ================= push_notifiy ================== //
             // return response 
-            if(pre_booking_detail.booking_status === 13){
+            if (pre_booking_detail.booking_status === 13) {
                 return resolve({ job_status: 14, msg: "job is completed successfully", status: 'success' });
-            }else{
+            } else {
                 let data = {
                     user_parent: true,
                     ...booking_detail.data._doc,
@@ -1503,11 +1506,11 @@ module.exports.confrimation_call = async (body) => {
                 return resolve({ status: true, msg: "Payment Is success !", data })
             }
 
-    } catch (error) {
-        console.log("module.exports.confrimation_call -> error", error)
-        return reject({ status: false, msg: "Payment Is Failed" })
-    }
-})
+        } catch (error) {
+            console.log("module.exports.confrimation_call -> error", error)
+            return reject({ status: false, msg: "Payment Is Failed" })
+        }
+    })
 }
 
 remove_demo_acount.start();

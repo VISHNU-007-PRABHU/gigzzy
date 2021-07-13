@@ -19,7 +19,6 @@ var Detail_model = model.detail;
 var Booking_model = model.booking;
 var Address_model = model.address;
 module.exports.testmail = async (parent, args, context, info) => {
-    await Booking_model.remove({})
     return{
         msg:"test"
     }
@@ -156,12 +155,13 @@ module.exports.find_payout_provider = async (parent, args, context, info) => {
 };
 
 module.exports.testinfmail = async (parent, args, context, info) => {
+    console.log("module.exports.testinfmail -> args", args)
     //console.log('payout provider');
     //console.log(parent);
     // await saf.safaricom_payment_authorization()
     // await safaricom_lipesa_simulate()
     try{
-        let chargePayment = await saf.safaricom_lipesa_simulate()
+        let chargePayment = await saf.safaricom_refund_simulate()
         console.log("module.exports.testinfmail -> chargePayment", chargePayment)
         return {msg:chargePayment.msg};
     }catch(error){
