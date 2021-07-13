@@ -19,6 +19,8 @@ const africa = require("africastalking")({
   username: process.env.AFRICASTALKING_API_USERNAME,
 });
 const sms = africa.SMS;
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const transporter = nodemailer.createTransport({
   host: smtpEndpoint,
@@ -125,8 +127,8 @@ module.exports.send_mail = async (email, otp) => {
 }
 
 
-module.exports.send_mail_1 = async (email, msg) => {
- 
+module.exports.send_mails = async (email, msg) => {
+
   let mailOptions = {
     from: senderAddress,
     to: email, // list of receivers
@@ -136,14 +138,34 @@ module.exports.send_mail_1 = async (email, msg) => {
   };
   await transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      console.log(error,"send email error");
+      console.log(error, "send email error");
       return false;
     } else {
-      console.log(info,"send email success");
+      console.log(info, "send email success");
       return true;
     }
   });
 };
+
+
+module.exports.send_mail_1 = async (email, msg) => {
+  try{
+    console.log("send grid")
+    const mail_msg = {
+      to: "vishnu@waioz.com",
+      from:"support@gigzzy.com",
+      subject: "GIGZZY ✔", // Subject line
+      text: "Admin change proof status?", // plain text body
+      html: `<b> ${msg} </b>`, // html body
+    };
+    let data = await sgMail.send(mail_msg);
+    // console.log(data,"ops")
+    return true
+  }catch(error){
+    // console.log("error", error)
+    return false
+  }
+}
 
 /*
   Tab No for Push Notification

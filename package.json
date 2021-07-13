@@ -21,6 +21,7 @@
         "@antv/g2plot": "^0.11.22",
         "@apollo/react-hooks": "0.1.0-beta.11",
         "@saeris/graphql-directives": "^0.2.3",
+        "@sendgrid/mail": "^7.4.5",
         "africastalking": "^0.5.4",
         "antd": "^3.20.6",
         "apollo-boost": "^0.4.3",

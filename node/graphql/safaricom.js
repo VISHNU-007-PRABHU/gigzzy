@@ -174,12 +174,12 @@ module.exports.safaricom_refund_simulate = async (PhoneNumber, amount,transactio
 
             let request_data = {
                 "Initiator": "testapi",
-                "SecurityCredential": password,
+                "SecurityCredential": "goxBxsLAvZ+jjru8qhsPwOfVWQMLtGXmZCKzSo7kPsyHzQ25YpOjb3BhAHwjGAhp4hnEnooFJhvpYJ6CnUq/9JEfnsdMP+PRb5n2E5vnA7FVhxC1wk1+Z9ITN7RP3g/ek2thiZe7w9CG8qMk1kX6v6lvdP5xgIgAJKWx6W/urubju4kQyFk2PlxrZtKSBh8lt7OKuJ0wzrGH1YW2FSDoOi3CGR0SpEM5ipAWAsKLdyAE6Lq/IGBHWM9VNixeWgDqALoukzV2jU6cuWCwGcB4AG7qI58NVx7UdJ/e6buKIj6WBFnI6sYURFpS6UDCXsqiiE1em2XJvUBSQ+U7x5jQuQ==",
                 "CommandID": "TransactionReversal",
-                "TransactionID": "PGD6A6SKXY",
+                "TransactionID": "PGD6AGEIJY",
                 "Amount":"1",
-                "ReceiverParty": "600982",
-                "ReceiverIdentifierType": "4",
+                "ReceiverParty": "174379",
+                "ReceiverIdentifierType": "11",
                 // "QueueTimeOutURL":  `${process.env.MPESA_CALLBACK_URL}/refund_timeout`,
                 // "ResultURL":  `${process.env.MPESA_CALLBACK_URL}/refund_confimation`,
                 "QueueTimeOutURL":  `https://gigzzy.com/cancelled`,
@@ -194,6 +194,7 @@ module.exports.safaricom_refund_simulate = async (PhoneNumber, amount,transactio
                 })
                 .send(JSON.stringify(request_data))
                 .end((res) => {
+                    // console.log(res.raw_body)
                     if (res.error) {
                         console.log("module.exports.safaricom_refund_simulate -> res.error", res.error)
                         return reject({ status: false, msg: "safaricom mpesa refund failed" })
