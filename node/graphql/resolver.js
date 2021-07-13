@@ -1405,7 +1405,7 @@ module.exports.confrimation_call = async (body) => {
         try {
             console.log("module.exports.confrimation_call -> body", body)
             let CheckoutRequestID = body["Body"]["stkCallback"]["CheckoutRequestID"]
-            let ResultCode = body["stkCallback"]["ResultCode"]
+            let ResultCode = body["Body"]["stkCallback"]["ResultCode"]
             let update_details = {
                 payment_message: ""
             }
@@ -1413,7 +1413,6 @@ module.exports.confrimation_call = async (body) => {
             update_details['payment_message'] = body["Body"]["stkCallback"]["ResultDesc"]
 
             let pre_booking_detail = await Booking_model.findOne({ CheckoutRequestID }).lean()
-
             if (ResultCode != 0) {
                 if(pre_booking_detail.booking_status === 13){
                     update_details['mpeas_payment_callback'] = false;
