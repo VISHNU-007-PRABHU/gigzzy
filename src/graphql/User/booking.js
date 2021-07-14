@@ -304,6 +304,14 @@ mutation ADDMSG($booking_id : ID,$user_id:ID,$data:String){
   }
 }`
 
+export const UPDATE_MANUAL_PAYMENT =  gql`
+mutation UPDATE_MANUAL_PAYMENT($booking_id : ID,$role:Int,){ 
+  update_manual_payment(role:$role,booking_id: $booking_id) {
+    msg
+    status
+  }
+}`
+
 export const UPDATE_MSG_COUNT = gql`
 mutation UPDATE_MSG_COUNT($booking_id : ID,$role:Int,){ 
   update_msg_is_read(role:$role,booking_id: $booking_id) {

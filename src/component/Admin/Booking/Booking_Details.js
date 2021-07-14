@@ -1,12 +1,12 @@
-import React,{Suspense} from "react";
+import React, { Suspense } from "react";
 import { withRouter } from "react-router";
 import { client } from "../../../apollo";
-import { Radio,Layout,Button, Empty,  Form, Card, Avatar, Row, Col, Rate,Skeleton } from 'antd';
+import { Radio, Layout, Button, Empty, Form, Card, Avatar, Row, Col, Rate, Skeleton } from 'antd';
 import 'antd/dist/antd.css';
 import '../../../scss/template.scss';
 import { FaBarcode, FaDollarSign, FaRegImage, FaSignInAlt, FaSignOutAlt, FaUserAlt, FaUserCog, FaEye } from 'react-icons/fa';
 import { AiFillTool, AiTwotoneBell, AiFillClockCircle, AiFillTags, AiTwotonePhone, AiTwotoneMail } from 'react-icons/ai';
-import { GET_PARTICULAR_BOOKING } from '../../../graphql/User/booking';
+import { GET_PARTICULAR_BOOKING, UPDATE_MANUAL_PAYMENT } from '../../../graphql/User/booking';
 import OwlCarousel from 'react-owl-carousel';
 import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
@@ -14,6 +14,7 @@ import { TiLocation } from 'react-icons/ti';
 import AdminSider from '../Layout/AdminSider';
 import AdminHeader from '../Layout/AdminHeader';
 import Geocode from "react-geocode";
+import { Alert_msg } from '../../Comman/alert_msg';
 const { Content } = Layout;
 const DescriptionValue = React.lazy(() => import('../../User/Book/DescriptionValue'));
 class BookingDetails extends React.Component {
@@ -44,8 +45,8 @@ class BookingDetails extends React.Component {
             booking_provider: [],
             booking_category: [],
             nav_text: ['', ''],
-            u_rate:0,
-            p_rate:0,
+            u_rate: 0,
+            p_rate: 0,
             responsive_first_category: {
                 0: {
                     items: 1,
@@ -93,14 +94,28 @@ class BookingDetails extends React.Component {
                 booking_user: result.data.booking[0].booking_user,
                 booking_provider: result.data.booking[0].booking_provider,
                 message: result.data.booking[0].get_booking_message,
-                u_rate:result.data.booking[0].user_rating,
-                p_rate:result.data.booking[0].provider_rating,
+                u_rate: result.data.booking[0].user_rating,
+                p_rate: result.data.booking[0].provider_rating,
             })
         });
     }
+
+    manual_refund = (id) => {
+        console.log("BookingDetails -> manual_refund -> id", id)
+        client.query({
+            query: UPDATE_MANUAL_PAYMENT,
+            variables: { booking_id: id },
+            fetchPolicy: 'no-cache',
+        }).then(result => {
+            Alert_msg(result.data.update_manual_payment.info);
+            if (result.data.update_manual_payment.info.status === "success") {
+                this.fetch_booking(id)
+            }
+        })
+    }
     render() {
         console.log(this.state.u_rate);
-        const { booking, booking_category, booking_provider, booking_user,u_rate } = this.state;
+        const { booking, booking_category, booking_provider, booking_user, u_rate } = this.state;
         console.log(this.props);
         return (
             <Layout style={{ height: '100vh' }}>
@@ -128,11 +143,11 @@ class BookingDetails extends React.Component {
                                                     <AiFillTool className="mx-3" /> Category:  {booking_category[0] ? booking_category[0].category_type === 1 ? booking_category[0].category_name : booking_category[0].subCategory_name : ''}
                                                 </div>
                                                 <div className="in_card_spilt">
-                                               <Suspense fallback={<Skeleton active/>}>
-                                                <DescriptionValue 
-                                                    data={booking[0] ? booking[0].description : ""}
-                                                    img={booking[0]?.user_image_url} />
-                                               </Suspense>
+                                                    <Suspense fallback={<Skeleton active />}>
+                                                        <DescriptionValue
+                                                            data={booking[0] ? booking[0].description : ""}
+                                                            img={booking[0]?.user_image_url} />
+                                                    </Suspense>
                                                     {/* {booking[0] ? booking[0].description : ""} */}
                                                 </div>
                                             </div>
@@ -181,7 +196,7 @@ class BookingDetails extends React.Component {
                                             <div className="d-block in_card">
                                                 <div>
                                                     <AiFillClockCircle className="mx-3" /> Scheduled at:
-                                                 </div>
+                                                </div>
                                                 <div className="in_card_spilt">
                                                     {booking[0] ? booking[0].booking_date : ""}
                                                 </div>
@@ -195,7 +210,7 @@ class BookingDetails extends React.Component {
                                             <div className="d-block in_card">
                                                 <div>
                                                     <FaDollarSign className="mx-3" /> Amount
-                                                 </div>
+                                                </div>
                                                 <div className="in_card_spilt">
                                                     {booking[0] ? booking[0].base_price : ""}
                                                 </div>
@@ -205,7 +220,7 @@ class BookingDetails extends React.Component {
                                             <div className="d-block in_card">
                                                 <div>
                                                     <AiFillTags className="mx-3" />  Transaction Id
-                                                 </div>
+                                                </div>
                                                 <div className="in_card_spilt">
                                                     {booking[0] ? booking[0].charge_id : ""}
                                                 </div>
@@ -219,7 +234,7 @@ class BookingDetails extends React.Component {
                                             <div className="d-block in_card">
                                                 <div>
                                                     <FaSignInAlt className="mx-3" />  Started Job
-                                                 </div>
+                                                </div>
                                                 <div className="in_card_spilt">
                                                     {booking[0] ? booking[0].job_start_time : ""}
                                                 </div>
@@ -229,7 +244,7 @@ class BookingDetails extends React.Component {
                                             <div className="d-block in_card">
                                                 <div>
                                                     <FaSignOutAlt className="mx-3" />    Ended Job
-                                                 </div>
+                                                </div>
                                                 <div className="in_card_spilt">
                                                     {booking[0] ? booking[0].job_end_time : ""}
                                                 </div>
@@ -251,7 +266,7 @@ class BookingDetails extends React.Component {
                                             <div className="d-block in_card">
                                                 <div>
                                                     <FaRegImage className="mx-3" />  Image before job
-                                                 </div>
+                                                </div>
                                                 <div className="in_card_spilt max_height_25">
                                                     {this.state.booking.length > 0 ?
                                                         <OwlCarousel className="owl-theme cursor_point" items={1} dots={false} nav={true} navText={this.state.nav_text} margin={30}>
@@ -277,7 +292,7 @@ class BookingDetails extends React.Component {
                                             <div className="d-block in_card">
                                                 <div>
                                                     <FaRegImage className="mx-3" />  Image after job
-                                                 </div>
+                                                </div>
                                                 <div className="in_card_spilt max_height_25">
                                                     {this.state.booking.length > 0 ?
                                                         <OwlCarousel className="owl-theme cursor_point" items={1} dots={false} nav={true} navText={this.state.nav_text} margin={30}>
@@ -319,19 +334,19 @@ class BookingDetails extends React.Component {
                                             <div className="d-flex in_card justify-content-between">
                                                 <div>
                                                     Base Price
-                                                 </div>
+                                                </div>
                                                 <div>
                                                     {booking[0] ? booking[0].base_price : ""}
                                                 </div>
                                             </div>
                                         </Col>
                                     </Row>
-                                    <Row gutter={[12, 12]} className={booking[0]?.extra_price === undefined ? 'd-none':''}>
+                                    <Row gutter={[12, 12]} className={booking[0]?.extra_price === undefined ? 'd-none' : ''}>
                                         <Col span={24}>
                                             <div className="d-flex in_card justify-content-between">
                                                 <div>
                                                     Extra Price
-                                                 </div>
+                                                </div>
                                                 <div>
                                                     {booking[0] ? booking[0].extra_price : ""}
                                                 </div>
@@ -343,7 +358,7 @@ class BookingDetails extends React.Component {
                                             <div className="d-flex in_card justify-content-between">
                                                 <div>
                                                     Total
-                                                 </div>
+                                                </div>
                                                 <div>
                                                     {booking[0] ? booking[0].total : ""}
                                                 </div>
@@ -408,6 +423,14 @@ class BookingDetails extends React.Component {
                                             </div>
                                         </div>
                                     </div>
+                                    <div className="mt-3">
+                                        {
+                                            booking[0]?.payment_status === 6 ? <>
+                                                <Button className="primary-bg" block onClick={() => { this.manual_refund(booking[0]._id) }}>Manual Refund</Button>
+                                            </>
+                                                : ""
+                                        }
+                                    </div>
                                     <div className="d-flex mt-3 justify-content-between align-items-center">
                                         <div>
                                             Payment Status :
@@ -418,14 +441,16 @@ class BookingDetails extends React.Component {
                                                     "Base Price Payout Pending" :
                                                     booking[0].payment_status === 1 ?
                                                         "Base Price Paid" :
-                                                        booking[0].payment_status === 2 ?
-                                                            "Refund Success" :
-                                                            booking[0].payment_status === 3 ?
-                                                                "Refund Failed" :
-                                                                booking[0].payment_status === 4 ?
-                                                                    "Final Payout Pending" :
-                                                                    booking[0].payment_status === 5 ?
-                                                                        "Payout Completed" : '' : '' : ''}
+                                                        booking[0].payment_status === 6 ?
+                                                            "Waiting for manual refund" :
+                                                            booking[0].payment_status === 2 ?
+                                                                "Refund Success" :
+                                                                booking[0].payment_status === 3 ?
+                                                                    "Refund Failed" :
+                                                                    booking[0].payment_status === 4 ?
+                                                                        "Final Payout Pending" :
+                                                                        booking[0].payment_status === 5 ?
+                                                                            "Payout Completed" : '' : '' : ''}
                                         </div>
                                     </div>
                                 </Card>
@@ -435,7 +460,7 @@ class BookingDetails extends React.Component {
                                         {this.state.message.length > 0 ? <>
                                             {this.state.message.map(data => (
                                                 <div className={data.role === 2 ? "d-flex m-3" : "d-flex m-3 flex-row-reverse"}>
-                                                <Avatar size="large" src={ data.role === 1 ? booking_user[0]?.img_url :  booking_provider[0]?.img_url  } />
+                                                    <Avatar size="large" src={data.role === 1 ? booking_user[0]?.img_url : booking_provider[0]?.img_url} />
                                                     <div className="d-block mx-3">
                                                         <div className={data.role === 1 ? "d-flex flex-md-row-reverse" : ''}>
                                                             {data.message ? data.message !== null ? <card style={{

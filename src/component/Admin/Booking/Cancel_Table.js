@@ -35,13 +35,13 @@ class CancelTable extends React.Component {
     }
 
     componentDidMount() {
-        this.fetch_booking({limit: this.state.pagination.pageSize, page: this.state.pagination.current,booking_status: [8, 11], payment_status: [1, 2, 3, 4]});
+        this.fetch_booking({limit: this.state.pagination.pageSize, page: this.state.pagination.current,booking_status: [8, 11], payment_status: [1, 2, 3, 4,6]});
     }
     handleTableChange = async pagination => {
         const pager = { ...pagination };
         pager.current = pagination.current;
         this.setState({ loading: true });
-        var input = { ...this.state.input_data, limit: pager.pageSize, page: pager.current, booking_status: [8, 11], payment_status: [1, 2, 3, 4]}
+        var input = { ...this.state.input_data, limit: pager.pageSize, page: pager.current, booking_status: [8, 11], payment_status: [1, 2, 3, 4,6]}
         await client.query({
             query: GET_BOOKING,
             variables: input,
@@ -76,11 +76,11 @@ class CancelTable extends React.Component {
             delete this.state.input_data[Object.keys(data)[0]];
             var data_pass = this.state.input_data;
             this.setState({ input_data: data_pass})
-            this.fetch_booking({...data_pass,limit: 10, page: 1,booking_status: [8, 11], payment_status: [1, 2, 3, 4] });
+            this.fetch_booking({...data_pass,limit: 10, page: 1,booking_status: [8, 11], payment_status: [1, 2, 3, 4,6] });
         } else {
             this.setState({ input_data: { ...this.state.input_data, ...data } });
             var input_data = { ...this.state.input_data, ...data };
-            this.fetch_booking({...input_data,limit: 10, page: 1,booking_status: [8, 11], payment_status: [1, 2, 3, 4]});
+            this.fetch_booking({...input_data,limit: 10, page: 1,booking_status: [8, 11], payment_status: [1, 2, 3, 4,6]});
         }
     }
 
@@ -88,7 +88,7 @@ class CancelTable extends React.Component {
         if (data.target.value) {
             this.fetch_booking({ booking_ref: { $regex: '.*' + data.target.value + '.*', $options: 'i' }, limit: 10, page: 1 });
         } else {
-            this.fetch_booking({ limit: 10, page: 1,booking_status: [8, 11], payment_status: [1, 2, 3, 4] });
+            this.fetch_booking({ limit: 10, page: 1,booking_status: [8, 11], payment_status: [1, 2, 3, 4,6] });
         }
     }
 

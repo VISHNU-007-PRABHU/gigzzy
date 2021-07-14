@@ -185,9 +185,9 @@ module.exports.update_manual_payment = async (parent, args) => {
     try {
         let update_params = { payment_status: 2, manual_payment_status: false }
         let cancelbooking = await Booking_model.update({ _id: args.booking_id }, update_params);
-        return { info: { status: "success", msg: "Manual refund success" } }
+        return { status: "success", msg: "Manual refund success" } 
     } catch (error) {
-        return { info: { status: "failed", msg: "Manual refund failed" } }
+        return { status: "failed", msg: "Manual refund failed" } 
     }
 };
 module.exports.find_payout_booking = async (parent, args) => {

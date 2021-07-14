@@ -152,7 +152,7 @@ module.exports.send_mail_1 = async (email, msg) => {
   try{
     console.log("send grid")
     const mail_msg = {
-      to: "vishnu@waioz.com",
+      to: email,
       from:"support@gigzzy.com",
       subject: "GIGZZY ✔", // Subject line
       text: "Admin change proof status?", // plain text body
