@@ -41,7 +41,7 @@ class _CardForm extends Component {
         }).then(result => {
             this.setState({ loading: false });
             if (result.data.manage_booking[0].status === "success") {
-                Alert_msg({ msg: "Job Booking Success", status: "success" });
+                Alert_msg({ msg: "Waiting for your payment confirmation", status: "success" });
                 this.props.history.push('/bookings')
             } else {
                 Alert_msg({ msg: "Job Booking Cancel Failed", status: "failed" });
