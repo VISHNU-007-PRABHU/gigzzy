@@ -129,14 +129,14 @@ module.exports.get_earnings_chart = async (root, args) => {
     var pipeline = [];
     pipeline = [
         { $project: { _id: 1, booking_status: 1, count: 1, admin_fee: 1, created_at: 1, year: { $year: new Date() }, month: { $month: '$created_at' } } },
-        { $match: { booking_status: { $in: [14] }, year: moment().year() } },
+        { $match: { admin_fee: { $ne: 'NaN' }, booking_status: { $in: [14] }, year: moment().year() } },
         { $group: { _id: "$month", total: { $sum: { "$toDouble": "$admin_fee" } } } },
         { $sort: { _id: 1 } }
     ];
 
     var data = await Booking_model.aggregate(pipeline);
     // console.log(data);
-   // console.log(data.length);
+    // console.log(data.length);
     return data
 };
 
@@ -146,29 +146,31 @@ module.exports.get_earnings_chart = async (root, args) => {
 module.exports.get_others_chart = async (root, args) => {
 
     var pipeline = [];
-    var data=[];
+    var data = [];
 
     pipeline = [
-        { $project: { _id: 1, booking_status: 1, count: 1, admin_fee: 1,total:1} },
-        { $match: { booking_status: { $in: [14] } }},
+        { $project: { _id: 1, booking_status: 1, count: 1, admin_fee: 1, total: 1 } },
+        { $match: { total: { $ne: 'NaN' }, booking_status: { $in: [14] } } },
         { $group: { _id: 1, revenue: { $sum: { "$toDouble": "$admin_fee" } }, earning: { $sum: { "$toDouble": "$total" } } } },
     ];
-    var complete_data = await Booking_model.count({booking_status:14});
-    if(complete_data > 0){
-        var data = await Booking_model.aggregate(pipeline); 
-    }else{
-        var revenue_count = {revenue:"0.00",earning:"0.00"};
+    var complete_data = await Booking_model.count({ booking_status: 14 });
+    console.log("module.exports.get_others_chart -> complete_data", complete_data)
+    if (complete_data > 0) {
+        var data = await Booking_model.aggregate(pipeline);
+        console.log("module.exports.get_others_chart -> data", data)
+    } else {
+        var revenue_count = { revenue: "0.00", earning: "0.00" };
         data.push(revenue_count);
     }
-   
+
     var user = await Detail_model.count({ role: 1, delete: 0 });
     var provider = await Detail_model.count({ role: 2, delete: 0 });
-    var data_count = { "user": user, "provider":provider};
-    if(data.length == 0 ){
+    var data_count = { "user": user, "provider": provider };
+    if (data.length == 0) {
         data.push(data_count);
-    }else{
-        data[0].user=user;
-        data[0].provider=provider;
+    } else {
+        data[0].user = user;
+        data[0].provider = provider;
     }
     return data;
 };
