@@ -25,7 +25,6 @@ module.exports.get_booking = async (root, args) => {
     var offset = Number(pages - 1) * Number(limits);
     delete args.limit;
     delete args.page;
-    console.log('check',args);
     var total = await Booking_model.count(args);
     var pageInfo = { totalDocs: total, page: pages }
     var result = await Booking_model.find(args).sort({ created_at: -1 }).skip(Number(offset)).limit(Number(limits));
@@ -48,56 +47,56 @@ module.exports.get_payout = async (root, args) => {
         booking_ref: 1,
         booking_status: 1,
         provider_fee: 1,
-        created_at:1,
-        bookingDate:1,
-        booking_date:1
+        created_at: 1,
+        bookingDate: 1,
+        booking_date: 1
     };
     var wmatch = {
         provider_id: ObjectId(args.provider_id),
         booking_status: args.booking_status,
-        weeks:Number(moment().tz('Asia/Kolkata').format('W'))-1
+        weeks: Number(moment().tz('Asia/Kolkata').format('W')) - 1
     };
     var mmatch = {
         provider_id: ObjectId(args.provider_id),
         booking_status: args.booking_status,
-        months:Number(moment().tz('Asia/Kolkata').format('M'))
+        months: Number(moment().tz('Asia/Kolkata').format('M'))
     };
     var ymatch = {
         provider_id: ObjectId(args.provider_id),
         booking_status: args.booking_status,
-        years:Number(moment().tz('Asia/Kolkata').format('Y'))
+        years: Number(moment().tz('Asia/Kolkata').format('Y'))
     };
     var total = [];
     if (args.option == 1) {
         //current weeek
         filter = [
-            { $project: { ...project,  weeks: {$week:{date: "$created_at",timezone: "Asia/Kolkata" }} } },
-            { $match: wmatch},
+            { $project: { ...project, weeks: { $week: { date: "$created_at", timezone: "Asia/Kolkata" } } } },
+            { $match: wmatch },
             { $sort: { 'created_at': -1 } },
             { $skip: Number(offset) },
             { $limit: Number(limit) }
         ];
-        total = [{ $project: { ...project, weeks: { $week: {date: "$created_at",timezone: "Asia/Kolkata" } } } }, { $match: wmatch},]
+        total = [{ $project: { ...project, weeks: { $week: { date: "$created_at", timezone: "Asia/Kolkata" } } } }, { $match: wmatch },]
     } else if (args.option == 2) {
         //current month
         filter = [
-            { $project: { ...project, months: { $month: {date: "$created_at",timezone: "Asia/Kolkata" } } } },
+            { $project: { ...project, months: { $month: { date: "$created_at", timezone: "Asia/Kolkata" } } } },
             { $match: mmatch },
             { $sort: { 'created_at': -1 } },
             { $skip: Number(offset) },
             { $limit: Number(limit) }
         ];
-        total = [{ $project: { ...project, months: { $month: {date: "$created_at",timezone: "Asia/Kolkata" }} } },  { $match: mmatch  },]
+        total = [{ $project: { ...project, months: { $month: { date: "$created_at", timezone: "Asia/Kolkata" } } } }, { $match: mmatch },]
     } else if (args.option == 3) {
         //current year
         filter = [
-            { $project: { ...project, years: { $year:  {date: "$created_at",timezone: "Asia/Kolkata" } } } },
-            { $match: ymatch  },
+            { $project: { ...project, years: { $year: { date: "$created_at", timezone: "Asia/Kolkata" } } } },
+            { $match: ymatch },
             { $sort: { 'created_at': -1 } },
             { $skip: Number(offset) },
             { $limit: Number(limit) }
         ]
-        total = [{ $project: { ...project, year: { $year: {date: "$created_at",timezone: "Asia/Kolkata" } } } }, { $match: ymatch  },]
+        total = [{ $project: { ...project, year: { $year: { date: "$created_at", timezone: "Asia/Kolkata" } } } }, { $match: ymatch },]
     }
     let pipeline = [{
         $project: {
@@ -140,11 +139,11 @@ module.exports.get_all_payout = async (root, args) => {
     var filter = [];
     var project = { _id: 1, category_id: 1, category_type: 1, user_id: 1, provider_id: 1, total_amount: 1, img_url: 1, booking_ref: 1, booking_status: 1, provider_fee: 1, };
     var total = [];
-    var match_query={};
-    if(args.provider_id){
-        match_query= { status: 1, booking_status: 14,provider_id:args.provider_id }
-    }else{
-        match_query= { status: 1, booking_status: 14 }
+    var match_query = {};
+    if (args.provider_id) {
+        match_query = { status: 1, booking_status: 14, provider_id: args.provider_id }
+    } else {
+        match_query = { status: 1, booking_status: 14 }
     }
     let pipeline = [
         { $match: match_query },
@@ -181,6 +180,16 @@ module.exports.pay_admin_to_provider = async (root, args) => {
 }
 
 
+//cancel booking
+module.exports.update_manual_payment = async (parent, args) => {
+    try {
+        let update_params = { payment_status: 2, manual_payment_status: false }
+        let cancelbooking = await Booking_model.update({ _id: args.booking_id }, update_params);
+        return { info: { status: "success", msg: "Manual refund success" } }
+    } catch (error) {
+        return { info: { status: "failed", msg: "Manual refund failed" } }
+    }
+};
 module.exports.find_payout_booking = async (parent, args) => {
     var data = await Booking_model.find({ _id: parent.booking_id });
     return data;
@@ -292,9 +301,9 @@ module.exports.get_trending = async (parent, args) => {
     ];
     var booking_data = await Booking_model.aggregate(pipeline);
     for (let i = 0; i < booking_data.length; i++) {
-        var category = await Category_model.find({ _id: booking_data[i] ,is_block:false });
+        var category = await Category_model.find({ _id: booking_data[i], is_block: false });
         if (category.length == 0) {
-            var sub_category = await subCategory_model.find({ _id: booking_data[i],is_block:false });
+            var sub_category = await subCategory_model.find({ _id: booking_data[i], is_block: false });
             if (sub_category.length != 0) {
                 data = [...data, ...sub_category]
             }
@@ -312,13 +321,13 @@ module.exports.addRating = async (parent, args, context, info) => {
         data = {
             user_rating: args.rating,
             user_comments: args.comments,
-            user_rating_status:1,
+            user_rating_status: 1,
         }
     } else if (args.role == 2) {
         data = {
             provider_rating: args.rating,
             provider_comments: args.comments,
-            provider_rating_status:1,
+            provider_rating_status: 1,
         }
     }
     var add_rating = await Booking_model.update({ _id: args.booking_id }, data, { new: true });
@@ -337,13 +346,13 @@ module.exports.get_review = async (root, args) => {
     var offset = Number(pages - 1) * Number(limits);
     delete args.limit;
     delete args.page;
-    var data ={};
+    var data = {};
     // console.log(args);
-    if(args.data){
-        data=args.data
-    }else{
-        data={booking_status: [13, 14]}
-    }   
+    if (args.data) {
+        data = args.data
+    } else {
+        data = { booking_status: [13, 14] }
+    }
     // console.log(data);
     var total = await Booking_model.count(data);
     var result = await Booking_model.find(data).sort({ created_at: -1 }).skip(Number(offset)).limit(Number(limits));
@@ -368,7 +377,7 @@ const job_reminder = new CronJob('* * * * * *', async () => {
     // console.log("cron");
     // {_id:ObjectId('5e4bca6a26706a565e2dd4fe')}
     // var d = new Date();
-    var h =moment.utc().format("HH");
+    var h = moment.utc().format("HH");
     var m = moment.utc().format("mm");
     // console.log(h,m,moment.utc().format("YYYY-MM-DD"))
     var allow_query = {
@@ -380,9 +389,9 @@ const job_reminder = new CronJob('* * * * * *', async () => {
     var allow_job = await Booking_model.find(allow_query);
     for (let i = 0; i < allow_job.length; i++) {
         var data = allow_job[i].booking_time.split(':');
-            
+
         if (Number(allow_job[i].booking_hour) <= Number(h)) {
-            if(Number(data[1]) <= Number(m)){
+            if (Number(data[1]) <= Number(m)) {
                 var update_allow_booking = await Booking_model.update({ _id: allow_job[i]._id }, { booking_alert: 2 }, { new: true });
             }
         }
@@ -410,10 +419,10 @@ const job_reminder = new CronJob('* * * * * *', async () => {
                     body: "your next job almost ready .. ",
                     click_action: ".activities.HomeActivity",
                 },
-                data: { 
-                    my_key:commonHelper.pending,
+                data: {
+                    my_key: commonHelper.pending,
                     my_another_key: commonHelper.pending,
-                    booking_id:booking[i]._id
+                    booking_id: booking[i]._id
                 }
             };
             var msg = await commonHelper.push_notifiy(message);

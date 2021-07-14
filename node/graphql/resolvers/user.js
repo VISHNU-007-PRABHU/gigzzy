@@ -161,7 +161,7 @@ module.exports.testinfmail = async (parent, args, context, info) => {
     // await saf.safaricom_payment_authorization()
     // await safaricom_lipesa_simulate()
     try{
-        let chargePayment = await saf.safaricom_refund_simulate()
+        let chargePayment = await commonHelper.send_sms("254708374149","Testing gigzzy sms")
         console.log("module.exports.testinfmail -> chargePayment", chargePayment)
         return {msg:chargePayment.msg};
     }catch(error){

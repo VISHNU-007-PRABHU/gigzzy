@@ -84,6 +84,7 @@ var bookingSchema = new Schema({
   MpesaReceiptNumber:{ type: String, default: 0 },
   payment_message:{type:String,default:""},
   mpeas_payment_callback:{ type: Boolean, default: false },
+  manual_payment_status:{ type: Boolean, default: false },
 }, schemaOptions);
 
 bookingSchema.virtual('uid').get(function () {

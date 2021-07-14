@@ -93,7 +93,7 @@ module.exports.send_sms = async (phone_no, msg) => {
       console.log("send sms ==>", suc);
     })
     .catch((err) => {
-      console.log("send sms ===>", err);
+      console.log("error sms ===>", err);
     });
 };
 //============================smsapi===================//

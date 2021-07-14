@@ -562,6 +562,7 @@ const resolvers = {
         add_providerDocument: statusResolver.add_providerDocument,
         delete_providerDocument: statusResolver.delete_providerDocument,
         pay_admin_to_provider: bookingResolver.pay_admin_to_provider,
+        update_manual_payment:bookingResolver.update_manual_payment,
         //add new booking
         add_booking: async (parent, args, context, info) => {
             var img = [];
@@ -752,7 +753,7 @@ const resolvers = {
 
                     // console.log(charge);
                     if (charge.status == "succeeded") {
-                        await Booking_model.update({ _id: args.booking_id }, { booking_status: 8, job_status: 8, payment_status: 2 }, { new: true });
+                        await Booking_model.update({ _id: args.booking_id }, { booking_status: 8, job_status: 8, payment_status: 6,manual_payment_status:true }, { new: true });
                         await Payout_model.remove({ booking_id: args.booking_id });
                         var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
 
@@ -1135,7 +1136,7 @@ const resolvers = {
                         refunded: true
                     }
                     if (charge.status == "succeeded" && charge.refunded == true) {
-                        await Booking_model.update({ _id: args.booking_id }, { booking_status: 11, job_status: 11, payment_status: 2 }, { new: true });
+                        await Booking_model.update({ _id: args.booking_id }, { booking_status: 11, job_status: 11, payment_status: 6,manual_payment_status:true }, { new: true });
                         await Payout_model.remove({ booking_id: args.booking_id });
                         var data = {
                             user_parent: true,
