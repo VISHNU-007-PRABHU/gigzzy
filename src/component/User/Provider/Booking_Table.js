@@ -74,6 +74,7 @@ class Booking_Table extends React.Component {
             {
                 title: 'User',
                 width: '15%',
+                fixed: 'left',
                 editable: true,
                 render: (text, record) => {
                     console.log(record);
@@ -140,6 +141,7 @@ class Booking_Table extends React.Component {
             {
                 title: 'Action',
                 dataIndex: 'operation',
+                fixed: 'right',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
                         <span>
@@ -163,6 +165,7 @@ class Booking_Table extends React.Component {
                     className='table_shadow'
                     dataSource={dataSource}
                     columns={columns}
+                    scroll={{ x: 'calc(700px + 50%)', y: 240 }}
                     size="middle"
                     style={{borderRadius:"1em"}}
                     pagination={this.state.pagination}

@@ -222,7 +222,7 @@ class BookingDetails extends React.Component {
                                                     <AiFillTags className="mx-3" />  Transaction Id
                                                 </div>
                                                 <div className="in_card_spilt">
-                                                    {booking[0] ? booking[0].charge_id : ""}
+                                                    {booking[0] ? booking[0].MpesaReceiptNumber : ""}
                                                 </div>
                                             </div>
                                         </Col>

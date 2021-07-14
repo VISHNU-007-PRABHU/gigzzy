@@ -215,6 +215,7 @@ query GETPARTICULARBOOKING($_id : ID) {
         total
         final_payment
         charge_id
+        MpesaReceiptNumber
         admin_fee
         service_fee
         lat
