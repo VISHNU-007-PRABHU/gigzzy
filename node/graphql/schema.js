@@ -503,6 +503,7 @@ const typeDefs = gql `
         user_comments_status:Int
         end_job_image_url:[String]
         charge_id:String
+        MpesaReceiptNumber:String
         job_status:Int
         jobStart_time:Date
         jobEnd_time:Date
