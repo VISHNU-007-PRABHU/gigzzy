@@ -347,7 +347,7 @@ const resolvers = {
                         let otp = String(Math.floor(100000 + Math.random() * 900000));
                         args.email_otp = otp;
                         args.last_email_otp_verification = moment.utc().format();
-                        var send_otp = await commonHelper.send_mail(args.email, otp);
+                        var send_otp = await commonHelper.send_mail_sendgrid(args.email, 'otp', { otp });
                     }
                 }
                 if (args.old_password != undefined && args.old_password != '') {
@@ -388,7 +388,8 @@ const resolvers = {
                             };
                             var msg_notification = await commonHelper.push_notifiy(message);
                             // ================= push_notifiy ================== //  
-                            // var send_verification = await commonHelper.send_mail_1(user.email, msg);
+                            var send_verification = await commonHelper.send_mail_sendgrid(user.email, "admin_approved", { msg });
+                            await commonHelper.send_sms(user_deails.country_code, user_deails.phone_no, "admin_apporved", {})
                             await pubsub.publish(PROOF_STATUS, { proof_status: 0, _id: args._id });
                             break;
                         }
@@ -421,6 +422,7 @@ const resolvers = {
                 if (args.device_id != null && args.device_id != undefined && args.device_id != '') {
                     const add_detail = await Detail_model.updateOne({ _id: data._id }, { device_id: args.device_id });
                 }
+                await commonHelper.send_sms(data.country_code, data.phone_no, "otp", {otp})
                 data.msg = "New User";
                 data.status = "success";
                 return data;
@@ -445,7 +447,7 @@ const resolvers = {
                         data.msg = "otp no change", data.status = 'failed';
                     }
                     // console.log({ ...data._doc, ...return_msg });
-
+                    await commonHelper.send_sms(data.country_code, data.phone_no, "otp", {otp:data.otp})
                     return data;
                 }
                 //"otp is change"
@@ -463,7 +465,7 @@ const resolvers = {
                     } else {
                         update_result.msg = "otp changed"; update_result.status = 'failed';
                     }
-
+                    await commonHelper.send_sms(update_result.country_code, update_result.phone_no, "otp", {otp})
                     return update_result;
                 }
             }
@@ -495,14 +497,14 @@ const resolvers = {
                 if (args.phone_no != '' && args.phone_no != null && typeof args.phone_no != "undefined") {
                     const find_pn = await Detail_model.find({ delete: 0, phone_no: args.phone_no, role: args.role, _id: { $ne: args._id } });
                     if (find_pn.length > 0) {
-                        return { info:{msg: "mobile no exists", status: 'failed' }}
+                        return { info: { msg: "mobile no exists", status: 'failed' } }
                     }
                 }
 
                 if (args.email) {
                     const find_email = await Detail_model.find({ delete: 0, email: args.email, role: args.role, _id: { $ne: args._id } });
                     if (find_email.length > 0) {
-                        return { info:{msg: "Email already exists", status: 'failed'}}
+                        return { info: { msg: "Email already exists", status: 'failed' } }
                     }
                 }
 
@@ -532,7 +534,8 @@ const resolvers = {
                             };
                             var msg_notification = await commonHelper.push_notifiy(message);
                             // ================= push_notifiy ================== //  
-                            var send_verification = await commonHelper.send_mail_1(user_deails.email, msg);
+                            var send_verification = await commonHelper.send_mail_sendgrid(user_deails.email, "admin_approved", { msg });
+                            await commonHelper.send_sms(user_deails.country_code, user_deails.phone_no, "admin_apporved", {})
                             await pubsub.publish(PROOF_STATUS, { proof_status: 0, _id: args._id });
                             break;
                         }
@@ -544,6 +547,8 @@ const resolvers = {
                 const update_user = await Detail_model.updateOne({ _id: args._id }, args);
                 //console.log(update_user);
                 if (update_user.n == update_user.nModified) {
+                    var user_sms_data = await Detail_model.findOne({ _id: args._id });
+                    await commonHelper.send_sms(user_sms_data.country_code, user_sms_data.phone_no, "otp", {otp})
                     return { ...args, ...{ info: { "msg": "Update Process Success", status: 'success' } } };
                 } else {
                     return { ...args, ...{ info: { "msg": "Update Process Failed !", status: 'failed' } } };
@@ -562,7 +567,7 @@ const resolvers = {
         add_providerDocument: statusResolver.add_providerDocument,
         delete_providerDocument: statusResolver.delete_providerDocument,
         pay_admin_to_provider: bookingResolver.pay_admin_to_provider,
-        update_manual_payment:bookingResolver.update_manual_payment,
+        update_manual_payment: bookingResolver.update_manual_payment,
         //add new booking
         add_booking: async (parent, args, context, info) => {
             var img = [];
@@ -753,7 +758,7 @@ const resolvers = {
 
                     // console.log(charge);
                     if (charge.status == "succeeded") {
-                        await Booking_model.update({ _id: args.booking_id }, { booking_status: 8, job_status: 8, payment_status: 6,manual_payment_status:true }, { new: true });
+                        await Booking_model.update({ _id: args.booking_id }, { booking_status: 8, job_status: 8, payment_status: 6, manual_payment_status: true }, { new: true });
                         await Payout_model.remove({ booking_id: args.booking_id });
                         var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
 
@@ -915,6 +920,7 @@ const resolvers = {
                     }
                 } else if (args.booking_status == 13) {
                     var end_data = {}
+                    let sms_notification = "job_finished"
                     // provider end the job (13)
                     end_data = { job_status: 13, booking_status: 13, jobEnd_time: moment.utc().format() };
                     var end_result = await Booking_model.update({ _id: args.booking_id }, end_data, { new: true });
@@ -962,6 +968,7 @@ const resolvers = {
                         }
                         // console.log(job_result.total);
                         if (Number(total) > (job_result.total)) {
+                            sms_notification = "pay_extra_fare"
                             await Booking_model.update({ _id: args.booking_id }, {
                                 provider_fee: String(parseFloat(provider_fee).toFixed(2)),
                                 total: String(parseFloat(total).toFixed(2)),
@@ -977,6 +984,7 @@ const resolvers = {
                         // ================= push_notifiy (to user)================== //
 
                         let user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
+                        let pro_user_detail  = await Detail_model.findOne({ _id: booking_detail.provider_id });
                         var message = {
                             to: user_detail.device_id,
                             notification: {
@@ -995,6 +1003,9 @@ const resolvers = {
                         final_result.msg = "job is end";
                         final_result.status = "success";
                         // console.log(final_result);
+                        await commonHelper.send_sms(user_detail.country_code, user_detail.phone_no, "sms_notification", {})
+                        await commonHelper.send_sms(pro_user_detail.country_code, pro_user_detail.phone_no, "job_finished", {})
+
                         var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: final_result });
                         return [final_result];
                     } else {
@@ -1136,7 +1147,7 @@ const resolvers = {
                         refunded: true
                     }
                     if (charge.status == "succeeded" && charge.refunded == true) {
-                        await Booking_model.update({ _id: args.booking_id }, { booking_status: 11, job_status: 11, payment_status: 6,manual_payment_status:true }, { new: true });
+                        await Booking_model.update({ _id: args.booking_id }, { booking_status: 11, job_status: 11, payment_status: 6, manual_payment_status: true }, { new: true });
                         await Payout_model.remove({ booking_id: args.booking_id });
                         var data = {
                             user_parent: true,
@@ -1218,6 +1229,8 @@ const resolvers = {
                         await Payout_model.update({ booking_id: args.booking_id }, { booking_status: 14 }, { new: true });
                         // ================= push_notifiy (to provider) ================== //
                         let user_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
+                        let app_user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
+
                         var message = {
                             to: user_detail.device_id,
                             notification: {
@@ -1233,6 +1246,7 @@ const resolvers = {
                         };
                         var msg = await commonHelper.push_notifiy(message);
                         // ================= push_notifiy ================== //
+                        await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_finished", {})
                         return [{ job_status: 14, msg: "job is completed successfully", status: 'success' }];
                     }
 
@@ -1378,7 +1392,8 @@ const resolvers = {
                 };
                 var msg_notification = await commonHelper.push_notifiy(message);
                 // ================= push_notifiy ================== //  
-                var send_verification = await commonHelper.send_mail_1(user.email, msg);
+                var send_verification = await commonHelper.send_mail_sendgrid(user.email, "admin_approved", { msg });
+                var send_sms_verification = await commonHelper.send_sms(user.country_code, user.phone_no, "admin_apporved", {})
                 await pubsub.publish(PROOF_STATUS, { proof_status: user });
                 return { info: { "msg": "Status Update Success", status: 'success' } };
             } else {
@@ -1431,10 +1446,10 @@ module.exports.confrimation_call = async (body) => {
             }
 
             if (pre_booking_detail.booking_status === 13) {
-                update_details['payment_status'] = 5,
-                    update_details['booking_status'] = 14,
-                    update_details['job_status'] = 14,
-                    update_details['MpesaReceiptNumber'] = body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"];
+                update_details['payment_status'] = 5;
+                update_details['booking_status'] = 14;
+                update_details['job_status'] = 14;
+                update_details['MpesaReceiptNumber'] = body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"];
                 update_details['TransactionDate'] = body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"];
             } else {
                 update_details['job_status'] = 10;
@@ -1462,6 +1477,7 @@ module.exports.confrimation_call = async (body) => {
 
             // ================= push_notifiy (to provider) ================== //
             let user_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
+            let app_user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
             if (user_detail && user_detail.device_id) {
                 var notification = {}
 
@@ -1492,7 +1508,9 @@ module.exports.confrimation_call = async (body) => {
             // ================= push_notifiy ================== //
             // return response 
             if (pre_booking_detail.booking_status === 13) {
+                await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_finished", {})
                 return resolve({ job_status: 14, msg: "job is completed successfully", status: 'success' });
+
             } else {
                 let data = {
                     user_parent: true,
@@ -1502,6 +1520,8 @@ module.exports.confrimation_call = async (body) => {
                     msg_status: 'to_provider'
                 }
                 const result = await Booking_model.find({ provider_id: booking_detail.provider_id, booking_status: 10 }).sort({ created_at: -1 });
+                await commonHelper.send_sms(user.country_code, user.phone_no, "job_assign", {})
+                await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_placed", {})
                 var appointments_details = await pubsub.publish(APPOINTMENTS, { get_my_appointments: result });
                 var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
                 return resolve({ status: true, msg: "Payment Is success !", data })

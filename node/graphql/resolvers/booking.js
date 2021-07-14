@@ -410,7 +410,7 @@ const job_reminder = new CronJob('* * * * * *', async () => {
         var minutes = Math.abs(Number(m) - Number(data[1]));
         if (Number(minutes) <= 15) {
             let user_detail = await Detail_model.findOne({ _id: booking[i].provider_id });
-            var email = await commonHelper.send_mail_1(user_detail.email, 'your next job almost ready ..');
+            var email = await commonHelper.send_mail_sendgrid(user_detail.email,"schedule_job",{msg:'your next job almost ready ..'});
             // (to provider)
             var message = {
                 to: user_detail.device_id,

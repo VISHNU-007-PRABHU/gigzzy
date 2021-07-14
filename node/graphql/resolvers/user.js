@@ -19,8 +19,8 @@ var Detail_model = model.detail;
 var Booking_model = model.booking;
 var Address_model = model.address;
 module.exports.testmail = async (parent, args, context, info) => {
-    return{
-        msg:"test"
+    return {
+        msg: "test"
     }
 }
 // find user (based on data)
@@ -48,7 +48,7 @@ module.exports.confirm_email = async (parent, args, context, info) => {
         let link = `<a> ${process.env.APP_URL}/confrim_password/${msg}</a>`;
         var update_reset_link = await Detail_model.updateOne({ _id: result._id }, { email_reset_link: String(msg) });
         if (update_reset_link.n == update_reset_link.nModified) {
-            var send_resset_link = await commonHelper.send_mail_1(args.email, link);
+            var send_resset_link = await commonHelper.send_mail_sendgrid(args.email, "reset_pwd", { link });
             return { msg: "Reset password link send to your E-mail", status: "success" };
         } else {
             return { msg: "Oops Error !", status: "failed" };
@@ -155,18 +155,18 @@ module.exports.find_payout_provider = async (parent, args, context, info) => {
 };
 
 module.exports.testinfmail = async (parent, args, context, info) => {
-    console.log("module.exports.testinfmail -> args", args)
-    //console.log('payout provider');
-    //console.log(parent);
-    // await saf.safaricom_payment_authorization()
-    // await safaricom_lipesa_simulate()
-    try{
-        let chargePayment = await commonHelper.send_sms("254708374149","Testing gigzzy sms")
+    try {
+        // let msg = "testing email template"
+        // let otp = 9890
+        // var send_verification = await commonHelper.send_mail_sendgrid("vishnu@waioz.com", "otp", {otp});
+        // console.log("module.exports.testinfmail -> send_verification", send_verification)
+
+        let chargePayment = await commonHelper.send_sms("254","708374149","otp",{otp:92173})
         console.log("module.exports.testinfmail -> chargePayment", chargePayment)
-        return {msg:chargePayment.msg};
-    }catch(error){
+        return { msg: "success test api" };
+    } catch (error) {
         console.log("module.exports.testinfmail -> error", error)
-        return {msg:error.msg};
+        return { msg: error.msg };
     }
 };
 // get user based on pagination
@@ -320,7 +320,7 @@ module.exports.addUser = async (_, args) => {
                 let otp = String(Math.floor(100000 + Math.random() * 900000));
                 args.email_otp = otp;
                 args.last_email_otp_verification = moment.utc().format();
-                var send_otp = await commonHelper.send_mail(args.email, otp);
+                var send_otp = await commonHelper.send_mail_sendgrid(args.email, "mail_register", { otp });
             }
         }
         if (args.old_password != undefined && args.old_password != '') {
@@ -362,6 +362,7 @@ module.exports.addUser = async (_, args) => {
         }
         data.msg = "New User";
         data.status = "success";
+        await commonHelper.send_sms(data.country_code, data.phone_no, "otp", {otp})
         return data;
     } else if (args.phone_no == undefined || args.phone_no == '') {
         return { ...args, "msg": "Please Enter phone Number", status: "failed" };
@@ -384,7 +385,7 @@ module.exports.addUser = async (_, args) => {
                 data.msg = "otp no change", data.status = 'failed';
             }
             // console.log({ ...data._doc, ...return_msg });
-
+            await commonHelper.send_sms(data.country_code, data.phone_no, "otp", {otp})
             return data;
         }
         //"otp is change"
@@ -402,7 +403,7 @@ module.exports.addUser = async (_, args) => {
             } else {
                 update_result.msg = "otp changed"; update_result.status = 'failed';
             }
-
+            await commonHelper.send_sms(update_result.country_code, update_result.phone_no, "otp", {otp})
             return update_result;
         }
     }
@@ -425,7 +426,7 @@ module.exports.addDetails = async (parent, args) => {
         if (args.email != '') {
             let otp = String(Math.floor(100000 + Math.random() * 900000));
             const update_opt = await Detail_model.updateOne({ _id: args.user_id }, { email_otp: otp, last_email_otp_verification: moment.utc().format() });
-            var send_otp = await commonHelper.send_mail(args.email, otp)
+            var send_otp = await commonHelper.send_mail_sendgrid(args.email, "mail_register", { otp })
             return { ...args, msg: "send opt in your email", success: "success" }
         }
     }
@@ -583,7 +584,7 @@ module.exports.resend_otp = async (_, args) => {
     if (otp_time_diff <= 15) {
         //console.log("otp is not change");
         const update_result = await Detail_model.findOne({ _id: args._id });
-        commonHelper.send_mail(update_result.email, update_result.email_otp);
+        commonHelper.send_mail_sendgrid(update_result.email, "otp", { otp: update_result.email_otp });
         return update_result;
     }
     else {
@@ -594,7 +595,7 @@ module.exports.resend_otp = async (_, args) => {
         const update_opt_time = await Detail_model.updateOne({ _id: args._id }, { email_otp: otp, last_email_otp_verification: moment.utc().format() });
         const update_result = await Detail_model.findOne({ _id: args._id });
         // console.log(send_otp);
-        commonHelper.send_mail(update_result.email, otp);
+        commonHelper.send_mail_sendgrid(update_result.email, "otp", { otp });
         return update_result;
     }
 
@@ -715,8 +716,8 @@ module.exports.kilometer = async (parent, args, context, info) => {
             dist = dist * 1.609344
             return { kilometre: Math.round(dist) };
         }
-    }else{
-        return { kilometre:0 };
+    } else {
+        return { kilometre: 0 };
     }
 
 };
