@@ -94,11 +94,11 @@ class AdminSider extends React.Component {
               <span>Static Pages</span>
               <Link to="/admin-static" />
             </Menu.Item>
-            <Menu.Item key="/admin-settings">
+            {/* <Menu.Item key="/admin-settings">
               <Icon type="setting" />
               <span>Settings</span>
               <Link to="/admin-settings" />
-            </Menu.Item>
+            </Menu.Item> */}
           </Menu>
         </Sider>
       </div>

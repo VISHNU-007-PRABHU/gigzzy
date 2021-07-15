@@ -5,7 +5,6 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import AdminSider from '../Layout/AdminSider';
 import AdminHeader from '../Layout/AdminHeader';
-// import 'react-phone-input-2/dist/style.css'
 import { client } from "../../../apollo";
 import '../../../scss/template.scss';
 import '../../../scss/Category.scss';
@@ -176,7 +175,7 @@ class Add_Static extends React.Component {
                                                 {form.getFieldDecorator("page_code", {
                                                     initialValue: this.state.update_data.page_code,
                                                     rules: [{ required: true }]
-                                                })(<Input placeholder="Code" />)}
+                                                })(<Input placeholder="Code"  disabled={this.state.update}/>)}
                                             </Form.Item>
                                         </Col>
                                     </Row>

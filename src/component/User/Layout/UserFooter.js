@@ -29,7 +29,7 @@ const UserFooter = () => {
                   <h6 style={{ color: "green" }}>Company</h6>
                 </li>
                 <li>
-                  <Link to="/about" target="_blank" className="mr-1">
+                  <Link to="/static_page/about_us" target="_blank" className="mr-1">
                     About
                   </Link>
                 </li>
@@ -56,22 +56,22 @@ const UserFooter = () => {
                   <h6 style={{ color: "green" }}>Legal</h6>
                 </li>
                 <li>
-                  <Link to="/terms" target="_blank" className="mr-1">
+                  <Link to="/static_page/terms" target="_blank" className="mr-1">
                     Terms & Condition
                   </Link>
                 </li>
                 <li>
-                  <Link to="/client" target="_blank" className="mr-1">
+                  <Link to="/static_page/client" target="_blank" className="mr-1">
                     Client Guarantee
                   </Link>
                 </li>
                 <li>
-                  <Link to="/policy" target="_blank" className="mr-1">
+                  <Link to="/static_page/policy" target="_blank" className="mr-1">
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <Link to="/conduct" target="_blank" className="mr-1">
+                  <Link to="/static_page/conduct" target="_blank" className="mr-1">
                     Gigzzy Conduct
                   </Link>
                 </li>
@@ -88,17 +88,17 @@ const UserFooter = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/why_gigzzy" target="_blank" className="mr-1">
+                  <Link to="/static_page/why_gigzzy" target="_blank" className="mr-1">
                     Why Gigzzy
                   </Link>
                 </li>
                 <li>
-                  <Link to="/professional_screening_process" target="_blank" className="mr-1">
+                  <Link to="/static_page/professional_screening_process" target="_blank" className="mr-1">
                       Professional Screening Process
                   </Link>
                 </li>
                 <li>
-                  <Link to="/faq" target="_blank" className="mr-1">
+                  <Link to="/static_page/faq" target="_blank" className="mr-1">
                     FAQs
                   </Link>
                 </li>

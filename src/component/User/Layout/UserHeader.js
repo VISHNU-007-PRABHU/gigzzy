@@ -154,9 +154,9 @@ const UserHeader = () => {
               }}
             />{"    "}
 
-              {location.pathname==="/about" ? "": <Button style={{margin:'0px 0px 0px 10px'}}
+              {location.pathname==="/static_page/about_us" ? "": <Button style={{margin:'0px 0px 0px 10px'}}
                     onClick={() => {
-                      open_new_tab("/about");
+                      open_new_tab("/static_page/about_us");
                     }}
                   >
                    About us

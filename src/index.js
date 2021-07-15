@@ -26,10 +26,8 @@ import Static from './component/Admin/Static/Static';
 import Add_Static from './component/Admin/Static/Add_static';
 import User_Login from './component/User/Login/User_Login';
 import Home_Page from './component/User/HomePage/Home_Page';
-import About from './component/Comman/about';
 import Profile_Page from './component/User/Profile/Profile';
 import Bookings_Page from './component/User/Book/Bookings';
-import Terms_Page from './component/Comman/Terms';
 import NotFound from './component/Comman/NotFound';
 import Description_Page from './component/User/Book/Description';
 import Payouts from './component/Admin/Payouts/Payouts';
@@ -47,12 +45,7 @@ import Provider_Login from './component/User/Login/Provider_Login';
 import { ConfrimPassword } from './component/User/Login/ConfrimPassword';
 import { CHECK_DEMO } from './graphql/User/login';
 import { Alert_msg } from './component/Comman/alert_msg';
-import Privacy from './component/Comman/Privacy';
-import Clints from './component/Comman/client'
-import Gigzzyconduct from './component/Comman/gigzzy_contact'
-import why_gigzzy from './component/User/About/why_gigzzy';
-import Hiring_guide from './component/User/About/Hiring_guide';
-import Faq from './component/User/About/Faq';
+import StaticPage from './component/Comman/static_page';
 
 function PrivateRoute({ component: Component, ...rest }) {
   return (
@@ -174,16 +167,8 @@ ReactDOM.render(
           <Route exact path="/login" component={User_Login} />
           <Route exact path="/Confrim_password/:id" component={ConfrimPassword} />
           <Route exact path="/signup" component={Email_Login} />
-          <Route exact path="/about" component={About} />
-          <Route exact path="/terms" component={Terms_Page} />
-          <Route exact path="/why_gigzzy" component={why_gigzzy}/>
-          <Route exact path="/professional_screening_process" component={Hiring_guide}/>
-          <Route exact path="/faq" component={Faq}/>
+          <Route exact path="/static_page/:id" component={StaticPage}/>
 
-
-          <Route exact path='/policy'component={Privacy}/>
-          <Route exact path='/client'component={Clints}/>
-          <Route exact path='/conduct'component={Gigzzyconduct}/>
           <UserRoute exact path="/profile" component={Profile_Page} />
           <UserRoute exact path="/description/:id" component={Description_Page} />
           <UserRoute exact path="/bookings" component={Bookings_Page} />
