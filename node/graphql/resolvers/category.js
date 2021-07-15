@@ -152,23 +152,38 @@ module.exports.addCategory = async (_, args, { file }) => {
         );
         args['image'] = file_name;
         var file_resize = await Jimp.read(path.join(__dirname, "../../images/category", file_name))
-        .then(image => {
-            image.resize(260, Jimp.AUTO)
-                .quality(30)
-                .write(path.join(__dirname, "../../images/category", file_name + "_small.jpg"));
-        })
-        .catch(err => {
-            // Handle an exception.
-        });
+            .then(image => {
+                image.resize(260, Jimp.AUTO)
+                    .quality(30)
+                    .write(path.join(__dirname, "../../images/category", file_name + "_small.jpg"));
+            })
+            .catch(err => {
+                // Handle an exception.
+            });
         delete args.file
     }
 
-    //console.log(args);
-    if (args.base_price) {
-        args.base_price = String(parseFloat(args.base_price).toFixed(2))
+    if (_.has(args,"base_price")) {
+        var base_price = args.base_price.replace("KSh", "");
+        if (!Number(base_price)) {
+            base_price = 0
+        }
+        args.base_price = String(parseFloat(Number(base_price)).toFixed(2))
     }
-    if (args.hour_price) {
-        args.hour_price = String(parseFloat(args.hour_price).toFixed(2))
+    
+    if (_.has(args,"hour_price")) {
+        var hour_price = args.hour_price.replace("KSh", "");
+        if (!Number(hour_price)) {
+            hour_price = 0
+        }
+        args.hour_price = String(parseFloat(Number(hour_price)).toFixed(2))
+    }
+    if (_.has(args,"day_price")) {
+        var day_price = args.day_price.replace("KSh", "");
+        if (!Number(day_price)) {
+            day_price = 0
+        }
+        args.day_price = String(parseFloat(Number(day_price)).toFixed(2))
     }
     const add_category = new Category_model(args);
     const save = await add_category.save();
@@ -203,23 +218,37 @@ module.exports.addsubCategory = async (_, args, { file }) => {
         );
         args['image'] = file_name;
         var file_resize = await Jimp.read(path.join(__dirname, "../../images/subcategory", file_name))
-        .then(image => {
-            image.resize(260, Jimp.AUTO)
-                .quality(30)
-                .write(path.join(__dirname, "../../images/subcategory", file_name + "_small.jpg"));
-        })
-        .catch(err => {
-            // Handle an exception.
-        });
+            .then(image => {
+                image.resize(260, Jimp.AUTO)
+                    .quality(30)
+                    .write(path.join(__dirname, "../../images/subcategory", file_name + "_small.jpg"));
+            })
+            .catch(err => {
+                // Handle an exception.
+            });
         delete args.file
     }
-    if (args.base_price) {
-        //console.log("vishnu",args.base_price);
-        args.base_price = String(parseFloat(args.base_price).toFixed(2));
-        //console.log(args.base_price);
+    if (_.has(args,"base_price")) {
+        var base_price = args.base_price.replace("KSh", "");
+        if (!Number(base_price)) {
+            base_price = 0
+        }
+        args.base_price = String(parseFloat(Number(base_price)).toFixed(2))
     }
-    if (args.hour_price) {
-        args.hour_price = String(parseFloat(args.hour_price).toFixed(2))
+    
+    if (_.has(args,"hour_price")) {
+        var hour_price = args.hour_price.replace("KSh", "");
+        if (!Number(hour_price)) {
+            hour_price = 0
+        }
+        args.hour_price = String(parseFloat(Number(hour_price)).toFixed(2))
+    }
+    if (_.has(args,"day_price")) {
+        var day_price = args.day_price.replace("KSh", "");
+        if (!Number(day_price)) {
+            day_price = 0
+        }
+        args.day_price = String(parseFloat(Number(day_price)).toFixed(2))
     }
     const add_subcategory = new subCategory_model(args);
     const save = await add_subcategory.save();
@@ -252,14 +281,14 @@ module.exports.updateCategory = async (parent, args, { file }) => {
             );
             args['image'] = file_name;
             var file_resize = await Jimp.read(path.join(__dirname, "../../images/category", file_name))
-            .then(image => {
-                image.resize(260, Jimp.AUTO)
-                    .quality(30)
-                    .write(path.join(__dirname, "../../images/category", file_name + "_small.jpg"));
-            })
-            .catch(err => {
-                // Handle an exception.
-            });
+                .then(image => {
+                    image.resize(260, Jimp.AUTO)
+                        .quality(30)
+                        .write(path.join(__dirname, "../../images/category", file_name + "_small.jpg"));
+                })
+                .catch(err => {
+                    // Handle an exception.
+                });
             delete args.file;
             // delete the old file
             await Category_model.find({ _id: args._id }, (err, data) => {
@@ -275,13 +304,27 @@ module.exports.updateCategory = async (parent, args, { file }) => {
             });
         }
     }
-    if (args.base_price) {
+    if (_.has(args,"base_price")) {
         var base_price = args.base_price.replace("KSh", "");
-        args.base_price = String(parseFloat(base_price).toFixed(2))
+        if (!Number(base_price)) {
+            base_price = 0
+        }
+        args.base_price = String(parseFloat(Number(base_price)).toFixed(2))
     }
-    if (args.hour_price) {
+    
+    if (_.has(args,"hour_price")) {
         var hour_price = args.hour_price.replace("KSh", "");
-        args.hour_price = String(parseFloat(hour_price).toFixed(2))
+        if (!Number(hour_price)) {
+            hour_price = 0
+        }
+        args.hour_price = String(parseFloat(Number(hour_price)).toFixed(2))
+    }
+    if (_.has(args,"day_price")) {
+        var day_price = args.day_price.replace("KSh", "");
+        if (!Number(day_price)) {
+            day_price = 0
+        }
+        args.day_price = String(parseFloat(Number(day_price)).toFixed(2))
     }
     var result = await Category_model.update({ _id: args._id }, args);
     //console.log(result);
@@ -293,63 +336,84 @@ module.exports.updateCategory = async (parent, args, { file }) => {
 };
 
 //update sub_category
-module.exports.updatesubCategory = async (_, args, { file }) => {
+module.exports.updatesubCategory = async (parent, args, { file }) => {
     //console.log(args.file);
-    if (args.subCategory_name) {
-        var pre_name = await subCategory_model.find({ subCategory_name: args.subCategory_name, delete: 0 });
-        if (pre_name.length > 1) {
-            return { ...args, ...{ info: { "msg": "This Sub Category name was already selected", status: 'failed' } } };
-        }
-    }
-    if (args.file != undefined) {
-        //console.log("file");
-        const { createReadStream, filename } = await args.file;
-        if (filename != undefined) {
-            var file_name = moment().unix() + "_" + filename;
-            await new Promise(res =>
-                createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/subcategory", file_name)))
-                    .on("close", res)
-            );
-            args['image'] = file_name;
-            var file_resize = await Jimp.read(path.join(__dirname, "../../images/subcategory", file_name))
-                .then(image => {
-                    image.resize(260, Jimp.AUTO)
-                        .quality(30)
-                        .write(path.join(__dirname, "../../images/subcategory", file_name + "_small.jpg"));
-                })
-                .catch(err => {
-                    // Handle an exception.
-                });
-            delete args.file
+    try {
 
-            // delete the old file
-            var fs = require('fs');
-            await subCategory_model.find({ _id: args._id }, (err, data) => {
-                if (typeof data[0].image == 'undefined' || data[0].image == '') {
-                    // console.log(" file not upload");
-                } else {
-                    // console.log("start file delete");
-                    var file = path.join(__dirname, "../../images/subcategory", data[0].image);
-                    fs.unlink(file, function (err) {
-                        // console.log("delete image");
-                    });
-                }
-            });
+        if (args.subCategory_name) {
+            var pre_name = await subCategory_model.find({ subCategory_name: args.subCategory_name, delete: 0 });
+            if (pre_name.length > 1) {
+                return { ...args, ...{ info: { "msg": "This Sub Category name was already selected", status: 'failed' } } };
+            }
         }
-    }
-    if (args.base_price) {
-        var base_price = args.base_price.replace("KSh", "");
-        args.base_price = String(parseFloat(base_price).toFixed(2))
-    }
-    if (args.hour_price) {
-        var hour_price = args.hour_price.replace("KSh", "");
-        args.hour_price = String(parseFloat(hour_price).toFixed(2))
-    }
-    var result = await subCategory_model.update({ _id: args._id }, args);
-    //console.log(result);
-    if (result.n == result.nModified) {
-        return { ...args, ...{ info: { "msg": "Update Process Success", status: 'success' } } };
-    } else {
+        if (args.file != undefined) {
+            //console.log("file");
+            const { createReadStream, filename } = await args.file;
+            if (filename != undefined) {
+                var file_name = moment().unix() + "_" + filename;
+                await new Promise(res =>
+                    createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/subcategory", file_name)))
+                        .on("close", res)
+                );
+                args['image'] = file_name;
+                var file_resize = await Jimp.read(path.join(__dirname, "../../images/subcategory", file_name))
+                    .then(image => {
+                        image.resize(260, Jimp.AUTO)
+                            .quality(30)
+                            .write(path.join(__dirname, "../../images/subcategory", file_name + "_small.jpg"));
+                    })
+                    .catch(err => {
+                        // Handle an exception.
+                    });
+                delete args.file
+
+                // delete the old file
+                var fs = require('fs');
+                await subCategory_model.find({ _id: args._id }, (err, data) => {
+                    if (typeof data[0].image == 'undefined' || data[0].image == '') {
+                        // console.log(" file not upload");
+                    } else {
+                        // console.log("start file delete");
+                        var file = path.join(__dirname, "../../images/subcategory", data[0].image);
+                        fs.unlink(file, function (err) {
+                            // console.log("delete image");
+                        });
+                    }
+                });
+            }
+        }
+        if (_.has(args,"base_price")) {
+            var base_price = args.base_price.replace("KSh", "");
+            if (!Number(base_price)) {
+                base_price = 0
+            }
+            args.base_price = String(parseFloat(Number(base_price)).toFixed(2))
+        }
+        
+        if (_.has(args,"hour_price")) {
+            var hour_price = args.hour_price.replace("KSh", "");
+            if (!Number(hour_price)) {
+                hour_price = 0
+            }
+            args.hour_price = String(parseFloat(Number(hour_price)).toFixed(2))
+        }
+        if (_.has(args,"day_price")) {
+            var day_price = args.day_price.replace("KSh", "");
+            if (!Number(day_price)) {
+                day_price = 0
+            }
+            args.day_price = String(parseFloat(Number(day_price)).toFixed(2))
+        }
+        var result = await subCategory_model.update({ _id: args._id }, args);
+        //console.log(result);
+        if (result.n == result.nModified) {
+            return { ...args, ...{ info: { "msg": "Update Process Success", status: 'success' } } };
+        } else {
+            return { ...args, ...{ info: { "msg": "Update Process Failed !", status: 'failed' } } };
+        }
+
+    } catch (error) {
+        console.log("module.exports.updatesubCategory -> error", error)
         return { ...args, ...{ info: { "msg": "Update Process Failed !", status: 'failed' } } };
     }
 };

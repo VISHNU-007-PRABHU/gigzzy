@@ -52,16 +52,19 @@ module.exports.get_payout = async (root, args) => {
         booking_date: 1
     };
     var wmatch = {
+        provider_fee: { $ne: 'NaN' },
         provider_id: ObjectId(args.provider_id),
         booking_status: args.booking_status,
         weeks: Number(moment().tz('Asia/Kolkata').format('W')) - 1
     };
     var mmatch = {
+        provider_fee: { $ne: 'NaN' },
         provider_id: ObjectId(args.provider_id),
         booking_status: args.booking_status,
         months: Number(moment().tz('Asia/Kolkata').format('M'))
     };
     var ymatch = {
+        provider_fee: { $ne: 'NaN' },
         provider_id: ObjectId(args.provider_id),
         booking_status: args.booking_status,
         years: Number(moment().tz('Asia/Kolkata').format('Y'))
@@ -141,9 +144,9 @@ module.exports.get_all_payout = async (root, args) => {
     var total = [];
     var match_query = {};
     if (args.provider_id) {
-        match_query = { status: 1, booking_status: 14, provider_id: args.provider_id }
+        match_query = { status: 1, booking_status: 14, provider_id: args.provider_id, amount: { $ne: 'NaN' } }
     } else {
-        match_query = { status: 1, booking_status: 14 }
+        match_query = { status: 1, booking_status: 14,amount: { $ne: 'NaN' } }
     }
     let pipeline = [
         { $match: match_query },
@@ -411,6 +414,7 @@ const job_reminder = new CronJob('* * * * * *', async () => {
         if (Number(minutes) <= 15) {
             let user_detail = await Detail_model.findOne({ _id: booking[i].provider_id });
             var email = await commonHelper.send_mail_sendgrid(user_detail.email,"schedule_job",{msg:'your next job almost ready ..'});
+            await commonHelper.send_sms(user_detail.country_code, user_detail.phone_no, "scheduled_job", {})
             // (to provider)
             var message = {
                 to: user_detail.device_id,
