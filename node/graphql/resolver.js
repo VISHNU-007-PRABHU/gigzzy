@@ -1520,7 +1520,7 @@ module.exports.confrimation_call = async (body) => {
                     msg_status: 'to_provider'
                 }
                 const result = await Booking_model.find({ provider_id: booking_detail.provider_id, booking_status: 10 }).sort({ created_at: -1 });
-                await commonHelper.send_sms(user.country_code, user.phone_no, "job_assign", {})
+                await commonHelper.send_sms(user_detail.country_code, user_detail.phone_no, "job_assign", {})
                 await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_placed", {})
                 var appointments_details = await pubsub.publish(APPOINTMENTS, { get_my_appointments: result });
                 var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
