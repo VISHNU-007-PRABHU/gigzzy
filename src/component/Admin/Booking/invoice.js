@@ -55,6 +55,7 @@ class Invoice extends React.Component {
             fetchPolicy: 'no-cache',
         }).then(result => {
             console.log(result);
+            this.current_booking_status(this.props.match.params.id)
             this.setState({
                 booking: result.data.booking,
                 booking_category: result.data.booking[0].booking_category,
@@ -63,21 +64,20 @@ class Invoice extends React.Component {
                 message: result.data.booking[0].get_booking_message,
                 booking_status:result.data.booking[0].booking_status,
             })
-            if(result.data.booking[0].booking_status === 50){
-                this.current_booking_status(this.props.match.params.id)
-            }
         });
     }
 
     current_booking_status = async (b_id) => {
+        console.log("Invoice -> current_booking_status -> b_id", b_id)
         var that = this;
         await client.subscribe({
             query: SEND_ACCEPT_MSG,
             variables: { _id: JSON.parse(localStorage.getItem('user'))._id, booking_id: b_id },
         }).subscribe({
             next(data, loading, error) {
+                console.log("Invoice -> next -> error", error)
                 if (loading) {
-                    // console.log('load');
+                    console.log('load');
                 }
                 if (data) {
                     console.log(data.data.send_accept_msg.booking_provider);
