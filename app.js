@@ -214,8 +214,7 @@ app.post('/c2b_validation', async (req, res, next) => {
 
 app.post('/c2b_confirmation', async (req, res, next) => {
   try {
-    console.log(req.body, "ops c2b")
-
+    console.log(req.body, "ops c2b")  
     return res.send({ status: true, message: "we reviced cancelled" })
   } catch (error) {
     return res.send(error.message)
@@ -226,7 +225,7 @@ app.use(async (req, res, next) => {
   const url = req.url;
   // console.log(url);
   const uriArray = url.split('/');
-  if (uriArray[1] !== 'graphql' && uriArray[1] !== "confirmation" && uriArray[1] !== "validation" && uriArray[1] !== "cancelled") {
+  if (uriArray[1] !== 'graphql' && uriArray[1] !== "c2b_confirmation" && uriArray[1] !== "c2b_validation" && uriArray[1] !== "confirmation" && uriArray[1] !== "validation" && uriArray[1] !== "cancelled") {
     // console.log("react run");
     const readFile = util.promisify(fs.readFile)
     try {
