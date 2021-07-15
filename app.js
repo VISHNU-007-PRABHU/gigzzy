@@ -203,7 +203,7 @@ app.post('/refund_confirmation', async (req, res, next) => {
   }
 })
 
-app.post('/validation', async (req, res, next) => {
+app.post('/c2b_validation', async (req, res, next) => {
   try {
     console.log(req.body, "ops validation")
     return res.send({ status: true, message: "we reviced validation" })
@@ -212,10 +212,9 @@ app.post('/validation', async (req, res, next) => {
   }
 })
 
-app.post('/cancelled', async (req, res, next) => {
+app.post('/c2b_confirmation', async (req, res, next) => {
   try {
-    console.log(req.body, "ops cancelled")
-    console.log(req.body['Result']['ReferenceData']['ReferenceItem'], "ops cancelled")
+    console.log(req.body, "ops c2b")
 
     return res.send({ status: true, message: "we reviced cancelled" })
   } catch (error) {

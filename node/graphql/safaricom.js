@@ -48,17 +48,20 @@ var safaricom_payment_authorization = async function (data) {
 module.exports.safaricom_ctob_register = async (data) => {
     try {
         let url = `https://${commonHelper.mpesaURL()}/mpesa/c2b/v1/registerurl`
-
+        let token = await safaricom_payment_authorization()
+        if (token && !token.status) {
+            return reject({ status: false, msg: "safaricom Mpesa express failed" })
+        }
         let req = unirest('POST', url)
             .headers({
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer 7vlhEMUahXwCM6a3m1TTXLwprJee'
+                'Authorization': `Bearer ${token.data.access_token}`
             })
             .send(JSON.stringify({
-                "ShortCode": 600997,
+                "ShortCode": process.env.MPESA_SHORT_CODE,
                 "ResponseType": "Completed",
-                "ConfirmationURL": "https://1ca7f53434ad.ngrok.io/confirmation",
-                "ValidationURL": "https://1ca7f53434ad.ngrok.io/validation",
+                "ConfirmationURL": "https://gigzzy.com/c2b_confirmation",
+                "ValidationURL": "https://gigzzy.com/c2b_validation",
             }))
             .end((error, raw_body) => {
                 console.log(error, raw_body);
@@ -79,23 +82,27 @@ module.exports.safaricom_ctob_register = async (data) => {
             "ResponseDescription": "Accept the service request successfully."
         }
  */
-module.exports.safaricom_ctob_simulate = async (data) => {
+module.exports.safaricom_ctob_simulate = async (PhoneNumber, amount) => {
     try {
+        if (!PhoneNumber || !amount) {
+            return reject({ status: false, msg: "Invailed params" })
+        }
         let url = "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/simulate"
+        let token = await safaricom_payment_authorization()
+        if (token && !token.status) {
+            return reject({ status: false, msg: "safaricom Mpesa express failed" })
+        }
         let req = unirest('POST', url)
             .headers({
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer 7vlhEMUahXwCM6a3m1TTXLwprJee',
-                // 'Authorization': 'Basic cFJZcjZ6anEwaThMMXp6d1FETUxwWkIzeVBDa2hNc2M6UmYyMkJmWm9nMHFRR2xWOQ=='
-                // 'Authorization': 'Bearer YkVJclpKS0toSUNyclpyQTJJRDJOaUpUd3cxYWVPb2k6eEs0UkFmcXM5UHpDVEZmNQ==' 
-                // 'Authorization': 'Basic YkVJclpKS0toSUNyclpyQTJJRDJOaUpUd3cxYWVPb2k6eEs0UkFmcXM5UHpDVEZmNQ'
+                'Authorization': `Bearer ${token.data.access_token}`
             })
             .send(JSON.stringify({
                 "CommandID": "CustomerPayBillOnline",
-                "Amount": "10",
-                "Msisdn": "254724628580",
-                "BillRefNumber": "h6dk0Ue2",
-                "ShortCode": 600981
+                "Amount": amount,
+                "Msisdn": PhoneNumber,
+                "BillRefNumber": Math.floor(100000 + Math.random() * 900000),
+                "ShortCode": process.env.MPESA_SHORT_CODE,
             }))
             .end(res => {
                 console.log(res.raw_body, 'simulate');
