@@ -134,7 +134,7 @@ module.exports.get_subcategory = async (parent, args, context, info) => {
 
 //add category { 'category_name','description','file'}
 
-module.exports.addCategory = async (_, args, { file }) => {
+module.exports.addCategory = async (parent, args, { file }) => {
     //console.log("add category");
     //console.log(args);
     if (args.category_name) {
@@ -200,7 +200,7 @@ module.exports.addCategory = async (_, args, { file }) => {
 };
 
 //  add sub category
-module.exports.addsubCategory = async (_, args, { file }) => {
+module.exports.addsubCategory = async (parent, args, { file }) => {
     // console.log("add sub category");
     // console.log(args);
     if (args.subCategory_name) {
