@@ -23,6 +23,26 @@ module.exports.testmail = async (parent, args, context, info) => {
         msg: "test"
     }
 }
+
+module.exports.testinfmail = async (parent, args, context, info) => {
+    try {
+        // let data = await saf.safaricom_ctob_register();
+        // let data = await saf.safaricom_lipesa_simulate('254705924459',"20");
+        let data =  await saf.safaricom_ctob_simulate('254705924459',"20")
+        console.log("module.exports.testinfmail -> data", data)
+        // let msg = "testing email template"
+        // let otp = 9890
+        // var send_verification = await commonHelper.send_mail_sendgrid("vishnu@waioz.com", "otp", {otp});
+        // console.log("module.exports.testinfmail -> send_verification", send_verification)
+
+        // let chargePayment = await commonHelper.send_sms("254","708374149","otp",{otp:92173})
+        // console.log("module.exports.testinfmail -> chargePayment", chargePayment)
+        return { msg: "success test api" };
+    } catch (error) {
+        console.log("module.exports.testinfmail -> error", error)
+        return { msg: error.msg };
+    }
+};
 // find user (based on data)
 module.exports.user = async (parent, args, context, info) => {
     //console.log('user-parent');
@@ -154,21 +174,7 @@ module.exports.find_payout_provider = async (parent, args, context, info) => {
     return result;
 };
 
-module.exports.testinfmail = async (parent, args, context, info) => {
-    try {
-        // let msg = "testing email template"
-        // let otp = 9890
-        // var send_verification = await commonHelper.send_mail_sendgrid("vishnu@waioz.com", "otp", {otp});
-        // console.log("module.exports.testinfmail -> send_verification", send_verification)
 
-        let chargePayment = await commonHelper.send_sms("254","708374149","otp",{otp:92173})
-        console.log("module.exports.testinfmail -> chargePayment", chargePayment)
-        return { msg: "success test api" };
-    } catch (error) {
-        console.log("module.exports.testinfmail -> error", error)
-        return { msg: error.msg };
-    }
-};
 // get user based on pagination
 module.exports.get_user = async (parent, args, context, info) => {
     var limit = args.limit || 10;

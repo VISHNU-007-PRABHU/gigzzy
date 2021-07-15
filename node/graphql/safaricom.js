@@ -48,6 +48,7 @@ var safaricom_payment_authorization = async function (data) {
 module.exports.safaricom_ctob_register = async (data) => {
     try {
         let url = `https://${commonHelper.mpesaURL()}/mpesa/c2b/v1/registerurl`
+        console.log("module.exports.safaricom_ctob_register -> url", url)
         let token = await safaricom_payment_authorization()
         if (token && !token.status) {
             return reject({ status: false, msg: "safaricom Mpesa express failed" })
@@ -58,7 +59,7 @@ module.exports.safaricom_ctob_register = async (data) => {
                 'Authorization': `Bearer ${token.data.access_token}`
             })
             .send(JSON.stringify({
-                "ShortCode": process.env.MPESA_SHORT_CODE,
+                "ShortCode": "600978",
                 "ResponseType": "Completed",
                 "ConfirmationURL": "https://gigzzy.com/c2b_confirmation",
                 "ValidationURL": "https://gigzzy.com/c2b_validation",
@@ -87,7 +88,7 @@ module.exports.safaricom_ctob_simulate = async (PhoneNumber, amount) => {
         if (!PhoneNumber || !amount) {
             return reject({ status: false, msg: "Invailed params" })
         }
-        let url = "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/simulate"
+        let url = `https://${commonHelper.mpesaURL()}/mpesa/c2b/v1/simulate`
         let token = await safaricom_payment_authorization()
         if (token && !token.status) {
             return reject({ status: false, msg: "safaricom Mpesa express failed" })
@@ -99,12 +100,13 @@ module.exports.safaricom_ctob_simulate = async (PhoneNumber, amount) => {
             })
             .send(JSON.stringify({
                 "CommandID": "CustomerPayBillOnline",
-                "Amount": amount,
-                "Msisdn": PhoneNumber,
-                "BillRefNumber": Math.floor(100000 + Math.random() * 900000),
-                "ShortCode": process.env.MPESA_SHORT_CODE,
+                "Amount": "10",
+                "Msisdn": "254724628580",
+                "BillRefNumber": "00JHY000",
+                "ShortCode":"600978",
             }))
             .end(res => {
+            console.log("module.exports.safaricom_ctob_simulate -> res", res)
                 console.log(res.raw_body, 'simulate');
                 return { status: true, msg: "safaricom ctob register success" }
             });
@@ -115,7 +117,7 @@ module.exports.safaricom_ctob_simulate = async (PhoneNumber, amount) => {
 }
 
 module.exports.safaricom_lipesa_simulate = async (PhoneNumber, amount) => {
-    return new Promise(async function (resolve, reject) {
+    return new Promise(async function (resolve, reject) {   
         try {
             if (!PhoneNumber || !amount) {
                 return reject({ status: false, msg: "Invailed params" })
@@ -142,6 +144,7 @@ module.exports.safaricom_lipesa_simulate = async (PhoneNumber, amount) => {
                 "AccountReference": "CompanyXLTD",
                 "TransactionDesc": "Payment of X"
             }
+            console.log("module.exports.safaricom_lipesa_simulate -> request_data", request_data)
             let req = unirest('POST', url)
                 .headers({
                     'Content-Type': 'application/json',

@@ -85,6 +85,7 @@ var bookingSchema = new Schema({
   payment_message:{type:String,default:""},
   mpeas_payment_callback:{ type: Boolean, default: false },
   manual_payment_status:{ type: Boolean, default: false },
+  payment_type:{ type: String, default: "" },
 }, schemaOptions);
 
 bookingSchema.virtual('uid').get(function () {

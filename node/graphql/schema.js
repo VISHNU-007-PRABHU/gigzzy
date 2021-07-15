@@ -504,6 +504,7 @@ const typeDefs = gql `
         end_job_image_url:[String]
         charge_id:String
         MpesaReceiptNumber:String
+        payment_type:String
         job_status:Int
         jobStart_time:Date
         jobEnd_time:Date
@@ -616,7 +617,7 @@ const typeDefs = gql `
         online_status(_id:ID,online_status:Int):Detail
         # booking process
         add_booking( user_id:ID,provider_id:ID,category_id:ID,lat:Float,lng:Float,weekday:JSON,hours:String,description:String,booking_status:Int,booking_type:Int,data:[JSON],file:[Upload],category_type:Int,booking_date:String,booking_time:String,booking_hour:String):[Booking]
-        manage_booking(role:Int,booking_id:ID,user_id:ID,provider_id:ID,category_id:String,lat:Float,lng:Float,weekday:JSON,hours:String,description:String,booking_status:Int,category_type:Int,stripe_token:String,phone_number:String,extra_fare:String,extra_fare_reason:String,option:Int,extra_fare_id:ID):[Booking]
+        manage_booking(role:Int,booking_id:ID,user_id:ID,provider_id:ID,category_id:String,lat:Float,lng:Float,weekday:JSON,hours:String,description:String,booking_status:Int,category_type:Int,stripe_token:String,payment_type:String,phone_number:String,extra_fare:String,extra_fare_reason:String,option:Int,extra_fare_id:ID):[Booking]
         update_booking(provider_id:ID,booking_id:ID,file:[Upload],option:Int):Booking
         update_booking_details(provider_id:ID,booking_id:ID,file:[Upload],option:Int,user_comments_status:Int):Booking
         pay_admin_to_provider(booking_status:Int,status:Int,provider_id:ID):Booking

@@ -1,21 +1,40 @@
 
 import React from "react";
-import { Icon,Tooltip } from "antd"
+import { Icon, Tooltip,Tag } from "antd"
 import 'antd/dist/antd.css';
 import '../../../scss/template.scss';
 import { client } from "../../../apollo";
+import gql from 'graphql-tag';
 import '../../../scss/template.scss';
 import { GET_PARTICULAR_BOOKING } from '../../../graphql/User/booking';
 import main from '../../../image/main.png';
 
+const payment_status = {
+    0: "welcome Gizzy",
+    50: "waiting for payment confirmation",
+    10: "Base price paid",
+    13: "Ongoing",
+    14: "Completed"
+}
+
+
+const SEND_ACCEPT_MSG = gql`
+subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
+    send_accept_msg (_id:$_id,booking_id:$booking_id){
+      _id
+      status
+      booking_status
+    }
+}`
 class Invoice extends React.Component {
     state = {
-        currency_symbol: '$',
+        currency_symbol: 'Ksh',
         collapsed: false,
         booking: [],
         booking_user: [],
         booking_provider: [],
-        booking_category: []
+        booking_category: [],
+        booking_status:0,
     };
     onToggle = (val) => {
         console.log(val);
@@ -41,10 +60,33 @@ class Invoice extends React.Component {
                 booking_category: result.data.booking[0].booking_category,
                 booking_user: result.data.booking[0].booking_user,
                 booking_provider: result.data.booking[0].booking_provider,
-                message: result.data.booking[0].get_booking_message
+                message: result.data.booking[0].get_booking_message,
+                booking_status:result.data.booking[0].booking_status,
             })
+            if(result.data.booking[0].booking_status === 50){
+                this.current_booking_status(this.props.match.params.id)
+            }
         });
     }
+
+    current_booking_status = async (b_id) => {
+        var that = this;
+        await client.subscribe({
+            query: SEND_ACCEPT_MSG,
+            variables: { _id: JSON.parse(localStorage.getItem('user'))._id, booking_id: b_id },
+        }).subscribe({
+            next(data, loading, error) {
+                if (loading) {
+                    // console.log('load');
+                }
+                if (data) {
+                    console.log(data.data.send_accept_msg.booking_provider);
+                    that.setState({ booking_category: data.data.send_accept_msg.booking_status });
+                }
+
+            }
+        });
+    };
 
     render() {
         const { booking, booking_category, booking_provider, booking_user } = this.state;
@@ -52,10 +94,17 @@ class Invoice extends React.Component {
             <div className=" col-xs-12 col-md-12 col-sm-12 invoice_body_color  " >
                 <div className="col-xs-12 col-md-12 col-sm-12 col-lg-6 main_content mx-lg-auto">
                     <div className="invoice_header mt-1">
-                        <p><img src={main} alt={'gigzzy'} className='w-50x object_fit cursor_point' /></p>
+                        <div>
+                            <img src={main} alt={'gigzzy'} className='w-50x object_fit cursor_point' />
+                        </div>
                         <div className="invoice_info">
                             <div>INVOICE NO <b>{booking[0] ? booking[0].booking_ref : ""}</b></div>
                             <div> <small>{booking[0] ? booking[0].booking_date : ""}</small></div>
+                            <div className="py-2">
+                                <Tag color="green">
+                                    { payment_status[this.state.booking_status]}
+                                </Tag>
+                            </div>
                         </div>
                     </div>
                     <div className="user_batch mx-3">
@@ -90,13 +139,13 @@ class Invoice extends React.Component {
                             <ul>
                                 <li>
                                     <label className="d-flex align-items-center">
-                                         Service Fee
+                                        Service Fee
                                         <Tooltip placement="right" title={`${booking[0]?.service_fee} %`}>
                                             <Icon className="ml-2 cursor_point" type="info-circle" />
                                         </Tooltip>
-                                      
-                                    <span className="ml-auto">
-                                        {booking[0] ? booking[0].admin_fee : ""}
+
+                                        <span className="ml-auto">
+                                            {booking[0] ? booking[0].admin_fee : ""}
                                         </span>
                                     </label>
                                 </li>
@@ -163,7 +212,7 @@ class Invoice extends React.Component {
                         <hr />
                         <p>	Thanks,</p>
                         gigzzy Team
-	                            </div>
+                    </div>
                 </div>
             </div>
         );
