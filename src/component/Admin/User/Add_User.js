@@ -337,9 +337,9 @@ class Add_User extends React.Component {
                                     </Row>
                                     <Row>
                                         <Col span={24}>
-                                            <Form.Item className="float-left">
+                                            {/* <Form.Item className="float-left">
                                                 <Checkbox checked={this.state.demo} onChange={(e) => { this.setState({ demo: e.target.checked }) }}>Demo Account</Checkbox>
-                                            </Form.Item>
+                                            </Form.Item> */}
                                             <Form.Item className="float-right">
                                                 <Button type="primary" htmlType="submit" className="mx-3" onClick={() => { this.props.history.push('/admin-user') }}>
                                                     Cancel

@@ -469,7 +469,7 @@ class Description extends React.Component {
         const { previewVisible, previewImage, fileList } = this.state;
         const uploadButton = (
             <div>
-                <Button>Upload</Button> <br/>
+                Upload
             </div>
         );
 
@@ -542,7 +542,7 @@ class Description extends React.Component {
                                                 >
                                                     {uploadButton}
                                                 </Upload>
-                                                <Button onClick={this.handleCancel} className={fileList.length===1? 'btnn':'d-none'}>Done</Button>
+                                                <Button onClick={() => this.setState({ file_upload_modal: false })} className={fileList.length > 0? 'btnn':'d-none'}>Done</Button>
                                                 <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
                                                     <img alt="example" className='object_fit' style={{ width: '100%', height: "500px" }} src={previewImage} />
                                                 </Modal>

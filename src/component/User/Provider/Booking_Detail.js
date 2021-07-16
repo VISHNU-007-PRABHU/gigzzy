@@ -190,7 +190,7 @@ class Booking_Detail extends React.Component {
                             </Card>
                             <Card bordered={0} title="Job Proof" className="mb-3 table_shadow">
                                 <Row gutter={[12, 12]}>
-                                    <Col span={8}>
+                                    <Col span={12}>
                                         <div className="d-block in_card">
                                             <div>
                                                 <FaSignInAlt className="mx-3" />  Started Job
@@ -200,7 +200,7 @@ class Booking_Detail extends React.Component {
                                             </div>
                                         </div>
                                     </Col>
-                                    <Col span={8}>
+                                    <Col span={12}>
                                         <div className="d-block in_card">
                                             <div>
                                                 <FaSignOutAlt className="mx-3" />    Ended Job
@@ -210,7 +210,7 @@ class Booking_Detail extends React.Component {
                                             </div>
                                         </div>
                                     </Col>
-                                    <Col span={8}>
+                                    {/* <Col span={8}>
                                         <div className="d-block in_card">
                                             <div>
                                                 <AiFillClockCircle className="mx-3 " /> Actual hours
@@ -219,7 +219,7 @@ class Booking_Detail extends React.Component {
                                                 {booking[0] ? booking[0].actual_time : ""}
                                             </div>
                                         </div>
-                                    </Col>
+                                    </Col> */}
                                 </Row>
                                 <Row gutter={[12, 12]}>
                                     <Col span={12}>
