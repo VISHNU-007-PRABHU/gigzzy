@@ -108,10 +108,9 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([SEND_ACCEPT_MSG]),
                 (payload, variables) => {
-                    console.log("Accepted MSG");
+                    // console.log("Accepted MSG");
                     // console.log(payload);
                     // console.log(payload.send_accept_msg.user_id);
-                    console.log(variables);
                     if (payload.send_accept_msg.msg_status != undefined && payload.send_accept_msg.msg_status == 'to_provider') {
                         if (payload.send_accept_msg.provider_id == variables._id) {
                             console.log("msg to provider");
@@ -1443,9 +1442,10 @@ module.exports.confrimation_call = async (body) => {
                     let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
                 }
                 const error_result = await Booking_model.find({ provider_id: pre_booking_detail.provider_id }).sort({ created_at: -1 });
+                let error_booking_detail = await Booking_model.findOne({ CheckoutRequestID }).lean()
                 let data = {
                     user_parent: true,
-                    ...pre_booking_detail,
+                    ...error_booking_detail,
                     msg:  update_details['payment_message'],
                     status: 'failed',
                     msg_status: 'to_provider'
