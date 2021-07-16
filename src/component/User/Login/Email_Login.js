@@ -71,15 +71,14 @@ class Email_Login extends React.Component {
                 <Row style={{ overflow: 'auto', height: '100vh' }}>
                     <Col lg={12} className="d-none d-lg-flex d-xl-flex justify-content-center align-items-center overflow-hidden h-100">
                         <div className="d-flex justify-content-around">
-                            <img src={jiffy} alt="jiffy" style={{width:500}}/>
+                            <img src={jiffy} alt="jiffy" style={{width:300}}/>
                         </div>
                     </Col>
                     <Col lg={12} md={24} sm={24} className="froms" style={{ overflow: 'auto', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-
                         <div className={this.state.email_login ? "w-75 mw-450" : " d-none"}>
                             <Row>
-                                <Col span={24} className="d-flex d-sm-flex d-lg-none justify-content-around py-3 my-2">
-                                    <img src={main} alt="jiffy" width='12' style={{ width: '7em', height: '3em' }} height='10' />
+                                <Col span={24} className="d-flex d-sm-flex d-lg-none h4 justify-content-around py-3 my-2">
+                                    <img src={main} alt="jiffy" width='12' style={{ width: '12em', height: '4em' }} height='10' class="img_cover"/>
                                 </Col>
                                 <Col span={24} className="d-flex justify-content-around py-3">
                                     <Title level={2}> <Text className="primary_color" strong={true} >LOGIN</Text></Title>

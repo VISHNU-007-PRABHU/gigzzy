@@ -304,13 +304,14 @@ class Home_Page extends React.Component {
     }
     render() {
         const settings = {
-            dots: false,
+            dots: true,
             infinite: true,
             arrows: false,
             speed: 500,
             slidesToShow: 5,
             slidesToScroll: 5,
             lazyLoad: true,
+            cssEase: "linear",
             responsive: [
                 {
                     breakpoint: 1024,
@@ -347,7 +348,7 @@ class Home_Page extends React.Component {
                     <Row>
                         <Col lg={{ span: 20, offset: 2 }}>
                             <div className="banner_section">
-                                <Carousel autoplay effect="fade">
+                                <Carousel effect="fade" dots={true} {...settings}>
                                     <div>
                                         <img alt='' src={require("../../../image/handyman.jpg")} loading="lazy" class="lazyload" />
                                     </div>
@@ -466,7 +467,7 @@ class Home_Page extends React.Component {
                                     </>
                                     : ""}
 
-                                <Modal footer={<></>} title="List subcategory based on category" className="new_modal" centered visible={this.state.service_modal} onOk={() => { this.setState({ service_modal: 0 }) }} onCancel={() => { this.setState({ service_modal: 0 }) }}>
+                                <Modal footer={<></>} title="Subcategory" className="new_modal" centered visible={this.state.service_modal} onOk={() => { this.setState({ service_modal: 0 }) }} onCancel={() => { this.setState({ service_modal: 0 }) }}>
                                     <List
                                         className="mt-4 mx-5"
                                         bordered
@@ -474,7 +475,7 @@ class Home_Page extends React.Component {
                                         dataSource={this.state.child_data}
                                         renderItem={item => (
                                             <List.Item style={{ cursor: 'pointer' }} onClick={() => { this._subcategory_book(item) }}>
-                                                <Typography.Text ><Avatar src={item.small_img_url} /></Typography.Text>
+                                                <Typography.Text ><Avatar src={item.img_url} /></Typography.Text>
                                                 <Typography.Text className="px-4">{item.subCategory_name}</Typography.Text>
                                             </List.Item>
                                         )}

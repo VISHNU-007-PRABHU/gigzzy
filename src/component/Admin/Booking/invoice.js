@@ -95,6 +95,13 @@ class Invoice extends React.Component {
                 <div className="col-xs-12 col-md-12 col-sm-12 col-lg-6 main_content mx-lg-auto">
                     <div className="invoice_header mt-1">
                         <div>
+                            <a href="/bookings">
+                                <Tooltip placement="left" title="Back to Booking">
+                                    <Icon className="ml-2 cursor_point" type="arrow-left" style={{ fontSize: "26px" }}/>
+                                </Tooltip>
+                            </a>
+                        </div>
+                        <div>
                             <img src={main} alt={'gigzzy'} className='w-50x object_fit cursor_point' />
                         </div>
                         <div className="invoice_info">

@@ -267,10 +267,10 @@ class Profile extends React.Component {
                                             </div>
                                         </Modal>
                                     </Col>
-                                    <Col span={1} >
-                                        <div className="text-center">
+                                    <Col orientation="left" justify="end" span={1}>
+                                        <div className="text-center cursor_point">
                                             <Tooltip title="Edit Your Profile">
-                                                <Icon className="ml-auto" theme="filled" type="edit" onClick={() => { this.setState({location_modal:false,  edit_profile_modal: true, detail: 1 }) }} className="normal_font_size" />
+                                                <Icon theme="filled" type="edit" onClick={() => { this.setState({location_modal:false,  edit_profile_modal: true, detail: 1 }) }} className="normal_font_size" />
                                             </Tooltip>
                                         </div>
                                     </Col>
@@ -316,8 +316,8 @@ class Profile extends React.Component {
                                         <h4>Privacy Policy</h4>
                                         <p className="normal_font_size mb-4">it is a short explanation of what you are doing to observe visitors to your website.</p>
                                         <ul className="list-style-none p-0">
-                                            <li className="d-flex align-items-center justify-content-between mb-2 normal_font_size cursor_point" onClick={() => { this.props.history.push('/about') }}>Help & Support <GoChevronRight /> </li>
-                                            <li className="d-flex align-items-center justify-content-between mb-2 normal_font_size cursor_point" onClick={() => { this.props.history.push('/terms') }}>Terms & Conditions <GoChevronRight /> </li>
+                                            <li className="d-flex align-items-center justify-content-between mb-2 normal_font_size cursor_point" onClick={() => { this.props.history.push('/static_page/about_us') }}>Help & Support <GoChevronRight /> </li>
+                                            <li className="d-flex align-items-center justify-content-between mb-2 normal_font_size cursor_point" onClick={() => { this.props.history.push('/static_page/terms') }}>Terms & Conditions <GoChevronRight /> </li>
                                         </ul>
                                     </Col>
                                 </Row>

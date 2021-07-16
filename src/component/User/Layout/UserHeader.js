@@ -92,7 +92,7 @@ const UserHeader = () => {
             : "d-none"
         }
         onClick={() => {
-          open_new_tab("/about");
+          open_new_tab("/static_page/about_us");
         }}
       >
         <Icon type="setting" />
@@ -105,7 +105,7 @@ const UserHeader = () => {
             : "d-none"
         }
         onClick={() => {
-          open_new_tab("/terms");
+          open_new_tab("/static_page/terms");
         }}
       >
         <Icon type="info-circle" />

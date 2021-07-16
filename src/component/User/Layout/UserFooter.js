@@ -17,39 +17,30 @@ const { Footer } = Layout;
 const UserFooter = () => {
   return (
     <div>
-      <Footer className="footer_bg px-1">
-        <Row>
-          <Col
-            lg={{ span: 20, offset: 2 }}
-            className="d-flex justify-content-around py-1"
-          >
+      <Footer className="footer_bg">
+        <Row gutter={[16, 16]}>
+          <Col className="gutter-row justify-content-around d-flex" xs={12} md={6}>
             <div>
               <ul>
                 <li>
                   <h6 style={{ color: "green" }}>Company</h6>
                 </li>
                 <li>
-                  <Link to="/static_page/about_us" target="_blank" className="mr-1">
-                    About
-                  </Link>
+                  <Link to="/static_page/about_us" target="_blank" className="mr-1">About</Link>
                 </li>
                 <li>
-                  <Link target="_blank" className="mr-1">
-                    Blog
-                  </Link>
+                  <Link target="_blank" className="mr-1">Blog</Link>
                 </li>
                 <li>
-                  <Link target="_blank" className="mr-1">
-                    Careers
-                  </Link>
+                  <Link target="_blank" className="mr-1">Careers</Link>
                 </li>
                 <li>
-                  <Link to="/provider_login" target="_blank" className="mr-1">
-                    Become a Pro
-                  </Link>
+                  <Link to="/provider_login" target="_blank" className="mr-1">Become a Pro</Link>
                 </li>
               </ul>
             </div>
+          </Col>
+          <Col className="gutter-row justify-content-around d-flex" xs={12} md={6}>
             <div>
               <ul>
                 <li>
@@ -77,6 +68,8 @@ const UserFooter = () => {
                 </li>
               </ul>
             </div>
+          </Col>
+          <Col className="gutter-row justify-content-around d-flex" xs={12} md={6}>
             <div>
               <ul>
                 <li>
@@ -104,6 +97,8 @@ const UserFooter = () => {
                 </li>
               </ul>
             </div>
+          </Col>
+          <Col className="gutter-row justify-content-around d-flex" xs={12} md={6}>
             <div>
               <ul>
                 <li>

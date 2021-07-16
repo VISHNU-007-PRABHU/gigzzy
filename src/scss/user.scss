@@ -127,6 +127,13 @@ body {
 .img_fit {
     object-fit: contain;
 }
+
+.img_cover {
+    vertical-align: middle;
+    border-style: none;
+    object-fit: cover;
+}
+
 .max_height_25 {
     max-height: 25em;
 }
@@ -228,6 +235,14 @@ span.ant-form-item-children.d-block {
         text-align: left;
         margin: 13px 0px;
         overflow: hidden;
+    }
+    
+    
+}
+
+@media only screen and (min-width: 900px) {
+    .otp_align {
+        margin-left: 85px;
     }
 }
 
