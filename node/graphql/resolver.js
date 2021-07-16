@@ -1455,7 +1455,7 @@ module.exports.confrimation_call = async (body) => {
                 // to user
                 let error_invoice_user_data = {
                     user_parent: true,
-                    ...booking_detail.data._doc,
+                    ...pre_booking_detail,
                     msg: update_details['payment_message'],
                     status: 'failed',
                     msg_status: 'to_user'
