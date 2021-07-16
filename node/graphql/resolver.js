@@ -422,7 +422,7 @@ const resolvers = {
                 if (args.device_id != null && args.device_id != undefined && args.device_id != '') {
                     const add_detail = await Detail_model.updateOne({ _id: data._id }, { device_id: args.device_id });
                 }
-                await commonHelper.send_sms(data.country_code, data.phone_no, "otp", {otp})
+                await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp })
                 data.msg = "New User";
                 data.status = "success";
                 return data;
@@ -447,7 +447,7 @@ const resolvers = {
                         data.msg = "otp no change", data.status = 'failed';
                     }
                     // console.log({ ...data._doc, ...return_msg });
-                    await commonHelper.send_sms(data.country_code, data.phone_no, "otp", {otp:data.otp})
+                    await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp: data.otp })
                     return data;
                 }
                 //"otp is change"
@@ -465,7 +465,7 @@ const resolvers = {
                     } else {
                         update_result.msg = "otp changed"; update_result.status = 'failed';
                     }
-                    await commonHelper.send_sms(update_result.country_code, update_result.phone_no, "otp", {otp})
+                    await commonHelper.send_sms(update_result.country_code, update_result.phone_no, "otp", { otp })
                     return update_result;
                 }
             }
@@ -548,7 +548,7 @@ const resolvers = {
                 //console.log(update_user);
                 if (update_user.n == update_user.nModified) {
                     var user_sms_data = await Detail_model.findOne({ _id: args._id });
-                    await commonHelper.send_sms(user_sms_data.country_code, user_sms_data.phone_no, "otp", {otp})
+                    await commonHelper.send_sms(user_sms_data.country_code, user_sms_data.phone_no, "otp", { otp })
                     return { ...args, ...{ info: { "msg": "Update Process Success", status: 'success' } } };
                 } else {
                     return { ...args, ...{ info: { "msg": "Update Process Failed !", status: 'failed' } } };
@@ -984,7 +984,7 @@ const resolvers = {
                         // ================= push_notifiy (to user)================== //
 
                         let user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
-                        let pro_user_detail  = await Detail_model.findOne({ _id: booking_detail.provider_id });
+                        let pro_user_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
                         var message = {
                             to: user_detail.device_id,
                             notification: {
@@ -1433,16 +1433,26 @@ module.exports.confrimation_call = async (body) => {
 
             let pre_booking_detail = await Booking_model.findOne({ CheckoutRequestID }).lean()
             if (ResultCode != 0) {
+
                 if (pre_booking_detail.booking_status === 13) {
                     update_details['mpeas_payment_callback'] = false;
                     let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
-                    return resolve({ status: true, msg: "Mpesa Final Payment failed !" })
                 } else {
                     update_details['job_status'] = 11;
                     update_details['booking_status'] = 11;
                     let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
-                    return resolve({ status: true, msg: "Mpesa Payment failed !" })
                 }
+                const error_result = await Booking_model.find({ provider_id: pre_booking_detail.provider_id }).sort({ created_at: -1 });
+                let data = {
+                    user_parent: true,
+                    ...pre_booking_detail,
+                    msg:  update_details['payment_message'],
+                    status: 'failed',
+                    msg_status: 'to_provider'
+                }
+                await pubsub.publish(APPOINTMENTS, { get_my_appointments: error_result });
+                await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
+                return resolve({ status: true, msg: "Mpesa Payment failed !" })
             }
 
             if (pre_booking_detail.booking_status === 13) {
