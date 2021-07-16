@@ -1452,6 +1452,7 @@ module.exports.confrimation_call = async (body) => {
                 }
                 await pubsub.publish(APPOINTMENTS, { get_my_appointments: error_result });
                 await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
+                await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: pre_booking_detail });
                 return resolve({ status: true, msg: "Mpesa Payment failed !" })
             }
 
@@ -1534,6 +1535,9 @@ module.exports.confrimation_call = async (body) => {
                 await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_placed", {})
                 var appointments_details = await pubsub.publish(APPOINTMENTS, { get_my_appointments: result });
                 var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
+                //to user
+                await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: booking_detail.data._doc });
+                console.log("module.exports.confrimation_call -> cancel_provider_to_user", cancel_provider_to_user)
                 return resolve({ status: true, msg: "Payment Is success !", data })
             }
 
