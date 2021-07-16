@@ -547,7 +547,9 @@ const resolvers = {
                 //console.log(update_user);
                 if (update_user.n == update_user.nModified) {
                     var user_sms_data = await Detail_model.findOne({ _id: args._id });
-                    await commonHelper.send_sms(user_sms_data.country_code, user_sms_data.phone_no, "otp", { otp })
+                    if(data.phone_no && user_sms_data.phone_no !== data.phone_no){
+                        await commonHelper.send_sms(user_sms_data.country_code, user_sms_data.phone_no, "otp", { otp:user_sms_data.otp })
+                    }
                     return { ...args, ...{ info: { "msg": "Update Process Success", status: 'success' } } };
                 } else {
                     return { ...args, ...{ info: { "msg": "Update Process Failed !", status: 'failed' } } };
