@@ -1460,7 +1460,8 @@ module.exports.confrimation_call = async (body) => {
                     status: 'failed',
                     msg_status: 'to_user'
                 }
-                await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: error_invoice_user_data });
+               let error_payment_issues =  await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: error_invoice_user_data });
+               console.log("module.exports.confrimation_call -> error_payment_issues", error_payment_issues)
                 return resolve({ status: true, msg: "Mpesa Payment failed !" })
             }
 
