@@ -549,11 +549,11 @@ class Home_Page extends React.Component {
                                                     }}>
 
                                                         <Col xs={4} md={4} >
-                                                            <img alt='' loading="lazy" className="lazyload w-100 h-100" src={data.booking_provider[0].small_img_url} />
+                                                            <img alt='' loading="lazy" className="lazyload w-100 h-100" src={data.booking_provider[0]?.small_img_url} />
                                                         </Col>
                                                         <Col xs={20} md={20} className="py-3 pl-4 d-flex justify-content-between">
-                                                            <p className="m-0">{data.booking_provider[0].name}</p>
-                                                            <p className="m-0">{data.booking_provider[0].phone_number}</p>
+                                                            <p className="m-0">{data.booking_provider[0]?.name}</p>
+                                                            <p className="m-0">{data.booking_provider[0]?.phone_number}</p>
                                                         </Col>
                                                     </Row>
                                                 </Card>
