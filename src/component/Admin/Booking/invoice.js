@@ -13,6 +13,8 @@ const payment_status = {
     0: "welcome Gizzy",
     50: "waiting for payment confirmation",
     10: "Base price paid",
+    11: "Booking canceled",
+    4:"Job started",
     13: "Ongoing",
     14: "Completed"
 }
@@ -80,8 +82,8 @@ class Invoice extends React.Component {
                     console.log('load');
                 }
                 if (data) {
-                    console.log(data.data.send_accept_msg.booking_provider);
-                    that.setState({ booking_category: data.data.send_accept_msg.booking_status });
+                    console.log(data.data.send_accept_msg);
+                    that.setState({ booking_status: data.data.send_accept_msg.booking_status });
                 }
 
             }
