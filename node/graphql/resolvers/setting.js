@@ -16,7 +16,7 @@ var site_setting = model.site_setting;
 
 module.exports.site_setting_detail = async (parent, args, context, info) => {
     var result = await site_setting.findOne(args);
-    console.log(result);
+    // console.log(result);
     return result;
 };
 

@@ -107,7 +107,7 @@ module.exports.get_category = async (root, args) => {
         data = args.data;
     }
     data.delete = 0;
-    console.log(data)
+    // console.log(data)
     var total = await Category_model.count(data);
     var result = await Category_model.find(data).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
     var pageInfo = { totalDocs: total, page: args.page }
@@ -413,7 +413,7 @@ module.exports.updatesubCategory = async (parent, args, { file }) => {
         }
 
     } catch (error) {
-        console.log("module.exports.updatesubCategory -> error", error)
+        // console.log("module.exports.updatesubCategory -> error", error)
         return { ...args, ...{ info: { "msg": "Update Process Failed !", status: 'failed' } } };
     }
 };

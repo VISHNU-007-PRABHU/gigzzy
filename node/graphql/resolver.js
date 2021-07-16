@@ -1070,13 +1070,13 @@ const resolvers = {
                     args['admin_fee'] = admin_fee;
                     args['provider_fee'] = provider_fee
                     args['total'] = amount;
-                    console.log("osp")
+                    // console.log("osp")
                     try {
                         var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(amount))
-                        console.log("charge", charge)
+                        // console.log("charge", charge)
                         if (charge.status == true && charge.data.ResponseCode === '0') {
                             // update charge amount
-                            console.log(charge.data.MerchantRequestID, args.booking_id)
+                            // console.log(charge.data.MerchantRequestID, args.booking_id)
                             var update_booking = await Booking_model.update({ _id: args.booking_id }, {
                                 accept_date: moment.utc().format(),
                                 admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
@@ -1104,7 +1104,7 @@ const resolvers = {
                         }
 
                     } catch (err) {
-                        console.log("err", err)
+                        // console.log("err", err)
                         return [{ msg: "Booking Payment failed", status: 'failed' }]
                     }
 
@@ -1422,7 +1422,7 @@ const remove_demo_acount = new CronJob('* * * * * *', async () => {
 module.exports.confrimation_call = async (body) => {
     return new Promise(async function (resolve, reject) {
         try {
-            console.log("module.exports.confrimation_call -> body", body)
+            // console.log("module.exports.confrimation_call -> body", body)
             let CheckoutRequestID = body["Body"]["stkCallback"]["CheckoutRequestID"]
             let ResultCode = body["Body"]["stkCallback"]["ResultCode"]
             let update_details = {
