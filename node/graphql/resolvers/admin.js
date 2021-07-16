@@ -154,10 +154,10 @@ module.exports.get_others_chart = async (root, args) => {
         { $group: { _id: 1, revenue: { $sum: { "$toDouble": "$admin_fee" } }, earning: { $sum: { "$toDouble": "$total" } } } },
     ];
     var complete_data = await Booking_model.count({ booking_status: 14 });
-    console.log("module.exports.get_others_chart -> complete_data", complete_data)
+    // console.log("module.exports.get_others_chart -> complete_data", complete_data)
     if (complete_data > 0) {
         var data = await Booking_model.aggregate(pipeline);
-        console.log("module.exports.get_others_chart -> data", data)
+        // console.log("module.exports.get_others_chart -> data", data)
     } else {
         var revenue_count = { revenue: "0.00", earning: "0.00" };
         data.push(revenue_count);

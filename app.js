@@ -88,6 +88,16 @@ class UpperCaseDirective extends SchemaDirectiveVisitor {
   }
 }
 
+
+class c2bDirective extends SchemaDirectiveVisitor {
+  visitFieldDefinition(field) {
+    const { resolve = defaultFieldResolver } = field;
+    field.resolve = async function (...args) {
+      return false;
+    };
+  }
+}
+
 class currencyDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
@@ -126,10 +136,12 @@ const server = new ApolloServer({
     ref: refDirective,
     date: DateFormatDirective,
     upper: UpperCaseDirective,
-    imgSize: ImgSizeDirective
+    imgSize: ImgSizeDirective,
+    payment:c2bDirective
   },
   subscriptions: {
-    onConnect: () => console.log('Connected to websocket'),
+    onConnect: () => {},
+    // console.log('Connected to websocket'),
     onDisconnect: () => {
     },
     uploads: {
@@ -181,10 +193,10 @@ app.use('/static', express.static(__dirname + '/public'));
 app.post('/confirmation', async (req, res, next) => {
   try {
     let confirm_data = await confrimation_call(req.body)
-    console.log("confirm_data", confirm_data)
+    // console.log("confirm_data", confirm_data)
     return res.send({ status: true, message: "we reviced confirmation" })
   } catch (error) {
-    console.log("confirmation error", error)
+    // console.log("confirmation error", error)
     return res.send(error)
   }
 })
@@ -254,7 +266,7 @@ app.use(cors({ origin: 'http://localhost:3000' }));
 
 mongoose.connect('mongodb://localhost/gigzzy').then(() => {
 }).catch((err) => {
-  console.log("Not Connected to Database ERROR! ", err);
+  // console.log("Not Connected to Database ERROR! ", err);
 });
 
 

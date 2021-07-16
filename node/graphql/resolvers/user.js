@@ -28,18 +28,18 @@ module.exports.testinfmail = async (parent, args, context, info) => {
     try {
         // let data = await saf.safaricom_ctob_register();
         // let data = await saf.safaricom_lipesa_simulate('254705924459',"20");
-        let data =  await saf.safaricom_ctob_simulate('254705924459',"20")
-        console.log("module.exports.testinfmail -> data", data)
+        // let data =  await saf.safaricom_ctob_simulate('254705924459',"20")
+        // console.log("module.exports.testinfmail -> data", data)
         // let msg = "testing email template"
         // let otp = 9890
         // var send_verification = await commonHelper.send_mail_sendgrid("vishnu@waioz.com", "otp", {otp});
         // console.log("module.exports.testinfmail -> send_verification", send_verification)
 
-        // let chargePayment = await commonHelper.send_sms("254","708374149","otp",{otp:92173})
+        let chargePayment = await commonHelper.send_sms("254","705924459","otp",{otp:9213})
         // console.log("module.exports.testinfmail -> chargePayment", chargePayment)
         return { msg: "success test api" };
     } catch (error) {
-        console.log("module.exports.testinfmail -> error", error)
+        // console.log("module.exports.testinfmail -> error", error)
         return { msg: error.msg };
     }
 };
@@ -703,7 +703,7 @@ module.exports.kilometer = async (parent, args, context, info) => {
     var result;
     if (parent._id) {
         result = await Booking_model.findOne({ _id: parent._id });
-        console.log(result);
+        // console.log(result);
         if (args.lat == result.location.coordinates[1] && args.lng == result.location.coordinates[0]) {
             return { kilometre: 0 };
         }
@@ -768,7 +768,7 @@ module.exports.user_address = async (parent, args, context, info) => {
 
 
 module.exports.user_search = async (parent, args, context, info) => {
-    console.log(args)
+    // console.log(args)
     return await Detail_model.find(args.data);
 }
 

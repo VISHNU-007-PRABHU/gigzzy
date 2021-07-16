@@ -47,15 +47,15 @@ module.exports.update_msg_is_read = async (parent, args) => {
 };
 
 module.exports.add_providerDocument = async (_, args, { file }) => {
-    console.log(args);
-    console.log(args.file.length);
+    // console.log(args);
+    // console.log(args.file.length);
     if (args.user_id == undefined || args.user_id == '' || args.user_id == null) {
         return { msg: "please check user id", status: "failed" };
     }
     if (args.file != '') {
         var img_data = [];
         for (let i = 0; i < args.file.length; i++) {
-            console.log(i);
+            // console.log(i);
             var img = {}
             const { createReadStream, filename } = await args.file[i];
             if (filename != undefined) {
@@ -68,7 +68,7 @@ module.exports.add_providerDocument = async (_, args, { file }) => {
                 img_data.push(file_name);
             }
         }
-        console.log(img_data);
+        // console.log(img_data);
         if (args.option == "personal") {
             if (img_data.length > 0) {
                 for (let j = 0; j < img_data.length; j++) {
@@ -79,23 +79,23 @@ module.exports.add_providerDocument = async (_, args, { file }) => {
                 var data = await Detail_model.findOne({ _id: args.user_id });
                 data.msg = "upload success";
                 data.status = "success";
-                console.log(data);
+                // console.log(data);
                 return data;
             }
         } else if (args.option == "professional") {
-            console.log("professional");
-            console.log(img_data.length);
+            // console.log("professional");
+            // console.log(img_data.length);
             if (img_data.length > 0) {
                 for (let j = 0; j < img_data.length; j++) {
                     console.log('ceh',j);
                  var df= await Detail_model.updateOne({ "_id": args.user_id }, { $push: { professional_document: img_data[j] } },{new:true});
-                    console.log(df);
+                    // console.log(df);
                 }
                 console.log("professional return");
                 var data = await Detail_model.findOne({ _id: args.user_id });
                 data.msg = "upload success";
                 data.status = "success";
-                console.log(data);
+                // console.log(data);
                 return data;
             }
         }
@@ -114,7 +114,7 @@ module.exports.delete_providerDocument = async (_, args) => {
     var request = {}
     var myArray = args.filename.split("/");
     var file_name = myArray[myArray.length - 1];
-    console.log(file_name);
+    // console.log(file_name);
     if (args.option == "personal") {
         request = { personal_document: file_name }
     } else if (args.option == "professional") {

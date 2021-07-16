@@ -111,16 +111,15 @@ const resolvers = {
                     // console.log("Accepted MSG");
                     // console.log(payload);
                     // console.log(payload.send_accept_msg.user_id);
-                    //console.log(variables);
                     if (payload.send_accept_msg.msg_status != undefined && payload.send_accept_msg.msg_status == 'to_provider') {
                         if (payload.send_accept_msg.provider_id == variables._id) {
-                            //console.log("msg to provider");
+                            console.log("msg to provider");
                             return true;
                         }
                     } else {
                         if (payload.send_accept_msg.user_id == variables._id) {
                             if (payload.send_accept_msg._id == variables.booking_id) {
-                                //console.log("msg to user");
+                                console.log("msg to user user to cancel");
                                 return true;
                             }
                         }
@@ -422,7 +421,7 @@ const resolvers = {
                 if (args.device_id != null && args.device_id != undefined && args.device_id != '') {
                     const add_detail = await Detail_model.updateOne({ _id: data._id }, { device_id: args.device_id });
                 }
-                await commonHelper.send_sms(data.country_code, data.phone_no, "otp", {otp})
+                await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp })
                 data.msg = "New User";
                 data.status = "success";
                 return data;
@@ -447,7 +446,7 @@ const resolvers = {
                         data.msg = "otp no change", data.status = 'failed';
                     }
                     // console.log({ ...data._doc, ...return_msg });
-                    await commonHelper.send_sms(data.country_code, data.phone_no, "otp", {otp:data.otp})
+                    await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp: data.otp })
                     return data;
                 }
                 //"otp is change"
@@ -465,7 +464,7 @@ const resolvers = {
                     } else {
                         update_result.msg = "otp changed"; update_result.status = 'failed';
                     }
-                    await commonHelper.send_sms(update_result.country_code, update_result.phone_no, "otp", {otp})
+                    await commonHelper.send_sms(update_result.country_code, update_result.phone_no, "otp", { otp })
                     return update_result;
                 }
             }
@@ -548,12 +547,15 @@ const resolvers = {
                 //console.log(update_user);
                 if (update_user.n == update_user.nModified) {
                     var user_sms_data = await Detail_model.findOne({ _id: args._id });
-                    await commonHelper.send_sms(user_sms_data.country_code, user_sms_data.phone_no, "otp", {otp})
+                    if(data.phone_no && user_sms_data.phone_no !== data.phone_no){
+                        await commonHelper.send_sms(user_sms_data.country_code, user_sms_data.phone_no, "otp", { otp:user_sms_data.otp })
+                    }
                     return { ...args, ...{ info: { "msg": "Update Process Success", status: 'success' } } };
                 } else {
                     return { ...args, ...{ info: { "msg": "Update Process Failed !", status: 'failed' } } };
                 }
             } catch (error) {
+                console.log("admin_update_user:admin_update_user -> error", error)
                 return { ...args, ...{ info: { "msg": "Update Process Failed !", status: 'failed' } } };
             }
         },
@@ -984,7 +986,7 @@ const resolvers = {
                         // ================= push_notifiy (to user)================== //
 
                         let user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
-                        let pro_user_detail  = await Detail_model.findOne({ _id: booking_detail.provider_id });
+                        let pro_user_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
                         var message = {
                             to: user_detail.device_id,
                             notification: {
@@ -1070,13 +1072,13 @@ const resolvers = {
                     args['admin_fee'] = admin_fee;
                     args['provider_fee'] = provider_fee
                     args['total'] = amount;
-                    console.log("osp")
+                    // console.log("osp")
                     try {
                         var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(amount))
-                        console.log("charge", charge)
+                        // console.log("charge", charge)
                         if (charge.status == true && charge.data.ResponseCode === '0') {
                             // update charge amount
-                            console.log(charge.data.MerchantRequestID, args.booking_id)
+                            // console.log(charge.data.MerchantRequestID, args.booking_id)
                             var update_booking = await Booking_model.update({ _id: args.booking_id }, {
                                 accept_date: moment.utc().format(),
                                 admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
@@ -1104,7 +1106,7 @@ const resolvers = {
                         }
 
                     } catch (err) {
-                        console.log("err", err)
+                        // console.log("err", err)
                         return [{ msg: "Booking Payment failed", status: 'failed' }]
                     }
 
@@ -1422,7 +1424,7 @@ const remove_demo_acount = new CronJob('* * * * * *', async () => {
 module.exports.confrimation_call = async (body) => {
     return new Promise(async function (resolve, reject) {
         try {
-            console.log("module.exports.confrimation_call -> body", body)
+            // console.log("module.exports.confrimation_call -> body", body)
             let CheckoutRequestID = body["Body"]["stkCallback"]["CheckoutRequestID"]
             let ResultCode = body["Body"]["stkCallback"]["ResultCode"]
             let update_details = {
@@ -1433,16 +1435,37 @@ module.exports.confrimation_call = async (body) => {
 
             let pre_booking_detail = await Booking_model.findOne({ CheckoutRequestID }).lean()
             if (ResultCode != 0) {
+
                 if (pre_booking_detail.booking_status === 13) {
                     update_details['mpeas_payment_callback'] = false;
                     let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
-                    return resolve({ status: true, msg: "Mpesa Final Payment failed !" })
                 } else {
                     update_details['job_status'] = 11;
                     update_details['booking_status'] = 11;
                     let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
-                    return resolve({ status: true, msg: "Mpesa Payment failed !" })
                 }
+                const error_result = await Booking_model.find({ provider_id: pre_booking_detail.provider_id }).sort({ created_at: -1 });
+                let error_booking_detail = await Booking_model.findOne({ CheckoutRequestID }).lean()
+                let data = {
+                    user_parent: true,
+                    ...error_booking_detail,
+                    msg:  update_details['payment_message'],
+                    status: 'failed',
+                    msg_status: 'to_provider'
+                }
+                await pubsub.publish(APPOINTMENTS, { get_my_appointments: error_result });
+                await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
+                // to user
+                let error_invoice_user_data = {
+                    user_parent: true,
+                    ...error_booking_detail,
+                    msg: update_details['payment_message'],
+                    status: 'failed',
+                    msg_status: 'to_user'
+                }
+               let error_payment_issues =  await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: error_invoice_user_data });
+               console.log(error_payment_issues,"module.exports.confrimation_call -> error_payment_issues")
+                return resolve({ status: true, msg: "Mpesa Payment failed !" })
             }
 
             if (pre_booking_detail.booking_status === 13) {
@@ -1524,6 +1547,16 @@ module.exports.confrimation_call = async (body) => {
                 await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_placed", {})
                 var appointments_details = await pubsub.publish(APPOINTMENTS, { get_my_appointments: result });
                 var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
+                //to user
+                let invoice_user_data = {
+                    user_parent: true,
+                    ...booking_detail.data._doc,
+                    msg: "user accept the job ",
+                    status: 'success',
+                    msg_status: 'to_user'
+                }
+                await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: invoice_user_data });
+                console.log("module.exports.confrimation_call -> cancel_provider_to_user", cancel_provider_to_user)
                 return resolve({ status: true, msg: "Payment Is success !", data })
             }
 

@@ -24,13 +24,13 @@ var safaricom_payment_authorization = async function (data) {
                 .send()
                 .end(async res => {
                     if (res.error) {
-                        console.log("mpesa res.error", res.error)
+                        // console.log("mpesa res.error", res.error)
                         return reject({ status: false, msg: "error in safaricom payment authorization" })
                     }
                     return resolve({ status: true, msg: "success in safaricom payment authorization", data: JSON.parse(res.raw_body) })
                 });
         } catch (error) {
-            console.log("mpesa authu error", error)
+            // console.log("mpesa authu error", error)
             return reject({ status: false, msg: "error in safaricom payment authorization" })
         }
     })
@@ -48,7 +48,7 @@ var safaricom_payment_authorization = async function (data) {
 module.exports.safaricom_ctob_register = async (data) => {
     try {
         let url = `https://${commonHelper.mpesaURL()}/mpesa/c2b/v1/registerurl`
-        console.log("module.exports.safaricom_ctob_register -> url", url)
+        // console.log("module.exports.safaricom_ctob_register -> url", url)
         let token = await safaricom_payment_authorization()
         if (token && !token.status) {
             return reject({ status: false, msg: "safaricom Mpesa express failed" })
@@ -65,11 +65,11 @@ module.exports.safaricom_ctob_register = async (data) => {
                 "ValidationURL": "https://gigzzy.com/c2b_validation",
             }))
             .end((error, raw_body) => {
-                console.log(error, raw_body);
+                // console.log(error, raw_body);
                 return { status: true, msg: "safaricom ctob register success" }
             });
     } catch (error) {
-        console.log("module.exports.safaricom_payment_authorization -> error", error)
+        // console.log("module.exports.safaricom_payment_authorization -> error", error)
         return { status: false, msg: "error in safaricom ctob register url" }
     }
 }
@@ -106,12 +106,12 @@ module.exports.safaricom_ctob_simulate = async (PhoneNumber, amount) => {
                 "ShortCode":"600978",
             }))
             .end(res => {
-            console.log("module.exports.safaricom_ctob_simulate -> res", res)
-                console.log(res.raw_body, 'simulate');
+            // console.log("module.exports.safaricom_ctob_simulate -> res", res)
+                // console.log(res.raw_body, 'simulate');
                 return { status: true, msg: "safaricom ctob register success" }
             });
     } catch (error) {
-        console.log("module.exports.safaricom_payment_authorization -> error", error)
+        // console.log("module.exports.safaricom_payment_authorization -> error", error)
         return { status: false, msg: "error in safaricom ctob register url" }
     }
 }
@@ -144,7 +144,7 @@ module.exports.safaricom_lipesa_simulate = async (PhoneNumber, amount) => {
                 "AccountReference": "CompanyXLTD",
                 "TransactionDesc": "Payment of X"
             }
-            console.log("module.exports.safaricom_lipesa_simulate -> request_data", request_data)
+            // console.log("module.exports.safaricom_lipesa_simulate -> request_data", request_data)
             let req = unirest('POST', url)
                 .headers({
                     'Content-Type': 'application/json',
@@ -153,13 +153,13 @@ module.exports.safaricom_lipesa_simulate = async (PhoneNumber, amount) => {
                 .send(JSON.stringify(request_data))
                 .end((res) => {
                     if (res.error) {
-                        console.log("module.exports.safaricom_lipesa_simulate -> res.error", res.error)
+                        // console.log("module.exports.safaricom_lipesa_simulate -> res.error", res.error)
                         return reject({ status: false, msg: "safaricom Mpesa express failed" })
                     }
                     return resolve({ status: true, msg: "safaricom lipesa success", data: JSON.parse(res.raw_body) })
                 });
         } catch (error) {
-            console.log("module.exports.safaricom_lipesa_simulate -> error", error)
+            // console.log("module.exports.safaricom_lipesa_simulate -> error", error)
             return reject({ status: false, msg: "Invalid Mpesa express request" })
         }
     })
@@ -206,13 +206,13 @@ module.exports.safaricom_refund_simulate = async (PhoneNumber, amount,transactio
                 .end((res) => {
                     // console.log(res.raw_body)
                     if (res.error) {
-                        console.log("module.exports.safaricom_refund_simulate -> res.error", res.error)
+                        // console.log("module.exports.safaricom_refund_simulate -> res.error", res.error)
                         return reject({ status: false, msg: "safaricom mpesa refund failed" })
                     }
                     return resolve({ status: true, msg: "safaricom refund success", data: JSON.parse(res.raw_body) })
                 });
         } catch (error) {
-            console.log("module.exports.safaricom_refund_simulate -> error", error)
+            // console.log("module.exports.safaricom_refund_simulate -> error", error)
             return reject({ status: false, msg: "Invalid Mpesa refund request" })
         }
     })
