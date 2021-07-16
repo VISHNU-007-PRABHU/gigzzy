@@ -1548,6 +1548,8 @@ module.exports.confrimation_call = async (body) => {
                 var appointments_details = await pubsub.publish(APPOINTMENTS, { get_my_appointments: result });
                 var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
                 //to user
+                console.log("provider")
+
                 let invoice_user_data = {
                     user_parent: true,
                     ...booking_detail.data._doc,
