@@ -7,6 +7,7 @@ const typeDefs = gql `
     scalar Cursor
 
     directive @ref on FIELD_DEFINITION
+    directive @payment(defaultFormat: String = "false") on FIELD_DEFINITION
     directive @currency(defaultFormat: String = "KES") on FIELD_DEFINITION
     directive @upper on FIELD_DEFINITION
     directive @date(format: String) on FIELD_DEFINITION
@@ -460,6 +461,7 @@ const typeDefs = gql `
         provider_id:ID
         category_id:ID
         booking_ref:String @ref
+        ctob:Boolean @payment
         data:[JSON],
         booking_date:String @date(format: "DD/MM/YYYY hh:mm a")
         booking_time:String

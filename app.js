@@ -88,6 +88,16 @@ class UpperCaseDirective extends SchemaDirectiveVisitor {
   }
 }
 
+
+class c2bDirective extends SchemaDirectiveVisitor {
+  visitFieldDefinition(field) {
+    const { resolve = defaultFieldResolver } = field;
+    field.resolve = async function (...args) {
+      return false;
+    };
+  }
+}
+
 class currencyDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
@@ -126,7 +136,8 @@ const server = new ApolloServer({
     ref: refDirective,
     date: DateFormatDirective,
     upper: UpperCaseDirective,
-    imgSize: ImgSizeDirective
+    imgSize: ImgSizeDirective,
+    payment:c2bDirective
   },
   subscriptions: {
     onConnect: () => {},

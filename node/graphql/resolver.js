@@ -553,6 +553,7 @@ const resolvers = {
                     return { ...args, ...{ info: { "msg": "Update Process Failed !", status: 'failed' } } };
                 }
             } catch (error) {
+                console.log("admin_update_user:admin_update_user -> error", error)
                 return { ...args, ...{ info: { "msg": "Update Process Failed !", status: 'failed' } } };
             }
         },
