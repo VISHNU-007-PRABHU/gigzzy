@@ -108,19 +108,19 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([SEND_ACCEPT_MSG]),
                 (payload, variables) => {
-                    // console.log("Accepted MSG");
+                    console.log("Accepted MSG");
                     // console.log(payload);
                     // console.log(payload.send_accept_msg.user_id);
-                    //console.log(variables);
+                    console.log(variables);
                     if (payload.send_accept_msg.msg_status != undefined && payload.send_accept_msg.msg_status == 'to_provider') {
                         if (payload.send_accept_msg.provider_id == variables._id) {
-                            //console.log("msg to provider");
+                            console.log("msg to provider");
                             return true;
                         }
                     } else {
                         if (payload.send_accept_msg.user_id == variables._id) {
                             if (payload.send_accept_msg._id == variables.booking_id) {
-                                //console.log("msg to user");
+                                console.log("msg to user user to cancel");
                                 return true;
                             }
                         }
