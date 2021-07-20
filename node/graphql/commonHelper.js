@@ -122,7 +122,7 @@ module.exports.send_sms = async (country_code, phone_no, type, data) => {
     const options = {
       to: `+${phone_number}`,
       message: message,
-      // from: SMS_SENDERID
+      from: SMS_SENDERID
     }
     sms.send(options)
       .then((suc) => {
