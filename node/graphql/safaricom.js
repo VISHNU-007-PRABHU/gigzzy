@@ -125,7 +125,7 @@ module.exports.safaricom_lipesa_simulate = async (PhoneNumber, amount) => {
             let url = `https://${commonHelper.mpesaURL()}/mpesa/stkpush/v1/processrequest`
             console.log("module.exports.safaricom_lipesa_simulate -> url", url)
             let timeStamp = moment().format('YYYYMMDDHHmmss')
-            let passKey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
+            let passKey = process.env.MPESA_PASSKEY
             let encodeString = `${process.env.MPESA_SHORT_CODE}${passKey}${timeStamp}`
             let token = await safaricom_payment_authorization()
             if (token && !token.status) {
@@ -145,7 +145,7 @@ module.exports.safaricom_lipesa_simulate = async (PhoneNumber, amount) => {
                 "AccountReference": "CompanyXLTD",
                 "TransactionDesc": "Payment of X"
             }
-            console.log("module.exports.safaricom_lipesa_simulate -> request_data", request_data)
+            // console.log("module.exports.safaricom_lipesa_simulate -> request_data", request_data)
             let req = unirest('POST', url)
                 .headers({
                     'Content-Type': 'application/json',
