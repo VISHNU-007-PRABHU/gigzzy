@@ -704,8 +704,6 @@ module.exports.kilometer = async (parent, args, context, info) => {
     if (parent._id) {
         result = await Booking_model.findOne({ _id: parent._id });
         // console.log(result);
-        console.log("module.exports.kilometer -> args.lat", args.lat,arg.lng)
-        console.log("module.exports.kilometer -> result.location.coordinates[1]", result.location.coordinates[1],result.location.coordinates[0])
         if (args.lat == result.location.coordinates[1] && args.lng == result.location.coordinates[0]) {
             return { kilometre: 0 };
         }
@@ -722,7 +720,6 @@ module.exports.kilometer = async (parent, args, context, info) => {
             dist = dist * 180 / Math.PI;
             dist = dist * 60 * 1.1515;
             dist = dist * 1.609344
-            console.log("module.exports.kilometer -> dist", dist)
             return { kilometre: Math.round(dist) };
         }
     } else {
