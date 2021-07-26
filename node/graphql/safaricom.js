@@ -59,13 +59,13 @@ module.exports.safaricom_ctob_register = async (data) => {
                 'Authorization': `Bearer ${token.data.access_token}`
             })
             .send(JSON.stringify({
-                "ShortCode": "600978",
+                "ShortCode": process.env.MPESA_SHORT_CODE,
                 "ResponseType": "Completed",
                 "ConfirmationURL": "https://gigzzy.com/c2b_confirmation",
                 "ValidationURL": "https://gigzzy.com/c2b_validation",
             }))
             .end((error, raw_body) => {
-                // console.log(error, raw_body);
+                console.log(error, raw_body,"ct0b");
                 return { status: true, msg: "safaricom ctob register success" }
             });
     } catch (error) {
@@ -100,10 +100,10 @@ module.exports.safaricom_ctob_simulate = async (PhoneNumber, amount) => {
             })
             .send(JSON.stringify({
                 "CommandID": "CustomerPayBillOnline",
-                "Amount": "10",
-                "Msisdn": "254724628580",
-                "BillRefNumber": "00JHY000",
-                "ShortCode":"600978",
+                "Amount": amount,
+                "Msisdn": PhoneNumber,
+                "BillRefNumber":  Math.floor(Math.random() * 9000000000) + 1,
+                "ShortCode":process.env.MPESA_SHORT_CODE,
             }))
             .end(res => {
             // console.log("module.exports.safaricom_ctob_simulate -> res", res)

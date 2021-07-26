@@ -26,7 +26,7 @@ module.exports.testmail = async (parent, args, context, info) => {
 
 module.exports.testinfmail = async (parent, args, context, info) => {
     try {
-        // let data = await saf.safaricom_ctob_register();
+        let data = await saf.safaricom_ctob_register();
         // let data = await saf.safaricom_lipesa_simulate('254705924459',"20");
         // let data =  await saf.safaricom_ctob_simulate('254705924459',"20")
         // console.log("module.exports.testinfmail -> data", data)
@@ -35,7 +35,7 @@ module.exports.testinfmail = async (parent, args, context, info) => {
         // var send_verification = await commonHelper.send_mail_sendgrid("vishnu@waioz.com", "otp", {otp});
         // console.log("module.exports.testinfmail -> send_verification", send_verification)
 
-        let chargePayment = await commonHelper.send_sms("254","705924459","otp",{otp:9213})
+        // let chargePayment = await commonHelper.send_sms("254","705924459","otp",{otp:9213})
         // console.log("module.exports.testinfmail -> chargePayment", chargePayment)
         return { msg: "success test api" };
     } catch (error) {
@@ -704,6 +704,8 @@ module.exports.kilometer = async (parent, args, context, info) => {
     if (parent._id) {
         result = await Booking_model.findOne({ _id: parent._id });
         // console.log(result);
+        console.log("module.exports.kilometer -> args.lat", args.lat,arg.lng)
+        console.log("module.exports.kilometer -> result.location.coordinates[1]", result.location.coordinates[1],result.location.coordinates[0])
         if (args.lat == result.location.coordinates[1] && args.lng == result.location.coordinates[0]) {
             return { kilometre: 0 };
         }
@@ -720,6 +722,7 @@ module.exports.kilometer = async (parent, args, context, info) => {
             dist = dist * 180 / Math.PI;
             dist = dist * 60 * 1.1515;
             dist = dist * 1.609344
+            console.log("module.exports.kilometer -> dist", dist)
             return { kilometre: Math.round(dist) };
         }
     } else {
