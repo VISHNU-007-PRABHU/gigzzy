@@ -113,7 +113,8 @@ module.exports.get_payout = async (root, args) => {
     {
         $match: {
             provider_id: ObjectId(args.provider_id),
-            booking_status: 14
+            booking_status: 14,
+            provider_fee: { $ne: 'NaN' },
         }
     },
     {

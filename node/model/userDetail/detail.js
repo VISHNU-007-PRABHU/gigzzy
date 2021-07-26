@@ -59,6 +59,11 @@ var detailSchema = new Schema({
   demo:{type:Boolean,default:false},
   demo_end_time:Date,
   created_at: Date,
+  kra_pin:{ type: String },
+  payout_phone:{ type: String },
+  payout_frist_name:{ type: String },
+  payout_second_name:{ type: String },
+  payout_id:{ type: String },
 }, schemaOptions);
 
 detailSchema.virtual('img_url').get(function () {

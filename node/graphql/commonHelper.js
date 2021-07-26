@@ -11,8 +11,7 @@ const senderAddress = process.env.senderAddress;
 const smtpUsername = process.env.smtpUsername;
 const smtpPassword = process.env.smtpPassword;
 const SMS_SENDERID = process.env.AFRICASTALKING_SENDERID;
-var serverKey =
-  "AAAAuHbsbq4:APA91bFf9VkaLpuWm0vfMTfDIofpl8Lz4ySnkJfW8w0tvZss0CR5ozVQ97As7hVVL4k0nN-rANxTvRLBxRH3XuEXkHICQi8FKcV6fuqJpqcRsI0YF4XuFODcojoqKZaJ-uz9H_to-9U2";
+var serverKey =process.env.PUSHNOTIFICATION_KEY;
 var fcm = new FCM(serverKey);
 const env = process.env;
 const africa = require("africastalking")({
