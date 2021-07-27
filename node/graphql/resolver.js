@@ -814,12 +814,15 @@ const resolvers = {
                 } else if (args.booking_status == 16) {
                     var end_data = {};
                     if (args.extra_fare != undefined && args.extra_fare != null && args.extra_fare != '') {
+                        console.log("args.extra_fare ", args.extra_fare )
                        
                         var s_extra_fare = args.extra_fare.replace("KSh", "");
+                        console.log("s_extra_fare", s_extra_fare)
                         if (!Number(s_extra_fare)) {
                             s_extra_fare = 0
                         }
                         args.extra_fare = String(parseFloat(Number(s_extra_fare)).toFixed(2))
+                        console.log("args.extra_fare", args.extra_fare)
                         if (args.option == 1) {
                             //add extra_fee
                             let provider_fee = Number(booking_detail.provider_fee) + Number(args.extra_fare);    // add extra_fare in provider fee
