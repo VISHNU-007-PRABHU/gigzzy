@@ -467,6 +467,8 @@ const typeDefs = gql `
         category_id:ID
         booking_ref:String @ref
         ctob:Boolean @payment
+        ctob_shotcode:String
+        ctob_billRef:String
         data:[JSON],
         booking_date:String @date(format: "DD/MM/YYYY hh:mm a")
         booking_time:String
