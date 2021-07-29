@@ -1620,6 +1620,10 @@ module.exports.c2b_confirmation = async (body) => {
             update_details['payment_message'] = "ctob payment sucess"
 
             let pre_booking_detail = await Booking_model.findOne({ ctob_billRef }).lean()
+            if(!_.size(pre_booking_detail)){
+                console.log("module.exports.pre_booking_detail -> error", "null")
+                return reject({ status: false, msg: "Payment bill refe is in-correct" })
+            }
             if (ResultCode != 0) {
 
                 if (pre_booking_detail.booking_status === 13) {
