@@ -715,7 +715,7 @@ module.exports.kilometer = async (parent, args, context, info) => {
                 return { kilometre: 0 };
             }
             var distanceInMeters = getDistanceBetweenPoints.getDistanceBetweenPoints(
-                result.location.coordinates[1], result.location.coordinates[1], // Lat, Long of point A
+                result.location.coordinates[1], result.location.coordinates[0], // Lat, Long of point A
                 args.lat, args.lng// Lat, Long of point B
             );
             if (distanceInMeters && distanceInMeters > 0) {
