@@ -10,6 +10,7 @@ var commonHelper = require('../commonHelper');
 var saf = require('../safaricom');
 var CronJob = require('cron').CronJob;
 const dotenv = require('dotenv');
+var getDistanceBetweenPoints = require('get-distance-between-points');
 dotenv.config();
 
 const files = [];
@@ -368,7 +369,7 @@ module.exports.addUser = async (_, args) => {
         }
         data.msg = "New User";
         data.status = "success";
-        await commonHelper.send_sms(data.country_code, data.phone_no, "otp", {otp})
+        await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp })
         return data;
     } else if (args.phone_no == undefined || args.phone_no == '') {
         return { ...args, "msg": "Please Enter phone Number", status: "failed" };
@@ -391,7 +392,7 @@ module.exports.addUser = async (_, args) => {
                 data.msg = "otp no change", data.status = 'failed';
             }
             // console.log({ ...data._doc, ...return_msg });
-            await commonHelper.send_sms(data.country_code, data.phone_no, "otp", {otp})
+            await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp })
             return data;
         }
         //"otp is change"
@@ -409,7 +410,7 @@ module.exports.addUser = async (_, args) => {
             } else {
                 update_result.msg = "otp changed"; update_result.status = 'failed';
             }
-            await commonHelper.send_sms(update_result.country_code, update_result.phone_no, "otp", {otp})
+            await commonHelper.send_sms(update_result.country_code, update_result.phone_no, "otp", { otp })
             return update_result;
         }
     }
@@ -700,29 +701,32 @@ module.exports.sign_up = async (_, args) => {
  @params(parent._id,lat,lng)
 */
 module.exports.kilometer = async (parent, args, context, info) => {
-    var result;
-    if (parent._id) {
-        result = await Booking_model.findOne({ _id: parent._id });
-        // console.log(result);
-        if (args.lat == result.location.coordinates[1] && args.lng == result.location.coordinates[0]) {
+    try {
+
+        var result;
+        if (parent._id) {
+            result = await Booking_model.findOne({ _id: parent._id });
+
+            if (!_.size(result) || !result.location.coordinates[1] || !result.location.coordinates[0] || !args.lat || !args.lng) {
+                return { kilometre: 0 };
+            }
+
+            if (args.lat == result.location.coordinates[1] && args.lng == result.location.coordinates[0]) {
+                return { kilometre: 0 };
+            }
+            var distanceInMeters = getDistanceBetweenPoints.getDistanceBetweenPoints(
+                result.location.coordinates[1], result.location.coordinates[1], // Lat, Long of point A
+                args.lat, args.lng// Lat, Long of point B
+            );
+            if (distanceInMeters && distanceInMeters > 0) {
+                return { kilometre: String(parseFloat(distanceInMeters * 0.001).toFixed(2)) };
+            } else {
+                return { kilometre: 0 }
+            }
+        } else {
             return { kilometre: 0 };
         }
-        else {
-            var radlat1 = Math.PI * args.lat / 180;
-            var radlat2 = Math.PI * result.location.coordinates[1] / 180;
-            var theta = args.lng - result.location.coordinates[0];
-            var radtheta = Math.PI * theta / 180;
-            var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-            if (dist > 1) {
-                dist = 1;
-            }
-            dist = Math.acos(dist);
-            dist = dist * 180 / Math.PI;
-            dist = dist * 60 * 1.1515;
-            dist = dist * 1.609344
-            return { kilometre: Math.round(dist) };
-        }
-    } else {
+    } catch (error) {
         return { kilometre: 0 };
     }
 

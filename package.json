@@ -51,6 +51,7 @@
         "express-graphql": "^0.7.1",
         "express-static-gzip": "^2.1.1",
         "fcm-node": "^1.5.2",
+        "get-distance-between-points": "^1.2.0",
         "google-map-react": "^1.1.5",
         "google-maps-react": "^2.0.2",
         "graphql": "^14.4.2",
