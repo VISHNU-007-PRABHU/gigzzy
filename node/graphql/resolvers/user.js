@@ -702,16 +702,17 @@ module.exports.sign_up = async (_, args) => {
 */
 module.exports.kilometer = async (parent, args, context, info) => {
     try {
-
         var result;
         if (parent._id) {
             result = await Booking_model.findOne({ _id: parent._id });
 
             if (!_.size(result) || !result.location.coordinates[1] || !result.location.coordinates[0] || !args.lat || !args.lng) {
+                console.log("module.exports.kilometer -> error","size zero")
                 return { kilometre: 0 };
             }
 
             if (args.lat == result.location.coordinates[1] && args.lng == result.location.coordinates[0]) {
+                console.log("module.exports.kilometer -> error","zero")
                 return { kilometre: 0 };
             }
             var distanceInMeters = getDistanceBetweenPoints.getDistanceBetweenPoints(
@@ -721,12 +722,16 @@ module.exports.kilometer = async (parent, args, context, info) => {
             if (distanceInMeters && distanceInMeters > 0) {
                 return { kilometre: String(parseFloat(distanceInMeters * 0.001).toFixed(2)) };
             } else {
+                console.log("module.exports.kilometer -> error",distanceInMeters)
+
                 return { kilometre: 0 }
             }
         } else {
+            console.log("module.exports.kilometer -> error", "null parent")
             return { kilometre: 0 };
         }
     } catch (error) {
+        console.log("module.exports.kilometer -> error", error)
         return { kilometre: 0 };
     }
 
