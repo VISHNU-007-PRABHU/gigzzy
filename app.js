@@ -219,9 +219,11 @@ app.post('/c2b_validation', async (req, res, next) => {
   try {
     console.log(req.body, "ops validation")
     let confirm_data = await c2b_validation(req.body)
-    return res.send({ status: true, message: "we reviced validation data" })
+    console.log("confirm_data", confirm_data)
+    return res.send({ status: true, message: "valid data" })
   } catch (error) {
-    return res.send(error.message)
+    console.log("ops, not valid data")
+    return res.send({ status: false, message: "Not validation data" })
   }
 })
 

@@ -1622,13 +1622,27 @@ module.exports.c2b_validation = async (body) => {
     return new Promise(async function (resolve, reject) {
         try {
             let ctob_billRef = body["BillRefNumber"]
+            let shotcode = body["BusinessShortCode"]
+            let MPESA_shotcode = process.env.MPESA_SHORT_CODE
             var pre_booking_detail  = await Booking_model.find({ctob_billRef}).lean()
+            if(shotcode === MPESA_shotcode){
+                console.log("module.exports.c2b_validation -> shotcode", shotcode)
+                return reject({ status: false, msg: "Your payment shotcode is invalid !" })
+            }
+            if(!_.size(pre_booking_detail)){
+                console.log("module.exports.c2b_validation -> pre_booking_detail", "pre_booking_detail")
+                return reject({ status: false, msg: "Your bill Reference is invalid !" })
+            }
             if (pre_booking_detail.booking_status === 13) {
                 if (pre_booking_detail['extra_price'] !== Number(body['TransAmount'])) {
-                    return resolve({ status: false, msg: "Your payment amount is invalid !", data })
+                    return reject({ status: false, msg: "Your payment amount is invalid !" })
                 }
             }
-            return resolve({ status: true, msg: "Your payment amount is valid !", data })
+            if (pre_booking_detail['base_price'] != Number(body['TransAmount'])) {
+                console.log("module.exports.pre_booking_detail -> error", body['TransAmount'],pre_booking_detail['base_price'])
+                return reject({ status: false, msg: "Your payment amount is invalid !", pre_booking_detail })
+            }
+            return resolve({ status: true, msg: "Your payment amount is valid !" })
         }catch(error){
             console.log("module.exports.confrimation_call -> error", error)
             return reject({ status: false, msg: "Payment Is Failed" })
