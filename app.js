@@ -10,7 +10,7 @@ const https = require('https');
 const { ApolloServer, gql, SchemaDirectiveVisitor } = require('apollo-server-express');
 const { defaultFieldResolver, GraphQLString } = require('graphql');
 const { typeDefs } = require('./node/graphql/schema');
-const { resolvers,confrimation_call } = require('./node/graphql/resolver');
+const { resolvers,confrimation_call,c2b_confirmation,c2b_validation } = require('./node/graphql/resolver');
 const moment = require('moment');
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true, parameterLimit: 5000000 }));
@@ -218,7 +218,8 @@ app.post('/refund_confirmation', async (req, res, next) => {
 app.post('/c2b_validation', async (req, res, next) => {
   try {
     console.log(req.body, "ops validation")
-    return res.send({ status: true, message: "we reviced validation" })
+    let confirm_data = await c2b_validation(req.body)
+    return res.send({ status: true, message: "we reviced validation data" })
   } catch (error) {
     return res.send(error.message)
   }

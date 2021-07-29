@@ -1616,6 +1616,25 @@ module.exports.confrimation_call = async (body) => {
     })
 }
 
+
+
+module.exports.c2b_validation = async (body) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            let ctob_billRef = body["BillRefNumber"]
+            var pre_booking_detail  = await Booking_model.find({ctob_billRef}).lean()
+            if (pre_booking_detail.booking_status === 13) {
+                if (pre_booking_detail['extra_price'] !== Number(body['TransAmount'])) {
+                    return resolve({ status: false, msg: "Your payment amount is invalid !", data })
+                }
+            }
+            return resolve({ status: true, msg: "Your payment amount is valid !", data })
+        }catch(error){
+            console.log("module.exports.confrimation_call -> error", error)
+            return reject({ status: false, msg: "Payment Is Failed" })
+        }
+    })
+}
 /**
  * 
  * @param {*} body 
