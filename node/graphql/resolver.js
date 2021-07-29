@@ -1693,7 +1693,7 @@ module.exports.c2b_confirmation = async (body) => {
             }
 
             if (pre_booking_detail.booking_status === 13) {
-                if (pre_booking_detail['extra_price'] !== Number(body['TransAmount'])) {
+                if (pre_booking_detail['extra_price'] != Number(body['TransAmount'])) {
                     console.log("module.exports.pre_booking_detail -> error", body['TransAmount'])
                     return resolve({ status: true, msg: "Your payment amount is invalid !", pre_booking_detail })
                 }
