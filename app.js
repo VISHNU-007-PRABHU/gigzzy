@@ -93,7 +93,7 @@ class c2bDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
     field.resolve = async function (...args) {
-      return false;
+      return true;
     };
   }
 }
@@ -227,6 +227,7 @@ app.post('/c2b_validation', async (req, res, next) => {
 app.post('/c2b_confirmation', async (req, res, next) => {
   try {
     console.log(req.body, "ops c2b")  
+    let confirm_data = await c2b_confirmation(req.body)
     return res.send({ status: true, message: "we reviced cancelled" })
   } catch (error) {
     return res.send(error.message)

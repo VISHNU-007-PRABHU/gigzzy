@@ -547,8 +547,8 @@ const resolvers = {
                 //console.log(update_user);
                 if (update_user.n == update_user.nModified) {
                     var user_sms_data = await Detail_model.findOne({ _id: args._id });
-                    if(data.phone_no && user_sms_data.phone_no !== data.phone_no){
-                        await commonHelper.send_sms(user_sms_data.country_code, user_sms_data.phone_no, "otp", { otp:user_sms_data.otp })
+                    if (data.phone_no && user_sms_data.phone_no !== data.phone_no) {
+                        await commonHelper.send_sms(user_sms_data.country_code, user_sms_data.phone_no, "otp", { otp: user_sms_data.otp })
                     }
                     return { ...args, ...{ info: { "msg": "Update Process Success", status: 'success' } } };
                 } else {
@@ -647,6 +647,8 @@ const resolvers = {
             args['price_type'] = category.price_type;
 
             args['booking_ref'] = String(Math.floor(1000 + Math.random() * 9000));
+            args['ctob_shotcode'] = process.env.MPESA_SHORT_CODE;
+            args['ctob_billRef'] = await genrate_random();
             args['job_status'] = 12;
             let add_booking = new Booking_model(args);
             let booking = await add_booking.save();
@@ -814,8 +816,8 @@ const resolvers = {
                 } else if (args.booking_status == 16) {
                     var end_data = {};
                     if (args.extra_fare != undefined && args.extra_fare != null && args.extra_fare != '') {
-                        console.log("args.extra_fare ", args.extra_fare )
-                       
+                        console.log("args.extra_fare ", args.extra_fare)
+
                         var s_extra_fare = args.extra_fare.replace("KSh", "");
                         console.log("s_extra_fare", s_extra_fare)
                         if (!Number(s_extra_fare)) {
@@ -1083,22 +1085,14 @@ const resolvers = {
                     args['total'] = amount;
                     // console.log("osp")
                     try {
-                        var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(amount))
-                        // console.log("charge", charge)
-                        if (charge.status == true && charge.data.ResponseCode === '0') {
-                            // update charge amount
-                            // console.log(charge.data.MerchantRequestID, args.booking_id)
-                            var update_booking = await Booking_model.update({ _id: args.booking_id }, {
+                        if (args['payment_type']  && args['payment_type'] === "c2b") {
+                            var update_booking_c2b = await Booking_model.update({ _id: args.booking_id }, {
                                 accept_date: moment.utc().format(),
                                 admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
                                 provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
                                 total: String(parseFloat(args.total).toFixed(2)),
                                 booking_status: 50, // 50 means waiting booking
-                                phone_number: args.phone_number,
-                                // job_status: 10,
-                                // payment_status: 1,
-                                MerchantRequestID: charge.data.MerchantRequestID || 0,
-                                CheckoutRequestID: charge.data.CheckoutRequestID || 0
+                                phone_number: args.phone_number || "",
                             }, { new: true });
                             var findBooking = await Booking_model.find({ _id: args.booking_id });
                             data = {
@@ -1111,8 +1105,38 @@ const resolvers = {
                             // console.log("data", data)
                             return [data]
                         } else {
-                            return [{ msg: "Payment charge failed", status: 'failed' }]
-                        }
+
+                            var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(amount))
+                            // console.log("charge", charge)
+                            if (charge.status == true && charge.data.ResponseCode === '0') {
+                                // update charge amount
+                                // console.log(charge.data.MerchantRequestID, args.booking_id)
+                                var update_booking = await Booking_model.update({ _id: args.booking_id }, {
+                                    accept_date: moment.utc().format(),
+                                    admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
+                                    provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
+                                    total: String(parseFloat(args.total).toFixed(2)),
+                                    booking_status: 50, // 50 means waiting booking
+                                    phone_number: args.phone_number,
+                                    // job_status: 10,
+                                    // payment_status: 1,
+                                    MerchantRequestID: charge.data.MerchantRequestID || 0,
+                                    CheckoutRequestID: charge.data.CheckoutRequestID || 0
+                                }, { new: true });
+                                var findBooking = await Booking_model.find({ _id: args.booking_id });
+                                data = {
+                                    user_parent: true,
+                                    ...findBooking,
+                                    msg: "user accept the job ",
+                                    status: 'success',
+                                    msg_status: 'to_provider'
+                                }
+                                // console.log("data", data)
+                                return [data]
+                            } else {
+                                return [{ msg: "Payment charge failed", status: 'failed' }]
+                            }
+                        } 
 
                     } catch (err) {
                         // console.log("err", err)
@@ -1458,7 +1482,7 @@ module.exports.confrimation_call = async (body) => {
                 let data = {
                     user_parent: true,
                     ...error_booking_detail,
-                    msg:  update_details['payment_message'],
+                    msg: update_details['payment_message'],
                     status: 'failed',
                     msg_status: 'to_provider'
                 }
@@ -1472,8 +1496,8 @@ module.exports.confrimation_call = async (body) => {
                     status: 'failed',
                     msg_status: 'to_user'
                 }
-               let error_payment_issues =  await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: error_invoice_user_data });
-               console.log(error_payment_issues,"module.exports.confrimation_call -> error_payment_issues")
+                let error_payment_issues = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: error_invoice_user_data });
+                console.log(error_payment_issues, "module.exports.confrimation_call -> error_payment_issues")
                 return resolve({ status: true, msg: "Mpesa Payment failed !" })
             }
 
@@ -1578,7 +1602,174 @@ module.exports.confrimation_call = async (body) => {
     })
 }
 
+/**
+ * 
+ * @param {*} body 
+ * @returns 
+ */
+module.exports.c2b_confirmation = async (body) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            // console.log("module.exports.confrimation_call -> body", body)
+            let ctob_billRef = body["BillRefNumber"]
+            let ResultCode = 1
+            let update_details = {
+                payment_message: ""
+            }
+            update_details['resultcode'] = ResultCode;
+            update_details['payment_message'] = "ctob payment sucess"
+
+            let pre_booking_detail = await Booking_model.findOne({ ctob_billRef }).lean()
+            if (ResultCode != 0) {
+
+                if (pre_booking_detail.booking_status === 13) {
+                    update_details['mpeas_payment_callback'] = false;
+                    let update_booking_detail = await Booking_model.updateOne({ ctob_billRef }, update_details)
+                } else {
+                    update_details['job_status'] = 11;
+                    update_details['booking_status'] = 11;
+                    let update_booking_detail = await Booking_model.updateOne({ ctob_billRef }, update_details)
+                }
+                const error_result = await Booking_model.find({ provider_id: pre_booking_detail.provider_id }).sort({ created_at: -1 });
+                let error_booking_detail = await Booking_model.findOne({ ctob_billRef }).lean()
+                let data = {
+                    user_parent: true,
+                    ...error_booking_detail,
+                    msg: update_details['payment_message'],
+                    status: 'failed',
+                    msg_status: 'to_provider'
+                }
+                await pubsub.publish(APPOINTMENTS, { get_my_appointments: error_result });
+                await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
+                // to user
+                let error_invoice_user_data = {
+                    user_parent: true,
+                    ...error_booking_detail,
+                    msg: update_details['payment_message'],
+                    status: 'failed',
+                    msg_status: 'to_user'
+                }
+                let error_payment_issues = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: error_invoice_user_data });
+                console.log(error_payment_issues, "module.exports.confrimation_call -> error_payment_issues")
+                return resolve({ status: true, msg: "Mpesa Payment failed !" })
+            }
+
+            if (pre_booking_detail.booking_status === 13) {
+                update_details['payment_status'] = 5;
+                update_details['booking_status'] = 14;
+                update_details['job_status'] = 14;
+                update_details['MpesaReceiptNumber'] = body["TransID"];
+                update_details['TransactionDate'] = body["TransTime"];
+            } else {
+                update_details['job_status'] = 10;
+                update_details['booking_status'] = 10;
+                update_details['MpesaReceiptNumber'] = body["TransID"];
+                update_details['TransactionDate'] = body["TransTime"];
+            }
+
+
+            let booking_detail = await Booking_model.findOne({ ctob_billRef })
+            let update_booking_detail = await Booking_model.updateOne({ ctob_billRef: ctob_billRef }, update_details)
+
+            if (pre_booking_detail.booking_status === 16) {
+                var pay_detail = await Payout_model.update({ booking_id: booking_detail.booking_id }, { booking_status: 14 });
+            } else {
+                let update_provider_data = {
+                    provider_id: booking_detail.provider_id,
+                    booking_id: booking_detail._id,
+                    amount: String(booking_detail.provider_fee),
+                    booking_status: 10
+                };
+                const update_provider = new Payout_model(update_provider_data);
+                const save = await update_provider.save();
+            }
+
+            // ================= push_notifiy (to provider) ================== //
+            let user_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
+            let app_user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
+            if (user_detail && user_detail.device_id) {
+                var notification = {}
+
+                if (pre_booking_detail.booking_status === 13) {
+                    notification = {
+                        title: 'Complete',
+                        body: "User Complete the job",
+                        click_action: ".activities.HomeActivity",
+                    }
+                } else {
+                    notification = {
+                        title: 'Accept',
+                        body: "User Accept The Job",
+                        click_action: ".activities.HomeActivity",
+                    }
+                }
+            }
+            var message = {
+                to: user_detail.device_id,
+                notification: notification,
+                data: {
+                    my_key: commonHelper.pending,
+                    my_another_key: commonHelper.pending,
+                    booking_id: booking_detail.booking_id
+                }
+            };
+            var msg = await commonHelper.push_notifiy(message);
+            // ================= push_notifiy ================== //
+            // return response 
+            if (pre_booking_detail.booking_status === 13) {
+                await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_finished", {})
+                return resolve({ job_status: 14, msg: "job is completed successfully", status: 'success' });
+
+            } else {
+                let data = {
+                    user_parent: true,
+                    ...booking_detail.data._doc,
+                    msg: "user accept the job ",
+                    status: 'success',
+                    msg_status: 'to_provider'
+                }
+                const result = await Booking_model.find({ provider_id: booking_detail.provider_id, booking_status: 10 }).sort({ created_at: -1 });
+                await commonHelper.send_sms(user_detail.country_code, user_detail.phone_no, "job_assign", {})
+                await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_placed", {})
+                var appointments_details = await pubsub.publish(APPOINTMENTS, { get_my_appointments: result });
+                var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
+                //to user
+                console.log("provider")
+
+                let invoice_user_data = {
+                    user_parent: true,
+                    ...booking_detail.data._doc,
+                    msg: "user accept the job ",
+                    status: 'success',
+                    msg_status: 'to_user'
+                }
+                await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: invoice_user_data });
+                console.log("module.exports.confrimation_call -> cancel_provider_to_user", cancel_provider_to_user)
+                return resolve({ status: true, msg: "Payment Is success !", data })
+            }
+
+        } catch (error) {
+            console.log("module.exports.confrimation_call -> error", error)
+            return reject({ status: false, msg: "Payment Is Failed" })
+        }
+    })
+}
+
+
+genrate_random = async () => {
+    var random = Math.floor(Math.random() * 90000) + 10000;
+    var chars = "abcdefghijklmnopqrstufwxyzABCDEFGHIJKLMNOPQRSTUFWXYZ1234567890"
+    var random = _.join(_.sampleSize(chars, 20), "")
+    var digit = `${random}`
+    var check_p_id = await Booking_model.find({ "ctob_billRef": digit });
+    if (check_p_id.length) {
+        await genrate_random()
+    }
+    return digit;
+}
+
 remove_demo_acount.start();
+
 module.exports.resolvers = resolvers;
 
 
