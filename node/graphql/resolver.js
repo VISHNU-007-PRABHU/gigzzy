@@ -1645,7 +1645,7 @@ module.exports.c2b_confirmation = async (body) => {
         try {
             // console.log("module.exports.confrimation_call -> body", body)
             let ctob_billRef = body["BillRefNumber"]
-            let ResultCode = 1
+            let ResultCode = 0
             let update_details = {
                 payment_message: ""
             }
