@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 const moment = require("moment");
 const commonHelper = require('../../graphql/commonHelper');
-mongoose.set('useFindAndModify', false);
+mongoose.set('useFindAndModify', "");
 var Schema = mongoose.Schema;
 var schemaOptions = {
   toObject: {
@@ -15,9 +15,9 @@ var schemaOptions = {
 //create user schema 
 
 var bookingSchema = new Schema({
-  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
-  provider_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
-  category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'category', unique: false },
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: "" },
+  provider_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: "" },
+  category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'category', unique: "" },
   category_type: { type: Number },  // 1-parent category , 2-sub category
   booking_ref: { type: String },
   booked: { type: String },
@@ -83,9 +83,11 @@ var bookingSchema = new Schema({
   TransactionDate:Date,
   MpesaReceiptNumber:{ type: String, default: 0 },
   payment_message:{type:String,default:""},
-  mpeas_payment_callback:{ type: Boolean, default: false },
-  manual_payment_status:{ type: Boolean, default: false },
+  mpeas_payment_callback:{ type: Boolean, default: "" },
+  manual_payment_status:{ type: Boolean, default: "" },
   payment_type:{ type: String, default: "" },
+  ctob_shotcode:{ type: String, default: "" },
+  ctob_billRef:{ type: String, default: "" },
 }, schemaOptions);
 
 bookingSchema.virtual('uid').get(function () {
