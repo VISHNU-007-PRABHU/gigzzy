@@ -1695,7 +1695,7 @@ module.exports.c2b_confirmation = async (body) => {
             if (pre_booking_detail.booking_status === 13) {
                 if (pre_booking_detail['extra_price'] !== Number(body['TransAmount'])) {
                     console.log("module.exports.pre_booking_detail -> error", body['TransAmount'])
-                    return resolve({ status: true, msg: "Your payment amount is invalid !", data })
+                    return resolve({ status: true, msg: "Your payment amount is invalid !", pre_booking_detail })
                 }
                 update_details['payment_status'] = 5;
                 update_details['booking_status'] = 14;
@@ -1705,7 +1705,7 @@ module.exports.c2b_confirmation = async (body) => {
             } else {
                 if (pre_booking_detail['base_price'] !== Number(body['TransAmount'])) {
                     console.log("module.exports.pre_booking_detail -> error", body['TransAmount'])
-                    return resolve({ status: true, msg: "Your payment amount is invalid !", data })
+                    return resolve({ status: true, msg: "Your payment amount is invalid !", pre_booking_detail })
                 }
                 update_details['job_status'] = 10;
                 update_details['booking_status'] = 10;
