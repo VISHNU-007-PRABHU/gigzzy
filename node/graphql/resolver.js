@@ -1703,8 +1703,8 @@ module.exports.c2b_confirmation = async (body) => {
                 update_details['MpesaReceiptNumber'] = body["TransID"];
                 update_details['TransactionDate'] = body["TransTime"];
             } else {
-                if (pre_booking_detail['base_price'] !== Number(body['TransAmount'])) {
-                    console.log("module.exports.pre_booking_detail -> error", body['TransAmount'])
+                if (pre_booking_detail['base_price'] != Number(body['TransAmount'])) {
+                    console.log("module.exports.pre_booking_detail -> error", body['TransAmount'],pre_booking_detail['base_price'])
                     return resolve({ status: true, msg: "Your payment amount is invalid !", pre_booking_detail })
                 }
                 update_details['job_status'] = 10;
