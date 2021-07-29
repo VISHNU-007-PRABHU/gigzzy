@@ -1085,7 +1085,7 @@ const resolvers = {
                     args['total'] = amount;
                     // console.log("osp")
                     try {
-                        if (args['payment_type']  && args['payment_type'] === "c2b") {
+                        if (args['payment_type'] && args['payment_type'] === "c2b") {
                             var update_booking_c2b = await Booking_model.update({ _id: args.booking_id }, {
                                 accept_date: moment.utc().format(),
                                 admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
@@ -1136,7 +1136,7 @@ const resolvers = {
                             } else {
                                 return [{ msg: "Payment charge failed", status: 'failed' }]
                             }
-                        } 
+                        }
 
                     } catch (err) {
                         // console.log("err", err)
@@ -1227,10 +1227,7 @@ const resolvers = {
                         try {
                             let final_amount = Number(final_job.final_payment)
 
-                            var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(final_amount))
-
-                            if (charge.status == true && charge.data.ResponseCode === '0') {
-                                // update charge amount
+                            if (args['payment_type'] && args['payment_type'] === "c2b") {
                                 var update_booking = await Booking_model.update({ _id: args.booking_id }, {
                                     end_date: moment.utc().format(),
                                     admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
@@ -1239,15 +1236,32 @@ const resolvers = {
                                     mpeas_payment_callback: true,
                                     // job_status: 10,
                                     // payment_status: 1,
-                                    MerchantRequestID: charge.data.MerchantRequestID || 0,
-                                    CheckoutRequestID: charge.data.CheckoutRequestID || 0
                                 }, { new: true });
                                 var findBooking = await Booking_model.find({ _id: args.booking_id });
                                 return [{ job_status: 14, msg: "job is completed successfully", status: 'success' }];
-
                             } else {
-                                return [{ job_status: 14, msg: "job is completed failed", status: 'failed' }];
+                                var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(final_amount))
 
+                                if (charge.status == true && charge.data.ResponseCode === '0') {
+                                    // update charge amount
+                                    var update_booking = await Booking_model.update({ _id: args.booking_id }, {
+                                        end_date: moment.utc().format(),
+                                        admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
+                                        provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
+                                        phone_number: args.phone_number,
+                                        mpeas_payment_callback: true,
+                                        // job_status: 10,
+                                        // payment_status: 1,
+                                        MerchantRequestID: charge.data.MerchantRequestID || 0,
+                                        CheckoutRequestID: charge.data.CheckoutRequestID || 0
+                                    }, { new: true });
+                                    var findBooking = await Booking_model.find({ _id: args.booking_id });
+                                    return [{ job_status: 14, msg: "job is completed successfully", status: 'success' }];
+
+                                } else {
+                                    return [{ job_status: 14, msg: "job is completed failed", status: 'failed' }];
+
+                                }
                             }
 
                         } catch (err) {
@@ -1620,10 +1634,11 @@ module.exports.c2b_confirmation = async (body) => {
             update_details['payment_message'] = "ctob payment sucess"
 
             let pre_booking_detail = await Booking_model.findOne({ ctob_billRef }).lean()
-            if(!_.size(pre_booking_detail)){
+            if (!_.size(pre_booking_detail)) {
                 console.log("module.exports.pre_booking_detail -> error", "null")
                 return reject({ status: false, msg: "Payment bill refe is in-correct" })
             }
+          
             if (ResultCode != 0) {
 
                 if (pre_booking_detail.booking_status === 13) {
@@ -1659,12 +1674,20 @@ module.exports.c2b_confirmation = async (body) => {
             }
 
             if (pre_booking_detail.booking_status === 13) {
+                if (pre_booking_detail['extra_price'] !== Number(body['TransAmount'])) {
+                    console.log("module.exports.pre_booking_detail -> error", body['TransAmount'])
+                    return resolve({ status: true, msg: "Your payment amount is invalid !", data })
+                }
                 update_details['payment_status'] = 5;
                 update_details['booking_status'] = 14;
                 update_details['job_status'] = 14;
                 update_details['MpesaReceiptNumber'] = body["TransID"];
                 update_details['TransactionDate'] = body["TransTime"];
             } else {
+                if (pre_booking_detail['base_price'] !== Number(body['TransAmount'])) {
+                    console.log("module.exports.pre_booking_detail -> error", body['TransAmount'])
+                    return resolve({ status: true, msg: "Your payment amount is invalid !", data })
+                }
                 update_details['job_status'] = 10;
                 update_details['booking_status'] = 10;
                 update_details['MpesaReceiptNumber'] = body["TransID"];
