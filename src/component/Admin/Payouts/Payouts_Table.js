@@ -1,6 +1,6 @@
-import React,{Suspense} from "react";
-import { Table, Form, Icon,   Row, Col, Modal, Collapse,  Button } from 'antd';
-import {  GET_PAYOUT_DETAIL, GET_ALL_PAYOUT, ADMIN_TO_PROVIDER } from '../../../graphql/Admin/booking';
+import React, { Suspense } from "react";
+import { Table, Form, Icon, Row, Col, Modal, Collapse, Button, Tag } from 'antd';
+import { GET_PAYOUT_DETAIL, GET_ALL_PAYOUT, ADMIN_TO_PROVIDER } from '../../../graphql/Admin/booking';
 import { client } from "../../../apollo";
 import { Alert_msg } from '../../Comman/alert_msg';
 const { Panel } = Collapse;
@@ -21,7 +21,7 @@ class PayoutsTable extends React.Component {
             loading_img: false,
             imageUrl: '',
             file: {},
-            input_data:{},
+            input_data: {},
             previewVisible: false,
             previewImage: '',
             pagination: {
@@ -57,11 +57,11 @@ class PayoutsTable extends React.Component {
 
     fetch_payouts = async (data) => {
         this.setState({ loading: true });
-        let input={};
-        if(data?.provider_id){
-           input= { ...data,limit: this.state.pagination.pageSize, page: this.state.pagination.current };
-        }else{
-            input= { limit: this.state.pagination.pageSize, page: this.state.pagination.current };
+        let input = {};
+        if (data?.provider_id) {
+            input = { ...data, limit: this.state.pagination.pageSize, page: this.state.pagination.current };
+        } else {
+            input = { limit: this.state.pagination.pageSize, page: this.state.pagination.current };
         }
         await client.query({
             query: GET_ALL_PAYOUT,
@@ -70,7 +70,7 @@ class PayoutsTable extends React.Component {
         }).then(result => {
             const pagination = { ...this.state.pagination };
             pagination.total = result.data.get_all_payout.totaldata;
-            this.setState({ loading: false, pagination, dataSource: result.data.get_all_payout.data ,modalVisible:false});
+            this.setState({ loading: false, pagination, dataSource: result.data.get_all_payout.data, modalVisible: false });
         });
     }
 
@@ -133,16 +133,16 @@ class PayoutsTable extends React.Component {
                 },
                 width: '40%',
                 editable: true,
-                key:"provider_name",
+                key: "provider_name",
                 render: (text, record) => {
-                        return <span title="Provider"> { record?.find_payout_provider[0]?.name || " Admin Delete this Provider"}</span>;
+                    return <span title="Provider"> {record?.find_payout_provider[0]?.name || " Admin Delete this Provider"}</span>;
                 },
             },
             {
                 title: 'Amount',
                 width: '40%',
                 editable: true,
-                key:"provider_amount",
+                key: "provider_amount",
                 render: (text, record) => {
                     return <span title="Amount">{record?.total_amount}</span>;
                 },
@@ -150,7 +150,7 @@ class PayoutsTable extends React.Component {
             {
                 title: 'Action',
                 dataIndex: 'operation',
-                key:"provider_opertaion",
+                key: "provider_opertaion",
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
                         <span title="...." className="d-flex d-sm-inline justify-content-around">
@@ -183,7 +183,17 @@ class PayoutsTable extends React.Component {
                         footer={[]}
                     >
                         <Collapse accordion>
-                            <Panel header={<div className="d-flex align-items-center"><Icon className="px-3" type="bank" /> Bank Details</div>} key="1">
+                            <Panel header={
+                                <>
+                                    <div className="d-flex align-items-center justify-content-between">
+                                        <div className="align-items-center d-flex">
+                                            <Icon className="px-3" type="bank" />
+                                            Bank Details
+                                        </div>
+                                        <Tag visible={this.state.provider_data[0]?.booking_provider[0]?.payout_option == "mpesa" ? true : false} color="green">Provider Preferred</Tag>
+                                    </div>
+                                </>
+                            } key="1">
                                 <Row>
                                     <Col span={24}>
                                         <Row>
@@ -205,7 +215,40 @@ class PayoutsTable extends React.Component {
                                     </Col>
                                 </Row>
                             </Panel>
-                            <Panel header={<div className='d-flex align-items-center'><Icon className="px-3" type="wallet" />Payout Details</div>} key="2">
+                            <Panel header={
+                                <div className="d-flex align-items-center justify-content-between">
+                                    <div className="align-items-center d-flex">
+                                        <Icon className="px-3" type="bank" />
+                                        Mpesa Details
+                                    </div>
+                                    <Tag visible={this.state.provider_data[0]?.booking_provider[0]?.payout_option == "bank" ? true : false} color="green">Provider Preferred</Tag>
+                                </div>} key="2">
+                                <Row>
+                                    <Col span={24}>
+                                        <Row>
+                                            <Col span={12}>Frist Name</Col>
+                                            <Col span={12}>:{this.state.provider_data[0] ? this.state.provider_data[0].booking_provider[0] ? this.state.provider_data[0].booking_provider[0].payout_frist_name : '' : ""}</Col>
+                                        </Row>
+                                        <Row>
+                                            <Col span={12}>Second Name</Col>
+                                            <Col span={12}>:{this.state.provider_data[0] ? this.state.provider_data[0].booking_provider[0] ? this.state.provider_data[0].booking_provider[0].payout_second_name : '' : ""}</Col>
+                                        </Row>
+                                        <Row>
+                                            <Col span={12}>Kra Pin</Col>
+                                            <Col span={12}>:{this.state.provider_data[0] ? this.state.provider_data[0].booking_provider[0] ? this.state.provider_data[0].booking_provider[0].kra_pin : '' : ""}</Col>
+                                        </Row>
+                                        <Row>
+                                            <Col span={12}>M-PESA Phone Number</Col>
+                                            <Col span={12}>:{this.state.provider_data[0] ? this.state.provider_data[0].booking_provider[0] ? this.state.provider_data[0].booking_provider[0].payout_phone : '' : ""}</Col>
+                                        </Row>
+                                        <Row>
+                                            <Col span={12}>Payout ID</Col>
+                                            <Col span={12}>:{this.state.provider_data[0] ? this.state.provider_data[0].booking_provider[0] ? this.state.provider_data[0].booking_provider[0].payout_id : '' : ""}</Col>
+                                        </Row>
+                                    </Col>
+                                </Row>
+                            </Panel>
+                            <Panel header={<div className='d-flex align-items-center'><Icon className="px-3" type="wallet" />Payout Details</div>} key="3">
                                 <Row>
                                     <Col span={16} style={{
                                         overflowY: 'scroll',
@@ -242,17 +285,17 @@ class PayoutsTable extends React.Component {
                     </Modal>
                 </>
                 <div id="no-more-tables">
-                <Table
-                    rowClassName={() => 'editable-row'}
-                    rowKey={record => record._id} 
-                    className='table_shadow'
-                    dataSource={dataSource}
-                    columns={columns}
-                    size="middle"
-                    pagination={this.state.pagination}
-                    onChange={this.handleTableChange}
-                    loading={this.state.loading}
-                />
+                    <Table
+                        rowClassName={() => 'editable-row'}
+                        rowKey={record => record._id}
+                        className='table_shadow'
+                        dataSource={dataSource}
+                        columns={columns}
+                        size="middle"
+                        pagination={this.state.pagination}
+                        onChange={this.handleTableChange}
+                        loading={this.state.loading}
+                    />
                 </div>
             </React.Fragment >
         );

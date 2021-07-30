@@ -184,6 +184,12 @@ export const GET_PAYOUT_DETAIL = gql`
           account_no
           bank_name
           ifsc_code
+          kra_pin
+          payout_phone
+          payout_frist_name
+          payout_second_name
+          payout_id
+          payout_option
         }
         find_payout_booking{
 		    booking_ref	
