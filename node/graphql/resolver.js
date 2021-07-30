@@ -1624,12 +1624,12 @@ module.exports.c2b_validation = async (body) => {
             let ctob_billRef = body["BillRefNumber"]
             let shotcode = body["BusinessShortCode"]
             let MPESA_shotcode = process.env.MPESA_SHORT_CODE
-            var pre_booking_detail  = await Booking_model.find({ctob_billRef}).lean()
-            if(shotcode === MPESA_shotcode){
+            var pre_booking_detail = await Booking_model.find({ ctob_billRef }).lean()
+            if (shotcode === MPESA_shotcode) {
                 console.log("module.exports.c2b_validation -> shotcode", shotcode)
                 return reject({ status: false, msg: "Your payment shotcode is invalid !" })
             }
-            if(!_.size(pre_booking_detail)){
+            if (!_.size(pre_booking_detail)) {
                 console.log("module.exports.c2b_validation -> pre_booking_detail", "pre_booking_detail")
                 return reject({ status: false, msg: "Your bill Reference is invalid !" })
             }
@@ -1637,13 +1637,14 @@ module.exports.c2b_validation = async (body) => {
                 if (pre_booking_detail['extra_price'] !== Number(body['TransAmount'])) {
                     return reject({ status: false, msg: "Your payment amount is invalid !" })
                 }
-            }
-            if (pre_booking_detail['base_price'] != Number(body['TransAmount'])) {
-                console.log("module.exports.pre_booking_detail -> error", body['TransAmount'],pre_booking_detail['base_price'])
-                return reject({ status: false, msg: "Your payment amount is invalid !", pre_booking_detail })
+            } else {
+                if (pre_booking_detail['base_price'] != Number(body['TransAmount'])) {
+                    console.log("module.exports.pre_booking_detail -> error", body['TransAmount'], pre_booking_detail['base_price'])
+                    return reject({ status: false, msg: "Your payment amount is invalid !", pre_booking_detail })
+                }
             }
             return resolve({ status: true, msg: "Your payment amount is valid !" })
-        }catch(error){
+        } catch (error) {
             console.log("module.exports.confrimation_call -> error", error)
             return reject({ status: false, msg: "Payment Is Failed" })
         }
@@ -1671,7 +1672,7 @@ module.exports.c2b_confirmation = async (body) => {
                 console.log("module.exports.pre_booking_detail -> error", "null")
                 return reject({ status: false, msg: "Payment bill refe is in-correct" })
             }
-          
+
             if (ResultCode != 0) {
 
                 if (pre_booking_detail.booking_status === 13) {
@@ -1718,7 +1719,7 @@ module.exports.c2b_confirmation = async (body) => {
                 update_details['TransactionDate'] = body["TransTime"];
             } else {
                 if (pre_booking_detail['base_price'] != Number(body['TransAmount'])) {
-                    console.log("module.exports.pre_booking_detail -> error", body['TransAmount'],pre_booking_detail['base_price'])
+                    console.log("module.exports.pre_booking_detail -> error", body['TransAmount'], pre_booking_detail['base_price'])
                     return resolve({ status: true, msg: "Your payment amount is invalid !", pre_booking_detail })
                 }
                 update_details['job_status'] = 10;
