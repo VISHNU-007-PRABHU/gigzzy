@@ -64,6 +64,7 @@ var detailSchema = new Schema({
   payout_frist_name:{ type: String },
   payout_second_name:{ type: String },
   payout_id:{ type: String },
+  payout_option:{ type: String },
 }, schemaOptions);
 
 detailSchema.virtual('img_url').get(function () {
