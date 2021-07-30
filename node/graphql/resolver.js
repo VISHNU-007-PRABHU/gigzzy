@@ -1093,6 +1093,7 @@ const resolvers = {
                                 total: String(parseFloat(args.total).toFixed(2)),
                                 booking_status: 50, // 50 means waiting booking
                                 phone_number: args.phone_number || "",
+                                payment_type: "c2b",
                             }, { new: true });
                             var findBooking = await Booking_model.find({ _id: args.booking_id });
                             data = {
@@ -1118,6 +1119,7 @@ const resolvers = {
                                     total: String(parseFloat(args.total).toFixed(2)),
                                     booking_status: 50, // 50 means waiting booking
                                     phone_number: args.phone_number,
+                                    payment_type: "lipesa", 
                                     // job_status: 10,
                                     // payment_status: 1,
                                     MerchantRequestID: charge.data.MerchantRequestID || 0,
@@ -1233,6 +1235,7 @@ const resolvers = {
                                     admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
                                     provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
                                     phone_number: args.phone_number,
+                                    payment_type: "c2b", 
                                     mpeas_payment_callback: true,
                                     // job_status: 10,
                                     // payment_status: 1,
@@ -1249,6 +1252,7 @@ const resolvers = {
                                         admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
                                         provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
                                         phone_number: args.phone_number,
+                                        payment_type: "lipesa",
                                         mpeas_payment_callback: true,
                                         // job_status: 10,
                                         // payment_status: 1,
@@ -1484,7 +1488,7 @@ module.exports.confrimation_call = async (body) => {
             if (ResultCode != 0) {
 
                 if (pre_booking_detail.booking_status === 13) {
-                    update_details['mpeas_payment_callback'] = false;
+                    update_details['mpeas_payment_callback'] = true;
                     let update_booking_detail = await Booking_model.updateOne({ CheckoutRequestID }, update_details)
                 } else {
                     update_details['job_status'] = 11;
@@ -1516,6 +1520,7 @@ module.exports.confrimation_call = async (body) => {
             }
 
             if (pre_booking_detail.booking_status === 13) {
+                update_details['mpeas_payment_callback'] = false;
                 update_details['payment_status'] = 5;
                 update_details['booking_status'] = 14;
                 update_details['job_status'] = 14;
@@ -1689,7 +1694,7 @@ module.exports.c2b_confirmation = async (body) => {
                 update_details['payment_message'] ="C2B payment failed"
                 update_details['resultcode'] = ResultCode;
                 if (pre_booking_detail.booking_status === 13) {
-                    update_details['mpeas_payment_callback'] = false;
+                    update_details['mpeas_payment_callback'] = true;
                     let update_booking_detail = await Booking_model.updateOne({ ctob_billRef }, update_details)
                 } else {
                     update_details['job_status'] = 11;
@@ -1721,6 +1726,7 @@ module.exports.c2b_confirmation = async (body) => {
             }
 
             if (pre_booking_detail.booking_status === 13) {
+                update_details['mpeas_payment_callback'] = false;
                 update_details['payment_status'] = 5;
                 update_details['booking_status'] = 14;
                 update_details['job_status'] = 14;
@@ -1799,7 +1805,6 @@ module.exports.c2b_confirmation = async (body) => {
                 var appointments_details = await pubsub.publish(APPOINTMENTS, { get_my_appointments: result });
                 var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
                 //to user
-                console.log("provider")
 
                 let invoice_user_data = {
                     user_parent: true,

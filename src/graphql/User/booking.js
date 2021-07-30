@@ -216,12 +216,16 @@ query GETPARTICULARBOOKING($_id : ID) {
         final_payment
         charge_id
         MpesaReceiptNumber
+        mpeas_payment_callback
+        ctob_shotcode
+        ctob_billRef
         admin_fee
         service_fee
         lat
         lng
         provider_fee
         payment_status
+        payment_type
         user_rating
         user_rating_status
         actual_time
