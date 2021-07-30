@@ -45,6 +45,10 @@ subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
         booking_ref
         base_price
         extra_price
+        payment_type
+        mpeas_payment_callback
+        ctob_shotcode
+        ctob_billRef
         extra_hour_price
         total
         user_msg_count
@@ -341,7 +345,7 @@ class Bookings extends React.Component {
     }
 
     render() {
-
+        console.log(this.state.accept_pay_modal)
         return (
             <Layout className="white" style={{ minHeight: '100vh' }}>
                 <Suspense fallback={<Skeleton active />}>

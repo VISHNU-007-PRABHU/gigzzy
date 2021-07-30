@@ -142,6 +142,7 @@ mutation AcceptJobMutation($role: Int
   $provider_id: ID
   $booking_status:Int
   $phone_number : String
+  $payment_type : String
 ){
   manage_booking(
     role:$role
@@ -149,6 +150,7 @@ mutation AcceptJobMutation($role: Int
     provider_id: $provider_id
     booking_status: $booking_status
     phone_number : $phone_number
+    payment_type:$payment_type
   ){
     status
     msg

@@ -45,7 +45,7 @@ class Invoice extends React.Component {
         booking_provider: [],
         booking_category: [],
         booking_status: 0,
-        payment_option: "",
+        payment_type: "",
         mpeas_payment_callback: false,
         base_price: "0.00",
         extra_price: "0.00",
@@ -82,7 +82,7 @@ class Invoice extends React.Component {
                 booking_provider: result.data.booking[0].booking_provider,
                 message: result.data.booking[0].get_booking_message,
                 booking_status: result.data.booking[0].booking_status,
-                payment_option: result.data.booking[0]?.payment_option || "",
+                payment_type: result.data.booking[0]?.payment_type || "",
                 base_price: result.data.booking[0]?.base_price || "",
                 extra_price: result.data.booking[0]?.extra_price || "",
                 ctob_shotcode: result.data.booking[0]?.ctob_shotcode || "",
@@ -108,7 +108,7 @@ class Invoice extends React.Component {
                     console.log(data.data.send_accept_msg);
                     that.setState({
                         booking_status: data.data.send_accept_msg.booking_status,
-                        payment_option: data.data.send_accept_msg?.payment_option || "",
+                        payment_type: data.data.send_accept_msg?.payment_type || "",
                     });
                 }
 
@@ -117,7 +117,10 @@ class Invoice extends React.Component {
     };
 
     render() {
-        const { ctob_billRef,ctob_shotcode,mpeas_payment_callback,base_price,extra_price,booking, booking_category, booking_provider, booking_user, payment_option, booking_status } = this.state;
+        const { ctob_billRef,ctob_shotcode,mpeas_payment_callback,base_price,extra_price,booking, booking_category, booking_provider, booking_user, payment_type, booking_status } = this.state;
+        console.log("Invoice -> render -> booking_status", booking_status)
+        console.log("Invoice -> render -> mpeas_payment_callback", mpeas_payment_callback)
+        console.log("Invoice -> render -> payment_option", payment_type)
 
         return (
             <div className=" col-xs-12 col-md-12 col-sm-12 invoice_body_color  " >
@@ -143,7 +146,7 @@ class Invoice extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <div className={ (booking_status == 50 || mpeas_payment_callback == true)  && payment_option == "c2b" ? "jumbotron p-1 mb-3 mx-3" : "d-none"}>
+                    <div className={ (booking_status == 50 || mpeas_payment_callback == true)  && payment_type == "c2b" ? "jumbotron p-1 mb-3 mx-3" : "d-none"}>
                         <Suspense fallback={
                             <div class="spinner-border text-success" role="status">
                                 <span class="sr-only">Loading...</span>

@@ -36,6 +36,10 @@ subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
       booking_date
       base_price
       extra_price
+      payment_type
+      mpeas_payment_callback
+      ctob_shotcode
+      ctob_billRef
       booking_category {
         category_name
         category_type
