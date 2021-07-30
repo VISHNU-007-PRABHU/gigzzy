@@ -225,7 +225,7 @@ app.post('/c2b_validation', async (req, res, next) => {
       "ResultDesc": "Accepted"
     })
   } catch (error) {
-    console.log("ops, not valid data")
+    console.log("ops, not valid data",error)
     return res.send({
       "ResultCode": 1,
       "ResultDesc": "Rejected"
