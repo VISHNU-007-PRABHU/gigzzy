@@ -1629,9 +1629,10 @@ module.exports.c2b_validation = async (body) => {
             let ctob_billRef = body["BillRefNumber"]
             let shotcode = body["BusinessShortCode"]
             let MPESA_shotcode = process.env.MPESA_SHORT_CODE
+            console.log("module.exports.c2b_validation -> MPESA_shotcode", MPESA_shotcode)
             var pre_booking_detail = await Booking_model.findOne({ ctob_billRef }).lean()
             if (shotcode == MPESA_shotcode) {
-                console.log("module.exports.c2b_validation -> shotcode", shotcode)
+                console.log("module.exports.c2b_validation -> shotcode",shotcode)
                 return reject({ status: false, msg: "Your payment shotcode is invalid !" })
             }
             if (!_.size(pre_booking_detail)) {
