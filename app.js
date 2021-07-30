@@ -10,7 +10,7 @@ const https = require('https');
 const { ApolloServer, gql, SchemaDirectiveVisitor } = require('apollo-server-express');
 const { defaultFieldResolver, GraphQLString } = require('graphql');
 const { typeDefs } = require('./node/graphql/schema');
-const { resolvers,confrimation_call,c2b_confirmation,c2b_validation } = require('./node/graphql/resolver');
+const { resolvers, confrimation_call, c2b_confirmation, c2b_validation } = require('./node/graphql/resolver');
 const moment = require('moment');
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true, parameterLimit: 5000000 }));
@@ -137,10 +137,10 @@ const server = new ApolloServer({
     date: DateFormatDirective,
     upper: UpperCaseDirective,
     imgSize: ImgSizeDirective,
-    payment:c2bDirective
+    payment: c2bDirective
   },
   subscriptions: {
-    onConnect: () => {},
+    onConnect: () => { },
     // console.log('Connected to websocket'),
     onDisconnect: () => {
     },
@@ -220,16 +220,22 @@ app.post('/c2b_validation', async (req, res, next) => {
     console.log(req.body, "ops validation")
     let confirm_data = await c2b_validation(req.body)
     console.log("confirm_data", confirm_data)
-    return res.send({ status: true, message: "valid data" })
+    return res.send({
+      "ResultCode": 0,
+      "ResultDesc": "Accepted"
+    })
   } catch (error) {
     console.log("ops, not valid data")
-    return res.send({ status: false, message: "Not validation data" })
+    return res.send({
+      "ResultCode": 1,
+      "ResultDesc": "Rejected"
+    })
   }
 })
 
 app.post('/c2b_confirmation', async (req, res, next) => {
   try {
-    console.log(req.body, "ops c2b")  
+    console.log(req.body, "ops c2b")
     let confirm_data = await c2b_confirmation(req.body)
     return res.send({ status: true, message: "we reviced cancelled" })
   } catch (error) {
