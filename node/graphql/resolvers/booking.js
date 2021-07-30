@@ -130,8 +130,8 @@ module.exports.get_payout = async (root, args) => {
     var data = await Booking_model.aggregate(filter);
     //console.log("Vishnu");
     //console.log(total);
-    console.log(datas[0]);
-    var pageInfo = { totalDocs: total.length, page: args.page, total_amount: datas[0] ? String(parseFloat(datas[0].total_amount).toFixed(2)) : 0.00 }
+    // console.log(datas[0]);
+    var pageInfo = { totalDocs: total.length, page: args.page, total_amount: datas[0] ? String(parseFloat(datas[0].total_amount).toFixed(2)) : "0.00" }
     return { pageInfo, data };
 }
 
