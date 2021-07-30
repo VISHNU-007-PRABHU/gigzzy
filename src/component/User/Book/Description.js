@@ -1,4 +1,4 @@
-import React,{Suspense} from "react";
+import React, { Suspense } from "react";
 import { LocationContext } from '../../context/Location'
 import 'antd/dist/antd.css';
 import { Rate, Statistic, Spin, Skeleton, DatePicker, Collapse, Modal, Layout, Icon, Form, Button, Row, Col, Upload } from 'antd';
@@ -467,7 +467,7 @@ class Description extends React.Component {
         this.setState({ location: item.address, center: [item.lat, item.lng], location_modal: 0 });
     }
 
-  
+
     render() {
         // console.log(this.state.accept_provider[0]?.provider_rate[0]?.rating);
         const { previewVisible, previewImage, fileList } = this.state;
@@ -484,12 +484,12 @@ class Description extends React.Component {
                 location_change: this.on_location_change,
             }}>
                 <Layout className="white">
-                <Suspense fallback={<Skeleton active />}>
-                    <UserHeader />
-                </Suspense>
+                    <Suspense fallback={<Skeleton active />}>
+                        <UserHeader />
+                    </Suspense>
 
                     <h2 className="bold mb-5 text-center">What do you need?</h2>
-                    
+
                     <Content className="px-1 description_page container user_select">
                         <Row>
                             <Col lg={{ span: 20, offset: 2 }}>
@@ -546,7 +546,7 @@ class Description extends React.Component {
                                                 >
                                                     {uploadButton}
                                                 </Upload>
-                                                <Button onClick={() => this.setState({ file_upload_modal: false })} className={fileList.length > 0? 'btnn':'d-none'}>Done</Button>
+                                                <Button onClick={() => this.setState({ file_upload_modal: false })} className={fileList.length > 0 ? 'btnn' : 'd-none'}>Done</Button>
                                                 <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
                                                     <img alt="example" className='object_fit' style={{ width: '100%', height: "500px" }} src={previewImage} />
                                                 </Modal>
@@ -569,14 +569,17 @@ class Description extends React.Component {
                                             <div style={{ height: '200px', width: '100%' }}>
                                                 <GoogleMapReact
                                                     bootstrapURLKeys={{ key: 'AIzaSyDYRYnxipjEBUNazDUwUa_8BDvm8ON7TIk' }}
-                                                    center={this.state.add_booking[0] ?.location.coordinates}
+                                                    center={{
+                                                        lat: this.state.add_booking[0]?.location.coordinates[1],
+                                                        lng: this.state.add_booking[0]?.location.coordinates[0]
+                                                    }}
                                                     defaultZoom={18}
                                                     options={createMapOptions}
                                                 >
                                                     <div
                                                         className="place"
-                                                        lat={this.state.add_booking[0] ?.location.coordinates[0]}
-                                                        lng={this.state.add_booking[0] ?.location.coordinates[1]}>
+                                                        lat={this.state.add_booking[0]?.location.coordinates[1]}
+                                                        lng={this.state.add_booking[0]?.location.coordinates[0]}>
                                                         <img src={require("../../../image/pin_location.png")} alt="your Place" />
                                                     </div>
                                                 </GoogleMapReact>
@@ -586,9 +589,9 @@ class Description extends React.Component {
                                             }
                                         </Modal>
                                         <Modal okButtonProps={{ className: 'jiffy_btn white-text' }} okText="Confirm Job" cancelButtonProps={{ className: 'jiffy_btn' }} title="Requesting Job" visible={this.state.confirm_job_modal} className="new_modal" centered onOk={() => this.setPayModal(true)} onCancel={() => this.setConfirmJobModal(false)}>
-                                            
+
                                             <div className="job_description">
-                                                <DescriptionValue data= {this.state.add_booking[0]?.description}  img={this.state.add_booking[0]?.user_image_url}/>
+                                                <DescriptionValue data={this.state.add_booking[0]?.description} img={this.state.add_booking[0]?.user_image_url} />
                                             </div>
                                             <div className="price_section text-center">
                                                 <p className="price">
@@ -677,12 +680,12 @@ class Description extends React.Component {
                             <Col sm={{ span: 4, offset: 7 }} xs={{ span: 9, offset: 2 }} className="">
                                 <Button className="w-100 h-50x normal_font_size jiffy_btn" onClick={() => this.setLaterModal(true)}>
                                     Book Later
-                            </Button>
+                                </Button>
                             </Col>
                             <Col sm={{ span: 4, offset: 1 }} xs={{ span: 9, offset: 2 }} className="">
                                 <Button className="w-100 h-50x normal_font_size jiffy_btn primary-bg" onClick={() => this.book_now()}>
                                     Book Now
-                            </Button>
+                                </Button>
                             </Col>
                         </Row>
                     </Content>
