@@ -1672,9 +1672,22 @@ module.exports.c2b_confirmation = async (body) => {
                 console.log("module.exports.pre_booking_detail -> error", "null")
                 return reject({ status: false, msg: "Payment bill refe is in-correct" })
             }
-
+            /**
+             * check booking amount
+             */
+            if (pre_booking_detail.booking_status === 13) {
+                if (pre_booking_detail['extra_price'] != Number(body['TransAmount'])) {
+                    ResultCode = 1
+                }
+            } else {
+                if (pre_booking_detail['base_price'] != Number(body['TransAmount'])) {
+                    console.log("module.exports.pre_booking_detail -> error", body['TransAmount'], pre_booking_detail['base_price'])
+                    ResultCode = 2
+                }
+            }
             if (ResultCode != 0) {
-
+                update_details['payment_message'] ="C2B payment failed"
+                update_details['resultcode'] = ResultCode;
                 if (pre_booking_detail.booking_status === 13) {
                     update_details['mpeas_payment_callback'] = false;
                     let update_booking_detail = await Booking_model.updateOne({ ctob_billRef }, update_details)
@@ -1708,26 +1721,17 @@ module.exports.c2b_confirmation = async (body) => {
             }
 
             if (pre_booking_detail.booking_status === 13) {
-                if (pre_booking_detail['extra_price'] != Number(body['TransAmount'])) {
-                    console.log("module.exports.pre_booking_detail -> error", body['TransAmount'])
-                    return resolve({ status: true, msg: "Your payment amount is invalid !", pre_booking_detail })
-                }
                 update_details['payment_status'] = 5;
                 update_details['booking_status'] = 14;
                 update_details['job_status'] = 14;
                 update_details['MpesaReceiptNumber'] = body["TransID"];
                 update_details['TransactionDate'] = body["TransTime"];
             } else {
-                if (pre_booking_detail['base_price'] != Number(body['TransAmount'])) {
-                    console.log("module.exports.pre_booking_detail -> error", body['TransAmount'], pre_booking_detail['base_price'])
-                    return resolve({ status: true, msg: "Your payment amount is invalid !", pre_booking_detail })
-                }
                 update_details['job_status'] = 10;
                 update_details['booking_status'] = 10;
                 update_details['MpesaReceiptNumber'] = body["TransID"];
                 update_details['TransactionDate'] = body["TransTime"];
             }
-
 
             let booking_detail = await Booking_model.findOne({ ctob_billRef })
             let update_booking_detail = await Booking_model.updateOne({ ctob_billRef: ctob_billRef }, update_details)
