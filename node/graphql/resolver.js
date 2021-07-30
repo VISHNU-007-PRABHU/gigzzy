@@ -1426,9 +1426,9 @@ const resolvers = {
                 var user = await Detail_model.findOne({ _id: args._id });
                 var msg = "";
                 if (args.proof_status == 0)
-                    msg = "Admin change the proof status"
+                    msg = "you have been un approved as Gigzzy pro"
                 else
-                    msg = "Admin change the proof status"
+                    msg = "Congratulations,you have been approved as Gigzzy pro"
                 // ================= push_notifiy ================== //
                 var message = {
                     to: user.device_id,
