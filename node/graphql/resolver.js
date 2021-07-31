@@ -895,13 +895,15 @@ const resolvers = {
                         // console.log("ansbd");
                         var find_extra = await Extra_fee_model.find({ _id: args.extra_fare_id });
                         var find_extra_data = await Extra_fee_model.findOne({ _id: args.extra_fare_id });
-                        // console.log(find_extra);
+                        console.log("find_extra_data", find_extra_data)
                         if (find_extra.length == 0) {
                             return [{ msg: "Extra feee Id Wrong", status: "failed" }]
                         }
                         let provider_fee = Number(booking_detail.provider_fee) - Number(find_extra_data.extra_fee);     // sub extra_fare in provider fee
                         let total = Number(booking_detail.total) - Number(find_extra_data.extra_fare);                  // sub extra_fare in total amount
                         let extra_price = Number(booking_detail.extra_price) - Number(find_extra_data.extra_fee);       // sub extra_fare in extra price
+                        console.log("find_extra_data.extra_fe", find_extra_data.extra_fe)
+                        console.log("booking_detail.extra_price", booking_detail.extra_price)
                         console.log("extra_price", extra_price)
                         let final_payment = Number(booking_detail.final_payment) - Number(find_extra_data.extra_fare);
                         end_data = {
