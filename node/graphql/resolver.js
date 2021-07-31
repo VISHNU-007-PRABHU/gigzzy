@@ -869,7 +869,7 @@ const resolvers = {
                             provider_fee: String(parseFloat(Number(provider_fee) + Number(args.extra_fare)).toFixed(2)),      //add update extra fare in pro_fee
                             total: String(parseFloat(Number(total) + Number(args.extra_fare)).toFixed(2)),
                             extra_price: String(parseFloat(Number(extra_price) + Number(args.extra_fare)).toFixed(2)),
-                            final_payment: String(parseFloat(Number(booking_detail.final_payment) - Number(args.extra_fare)).toFixed(2))
+                            final_payment: String(parseFloat(Number(final_payment) + Number(args.extra_fare)).toFixed(2))
                         };
                         console.log("end_data", end_data)
                         var extra_fare_update = { extra_fare: String(parseFloat(args.extra_fare).toFixed(2)), extra_fare_reason: args.extra_fare_reason };
