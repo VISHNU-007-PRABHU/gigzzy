@@ -19,7 +19,8 @@ module.exports.category = async (parent, args, context, info) => {
     args.is_block = false;
     var result = await Category_model.find(args);
     console.log(_.size(result),"ops");
-    result = _.map(result,data=>{
+    _.map(result,data=>{
+        console.log(_.size(result.child_category))
         if(_.size(result.child_category))return data
     })
     console.log(_.size(result),"ops");
