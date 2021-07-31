@@ -18,7 +18,7 @@ module.exports.category = async (parent, args, context, info) => {
     args.delete = 0;
     args.is_block = false;
     var result = await Category_model.find(args);
-    //console.log(result);
+    console.log(result);
     return result;
 };
 
