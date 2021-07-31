@@ -860,6 +860,7 @@ const resolvers = {
                     if (args.option == 2) {
                         //update extra_fee
                         var find_extra_data = await Extra_fee_model.findOne({ _id: args.extra_fare_id }).lean();
+                        console.log("find_extra_data", find_extra_data)
                         let provider_fee = Number(booking_detail.provider_fee) - Number(find_extra_data.extra_fare);         // sub extra_fare in provider fee
                         let total = Number(booking_detail.total) - Number(find_extra_data.extra_fare);                       // sub extra_fare in total amount
                         let extra_price = Number(booking_detail.extra_price) - Number(find_extra_data.extra_fare);           // sub extra_fare in extra price
@@ -891,8 +892,6 @@ const resolvers = {
                         }
                     }
                     if (args.option == 3) {
-                        //delete extra_fee
-                        // console.log("ansbd");
                         
                         var find_extra = await Extra_fee_model.find({ _id: args.extra_fare_id });
                         var find_extra_data = await Extra_fee_model.findOne({ _id: args.extra_fare_id }).lean();
@@ -902,9 +901,6 @@ const resolvers = {
                         let provider_fee = Number(booking_detail.provider_fee) - Number(find_extra_data.extra_fare);     // sub extra_fare in provider fee
                         let total = Number(booking_detail.total) - Number(find_extra_data.extra_fare);                  // sub extra_fare in total amount
                         let extra_price = Number(booking_detail.extra_price) - Number(find_extra_data.extra_fare);       // sub extra_fare in extra price
-                        console.log("find_extra_data.extra_fe", find_extra_data.extra_fare)
-                        console.log("booking_detail.extra_price", booking_detail.extra_price)
-                        console.log("extra_price", extra_price)
                         let final_payment = Number(booking_detail.final_payment) - Number(find_extra_data.extra_fare);
                         end_data = {
                             provider_fee: String(parseFloat(provider_fee).toFixed(2)),
@@ -912,7 +908,6 @@ const resolvers = {
                             extra_price: String(parseFloat(extra_price).toFixed(2)),
                             final_payment: String(parseFloat(final_payment).toFixed(2))
                         };
-                        console.log("end_data", end_data)
                         if (find_extra.length == 1) {
                             // console.log("jhweg");
                             end_data.payment_status = 0;
