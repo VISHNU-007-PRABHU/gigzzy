@@ -116,7 +116,7 @@ module.exports.safaricom_ctob_simulate = async (PhoneNumber, amount) => {
     }
 }
 
-module.exports.safaricom_lipesa_simulate = async (PhoneNumber, amount) => {
+module.exports.safaricom_lipesa_simulate = async (PhoneNumber, amount,invoice_no) => {
     return new Promise(async function (resolve, reject) {   
         try {
             if (!PhoneNumber || !amount) {
@@ -142,7 +142,7 @@ module.exports.safaricom_lipesa_simulate = async (PhoneNumber, amount) => {
                 "PartyB": process.env.MPESA_PARTYB,
                 "PhoneNumber": PhoneNumber,
                 "CallBackURL": `${process.env.MPESA_CALLBACK_URL}/confirmation`,
-                "AccountReference": "CompanyXLTD",
+                "AccountReference": invoice_no || "CompanyXLTD",
                 "TransactionDesc": "Payment of X"
             }
             // console.log("module.exports.safaricom_lipesa_simulate -> request_data", request_data)

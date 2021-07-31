@@ -1103,7 +1103,7 @@ const resolvers = {
                             return [data]
                         } else {
 
-                            var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(amount))
+                            var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(amount),booking_detail.booking_ref)
                             // console.log("charge", charge)
                             if (charge.status == true && charge.data.ResponseCode === '0') {
                                 // update charge amount
@@ -1239,7 +1239,7 @@ const resolvers = {
                                 var findBooking = await Booking_model.find({ _id: args.booking_id });
                                 return [{ job_status: 14, msg: "job is completed successfully", status: 'success' }];
                             } else {
-                                var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(final_amount))
+                                var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(final_amount),booking_detail.booking_ref)
 
                                 if (charge.status == true && charge.data.ResponseCode === '0') {
                                     // update charge amount
