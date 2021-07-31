@@ -815,50 +815,46 @@ const resolvers = {
 
                 } else if (args.booking_status == 16) {
                     var end_data = {};
-                    if (args.extra_fare != undefined && args.extra_fare != null && args.extra_fare != '') {
-                        console.log("args.extra_fare ", args.extra_fare)
-
+                    if (args.extra_fare) {
                         var s_extra_fare = args.extra_fare.replace("KSh", "");
-                        console.log("s_extra_fare", s_extra_fare)
                         if (!Number(s_extra_fare)) {
                             s_extra_fare = 0
                         }
-                        args.extra_fare = String(parseFloat(Number(s_extra_fare)).toFixed(2))
-                        console.log("args.extra_fare", args.extra_fare)
-                        if (args.option == 1) {
-                            //add extra_fee
-                            let provider_fee = Number(booking_detail.provider_fee) + Number(args.extra_fare);    // add extra_fare in provider fee
-                            let total = Number(booking_detail.total) + Number(args.extra_fare);                  // add extra_fare in total amount
-                            let extra_price = Number(booking_detail.extra_price) + Number(args.extra_fare);    // add extra_fare in extra price
-                            let final_payment = Number(booking_detail.final_payment) + Number(args.extra_fare);
-                            let data = {
-                                booking_id: args.booking_id,
-                                extra_fare: String(parseFloat(args.extra_fare).toFixed(2)),
-                                extra_fare_reason: args.extra_fare_reason,
-                            }
-                            let add_extra_fee = new Extra_fee_model(data);
-                            let extra_fee = await add_extra_fee.save();
-                            end_data = {
-                                provider_fee: String(parseFloat(provider_fee).toFixed(2)),
-                                total: String(parseFloat(total).toFixed(2)),
-                                extra_price: String(parseFloat(extra_price).toFixed(2)),
-                                final_payment: String(parseFloat(final_payment).toFixed(2)),
-                                payment_status: 4
-                            };
-                            var end_result = await Booking_model.update({ _id: args.booking_id }, end_data, { new: true });
-                            if (end_result.n == end_result.nModified) {
-                                await Payout_model.update({ booking_id: args.booking_id }, {
-                                    amount: String(parseFloat(Number(end_data.provider_fee)).toFixed(2))
-                                });
-                                var result_data = await Booking_model.findOne({ _id: args.booking_id });
-                                // console.log([{{ msg: "Extra fare added success", status: 'success' }}]);
-                                extra_fee.msg = "Extra fee add success";
-                                extra_fee.status = 'success';
-                                return [extra_fee];
-                            } else {
-                                //  console.log([{ msg: "Extra fare added success", status: 'failed' }]);
-                                return [{ msg: "Extra added failed", status: 'failed' }];
-                            }
+                    }
+                    args.extra_fare = String(parseFloat(Number(s_extra_fare)).toFixed(2))
+                    if (args.option == 1) {
+                        //add extra_fee
+                        let provider_fee = Number(booking_detail.provider_fee) + Number(args.extra_fare);    // add extra_fare in provider fee
+                        let total = Number(booking_detail.total) + Number(args.extra_fare);                  // add extra_fare in total amount
+                        let extra_price = Number(booking_detail.extra_price) + Number(args.extra_fare);    // add extra_fare in extra price
+                        let final_payment = Number(booking_detail.final_payment) + Number(args.extra_fare);
+                        let data = {
+                            booking_id: args.booking_id,
+                            extra_fare: String(parseFloat(args.extra_fare).toFixed(2)),
+                            extra_fare_reason: args.extra_fare_reason,
+                        }
+                        let add_extra_fee = new Extra_fee_model(data);
+                        let extra_fee = await add_extra_fee.save();
+                        end_data = {
+                            provider_fee: String(parseFloat(provider_fee).toFixed(2)),
+                            total: String(parseFloat(total).toFixed(2)),
+                            extra_price: String(parseFloat(extra_price).toFixed(2)),
+                            final_payment: String(parseFloat(final_payment).toFixed(2)),
+                            payment_status: 4
+                        };
+                        var end_result = await Booking_model.update({ _id: args.booking_id }, end_data, { new: true });
+                        if (end_result.n == end_result.nModified) {
+                            await Payout_model.update({ booking_id: args.booking_id }, {
+                                amount: String(parseFloat(Number(end_data.provider_fee)).toFixed(2))
+                            });
+                            var result_data = await Booking_model.findOne({ _id: args.booking_id });
+                            // console.log([{{ msg: "Extra fare added success", status: 'success' }}]);
+                            extra_fee.msg = "Extra fee add success";
+                            extra_fee.status = 'success';
+                            return [extra_fee];
+                        } else {
+                            //  console.log([{ msg: "Extra fare added success", status: 'failed' }]);
+                            return [{ msg: "Extra added failed", status: 'failed' }];
                         }
                     }
                     if (args.option == 2) {
@@ -874,6 +870,7 @@ const resolvers = {
                             extra_price: String(parseFloat(Number(extra_price) + Number(args.extra_fare)).toFixed(2)),
                             final_payment: String(parseFloat(Number(booking_detail.final_payment) - Number(args.extra_fare)).toFixed(2))
                         };
+                        console.log("end_data", end_data)
                         var extra_fare_update = { extra_fare: String(parseFloat(args.extra_fare).toFixed(2)), extra_fare_reason: args.extra_fare_reason };
                         var update_extra_fee = await Extra_fee_model.update({ _id: args.extra_fare_id }, extra_fare_update, { new: true });
                         if (update_extra_fee.n == update_extra_fee.nModified) {
@@ -905,6 +902,7 @@ const resolvers = {
                         let provider_fee = Number(booking_detail.provider_fee) - Number(find_extra_data.extra_fee);     // sub extra_fare in provider fee
                         let total = Number(booking_detail.total) - Number(find_extra_data.extra_fare);                  // sub extra_fare in total amount
                         let extra_price = Number(booking_detail.extra_price) - Number(find_extra_data.extra_fee);       // sub extra_fare in extra price
+                        console.log("extra_price", extra_price)
                         let final_payment = Number(booking_detail.final_payment) - Number(find_extra_data.extra_fare);
                         end_data = {
                             provider_fee: String(parseFloat(provider_fee).toFixed(2)),
@@ -912,6 +910,7 @@ const resolvers = {
                             extra_price: String(parseFloat(extra_price).toFixed(2)),
                             final_payment: String(parseFloat(final_payment).toFixed(2))
                         };
+                        console.log("end_data", end_data)
                         if (find_extra.length == 1) {
                             // console.log("jhweg");
                             end_data.payment_status = 0;
@@ -1119,7 +1118,7 @@ const resolvers = {
                                     total: String(parseFloat(args.total).toFixed(2)),
                                     booking_status: 50, // 50 means waiting booking
                                     phone_number: args.phone_number,
-                                    payment_type: "lipesa", 
+                                    payment_type: "lipesa",
                                     // job_status: 10,
                                     // payment_status: 1,
                                     MerchantRequestID: charge.data.MerchantRequestID || 0,
@@ -1235,7 +1234,7 @@ const resolvers = {
                                     admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
                                     provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
                                     phone_number: args.phone_number,
-                                    payment_type: "c2b", 
+                                    payment_type: "c2b",
                                     mpeas_payment_callback: true,
                                     // job_status: 10,
                                     // payment_status: 1,
@@ -1632,7 +1631,7 @@ module.exports.c2b_validation = async (body) => {
             console.log("module.exports.c2b_validation -> MPESA_shotcode", MPESA_shotcode)
             var pre_booking_detail = await Booking_model.findOne({ ctob_billRef }).lean()
             if (shotcode != MPESA_shotcode) {
-                console.log("module.exports.c2b_validation -> shotcode",shotcode)
+                console.log("module.exports.c2b_validation -> shotcode", shotcode)
                 return reject({ status: false, msg: "Your payment shotcode is invalid !" })
             }
             if (!_.size(pre_booking_detail)) {
@@ -1694,7 +1693,7 @@ module.exports.c2b_confirmation = async (body) => {
                 }
             }
             if (ResultCode != 0) {
-                update_details['payment_message'] ="C2B payment failed"
+                update_details['payment_message'] = "C2B payment failed"
                 update_details['resultcode'] = ResultCode;
                 if (pre_booking_detail.booking_status === 13) {
                     update_details['mpeas_payment_callback'] = true;
