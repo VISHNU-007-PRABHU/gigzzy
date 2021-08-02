@@ -893,7 +893,7 @@ const resolvers = {
                     }
                     if (args.option == 3) {
                         
-                        var find_extra = await Extra_fee_model.find({ _id: args.booking_id });
+                        var find_extra = await Extra_fee_model.find({ booking_id: args.booking_id });
                         var find_extra_data = await Extra_fee_model.findOne({ _id: args.extra_fare_id }).lean();
                         if (find_extra.length == 0) {
                             return [{ msg: "Extra feee Id Wrong", status: "failed" }]
