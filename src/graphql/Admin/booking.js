@@ -190,6 +190,9 @@ export const GET_PAYOUT_DETAIL = gql`
           payout_second_name
           payout_id
           payout_option
+          account_name
+          routing_name
+          branch_name
         }
         find_payout_booking{
 		    booking_ref	

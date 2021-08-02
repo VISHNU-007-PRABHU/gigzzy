@@ -205,6 +205,18 @@ class PayoutsTable extends React.Component {
                                             <Col span={12}>:{this.state.provider_data[0] ? this.state.provider_data[0].booking_provider[0] ? this.state.provider_data[0].booking_provider[0].bank_name : '' : ""}</Col>
                                         </Row>
                                         <Row>
+                                            <Col span={12}>Branch Name</Col>
+                                            <Col span={12}>:{this.state.provider_data[0] ? this.state.provider_data[0].booking_provider[0] ? this.state.provider_data[0].booking_provider[0].branch_name : '' : ""}</Col>
+                                        </Row>
+                                        <Row>
+                                            <Col span={12}>Routing Name</Col>
+                                            <Col span={12}>:{this.state.provider_data[0] ? this.state.provider_data[0].booking_provider[0] ? this.state.provider_data[0].booking_provider[0].routing_name : '' : ""}</Col>
+                                        </Row>
+                                        <Row>
+                                            <Col span={12}>Account Name</Col>
+                                            <Col span={12}>:{this.state.provider_data[0] ? this.state.provider_data[0].booking_provider[0] ? this.state.provider_data[0].booking_provider[0].account_name : '' : ""}</Col>
+                                        </Row>
+                                        <Row>
                                             <Col span={12}>Account Number</Col>
                                             <Col span={12}>:{this.state.provider_data[0] ? this.state.provider_data[0].booking_provider[0] ? this.state.provider_data[0].booking_provider[0].account_no : '' : ""}</Col>
                                         </Row>
