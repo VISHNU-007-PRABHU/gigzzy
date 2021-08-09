@@ -2,6 +2,7 @@
 
 import React, { Suspense } from "react";
 import 'antd/dist/antd.css';
+import { Link } from 'react-router-dom';
 import { Modal, Spin, Carousel, Layout, Icon, Form, Input, AutoComplete, Button, Typography, Row, Col, Card, Avatar, List, Skeleton } from 'antd';
 import { GET_CATEGORY_PAGINATION, SEARCH_CATEGORY, FIND_CATEGORY, GET_FUTURE, GET_TRENDING } from '../../../graphql/User/home_page';
 import { My_APPOINTMENTS } from '../../../graphql/User/booking';
@@ -24,7 +25,7 @@ const layout = layoutGenerator({
     phablet: 480,
     tablet: 600,
     desktop: 1024,
-  });
+});
 
 const { Content } = Layout;
 const UserHeader = React.lazy(() => import('../Layout/UserHeader'));
@@ -156,17 +157,17 @@ class Home_Page extends React.Component {
     };
 
     fetch_category = async () => {
-        const OnMobile = window.innerWidth ;
-        if(OnMobile >= 600 && OnMobile < 1024){
+        const OnMobile = window.innerWidth;
+        if (OnMobile >= 600 && OnMobile < 1024) {
             await this.setState({
-                item_count:3
+                item_count: 3
             })
-        }else if(OnMobile < 600 && OnMobile >= 480){
+        } else if (OnMobile < 600 && OnMobile >= 480) {
             await this.setState({
-                item_count:2
+                item_count: 2
             })
-        }else if(OnMobile < 480){
-            await this.setState({ item_count:1 })
+        } else if (OnMobile < 480) {
+            await this.setState({ item_count: 1 })
         }
         this.setState({ categoryloading: true });
         let input = {};
@@ -187,11 +188,11 @@ class Home_Page extends React.Component {
 
     handleTableChange = async (page) => {
         let totalpage = Math.floor(Number(this.state.total) / this.state.item_count)
-        console.log(totalpage,this.state.current_page)
+        console.log(totalpage, this.state.current_page)
         if (this.state.current_page < 0 || (totalpage <= this.state.current_page && page === "forward")) {
             return false
         }
-        this.setState({ categoryloading: true });   
+        this.setState({ categoryloading: true });
         let Cpage = 0
         if (page === "forward") {
             Cpage = Number(this.state.current_page + 1)
@@ -458,9 +459,9 @@ class Home_Page extends React.Component {
                                         </Slider>
                                         <div class="owl-carousel owl-theme cursor_point d-flex justify-content-between mt-n5 position-absolute w-100">
                                             <div class="owl-nav">
-                                                <button onClick={()=>{this.handleTableChange('back',)}} type="button" role="presentation" class="owl-prev">
+                                                <button onClick={() => { this.handleTableChange('back',) }} type="button" role="presentation" class="owl-prev">
                                                 </button>
-                                                <button onClick={()=>{this.handleTableChange('forward')}} type="button" role="presentation" class="owl-next">
+                                                <button onClick={() => { this.handleTableChange('forward') }} type="button" role="presentation" class="owl-next">
                                                 </button>
                                             </div>
                                         </div>
@@ -566,8 +567,12 @@ class Home_Page extends React.Component {
                             <div className="download_section position-relative pt-5 text-center">
                                 <h2 className="bold mb-5 text-center">Download the App</h2>
                                 <p className="normal_font_size">Choose and book 100+ services and track them on Gigzzy App</p>
-                                <img alt='' loading="lazy" className="lazyload mr-3" src={require("../../../image/play_store.png")} />
-                                <img alt='' loading="lazy" className="lazyload ml-3" src={require("../../../image/app_store.png")} />
+                                <a href="https://play.google.com/store/apps/details?id=com.gigzzy.user" target="_blank">
+                                    <img alt='' loading="lazy" className="lazyload mr-3" src={require("../../../image/play_store.png")} />
+                                </a>
+                                <a href="https://apps.apple.com/us/app/gigzzy-user/id1574904567" target="_blank">
+                                    <img alt='' loading="lazy" className="lazyload ml-3" src={require("../../../image/app_store.png")} />
+                                </a>
                             </div>
                             <div className="feature_section pt-5 container mb-5">
                                 <Row>

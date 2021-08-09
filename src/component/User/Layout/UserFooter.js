@@ -104,7 +104,10 @@ const UserFooter = () => {
                 <li>
                   <h6 style={{ color: "green" }}>Contact Us</h6>
                 </li>
-                <li>info@gigzzy.com</li>
+                <li>UMEA, Address Nyago house,</li>
+                <li>Mombasa road 2nd Floor</li> 
+                <li>HQ ,5655 Lake Acworth drive nw 30101.Acworth ,Georgia .</li>
+                <li className="pt-3 ">info@gigzzy.com</li>
                 <li>Tel +254 733 494 363</li>
                 <li>
                   <FacebookShareButton
