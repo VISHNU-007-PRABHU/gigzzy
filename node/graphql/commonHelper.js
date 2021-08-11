@@ -98,7 +98,7 @@ const static_sms_template = (type, data) => {
     case "job_finished":
       return `Your gigzzy job is completed successfully`
     case "admin_apporved":
-      return `Congratulations,you have been approved as Gigzzy pro`
+      return `Congratulations and you have been approved as Gigzzy Pro`
     case "job_assign":
       return `You have a new job from Gigzzy`
     case "scheduled_job":
@@ -153,7 +153,7 @@ const static_mail_template = (type, data) => {
       }
     case "admin_approved":
       return {
-        subject: "GIGZZY Proifle verification ✔",
+        subject: "GIGZZY Profile verification ✔",
         text: "Please wait, admin will verified you profile?",
         html: `<b>${msg}</b>`
       }
