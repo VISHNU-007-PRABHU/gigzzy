@@ -160,7 +160,7 @@ class Invoice extends React.Component {
                         <p>Thanks for using gigzzy</p>
                     </div>
                     <div className="total_fare">
-                        <h5>TOTAL FARE</h5>
+                        <h5>TOTAL COST</h5>
                         <h1><small></small>{booking[0] ? booking[0].total : ""}</h1>
                         {/* <h6>TOTAL HOURS : asd</h6> */}
                     </div>
