@@ -34,7 +34,7 @@ export const ConfrimPassword = () => {
   const [resetPassword] = useMutation(RESET_PwD);
   const onFinish = useCallback(() => {
     let pwd_id = history.location.pathname.split('/')
-    if (password != '' && c_password != '') {
+    if (password !== '' && c_password !== '') {
       if (password === c_password) {
         setspin(true);
         resetPassword({

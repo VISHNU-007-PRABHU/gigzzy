@@ -72,13 +72,9 @@ class _CardForm extends Component {
         });
         this.setState({ loading: false });
     }
-    //     });
-    // } else {
-    //     Alert_msg({ msg: "Stripe is not working now ...", status: "failed" });
-    // }
 
     render() {
-        const { ctob_billRef, ctob_shotcode, mpeas_payment_callback, base_price, extra_price } = this.props.data
+        const { ctob_billRef, ctob_shotcode, base_price } = this.props.data
         return (
             <div className="CardDemo w-100">
                 <label className="w-100">
@@ -108,7 +104,7 @@ class _CardForm extends Component {
                                 country={'ke'}
                                 mask={{ in: '..........' }}
                                 onKeyDown={(event) => {
-                                    if (event.keyCode == 13) {
+                                    if (event.keyCode === 13) {
                                         this.handleSubmit();
                                     }
                                 }}

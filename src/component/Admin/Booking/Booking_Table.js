@@ -4,12 +4,9 @@ import { Table, Form, Icon, Tag } from 'antd';
 import { GET_BOOKING } from '../../../graphql/Admin/booking';
 import { client } from "../../../apollo";
 import Search from "antd/lib/input/Search";
-
 const EmailSearch = React.lazy(() => import('../User/EmailSearch'));
 const DateSearch = React.lazy(() => import('../User/DateSearch'));
-const SearchCategory = React.lazy(() => import('../User/SearchCategory'));
 const SearchSubcategory = React.lazy(() => import('../User/SearchSubcategory'));
-
 class BookingTable extends React.Component {
     constructor(props) {
         super(props);

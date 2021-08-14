@@ -1,8 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Layout, Row, Col, Icon } from "antd";
+import Layout from 'antd/lib/layout';
+import Row from 'antd/lib/row';
+import Col from 'antd/lib/col';
 import {
-  EmailShareButton,
   FacebookShareButton,
   TwitterIcon,
   FacebookIcon,
@@ -28,12 +29,12 @@ const UserFooter = () => {
                 <li>
                   <Link to="/static_page/about_us" target="_blank" className="mr-1">About</Link>
                 </li>
-                <li>
-                  <Link target="_blank" className="mr-1">Blog</Link>
+                {/* <li>
+                  <Link className="mr-1">Blog</Link>
                 </li>
                 <li>
-                  <Link target="_blank" className="mr-1">Careers</Link>
-                </li>
+                  <Link>Careers</Link>
+                </li> */}
                 <li>
                   <Link to="/provider_login" target="_blank" className="mr-1">Become a Pro</Link>
                 </li>
@@ -106,16 +107,16 @@ const UserFooter = () => {
                 </li>
                 <li>UMEA, Address Nyago house,</li>
                 <li>Mombasa road 2nd Floor</li> 
-                <li>HQ ,5655 Lake Acworth drive nw 30101.Acworth ,Georgia .</li>
+                <li>14314 S Myers Park Rd Cheney WA 99004, USA .</li>
                 <li className="pt-3 ">info@gigzzy.com</li>
-                <li>Tel +254 733 494 363</li>
+                {/* <li>Tel +254 733 494 363</li> */}
+                <li>Tel +1 (509) 319-6332</li>
                 <li>
                   <FacebookShareButton
                     url="https://web.facebook.com/gigzzy"
                     hashtag="#programing joke"
                   >
                     <FacebookIcon
-                      logoFillColor="white"
                       size={32}
                       round={true}
                     />
@@ -125,7 +126,7 @@ const UserFooter = () => {
                     url="https://twitter.com/Gigzzyafrica"
                     hashtag="#programing joke"
                   >
-                    <TwitterIcon logoFillColor="white" size={32} round={true} />
+                    <TwitterIcon size={32} round={true} />
                   </TwitterShareButton>
                   {"    "}
                   <LinkedinShareButton
@@ -133,7 +134,6 @@ const UserFooter = () => {
                     hashtag="#programing joke"
                   >
                     <LinkedinIcon
-                      logoFillColor="white"
                       size={32}
                       round={true}
                     />
@@ -144,7 +144,6 @@ const UserFooter = () => {
                     hashtag="#programing joke"
                   >
                     <WhatsappIcon
-                      logoFillColor="white"
                       size={32}
                       round={true}
                     />

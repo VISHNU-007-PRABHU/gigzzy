@@ -95,7 +95,7 @@ class EditableTable extends React.Component {
 
     onFilter = async (data) => {
         console.log(Object.keys(data)[0]);
-        if (data[Object.keys(data)[0]] == '') {
+        if (data[Object.keys(data)[0]] === '') {
             delete this.state.input_data[Object.keys(data)[0]];
             var data_pass = this.state.input_data;
             this.setState({ input_data: data_pass })

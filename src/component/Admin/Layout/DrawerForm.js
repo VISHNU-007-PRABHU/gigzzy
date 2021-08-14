@@ -1,11 +1,9 @@
 import React from "react";
-import { Menu, Icon,  Layout } from 'antd';
-import { BrowserRouter as Route,Link,withRouter } from "react-router-dom";
-import { Drawer, Button, Select } from 'antd';
+import { Menu, Icon } from 'antd';
+import { BrowserRouter as Link,withRouter } from "react-router-dom";
+import { Drawer } from 'antd';
 import main from '../../../image/Gigzzy.png';
 import '../../../scss/template.scss';
-const { Option } = Select;
-
 class DrawerForm extends React.Component {
   state = { visible: false };
 
@@ -94,6 +92,11 @@ class DrawerForm extends React.Component {
               <Icon type="book" />
               <span>Static Pages</span>
               <Link to="/admin-static" />
+            </Menu.Item>
+            <Menu.Item key="/admin-roles">
+              <Icon type="book" />
+              <span>Manage Admin</span>
+              <Link to="/admin-roles" />
             </Menu.Item>
             {/* <Menu.Item key="/admin-settings">
               <Icon type="setting" />

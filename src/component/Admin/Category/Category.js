@@ -6,7 +6,7 @@ import AdminSider from '../Layout/AdminSider';
 import AdminHeader from '../Layout/AdminHeader';
 import CategoryTable from './Category_Tabels';
 import { Layout, Tabs,Button } from 'antd';
-import ParentCategory_Table from "./ParentCategory_Table";
+import ParentCategoryTable from "./ParentCategory_Table";
 const { Content } = Layout;
 const { TabPane } = Tabs;
 class Category extends React.Component {
@@ -38,7 +38,7 @@ class Category extends React.Component {
                                 <CategoryTable />
                             </TabPane>
                             <TabPane tab="Parent Category" key="2">
-                                <ParentCategory_Table />
+                                <ParentCategoryTable />
                             </TabPane>
                         </Tabs>
                     </Content>

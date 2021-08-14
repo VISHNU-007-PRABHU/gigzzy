@@ -1,3 +1,4 @@
+const permission = require('./model/Admin/permission');
 
 module.exports = {
     user : require('./model/userDetail/user'),
@@ -14,5 +15,7 @@ module.exports = {
     Extra_fee:require('./model/booking/extra'),
     payout_setting:require('./model/Admin/payout_setting'),
     site_setting:require('./model/Admin/site'),
-    address:require('./model/userDetail/address')
+    address:require('./model/userDetail/address'),
+    roles:require('./model/Admin/roles'),
+    permission:require('./model/Admin/permission')
 }

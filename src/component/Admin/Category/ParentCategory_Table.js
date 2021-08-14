@@ -1,13 +1,13 @@
 import * as React from "react";
 import { withRouter } from "react-router-dom";
-import { Table, Button, Modal, Form, Avatar, Popconfirm, Tag, Icon,Switch } from "antd";
-import { GET_CATEGORY, UPDATE_CATEGORY,CHNAGE_PARENT_BLOCK, DELETE_CATEGORY } from '../../../graphql/Admin/category';
+import { Table,Modal, Form, Avatar, Popconfirm, Tag, Icon,Switch } from "antd";
+import { GET_CATEGORY, CHNAGE_PARENT_BLOCK, DELETE_CATEGORY } from '../../../graphql/Admin/category';
 import { client } from "../../../apollo";
 import '../../../scss/template.scss';
 import { Alert_msg } from '../../Comman/alert_msg';
 import Search from "antd/lib/input/Search";
 
-class ParentCategory_Table extends React.Component {
+class ParentCategoryTable extends React.Component {
     state = {
         modalVisible: false,
         dataSource: [],
@@ -198,4 +198,4 @@ class ParentCategory_Table extends React.Component {
     }
 }
 
-export default Form.create()(withRouter(ParentCategory_Table));
+export default Form.create()(withRouter(ParentCategoryTable));

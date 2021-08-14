@@ -2,7 +2,7 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import { GET_USER, DELETE_USER,USER_EMAIL_QUERY } from '../../../graphql/Admin/user';
 import { client } from "../../../apollo";
-import { Table, Button, Icon, Popconfirm,Tag } from 'antd';
+import { Table, Icon, Popconfirm,Tag } from 'antd';
 import { Alert_msg } from '../../Comman/alert_msg';
 import Search from "antd/lib/input/Search";
 

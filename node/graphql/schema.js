@@ -1,7 +1,7 @@
-const { gql,SchemaDirectiveVisitor } = require('apollo-server');
+const { gql, SchemaDirectiveVisitor } = require('apollo-server');
 const { defaultFieldResolver } = require('graphql');
 
-const typeDefs = gql `
+const typeDefs = gql`
     scalar Date
     scalar JSON
     scalar Cursor
@@ -75,6 +75,9 @@ const typeDefs = gql `
         get_cancel_chart(option:Int):[Dashboard]
         get_earnings_chart(option:Int):[Dashboard]
         get_others_chart(option:Int):[Dashboard]
+        get_admin_users(option:Int):[Admin]
+        get_admin_roles(option:Int):[Roles]
+        get_admin_permission(option:Int):[Permission]
     }
 
     # sub category pagination data
@@ -214,6 +217,28 @@ const typeDefs = gql `
         email:String
         password:String
         info:JSON
+        count:Int
+        roles:[Roles]
+    }
+    type Roles{
+        name:String
+        key:String
+        type:String
+        is_delete:Boolean
+        _id:ID
+        count:Int
+        permission:[Permission]
+    }
+    type Permission{
+        name:String
+        key:String
+        type:String
+        is_delete:Boolean
+        _id:ID
+        count:Int
+        msg:String
+        status:String
+        permission:[Permission]
     }
     type Certificate{
         id: ID
@@ -660,7 +685,30 @@ const typeDefs = gql `
             client_key:String,
             signature:String,
             payout_status:Int):Payout
-
+            add_admin_roles(
+                name: String,
+                type:String,
+                key:String,
+                page_type:String,
+            ):Roles
+            update_admin_roles(
+                _id:ID
+                name: String,
+                type:String,
+                key:String,
+                page_type:String,
+                options:JSON,
+            ):Permission
+            add_admin_permission(
+                _id:ID,
+                name: String,
+                type:String,
+                key:String,
+                page_type:String,
+            ):Permission
+            delete_admin_permission(
+                _id:ID
+            ):Permission
         modified_address(
             option:Int  
             is_default:Int

@@ -1,5 +1,4 @@
 const model = require('../../model_data');
-const opencage = require('opencage-api-client');
 const nodemailer = require("nodemailer");
 const moment = require('moment');
 var ObjectId = require('mongodb').ObjectID;

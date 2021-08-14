@@ -6,7 +6,7 @@ import 'antd/dist/antd.css';
 import '../../../scss/template.scss';
 import AdminSider from '../Layout/AdminSider';
 import AdminHeader from '../Layout/AdminHeader';
-import { Layout, Row, Col, Switch, Card, Carousel } from 'antd';
+import { Layout, Row, Col, Switch, Card } from 'antd';
 import { FIND_USER, PROVIDER_DOCUMENT_VERIFIED } from '../../../graphql/Admin/user';
 import { Alert_msg } from '../../Comman/alert_msg';
 import { client } from "../../../apollo";

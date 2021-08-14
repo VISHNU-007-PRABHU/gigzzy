@@ -1,12 +1,10 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { withRouter } from "react-router-dom";
 import { GET_USER, DELETE_USER, USER_EMAIL_QUERY } from '../../../graphql/Admin/user';
 import { client } from "../../../apollo";
 import { Table, Button, Icon, Popconfirm } from 'antd';
 import { Alert_msg } from '../../Comman/alert_msg';
 import Search from "antd/lib/input/Search";
-// const EmailSearch = React.lazy(() => import('./EmailSearch'));
-
 class UserTable extends React.Component {
     constructor(props) {
         super(props);

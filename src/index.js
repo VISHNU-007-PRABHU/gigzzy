@@ -2,7 +2,7 @@ import 'react-app-polyfill/ie11';
 import 'react-app-polyfill/stable';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Switch, Redirect, Route, BrowserRouter, useHistory } from 'react-router-dom';
+import { Switch, Redirect, Route, BrowserRouter } from 'react-router-dom';
 import './index.css';
 import './scss/bootstrap.min.css';
 import * as serviceWorker from './serviceWorker';
@@ -46,6 +46,8 @@ import { ConfrimPassword } from './component/User/Login/ConfrimPassword';
 import { CHECK_DEMO } from './graphql/User/login';
 import { Alert_msg } from './component/Comman/alert_msg';
 import StaticPage from './component/Comman/static_page';
+import Roles from './component/Admin/Roles/Roles';
+import Add_Admin from './component/Admin/Roles/Add_Admin';
 
 function PrivateRoute({ component: Component, ...rest }) {
   return (
@@ -163,12 +165,14 @@ ReactDOM.render(
           <PrivateRoute path="/admin-static/add/:id" component={Add_Static} exact />
           <PrivateRoute path="/admin-static" component={Static} exact />
           <PrivateRoute path="/admin-settings" component={Settings} exact />
+          <PrivateRoute path="/admin-roles" component={Roles} exact />
+          <PrivateRoute path="/admin-admin/add" component={Add_Admin} exact />
+          <PrivateRoute path="/admin-admin/add/:id" component={Add_Admin} exact />
           <Route exact path="/" component={Home_Page} />
           <Route exact path="/login" component={User_Login} />
           <Route exact path="/Confrim_password/:id" component={ConfrimPassword} />
           <Route exact path="/signup" component={Email_Login} />
           <Route exact path="/static_page/:id" component={StaticPage}/>
-
           <UserRoute exact path="/profile" component={Profile_Page} />
           <UserRoute exact path="/description/:id" component={Description_Page} />
           <UserRoute exact path="/bookings" component={Bookings_Page} />

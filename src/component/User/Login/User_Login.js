@@ -167,7 +167,7 @@ class User_Login extends React.Component {
                                             country={'ke'}
                                             mask={{ in: '..........' }}
                                             onKeyDown={(event)=>{
-                                                if(event.keyCode == 13){
+                                                if(event.keyCode === 13){
                                                     this.get_otp();
                                                 }
                                             }}

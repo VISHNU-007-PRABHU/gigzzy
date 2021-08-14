@@ -2,8 +2,23 @@
 
 import React, { Suspense } from "react";
 import 'antd/dist/antd.css';
-import { Link } from 'react-router-dom';
-import { Modal, Spin, Carousel, Layout, Icon, Form, Input, AutoComplete, Button, Typography, Row, Col, Card, Avatar, List, Skeleton } from 'antd';
+import Modal from 'antd/lib/modal';
+import Spin from 'antd/lib/spin';
+import Carousel from 'antd/lib/carousel';
+import Layout from 'antd/lib/layout';
+import Icon from 'antd/lib/icon';
+import Form from 'antd/lib/form';
+import Input from 'antd/lib/input';
+import AutoComplete from 'antd/lib/auto-complete';
+import Button from 'antd/lib/button';
+import Typography from 'antd/lib/typography';
+import Row from 'antd/lib/row';
+import Col from 'antd/lib/col';
+import Card from 'antd/lib/card';
+import Avatar from 'antd/lib/avatar';
+import List from 'antd/lib/list';
+import Skeleton from 'antd/lib/skeleton';
+
 import { GET_CATEGORY_PAGINATION, SEARCH_CATEGORY, FIND_CATEGORY, GET_FUTURE, GET_TRENDING } from '../../../graphql/User/home_page';
 import { My_APPOINTMENTS } from '../../../graphql/User/booking';
 import { client } from "../../../apollo";
@@ -18,15 +33,6 @@ import PlacesAutocomplete, {
     geocodeByAddress,
     getLatLng,
 } from 'react-places-autocomplete';
-import { layoutGenerator } from 'react-break';
-
-const layout = layoutGenerator({
-    mobile: 0,
-    phablet: 480,
-    tablet: 600,
-    desktop: 1024,
-});
-
 const { Content } = Layout;
 const UserHeader = React.lazy(() => import('../Layout/UserHeader'));
 const UserFooter = React.lazy(() => import('../Layout/UserFooter'));
@@ -351,13 +357,13 @@ class Home_Page extends React.Component {
                             <div className="banner_section">
                                 <Carousel effect="fade" dots={true} {...settings}>
                                     <div>
-                                        <img alt='' src={require("../../../image/handyman.jpg")} loading="lazy" class="lazyload" />
+                                        <img alt='' src={require("../../../image/handyman.jpg")} loading="lazy" className="lazyload" />
                                     </div>
                                     <div>
-                                        <img alt='' src={require("../../../image/handyman2.jpg")} loading="lazy" class="lazyload" />
+                                        <img alt='' src={require("../../../image/handyman2.jpg")} loading="lazy" className="lazyload" />
                                     </div>
                                     <div>
-                                        <img alt='' src={require("../../../image/handyman3.jpg")} loading="lazy" class="lazyload" />
+                                        <img alt='' src={require("../../../image/handyman3.jpg")} loading="lazy" className="lazyload" />
                                     </div>
                                 </Carousel>
                                 <div className="banner_inner">
@@ -457,11 +463,11 @@ class Home_Page extends React.Component {
                                                 </div>
                                             )}
                                         </Slider>
-                                        <div class="owl-carousel owl-theme cursor_point d-flex justify-content-between mt-n5 position-absolute w-100">
-                                            <div class="owl-nav">
-                                                <button onClick={() => { this.handleTableChange('back',) }} type="button" role="presentation" class="owl-prev">
+                                        <div className="owl-carousel owl-theme cursor_point d-flex justify-content-between mt-n5 position-absolute w-100">
+                                            <div className="owl-nav">
+                                                <button onClick={() => { this.handleTableChange('back',) }} type="button" role="presentation" className="owl-prev">
                                                 </button>
-                                                <button onClick={() => { this.handleTableChange('forward') }} type="button" role="presentation" class="owl-next">
+                                                <button onClick={() => { this.handleTableChange('forward') }} type="button" role="presentation" className="owl-next">
                                                 </button>
                                             </div>
                                         </div>
@@ -567,10 +573,10 @@ class Home_Page extends React.Component {
                             <div className="download_section position-relative pt-5 text-center">
                                 <h2 className="bold mb-5 text-center">Download the App</h2>
                                 <p className="normal_font_size">Choose and book 100+ services and track them on Gigzzy App</p>
-                                <a href="https://play.google.com/store/apps/details?id=com.gigzzy.user" target="_blank">
+                                <a rel="noopener noreferrer" href="https://play.google.com/store/apps/details?id=com.gigzzy.user" target="_blank">
                                     <img alt='' loading="lazy" className="lazyload mr-3" src={require("../../../image/play_store.png")} />
                                 </a>
-                                <a href="https://apps.apple.com/us/app/gigzzy-user/id1574904567" target="_blank">
+                                <a rel="noopener noreferrer" href="https://apps.apple.com/us/app/gigzzy-user/id1574904567" target="_blank">
                                     <img alt='' loading="lazy" className="lazyload ml-3" src={require("../../../image/app_store.png")} />
                                 </a>
                             </div>

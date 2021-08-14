@@ -1,14 +1,16 @@
-import React, { Suspense, useMemo } from 'react'
+import React, { Suspense } from 'react'
 import { Query } from "react-apollo";
 import { My_APPOINTMENTS } from '../../../graphql/User/booking';
-import { Badge, Tooltip, Row, Col, Card, Skeleton, Pagination,Icon } from 'antd';
+import Badge from 'antd/lib/badge';
+import Row from 'antd/lib/row';
+import Col from 'antd/lib/col';
+import Card from 'antd/lib/card';
+import Skeleton from 'antd/lib/skeleton';
+import Pagination from 'antd/lib/pagination';
+import Tooltip from 'antd/lib/tooltip';
 import timer_icon from '../../../image/bookLater.png';
-
 const AppiontmentsEmpty = React.lazy(() => import('./AppiontmentsEmpty'));
-
-// export default  Appointments = (props) => {
 function Appointments(props) {
-
     return (
         <Query
             query={My_APPOINTMENTS}

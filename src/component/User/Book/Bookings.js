@@ -1,18 +1,30 @@
 import React, { Suspense } from "react";
 import 'antd/dist/antd.css';
-import { Empty, Badge, Tooltip, Avatar, Modal, Layout, Rate, Icon, Form, Input, Button, Row, Col, Card, Timeline, Pagination, Skeleton } from 'antd';
+import Modal from 'antd/lib/modal';
+import Badge from 'antd/lib/badge';
+import Empty from 'antd/lib/empty';
+import Layout from 'antd/lib/layout';
+import Row from 'antd/lib/row';
+import Col from 'antd/lib/col';
+import Icon from 'antd/lib/icon';
+import Form from 'antd/lib/form';
+import Input from 'antd/lib/input';
+import Button from 'antd/lib/button';
+import Card from 'antd/lib/card';
+import Avatar from 'antd/lib/avatar';
+import Skeleton from 'antd/lib/skeleton';
+import Rate from 'antd/lib/rate';
+import Timeline from 'antd/lib/timeline';
 import GoogleMapReact from 'google-map-react';
 import OwlCarousel from 'react-owl-carousel';
 import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
 import send_icon from '../../../image/send message.png'
-import timer_icon from '../../../image/bookLater.png';
-import { My_APPOINTMENTS, UPDATE_MSG_COUNT, GET_PARTICULAR_BOOKING, ADD_MSG, MSG_SUB, GET_MSG, ADD_COMMENTS, ACCEPT_JOB_MSG, PENDING_DATA } from '../../../graphql/User/booking';
+import { UPDATE_MSG_COUNT, GET_PARTICULAR_BOOKING, ADD_MSG, MSG_SUB, GET_MSG, ADD_COMMENTS, ACCEPT_JOB_MSG } from '../../../graphql/User/booking';
 import { client } from "../../../apollo";
 import CompletePayment from "./Complete_Payment";
 import gql from 'graphql-tag';
 import { Alert_msg } from "../../Comman/alert_msg";
-import noimg from '../../../image/no_booking.png';
 import DescriptionValue from "../Book/DescriptionValue";
 import { MdLocationOn } from "react-icons/md";
 const { TextArea } = Input;
@@ -89,7 +101,6 @@ subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
       }
     }`
 
-var that_set = {};
 class Bookings extends React.Component {
     constructor(props) {
         super(props);
@@ -132,7 +143,6 @@ class Bookings extends React.Component {
             msg_count: 0,
             comment: '',
             mange_state: 0,
-            msg_count: 0,
             mode_state: "Pending",
             infinite_loading: false,
             pagination: {
@@ -468,7 +478,7 @@ class Bookings extends React.Component {
                                         </Timeline.Item>
                                         <Timeline.Item color="green">
                                             <p className="m-0">
-                                                {this.state.particular_booking[0].job_start_time == "" ? "Task not start" : "Tasks Started"}
+                                                {this.state.particular_booking[0].job_start_time === "" ? "Task not start" : "Tasks Started"}
                                             </p>
                                             <small className="m-0 mb-2">{this.state.particular_booking[0].job_start_time ? this.state.particular_booking[0].job_start_time : ""}</small>
                                             {this.state.particular_booking[0].start_job_image_url.length > 0 ?
@@ -485,7 +495,7 @@ class Bookings extends React.Component {
                                         </Timeline.Item>
                                         <Timeline.Item color="green">
                                             <p className="m-0">
-                                                {this.state.particular_booking[0].job_end_time == "" ? "Task not completed" : "Completed"}
+                                                {this.state.particular_booking[0].job_end_time === "" ? "Task not completed" : "Completed"}
                                             </p>
                                             <small className="m-0 mb-2">{this.state.particular_booking[0].job_end_time ? this.state.particular_booking[0].job_end_time : ""}</small>
                                             {this.state.particular_booking[0].start_job_image_url.length > 0 ?

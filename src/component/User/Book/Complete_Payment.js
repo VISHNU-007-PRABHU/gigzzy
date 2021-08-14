@@ -2,7 +2,7 @@ import React, { Suspense,Component } from 'react';
 import { withRouter } from "react-router-dom";
 import { ACCEPT_JOB_MSG, My_APPOINTMENTS } from '../../../graphql/User/booking';
 import { client } from '../../../apollo';
-import { Form, Button, Spin, Collapse, Icon,Input } from 'antd';
+import { Button, Spin, Collapse, Icon,Input } from 'antd';
 import { Alert_msg } from '../../Comman/alert_msg';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css'

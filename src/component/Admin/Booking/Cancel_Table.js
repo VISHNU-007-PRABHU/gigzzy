@@ -4,12 +4,9 @@ import { Table, Icon, Tag } from 'antd';
 import { GET_BOOKING } from '../../../graphql/Admin/booking';
 import { client } from "../../../apollo";
 import Search from "antd/lib/input/Search";
-
 const EmailSearch = React.lazy(() => import('../User/EmailSearch'));
 const DateSearch = React.lazy(() => import('../User/DateSearch'));
-const SearchCategory = React.lazy(() => import('../User/SearchCategory'));
 const SearchSubcategory = React.lazy(() => import('../User/SearchSubcategory'));
-
 class CancelTable extends React.Component {
     constructor(props) {
         super(props);
@@ -72,7 +69,7 @@ class CancelTable extends React.Component {
 
     onFilter = async (data) => {
         console.log(Object.keys(data)[0]);
-        if (data[Object.keys(data)[0]] == '') {
+        if (data[Object.keys(data)[0]] === '') {
             delete this.state.input_data[Object.keys(data)[0]];
             var data_pass = this.state.input_data;
             this.setState({ input_data: data_pass})

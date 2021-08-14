@@ -15,6 +15,7 @@ var adminResolver = require('./resolvers/admin');
 var certificateResolver = require('./resolvers/certificate');
 var staticResolver = require('./resolvers/static');
 var settingResolver = require('./resolvers/setting');
+var rolesResolver = require('./resolvers/roles');
 const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
@@ -199,6 +200,10 @@ const resolvers = {
         site_setting_detail: settingResolver.site_setting_detail,
         payout_setting_detail: settingResolver.payout_setting_detail,
         user_address: userResolver.user_address,
+        // admin roles and permission
+        // get_admin_users(option:Int):[Admin]
+        // get_admin_roles(option:Int):[Roles]
+        get_admin_permission:rolesResolver.get_admin_permission,
         get_my_appointments: async (parent, args, context, info) => {
             try {
 
@@ -1361,6 +1366,12 @@ const resolvers = {
         add_static: staticResolver.add_static,
         update_static: staticResolver.update_static,
 
+        // ------------------admin roles functions.......................//
+        add_admin_permission:rolesResolver.add_admin_permission,
+        delete_admin_permission:rolesResolver.delete_admin_permission,
+        add_admin_roles:rolesResolver.add_admin_roles,
+        update_admin_roles:
+        // ---------------- admin roles function ........................//
         online_status: statusResolver.online_status,
         available_deleteBooking: bookingResolver.available_deleteBooking,
         addRating: bookingResolver.addRating,

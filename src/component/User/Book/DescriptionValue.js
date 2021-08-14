@@ -1,5 +1,5 @@
 import React from 'react'
-import { Icon,Modal,Alert } from 'antd';
+import { Icon,Modal } from 'antd';
 import ImageGallery from 'react-image-gallery';
 import { Alert_msg } from '../../Comman/alert_msg';
 

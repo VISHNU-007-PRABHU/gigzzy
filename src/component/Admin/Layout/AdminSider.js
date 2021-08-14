@@ -1,6 +1,6 @@
 import React from "react";
 import { Menu, Icon, Layout } from "antd";
-import { BrowserRouter as Route, Link, withRouter } from "react-router-dom";
+import { BrowserRouter as Router,Link, withRouter } from "react-router-dom";
 import main from "../../../image/Gigzzy.png";
 import "../../../scss/template.scss";
 
@@ -93,6 +93,11 @@ class AdminSider extends React.Component {
               <Icon type="book" />
               <span>Static Pages</span>
               <Link to="/admin-static" />
+            </Menu.Item>
+            <Menu.Item key="/admin-roles">
+              <Icon type="book" />
+              <span>Manage Admin</span>
+              <Link to="/admin-roles" />
             </Menu.Item>
             {/* <Menu.Item key="/admin-settings">
               <Icon type="setting" />

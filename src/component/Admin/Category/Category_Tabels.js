@@ -1,6 +1,6 @@
 import * as React from "react";
 import { withRouter } from "react-router-dom";
-import { Table, Button, Modal, Form, Avatar, Popconfirm, Tag, Icon,Switch } from "antd";
+import { Table, Modal, Form, Avatar, Popconfirm, Tag, Icon,Switch } from "antd";
 import { GET_CATEGORY, UPDATE_CATEGORY, DELETE_CATEGORY } from '../../../graphql/Admin/category';
 import { client } from "../../../apollo";
 import '../../../scss/template.scss';

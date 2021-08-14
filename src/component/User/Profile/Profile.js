@@ -1,9 +1,18 @@
 import React, { Suspense } from "react";
 import 'antd/dist/antd.css';
 import PhoneInput from 'react-phone-input-2';
-import { Tooltip, Modal, Layout, Icon, Form, Input, Row, Col, Upload, message, Skeleton } from 'antd';
+import Modal from 'antd/lib/modal';
+import Tooltip from 'antd/lib/tooltip';
+import Upload from 'antd/lib/upload';
+import Layout from 'antd/lib/layout';
+import Icon from 'antd/lib/icon';
+import Form from 'antd/lib/form';
+import Input from 'antd/lib/index';
+import message from 'antd/lib/message';
+import Row from 'antd/lib/row';
+import Col from 'antd/lib/col';
+import Skeleton from 'antd/lib/skeleton';
 import '../../../scss/user.scss';
-
 import { ADD_USER, USERS, UPDATE_IMG } from '../../../graphql/User/login';
 import { client } from "../../../apollo";
 import { Alert_msg } from "../../Comman/alert_msg";
@@ -104,8 +113,6 @@ class Profile extends React.Component {
             });
         }
     };
-
-
     update_user_detail = async () => {
         const { form } = this.props;
         form.validateFields(async (err, values) => {

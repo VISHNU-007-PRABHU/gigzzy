@@ -6,7 +6,8 @@ var Schema = mongoose.Schema;
 
 var adminSchema = new Schema({
     email:{type:String,unique:true},
-    password:{type:String}
+    password:{type:String},
+    roles: {type: mongoose.Schema.Types.ObjectId, ref: 'roles'}
 });
 
 
