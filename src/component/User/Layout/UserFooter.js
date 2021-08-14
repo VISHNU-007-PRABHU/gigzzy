@@ -104,12 +104,13 @@ const UserFooter = () => {
                 <li>
                   <h6 style={{ color: "green" }}>Contact Us</h6>
                 </li>
-                <li>UMEA, Address Nyago house,</li>
+                <li>1. HQ ,USA 14314 S Myers Park Rd</li>
+                <li>Cheney WA 99004 ,USA.</li>
+                <li className="mb-2">Tel +1 (509) 319-6332</li>
+                <li>2. UMEA, Nyago house,</li>
                 <li>Mombasa road 2nd Floor</li>
-                <li>14314 S Myers Park Rd Cheney WA 99004 ,USA.</li>
+                <li className="mb-2">Tel +254 733 494 363</li>
                 <li className="pt-3 ">info@gigzzy.com</li>
-                {/* <li>Tel +254 733 494 363</li> */}
-                <li>Tel +1 (509) 319-6332</li>
                 <li>
                   <FacebookShareButton
                     url="https://web.facebook.com/gigzzy"
