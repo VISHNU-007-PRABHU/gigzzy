@@ -370,7 +370,7 @@ class Home_Page extends React.Component {
                                     <Col span={22} offset={2} className="h-100">
                                         <div className="d-flex h-100 align-items-center">
                                             <div className="banner_center w-100">
-                                                <h3 className="white-text bold">Your Service Expert in <br /> {this.state.home_page_city} </h3>
+                                                <h3 className="white-text bold">Your home of convenience <br /> {this.state.home_page_city} </h3>
                                                 <p className="normal_font_size white-text">Get instant access to reliable and affordable Gigzzy service providers.</p>
                                                 <Col sm={{ span: 4 }} xs={{ span: 22 }} className="mr-4 mb-4">
                                                     <Button icon="environment" className="px-1 jiffy_btn h-50x normal_font_size w-100 text-left" onClick={() => this.setLocationModal(true)}>

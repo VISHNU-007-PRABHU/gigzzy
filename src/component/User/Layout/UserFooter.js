@@ -88,7 +88,7 @@ const UserFooter = () => {
                 </li>
                 <li>
                   <Link to="/static_page/professional_screening_process" target="_blank" className="mr-1">
-                      Professional Screening Process
+                    Professional Screening Process
                   </Link>
                 </li>
                 <li>
@@ -106,8 +106,8 @@ const UserFooter = () => {
                   <h6 style={{ color: "green" }}>Contact Us</h6>
                 </li>
                 <li>UMEA, Address Nyago house,</li>
-                <li>Mombasa road 2nd Floor</li> 
-                <li>14314 S Myers Park Rd Cheney WA 99004, USA .</li>
+                <li>Mombasa road 2nd Floor</li>
+                <li>14314 S Myers Park Rd Cheney WA 99004 ,USA.</li>
                 <li className="pt-3 ">info@gigzzy.com</li>
                 {/* <li>Tel +254 733 494 363</li> */}
                 <li>Tel +1 (509) 319-6332</li>
