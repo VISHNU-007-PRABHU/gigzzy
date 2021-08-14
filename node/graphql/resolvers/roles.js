@@ -65,7 +65,7 @@ module.exports.update_admin_roles = async (_, args) => {
         let find_query = { _id: args['_id'] }
         let update_query = {}
         if (args['fun_type'] === "add") {
-            update_query['$push'] = { "permissions": args['permissions'] }
+            update_query['$addToSet'] = { "permissions": {$each: args['permissions'] }}
         } else {
             update_query['$pull'] = {
                 "permissions": { '$in': args['permissions'] }
@@ -87,5 +87,26 @@ module.exports.delete_admin_roles = async (_, args) => {
         return { status: 'success', msg: "Permission deleted successfully" }
     } catch (error) {
         return { status: 'success', msg: "Permission deleted failed" }
+    }
+}
+
+
+module.exports.update_admin_user_permission = async (_, args) => {
+    // console.log(args);
+    try {
+        let find_query = { _id: args['_id'] }
+        let update_query = {}
+        if (args['fun_type'] === "add") {
+            update_query['$addToSet'] = { "permissions": {$each: args['permissions'] }}
+        } else {
+            update_query['$pull'] = {
+                "permissions": { '$in': args['permissions'] }
+            }
+        }
+        const update_roles = await Admin_model.updateOne(find_query,update_query).exec();
+        return { status: 'success', msg: "Roles updated successfully" }
+    } catch (error) {
+        console.log("module.exports.add_admin_permission -> error", error)
+        return { status: 'success', msg: "Roles updated failed" }
     }
 }
