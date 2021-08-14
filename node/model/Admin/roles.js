@@ -1,5 +1,7 @@
 // grab the things we need
 const mongoose = require('mongoose');
+const moment = require("moment");
+const commonHelper = require('../../graphql/commonHelper');
 mongoose.set('useFindAndModify', false);
 var mongoosePaginate = require('mongoose-paginate-v2');
 //create schemaOptions
@@ -16,9 +18,11 @@ var schemaOptions = {
 const rolesSchema = new mongoose.Schema({
     name: String,
     type:String,
+    key:String,
     parent_type:String,
     page_type:String,
-    user_type:String,
+    user_type:Number,
+    admin_type:Number,
     permissions:Array,
     is_delete:{ type: Boolean,default:false },
 }, schemaOptions);

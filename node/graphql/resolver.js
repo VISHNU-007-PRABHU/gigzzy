@@ -1370,7 +1370,7 @@ const resolvers = {
         add_admin_permission:rolesResolver.add_admin_permission,
         delete_admin_permission:rolesResolver.delete_admin_permission,
         add_admin_roles:rolesResolver.add_admin_roles,
-        update_admin_roles:
+        update_admin_roles:rolesResolver.update_admin_roles,
         // ---------------- admin roles function ........................//
         online_status: statusResolver.online_status,
         available_deleteBooking: bookingResolver.available_deleteBooking,

@@ -219,6 +219,8 @@ const typeDefs = gql`
         info:JSON
         count:Int
         roles:[Roles]
+        msg:String
+        status:String
     }
     type Roles{
         name:String
@@ -228,6 +230,8 @@ const typeDefs = gql`
         _id:ID
         count:Int
         permission:[Permission]
+        msg:String
+        status:String
     }
     type Permission{
         name:String
@@ -690,15 +694,14 @@ const typeDefs = gql`
                 type:String,
                 key:String,
                 page_type:String,
+                admin_type:Int
             ):Roles
             update_admin_roles(
                 _id:ID
-                name: String,
-                type:String,
-                key:String,
-                page_type:String,
-                options:JSON,
-            ):Permission
+                fun_type:String,
+                permissions:[ID],
+            ):Roles
+            delete_admin_roles(_id:ID):Roles
             add_admin_permission(
                 _id:ID,
                 name: String,
