@@ -21,7 +21,7 @@ class Roles extends React.Component {
         activeKey: "1",
         add_btn: 'admin',
         btns: ['admin', 'roles'],
-        add_permission:false,
+        add_permission: false,
     };
     changeTab = activeKey => {
         this.setState({
@@ -29,6 +29,11 @@ class Roles extends React.Component {
             add_btn: this.state.btns[activeKey - 1]
         });
     };
+    closePermission = () => {
+        this.setState({
+            add_permission: false
+        })
+    }
     render() {
         return (
             <Layout style={{ height: '100vh' }}>
@@ -46,11 +51,11 @@ class Roles extends React.Component {
                                 <Button className="mx-2" type="primary" onClick={() => { this.props.history.push(`/admin-${this.state.add_btn}/add`); }}>
                                     Add {this.state.add_btn}
                                 </Button>
-                                <Button className={this.state.activeKey === "2" ? '' : 'd-none'} type="primary" onClick={() => {this.setState({add_permission:true}) }}>
+                                <Button className={this.state.activeKey === "2" ? '' : 'd-none'} type="primary" onClick={() => { this.setState({ add_permission: true }) }}>
                                     Add permission
                                 </Button>
                                 <Suspense fallback={<Skeleton active />}>
-                                    <AdminPermission active={this.state.add_permission} />
+                                    <AdminPermission closePermission={this.closePermission} active={this.state.add_permission} />
                                 </Suspense>
                             </div>
                             }>

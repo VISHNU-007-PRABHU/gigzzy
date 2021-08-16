@@ -1,10 +1,11 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
-import { GET_USER, DELETE_USER, USER_EMAIL_QUERY } from '../../../graphql/Admin/user';
+import { GET_ADMIN_USER } from '../../../graphql/Admin/roles';
 import { client } from "../../../apollo";
 import { Table, Button, Icon, Popconfirm } from 'antd';
-import { Alert_msg } from '../../Comman/alert_msg';
+import Tag from 'antd/es/tag';
 import Search from "antd/es/input/Search";
+import { Alert_msg } from '../../Comman/alert_msg';
 class AdminUsers extends React.Component {
     constructor(props) {
         super(props);
@@ -29,16 +30,14 @@ class AdminUsers extends React.Component {
         this.setState({ loading: true });
 
         await client.query({
-            query: GET_USER,
+            query: GET_ADMIN_USER,
             variables: { limit: pager.pageSize, page: pager.current, role: "1" },
             fetchPolicy: 'no-cache',
         }).then(result => {
-            console.log(result.data);
             const pagination = { ...this.state.pagination };
-            pagination.total = result.data.get_user.pageInfo.totalDocs;
-            pagination.current = result.data.get_user.pageInfo.page;
-            console.log(pagination);
-            this.setState({ pagination, loading: false, dataSource: result.data.get_user.data });
+            pagination.total = result.data.get_admin_users.pageInfo.totalDocs;
+            pagination.current = result.data.get_admin_users.pageInfo.page;
+            this.setState({ pagination, loading: false, dataSource: result.data.get_admin_users.data });
         });
     };
 
@@ -46,40 +45,40 @@ class AdminUsers extends React.Component {
         this.setState({ loading: true });
 
         await client.query({
-            query: GET_USER,
+            query: GET_ADMIN_USER,
             variables: { limit: this.state.pagination.pageSize, page: this.state.pagination.current, role: "1" },
             fetchPolicy: 'no-cache',
         }).then(result => {
             const pagination = { ...this.state.pagination };
-            pagination.total = result.data.get_user.pageInfo.totalDocs;
-            this.setState({ loading: false, pagination, dataSource: result.data.get_user.data });
+            pagination.total = result.data.get_admin_users.pageInfo.totalDocs;
+            this.setState({ loading: false, pagination, dataSource: result.data.get_admin_users.data });
         });
     }
 
-    handleDelete = async (_id) => {
-        console.log(_id);
-        await client.mutate({
-            mutation: DELETE_USER,
-            variables: { _id: _id },
-        }).then((result, loading, error) => {
-            Alert_msg(result.data.deleteDetails);
-            if (result.data.deleteDetails.status === 'success') {
-                this.fetch_user();
-            }
-        });
-    }
+    // handleDelete = async (_id) => {
+    //     console.log(_id);
+    //     await client.mutate({
+    //         mutation: DELETE_USER,
+    //         variables: { _id: _id },
+    //     }).then((result, loading, error) => {
+    //         Alert_msg(result.data.deleteDetails);
+    //         if (result.data.deleteDetails.status === 'success') {
+    //             this.fetch_user();
+    //         }
+    //     });
+    // }
 
-    onFilter = async (value) => {
-        console.log(value.target.value);
-        var datas = { delete: 0, role: 1, $or: [{ 'name': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }, { 'email': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }, { 'phone_no': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }] }
-        await client.query({
-            query: USER_EMAIL_QUERY,
-            variables: { data: datas },
-            fetchPolicy: 'no-cache',
-        }).then(result => {
-            this.setState({ dataSource: result?.data?.user_search });
-        });
-    }
+    // onFilter = async (value) => {
+    //     console.log(value.target.value);
+    //     var datas = { delete: 0, role: 1, $or: [{ 'name': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }, { 'email': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }, { 'phone_no': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }] }
+    //     await client.query({
+    //         query: USER_EMAIL_QUERY,
+    //         variables: { data: datas },
+    //         fetchPolicy: 'no-cache',
+    //     }).then(result => {
+    //         this.setState({ dataSource: result?.data?.user_search });
+    //     });
+    // }
     render() {
         const { dataSource } = this.state;
 
@@ -99,11 +98,6 @@ class AdminUsers extends React.Component {
                             <div>
                                 Email
                              </div>
-                            {/* <>
-                                <Suspense fallback={<div>.......</div>}>
-                                    <EmailSearch role='1' value='email' placeholder='Enter Email'  passedFunction={this.onFilter}/>
-                                </Suspense>
-                            </> */}
                         </div>
                     </div>
                 },
@@ -116,19 +110,19 @@ class AdminUsers extends React.Component {
             {
                 title: () => {
                     return <div>
-                        <div>
-                            Phone Number
+                        <div className="d-block">
+                            <div>
+                                Roles
                              </div>
-                        {/* <>
-                                <Suspense fallback={<div>.......</div>}>
-                                    <EmailSearch role='1' value='phone_no' placeholder='Enter Phone Number' passedFunction={this.onFilter}/>
-                                </Suspense>
-                            </> */}
+                        </div>
                     </div>
                 },
                 width: '20%',
                 render: (text, record) => {
-                    return <span title="Phone Number">{record.phone_no}</span>;
+                    return <span title="Email" style={{ wordBreak: "keep-all" }}>
+                        {record['roles'] ? 
+                          <Tag color="purple">{record['admin_role_detail']['name']}</Tag>:record['admin_role_detail']['msg']}
+                        </span>;
                 }
 
             },
@@ -138,7 +132,7 @@ class AdminUsers extends React.Component {
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
                         <span title="...." className="d-flex d-sm-inline justify-content-around">
-                            <span className='cursor_point' onClick={() => { this.props.history.push(`/admin-user/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
+                            <span className='cursor_point' onClick={() => { this.props.history.push(`/admin-admin/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
                             <Popconfirm title="Sure to delete the user ?" onConfirm={() => this.handleDelete(record._id)}>
                                 <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
                             </Popconfirm>

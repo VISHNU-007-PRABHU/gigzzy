@@ -1,6 +1,6 @@
 import React from 'react'
-import { Layout, Form, Input, Button, message, Typography, Row, Col } from 'antd';
-import { ADD_USER, FIND_USER, UPDATE_USER } from '../../../graphql/Admin/user';
+import { Layout, Form, Input, Button, message, Row, Col } from 'antd';
+import { FIND_ADMIN_USER, UPDATE_ADMIN_USER_PERMISSION } from '../../../graphql/Admin/roles';
 
 import PlacesAutocomplete, {
     geocodeByAddress,
@@ -15,9 +15,15 @@ import { client } from "../../../apollo";
 import '../../../scss/template.scss';
 import '../../../scss/Category.scss';
 import { Alert_msg } from '../../Comman/alert_msg';
+import Collapse from 'antd/es/collapse';
+import Typography from 'antd/es/typography';
+import Popconfirm from 'antd/es/popconfirm';
+import Badge from 'antd/es/badge'
+import Icon from 'antd/es/icon';
+
 const { Content } = Layout;
 const { Title } = Typography;
-
+const { Panel } = Collapse;
 
 class Add_Admin extends React.Component {
     constructor(props) {
@@ -51,177 +57,105 @@ class Add_Admin extends React.Component {
 
     }
     componentDidMount() {
+        console.log(this.props.match.params.id, "testinf");
         const { form } = this.props;
         form.resetFields();
-        this.setState({ imageUrl: '' })
-        console.log(this.props.match.params.id);
+        console.log(this.props.match.params.id, "testinf");
         if (this.props.match.params.id !== undefined) {
             this.fetch_find_user();
         }
     }
-    find_address = async (lat, lng) => {
-        Geocode.fromLatLng(lat, lng).then(
-            response => {
-                const address = response.results[0].formatted_address;
-                console.log(address);
-                this.setState({ address })
-            },
-            error => {
-                console.error(error);
-            }
-        );
-    }
+
     fetch_find_user = async () => {
         await client.query({
-            query: FIND_USER,
+            query: FIND_ADMIN_USER,
             variables: { _id: this.props.match.params.id },
             fetchPolicy: 'no-cache',
         }).then(result => {
             console.log(result);
-            if (Array.isArray(result.data?.user[0]?.location?.coordinates)) {
-                this.find_address(result.data?.user[0]?.location?.coordinates[0], result.data?.user[0]?.location?.coordinates[1]);
-            }
             this.setState({
                 update: 1,
-                update_data: result.data?.user[0],
-                m_no: result.data?.user[0].phone_no,
-                country_code: result.data?.user[0].country_code,
-                _phone: `+${result.data?.user[0].country_code} ${result.data?.user[0].phone_no}`,
-                address: result.data?.user[0]?.address, demo: result.data?.user[0]?.demo
+                update_data: result.data?.get_admin_users.data[0],
             });
         });
     }
 
-    normFile = e => {
-        if (Array.isArray(e)) {
-            return e;
-        }
-        return e && e.fileList;
-    };
+    // add_user = () => {
+    //     const { form, history } = this.props;
+    //     form.validateFields(async (err, values) => {
+    //         if (!err) {
+    //             await client.mutate({
+    //                 mutation: ADD_USER,
+    //                 variables: {
+    //                     role: 1,
+    //                     country_code: this.state.country_code,
+    //                     phone_no: this.state.m_no,
+    //                     email: values.email,
+    //                     password: values.password,
+    //                     name: values.user_name,
+    //                     lat: this.state.lat_lng.lat,
+    //                     lng: this.state.lat_lng.lng,
+    //                     address: this.state.address,
+    //                     demo: this.state.demo
+    //                 },
+    //             }).then((result, loading, error) => {
+    //                 Alert_msg(result.data.admin_add_user.info);
+    //                 if (result.data.admin_add_user.info.status === "success") {
+    //                     history.push('/admin-user');
+    //                 }
+    //             });
+    //         }
+    //     });
+    // };
 
-    getBase64 = (img, callback) => {
-        const reader = new FileReader();
-        reader.addEventListener('load', () => callback(reader.result));
-        reader.readAsDataURL(img);
-    }
+    // update_user = () => {
+    //     const { form, history } = this.props;
+    //     form.validateFields(async (err, values) => {
+    //         var datas = {};
+    //         console.log(values.phone.length)
+    //         if (values.phone.length > 10) {
+    //             datas = {
+    //                 _id: this.props.match.params.id,
+    //                 demo: this.state.demo,
+    //                 country_code: this.state.country_code,
+    //                 phone_no: this.state.m_no,
+    //                 email: values.email,
+    //                 password: values.password,
+    //                 name: values.user_name,
+    //                 lat: this.state.lat_lng.lat,
+    //                 lng: this.state.lat_lng.lng,
+    //                 address: this.state.address
+    //             };
+    //         } else {
+    //             datas = {
+    //                 _id: this.props.match.params.id,
+    //                 demo: this.state.demo,
+    //                 email: values.email,
+    //                 password: values.password,
+    //                 name: values.user_name,
+    //                 lat: this.state.lat_lng.lat,
+    //                 lng: this.state.lat_lng.lng,
+    //                 address: this.state.address
+    //             };
+    //         }
 
-    beforeUpload = (file) => {
-        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-        if (!isJpgOrPng) {
-            message.error('You can only upload JPG/PNG file!');
-        }
-        const isLt2M = file.size / 1024 / 1024 < 2;
-        if (!isLt2M) {
-            message.error('Image must smaller than 2MB!');
-        }
-        return isJpgOrPng && isLt2M;
-    }
+    //         if (!err) {
+    //             await client.mutate({
+    //                 mutation: UPDATE_USER,
+    //                 variables: datas,
+    //             }).then((result, loading, error) => {
+    //                 Alert_msg(result.data.admin_update_user.info);
+    //                 if (result.data.admin_update_user.info.status === "success") {
+    //                     history.push('/admin-user');
+    //                 }
+    //             });
+    //         }
+    //     });
+    // };
 
-    handleChange = info => {
-        if (info.file.status === 'uploading') {
-            this.setState({ loading: true });
-            return;
-        }
-        if (info.file.status) {
-            console.log(info.file.originFileObj);
-            this.setState({ file: info.file.originFileObj });
-            this.getBase64(info.file.originFileObj, imageUrl =>
-                this.setState({
-                    imageUrl,
-                    loading: false,
-                }),
-            );
-        }
-    };
-
-    add_user = () => {
-        const { form, history } = this.props;
-        form.validateFields(async (err, values) => {
-            if (!err) {
-                await client.mutate({
-                    mutation: ADD_USER,
-                    variables: {
-                        role: 1,
-                        country_code: this.state.country_code,
-                        phone_no: this.state.m_no,
-                        email: values.email,
-                        password: values.password,
-                        name: values.user_name,
-                        lat: this.state.lat_lng.lat,
-                        lng: this.state.lat_lng.lng,
-                        address: this.state.address,
-                        demo: this.state.demo
-                    },
-                }).then((result, loading, error) => {
-                    Alert_msg(result.data.admin_add_user.info);
-                    if (result.data.admin_add_user.info.status === "success") {
-                        history.push('/admin-user');
-                    }
-                });
-            }
-        });
-    };
-
-    update_user = () => {
-        const { form, history } = this.props;
-        form.validateFields(async (err, values) => {
-            var datas = {};
-            console.log(values.phone.length)
-            if (values.phone.length > 10) {
-                datas = {
-                    _id: this.props.match.params.id,
-                    demo: this.state.demo,
-                    country_code: this.state.country_code,
-                    phone_no: this.state.m_no,
-                    email: values.email,
-                    password: values.password,
-                    name: values.user_name,
-                    lat: this.state.lat_lng.lat,
-                    lng: this.state.lat_lng.lng,
-                    address: this.state.address
-                };
-            } else {
-                datas = {
-                    _id: this.props.match.params.id,
-                    demo: this.state.demo,
-                    email: values.email,
-                    password: values.password,
-                    name: values.user_name,
-                    lat: this.state.lat_lng.lat,
-                    lng: this.state.lat_lng.lng,
-                    address: this.state.address
-                };
-            }
-
-            if (!err) {
-                await client.mutate({
-                    mutation: UPDATE_USER,
-                    variables: datas,
-                }).then((result, loading, error) => {
-                    Alert_msg(result.data.admin_update_user.info);
-                    if (result.data.admin_update_user.info.status === "success") {
-                        history.push('/admin-user');
-                    }
-                });
-            }
-        });
-    };
-    handleChange1 = address => {
-        this.setState({ address });
-    };
-
-    handleSelect = address => {
-        console.log(address);
-        this.setState({ address });
-        geocodeByAddress(address)
-            .then(results => getLatLng(results[0]))
-            .then(latLng => this.setState({ lat_lng: latLng }))
-            .catch(error => console.error('Error', error));
-    };
     render() {
         const { form } = this.props;
-
-        console.log(this.state.update_data.subCategory_name);
+        console.log(this.state.update_data);
         return (
             <Layout style={{ height: '100vh' }}>
                 <AdminSider update_collapsed={this.state.collapsed} />
@@ -230,41 +164,23 @@ class Add_Admin extends React.Component {
                     <Content className="main_frame">
                         <Row gutter={[24, 24]}>
                             <Col span={24}>
-                                <Title level={3}>Add User</Title>
+                                <Title level={3}>Add Admin</Title>
                             </Col>
                         </Row>
                         <Row>
                             <Form>
                                 <Col span={24}>
                                     <Row gutter={12}>
-                                        <Col span={12}>
-                                            <Form.Item label="User Name">
-                                                {form.getFieldDecorator("user_name", {
+                                        <Col className="" lg={12}>
+                                            <Form.Item label="Name">
+                                                {form.getFieldDecorator("name", {
                                                     initialValue: this.state.update_data.name,
                                                     rules: [{ required: true }]
                                                 })(<Input placeholder="Name" />)}
                                             </Form.Item>
                                         </Col>
-                                        <Col className="" lg={12}>
-                                            <Form.Item label="Phone">
-                                                {form.getFieldDecorator("phone", {
-                                                    initialValue: this.state._phone,
-                                                    rules: [{ required: true, message: 'Phone no is required' }]
-                                                })(<PhoneInput
-                                                    country={'ke'}
-                                                    value={this.state.phone}
-                                                    onChange={(value, data, event) => {
-                                                        this.setState({
-                                                            m_no: value.replace(/[^0-9]+/g, '').slice(data.dialCode.length),
-                                                            country_code: data.dialCode
-                                                        });
-                                                    }} />
-                                                )}
-                                            </Form.Item>
-                                        </Col>
                                     </Row>
-
-                                    <Row className="py-3" gutter={12}>
+                                    <Row gutter={12}>
                                         <Col className="" lg={12}>
                                             <Form.Item label="Email">
                                                 {form.getFieldDecorator("email", {
@@ -273,6 +189,8 @@ class Add_Admin extends React.Component {
                                                 })(<Input placeholder="Email" />)}
                                             </Form.Item>
                                         </Col>
+                                    </Row>
+                                    <Row gutter={12}>
                                         <Col className="" lg={12}>
                                             <Form.Item label="Password">
                                                 {form.getFieldDecorator("password", {
@@ -282,13 +200,41 @@ class Add_Admin extends React.Component {
                                             </Form.Item>
                                         </Col>
                                     </Row>
+                                    <Row gutter={12}>
+                                        <div className="p-3">
+                                            {/* {this.state.update_data?.role_based_permissions_detail.map((main_permission, i) => {
+                                                return (
+                                                    <>
+                                                        <Collapse className="mb-3" collapsible="header" >
+                                                            <Panel header={<div className="d-flex justify-content-between">
+                                                                <div>{main_permission['_id']}</div>
+                                                                <Badge count={main_permission['count'] ? main_permission['count'] : 0} />
+
+                                                            </div>} key="1">
+                                                                {main_permission['permission'].map(sub_permission => {
+                                                                    return (<div className="d-flex jumbotron p-1 my-2 justify-content-between align-items-center">
+                                                                        <div>
+                                                                            <div className="bold">{sub_permission['name']}</div>
+                                                                            <div>{sub_permission['key']}</div>
+                                                                        </div>
+                                                                        <div>
+                                                                            <Popconfirm title="Sure to delete this permission ?" onConfirm={() => this.handleDelete(sub_permission['_id'])}>
+                                                                                <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
+                                                                            </Popconfirm>
+                                                                        </div>
+                                                                    </div>)
+                                                                })}
+                                                            </Panel>
+                                                        </Collapse>
+                                                    </>
+                                                )
+                                            })} */}
+                                        </div>
+                                    </Row>
                                     <Row>
                                         <Col span={24}>
-                                            {/* <Form.Item className="float-left">
-                                                <Checkbox checked={this.state.demo} onChange={(e) => { this.setState({ demo: e.target.checked }) }}>Demo Account</Checkbox>
-                                            </Form.Item> */}
                                             <Form.Item className="float-right">
-                                                <Button type="primary" htmlType="submit" className="mx-3" onClick={() => { this.props.history.push('/admin-user') }}>
+                                                <Button type="primary" htmlType="submit" className="mx-3" onClick={() => { this.props.history.push('/admin-roles') }}>
                                                     Cancel
                                                 </Button>
                                                 <Button type="primary" className={this.state.update ? 'd-none' : ''} htmlType="submit" onClick={this.add_user}>

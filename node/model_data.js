@@ -1,4 +1,3 @@
-const permission = require('./model/Admin/permission');
 
 module.exports = {
     user : require('./model/userDetail/user'),

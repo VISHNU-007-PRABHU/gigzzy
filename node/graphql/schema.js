@@ -75,12 +75,15 @@ const typeDefs = gql`
         get_cancel_chart(option:Int):[Dashboard]
         get_earnings_chart(option:Int):[Dashboard]
         get_others_chart(option:Int):[Dashboard]
-        get_admin_users(option:Int):[Admin]
-        get_admin_roles(option:Int):[Roles]
-        get_admin_permission(option:Int):[Permission]
+        get_admin_users(option:Int,page:Int,limit:Int,_id:ID):AdminConnection
+        get_admin_roles(option:Int,page:Int,limit:Int,_id:ID):RolesConnection
+        get_admin_permission(option:Int,page:Int,limit:Int,_id:ID):PermissionConnection
+        role_based_permissions_detail(data:JSON):[Permission]
+        individual_based_permissions_detail(data:JSON):[Permission]
+        admin_role_detail(data:JSON):Roles
     }
 
-    # sub category pagination data
+    # sub category pagination data  
     type SubCategoryConnection {
         data: [subCategory]
         pageInfo: PageInfo!
@@ -97,8 +100,21 @@ const typeDefs = gql`
         data:[Detail]
         pageInfo: PageInfo!
     }
-
-
+    # Admin pagination data
+    type AdminConnection {
+        data:[Admin]
+        pageInfo: PageInfo!
+    }
+       # Roles pagination data
+    type RolesConnection {
+        data:[Roles]
+        pageInfo: PageInfo!
+    }
+        # Permission pagination data
+    type PermissionConnection {
+        data:[Permission]
+        pageInfo: PageInfo!
+    }
      # certificate pagination data
      type CertificateConnection {
         data:[Certificate]
@@ -213,12 +229,17 @@ const typeDefs = gql`
         nextPage: String
     }
     type Admin{
-        username:String
+        _id:ID
+        name:String
         email:String
         password:String
+        permissions:[ID]
+        role_based_permissions_detail:[Permission]
+        individual_based_permissions_detail:[Permission]
+        admin_role_detail:Roles
+        roles:ID
         info:JSON
         count:Int
-        roles:[Roles]
         msg:String
         status:String
     }
@@ -230,6 +251,8 @@ const typeDefs = gql`
         _id:ID
         count:Int
         permission:[Permission]
+        admin_type:Int
+        role_based_permissions_detail:[Permission]
         msg:String
         status:String
     }
@@ -702,6 +725,13 @@ const typeDefs = gql`
                 permissions:[ID],
             ):Roles
             delete_admin_roles(_id:ID):Roles
+            update_admin_user_permission(
+                _id:ID
+                fun_permission:String
+                roles:ID
+                fun_type:String
+                permissions:[ID]
+            ):Admin
             add_admin_permission(
                 _id:ID,
                 name: String,

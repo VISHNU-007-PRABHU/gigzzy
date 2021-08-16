@@ -1,6 +1,6 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
-import { GET_USER, DELETE_USER, USER_EMAIL_QUERY } from '../../../graphql/Admin/user';
+import { GET_ADMIN_ROLES } from '../../../graphql/Admin/roles';
 import { client } from "../../../apollo";
 import { Table, Button, Icon, Popconfirm } from 'antd';
 import { Alert_msg } from '../../Comman/alert_msg';
@@ -29,16 +29,16 @@ class AdminRoles extends React.Component {
         this.setState({ loading: true });
 
         await client.query({
-            query: GET_USER,
+            query: GET_ADMIN_ROLES,
             variables: { limit: pager.pageSize, page: pager.current, role: "1" },
             fetchPolicy: 'no-cache',
         }).then(result => {
             console.log(result.data);
             const pagination = { ...this.state.pagination };
-            pagination.total = result.data.get_user.pageInfo.totalDocs;
-            pagination.current = result.data.get_user.pageInfo.page;
+            pagination.total = result.data.get_admin_roles.pageInfo.totalDocs;
+            pagination.current = result.data.get_admin_roles.pageInfo.page;
             console.log(pagination);
-            this.setState({ pagination, loading: false, dataSource: result.data.get_user.data });
+            this.setState({ pagination, loading: false, dataSource: result.data.get_admin_roles.data });
         });
     };
 
@@ -46,49 +46,49 @@ class AdminRoles extends React.Component {
         this.setState({ loading: true });
 
         await client.query({
-            query: GET_USER,
+            query: GET_ADMIN_ROLES,
             variables: { limit: this.state.pagination.pageSize, page: this.state.pagination.current, role: "1" },
             fetchPolicy: 'no-cache',
         }).then(result => {
             const pagination = { ...this.state.pagination };
-            pagination.total = result.data.get_user.pageInfo.totalDocs;
-            this.setState({ loading: false, pagination, dataSource: result.data.get_user.data });
+            pagination.total = result.data.get_admin_roles.pageInfo.totalDocs;
+            this.setState({ loading: false, pagination, dataSource: result.data.get_admin_roles.data });
         });
     }
 
-    handleDelete = async (_id) => {
-        console.log(_id);
-        await client.mutate({
-            mutation: DELETE_USER,
-            variables: { _id: _id },
-        }).then((result, loading, error) => {
-            Alert_msg(result.data.deleteDetails);
-            if (result.data.deleteDetails.status === 'success') {
-                this.fetch_user();
-            }
-        });
-    }
+    // handleDelete = async (_id) => {
+    //     console.log(_id);
+    //     await client.mutate({
+    //         mutation: DELETE_USER,
+    //         variables: { _id: _id },
+    //     }).then((result, loading, error) => {
+    //         Alert_msg(result.data.deleteDetails);
+    //         if (result.data.deleteDetails.status === 'success') {
+    //             this.fetch_user();
+    //         }
+    //     });
+    // }
 
-    onFilter = async (value) => {
-        console.log(value.target.value);
-        var datas = { delete: 0, role: 1, $or: [{ 'name': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }, { 'email': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }, { 'phone_no': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }] }
-        await client.query({
-            query: USER_EMAIL_QUERY,
-            variables: { data: datas },
-            fetchPolicy: 'no-cache',
-        }).then(result => {
-            this.setState({ dataSource: result?.data?.user_search });
-        });
-    }
+    // onFilter = async (value) => {
+    //     console.log(value.target.value);
+    //     var datas = { delete: 0, role: 1, $or: [{ 'name': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }, { 'email': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }, { 'phone_no': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }] }
+    //     await client.query({
+    //         query: USER_EMAIL_QUERY,
+    //         variables: { data: datas },
+    //         fetchPolicy: 'no-cache',
+    //     }).then(result => {
+    //         this.setState({ dataSource: result?.data?.user_search });
+    //     });
+    // }
     render() {
         const { dataSource } = this.state;
 
         const columns = [
             {
-                title: "Name",
+                title: "Roles Name",
                 width: '20%',
                 render: (text, record) => {
-                    return <span title="Name">{record.name}</span>;
+                    return <span title="Roles Name">{record?.name}</span>;
                 }
 
             },
@@ -97,38 +97,14 @@ class AdminRoles extends React.Component {
                     return <div>
                         <div className="d-block">
                             <div>
-                                Email
+                                Key Roles
                              </div>
-                            {/* <>
-                                <Suspense fallback={<div>.......</div>}>
-                                    <EmailSearch role='1' value='email' placeholder='Enter Email'  passedFunction={this.onFilter}/>
-                                </Suspense>
-                            </> */}
                         </div>
                     </div>
                 },
                 width: '20%',
                 render: (text, record) => {
-                    return <span title="Email" style={{ wordBreak: "keep-all" }}>{record.email}</span>;
-                }
-
-            },
-            {
-                title: () => {
-                    return <div>
-                        <div>
-                            Phone Number
-                             </div>
-                        {/* <>
-                                <Suspense fallback={<div>.......</div>}>
-                                    <EmailSearch role='1' value='phone_no' placeholder='Enter Phone Number' passedFunction={this.onFilter}/>
-                                </Suspense>
-                            </> */}
-                    </div>
-                },
-                width: '20%',
-                render: (text, record) => {
-                    return <span title="Phone Number">{record.phone_no}</span>;
+                    return <span title="Key Roles" style={{ wordBreak: "keep-all" }}>{record?.key}</span>;
                 }
 
             },

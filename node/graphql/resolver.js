@@ -201,8 +201,8 @@ const resolvers = {
         payout_setting_detail: settingResolver.payout_setting_detail,
         user_address: userResolver.user_address,
         // admin roles and permission
-        // get_admin_users(option:Int):[Admin]
-        // get_admin_roles(option:Int):[Roles]
+        get_admin_users:rolesResolver.get_admin_users,
+        get_admin_roles:rolesResolver.get_admin_roles,
         get_admin_permission:rolesResolver.get_admin_permission,
         get_my_appointments: async (parent, args, context, info) => {
             try {
@@ -265,6 +265,14 @@ const resolvers = {
     Chat: {
         user: userResolver.user,
         provider: userResolver.user
+    },
+    Admin:{
+        role_based_permissions_detail:rolesResolver.role_based_permissions_detail,
+        individual_based_permissions_detail:rolesResolver.individual_based_permissions_detail,
+        admin_role_detail:rolesResolver.admin_role_detail,
+    },
+    Roles:{
+        role_based_permissions_detail:rolesResolver.role_table_based_permissions_detail,
     },
     Category: {
         booking_parent_category: categoryResolver.booking_parent_category,
@@ -1371,6 +1379,7 @@ const resolvers = {
         delete_admin_permission:rolesResolver.delete_admin_permission,
         add_admin_roles:rolesResolver.add_admin_roles,
         update_admin_roles:rolesResolver.update_admin_roles,
+        update_admin_user_permission:rolesResolver.update_admin_user_permission,
         // ---------------- admin roles function ........................//
         online_status: statusResolver.online_status,
         available_deleteBooking: bookingResolver.available_deleteBooking,
