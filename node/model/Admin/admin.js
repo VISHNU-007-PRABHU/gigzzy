@@ -24,6 +24,7 @@ var adminSchema = new mongoose.Schema({
   permissions: [],
   roles_permissions: [],
   is_delete: { type: Boolean, default: false },
+  GizzyDeveloper: { type: Boolean, default: false },
 }, schemaOptions);
 
 adminSchema.pre('save', function (next) {

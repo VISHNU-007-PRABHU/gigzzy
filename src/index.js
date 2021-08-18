@@ -55,9 +55,9 @@ import RoleView, { RoleViewFunction } from './component/Comman/roles_permission_
 function PrivateRoute({ permission, component: Component, ...rest }) {
   console.log("PrivateRoute -> permission", permission)
   let permission_condition = true
-  if (permission) {
-    permission_condition = RoleViewFunction(permission)
-  }
+  // if (permission) {
+  //   permission_condition = RoleViewFunction(permission)
+  // }
   console.log("PrivateRoute -> permission_condition", permission_condition)
 
   return (

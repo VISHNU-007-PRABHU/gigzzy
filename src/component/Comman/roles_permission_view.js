@@ -6,12 +6,14 @@ import size from 'lodash/size';
 const RoleView = (props) => {
     let data = localStorage.getItem('hokjighsasd')
     const user = JSON.parse(window.atob(data))
-    console.log("RoleView -> user", user)
     const [PermissionAllow, setPermissionAllow] = useState(false);
+    const [GizzyDeveloper, setGizzyDeveloper] = useState(false);
+
     useEffect(() => {
+        setGizzyDeveloper(user['GizzyDeveloper'] || false)
         if (user && user['full_permission_list']) {
             let data = find(user['full_permission_list'], { key: props.permission })
-            if (size(data)) {
+            if (size(data) || GizzyDeveloper) {
                 setPermissionAllow(true)
             }
         }
@@ -33,9 +35,10 @@ export const RoleViewFunction = (permission) => {
     let data = localStorage.getItem('hokjighsasd')
     const user = JSON.parse(window.atob(data))
     let func_data = false
+    let GizzyDeveloper = user['GizzyDeveloper'] || false
     if (user && user['full_permission_list']) {
         let data = find(user['full_permission_list'], { key: permission })
-        if (size(data)) {
+        if (size(data) || GizzyDeveloper) {
             func_data = true
         }
     }

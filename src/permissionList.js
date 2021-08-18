@@ -58,7 +58,7 @@ add_admin
 edit_admin
 view_admin
 delete_admin
-assign_role
+assign_roles
 // roles
 add_roles
 edit_roles

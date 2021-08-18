@@ -1,9 +1,9 @@
 import React from "react";
-import { Table, Modal, Form, Input, Button,Icon,Popconfirm } from 'antd';
-import { GET_CERTIFICATE, ADD_CERTIFICATE,FIND_CERTIFICATE,UPDATE_CERTIFICATE, DELETE_CERTIFICATE } from '../../../graphql/Admin/certificate';
-import {  client } from "../../../apollo";
+import { Table, Modal, Form, Input, Button, Icon, Popconfirm } from 'antd';
+import { GET_CERTIFICATE, ADD_CERTIFICATE, FIND_CERTIFICATE, UPDATE_CERTIFICATE, DELETE_CERTIFICATE } from '../../../graphql/Admin/certificate';
+import { client } from "../../../apollo";
 import { Alert_msg } from '../../Comman/alert_msg';
-
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 class CertificateTable extends React.Component {
     constructor(props) {
         super(props);
@@ -30,7 +30,7 @@ class CertificateTable extends React.Component {
     componentDidMount() {
         this.fetch_certificate();
     }
-    handleTableChange =async pagination => {
+    handleTableChange = async pagination => {
         const pager = { ...pagination };
         pager.current = pagination.current;
         this.setState({ loading: true });
@@ -58,7 +58,7 @@ class CertificateTable extends React.Component {
         }).then(result => {
             const pagination = { ...this.state.pagination };
             pagination.total = result.data.get_certificate.pageInfo.totalDocs;
-            this.setState({ loading:false,pagination, dataSource: result.data.get_certificate.data });
+            this.setState({ loading: false, pagination, dataSource: result.data.get_certificate.data });
         });
     }
 
@@ -66,11 +66,11 @@ class CertificateTable extends React.Component {
         console.log(_id);
         await client.query({
             query: FIND_CERTIFICATE,
-            variables: {_id:_id},
+            variables: { _id: _id },
             fetchPolicy: 'no-cache',
         }).then(result => {
             console.log(result);
-            this.setState({modalVisible:1,update:1,update_data: result.data.certificate[0]});
+            this.setState({ modalVisible: 1, update: 1, update_data: result.data.certificate[0] });
         });
     }
 
@@ -84,8 +84,8 @@ class CertificateTable extends React.Component {
                     variables: { certificate_name: values.certificate_name },
                 }).then((result, loading, error) => {
                     Alert_msg(result.data.add_certificate.info);
-                    if(result.data.add_certificate.info.status==='success'){
-                        this.setState({modalVisible:0});
+                    if (result.data.add_certificate.info.status === 'success') {
+                        this.setState({ modalVisible: 0 });
                         form.resetFields();
                         this.fetch_certificate();
                     }
@@ -107,22 +107,22 @@ class CertificateTable extends React.Component {
         });
     }
 
-    update_certificate= (_id) => {
+    update_certificate = (_id) => {
         const { form } = this.props;
         form.validateFields(async (err, values) => {
             if (!err) {
                 console.log(values);
                 await client.mutate({
                     mutation: UPDATE_CERTIFICATE,
-                    variables: {certificate_name: values.certificate_name, _id:_id},
+                    variables: { certificate_name: values.certificate_name, _id: _id },
                 }).then((result, loading, error) => {
                     console.log(result);
                     Alert_msg(result.data.update_certificate.info);
-                   if(result.data.update_certificate.info.status === "success"){
-                    form.resetFields();
-                     this.setState({ modalVisible: false,update_data:{}});
-                   }
-                   this.fetch_certificate();
+                    if (result.data.update_certificate.info.status === "success") {
+                        form.resetFields();
+                        this.setState({ modalVisible: false, update_data: {} });
+                    }
+                    this.fetch_certificate();
                 });
             }
         });
@@ -140,14 +140,19 @@ class CertificateTable extends React.Component {
             {
                 title: 'Action',
                 dataIndex: 'operation',
+                className: RoleViewFunction('edit_certificate') || RoleViewFunction('delete_certificate') ? '' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
                         <span title="...." className="d-flex d-sm-inline justify-content-around">
-                        <span className="cursor_point" onClick={() => this.find_certificate(record._id)}><Icon type="edit"  theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
-                        <Popconfirm title="Sure to delete this certificate ?" onConfirm={() => this.handleDelete(record._id)}>
-                            <Icon type="delete"  theme="twoTone" twoToneColor="#52c41a" className='f_25' />
-                        </Popconfirm>
-                    </span>
+                            <RoleView permission="edit_certificate">
+                                <span className="cursor_point" onClick={() => this.find_certificate(record._id)}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
+                            </RoleView>
+                            <RoleView permission="delete_certificate">
+                                <Popconfirm title="Sure to delete this certificate ?" onConfirm={() => this.handleDelete(record._id)}>
+                                    <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
+                                </Popconfirm>
+                            </RoleView>
+                        </span>
 
                     ) : null,
             },
@@ -158,7 +163,7 @@ class CertificateTable extends React.Component {
             <React.Fragment>
                 <Modal
                     onOk={e => { this.state.update ? this.update_certificate(this.state.update_data._id) : this.add_certificate() }}
-                    onCancel={() => { this.setState({ modalVisible: 0}) }}
+                    onCancel={() => { this.setState({ modalVisible: 0 }) }}
                     title="Add Certificate"
                     // confirmLoading={loading}
                     visible={this.state.modalVisible}
@@ -168,24 +173,26 @@ class CertificateTable extends React.Component {
                             {form.getFieldDecorator("certificate_name", {
                                 initialValue: this.state.update_data.certificate_name,
                                 rules: [{ required: true }]
-                            })(<Input placeholder="Certificate Name"/>)}
+                            })(<Input placeholder="Certificate Name" />)}
                         </Form.Item>
                     </Form>
                 </Modal>
-                <div style={{ marginBottom: "12px" }}>
-                    <Button onClick={() => { this.setState({ modalVisible: 1,update_data:{} }); form.resetFields(); }} type="primary"> Add Certificate </Button>
-                </div>
+                <RoleView permission="add_certificate">
+                    <div style={{ marginBottom: "12px" }}>
+                        <Button onClick={() => { this.setState({ modalVisible: 1, update_data: {} }); form.resetFields(); }} type="primary"> Add Certificate </Button>
+                    </div>
+                </RoleView>
                 <div id="no-more-tables">
-                <Table
-                    rowClassName={() => 'editable-row'}
-                    className='table_shadow'
-                    dataSource={dataSource}
-                    columns={columns}
-                    size="middle"
-                    pagination={this.state.pagination}
-                    onChange={this.handleTableChange}
-                    loading={this.state.loading}
-                />
+                    <Table
+                        rowClassName={() => 'editable-row'}
+                        className='table_shadow'
+                        dataSource={dataSource}
+                        columns={columns}
+                        size="middle"
+                        pagination={this.state.pagination}
+                        onChange={this.handleTableChange}
+                        loading={this.state.loading}
+                    />
                 </div>
             </React.Fragment>
         );

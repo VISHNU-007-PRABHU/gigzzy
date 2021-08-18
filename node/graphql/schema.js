@@ -253,6 +253,7 @@ const typeDefs = gql`
         msg:String
         status:String
         admin_search:[Admin]
+        GizzyDeveloper:Boolean
     }
     type Roles{
         name:String

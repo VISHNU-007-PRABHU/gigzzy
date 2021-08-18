@@ -1,13 +1,12 @@
 import * as React from "react";
 import { withRouter } from "react-router-dom";
-import { Table, Modal, Form, Avatar, Popconfirm, Tag, Icon,Switch } from "antd";
+import { Table, Modal, Form, Avatar, Popconfirm, Tag, Icon, Switch } from "antd";
 import { GET_CATEGORY, UPDATE_CATEGORY, DELETE_CATEGORY } from '../../../graphql/Admin/category';
 import { client } from "../../../apollo";
 import '../../../scss/template.scss';
 import { Alert_msg } from '../../Comman/alert_msg';
 import Search from "antd/lib/input/Search";
-
-
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 class CategoryTable extends React.Component {
     state = {
         modalVisible: false,
@@ -91,7 +90,7 @@ class CategoryTable extends React.Component {
             variables: data,
         }).then((result, loading, error) => {
             Alert_msg(result.data.updateCategory.info);
-            this.fetch_category({is_parent: false});
+            this.fetch_category({ is_parent: false });
         });
     }
 
@@ -165,13 +164,18 @@ class CategoryTable extends React.Component {
                 title: 'Action',
                 width: '10%',
                 dataIndex: 'operation',
+                className: RoleViewFunction('edit_category') || RoleViewFunction('delete_category') ? '' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
                         <span title="...." className="d-flex d-sm-inline justify-content-around">
-                            <span className="cursor_point" onClick={() => { this.props.history.push(`/admin-category/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
-                            <Popconfirm title="Sure to delete because may be under some more sub_category ?" onConfirm={() => this.handleDelete(record._id)}>
-                                <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
-                            </Popconfirm>
+                            <RoleView permission="edit_category">
+                                <span className="cursor_point" onClick={() => { this.props.history.push(`/admin-category/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
+                            </RoleView>
+                            <RoleView permission="delete_category">
+                                <Popconfirm title="Sure to delete because may be under some more sub_category ?" onConfirm={() => this.handleDelete(record._id)}>
+                                    <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
+                                </Popconfirm>
+                            </RoleView>
                         </span>
 
                     ) : null,

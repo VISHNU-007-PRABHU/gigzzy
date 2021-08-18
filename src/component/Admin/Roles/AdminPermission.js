@@ -16,6 +16,7 @@ import Form from 'antd/es/form';
 import { client } from "../../../apollo";
 import { Alert_msg } from '../../Comman/alert_msg';
 import { DELETE_ADMIN_PERMISSION, GET_FETCH_ADMIN_PERMISSION, GET_ADMIN_PERMISSION, ADD_ADMIN_PERMISSION } from '../../../graphql/Admin/roles';
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 const { Title } = Typography;
 const { Option } = Select;
 const { Panel } = Collapse;
@@ -122,9 +123,11 @@ class AdminPermission extends React.Component {
             <>
                 <Drawer
                     title={<><div>
-                        <Button type="primary" onClick={this.showModal}>
-                            Create a new permission
-                        </Button>
+                        <RoleView permission="add_permission">
+                            <Button type="primary" onClick={this.showModal}>
+                                Create a new permission
+                            </Button>
+                        </RoleView>
                     </div></>}
                     width={500}
                     onClose={this.onClose}
@@ -158,11 +161,13 @@ class AdminPermission extends React.Component {
                                                 <div className="bold">{sub_permission['name']}</div>
                                                 <div>{sub_permission['key']}</div>
                                             </div>
-                                            <div>
-                                                <Popconfirm title="Sure to delete this permission ?" onConfirm={() => this.handleDelete(sub_permission['_id'])}>
-                                                    <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
-                                                </Popconfirm>
-                                            </div>
+                                            <RoleView permission="delete_permission">
+                                                <div>
+                                                    <Popconfirm title="Sure to delete this permission ?" onConfirm={() => this.handleDelete(sub_permission['_id'])}>
+                                                        <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
+                                                    </Popconfirm>
+                                                </div>
+                                            </RoleView>
                                         </div>)
                                     })}
                                 </Panel>

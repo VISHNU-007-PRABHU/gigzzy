@@ -6,6 +6,7 @@ import Layout from 'antd/es/layout';
 import Tabs from 'antd/es/tabs';
 import Button from 'antd/es/button';
 import Skeleton from 'antd/es/skeleton'
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 const { Content } = Layout;
 const { TabPane } = Tabs;
 
@@ -48,9 +49,11 @@ class Roles extends React.Component {
                         <Tabs
                             onChange={this.changeTab}
                             tabBarExtraContent={<div>
-                                <Button className="mx-2" type="primary" onClick={() => { this.props.history.push(`/admin-${this.state.add_btn}/add`); }}>
-                                    Add {this.state.add_btn}
-                                </Button>
+                                <RoleView permission="add_admin">
+                                    <Button className="mx-2" type="primary" onClick={() => { this.props.history.push(`/admin-${this.state.add_btn}/add`); }}>
+                                        Add {this.state.add_btn}
+                                    </Button>
+                                </RoleView>
                                 <Button className={this.state.activeKey === "2" ? '' : 'd-none'} type="primary" onClick={() => { this.setState({ add_permission: true }) }}>
                                     Add permission
                                 </Button>

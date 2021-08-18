@@ -1,10 +1,11 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
-import { GET_ADMIN_ROLES,DELETE_ADMIN_ROLES,SEARCH_ROLE } from '../../../graphql/Admin/roles';
+import { GET_ADMIN_ROLES, DELETE_ADMIN_ROLES, SEARCH_ROLE } from '../../../graphql/Admin/roles';
 import { client } from "../../../apollo";
 import { Table, Button, Icon, Popconfirm } from 'antd';
 import { Alert_msg } from '../../Comman/alert_msg';
 import Search from "antd/es/input/Search";
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 class AdminRoles extends React.Component {
     constructor(props) {
         super(props);
@@ -70,7 +71,7 @@ class AdminRoles extends React.Component {
 
     onFilter = async (value) => {
         console.log(value.target.value);
-        var datas = { $or: [{ 'name': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }, { 'key': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }] }
+        var datas = { $or: [{ 'name': { $regex: '.*' + value.target.value + '.*', $options: 'i' } }, { 'key': { $regex: '.*' + value.target.value + '.*', $options: 'i' } }] }
         await client.query({
             query: SEARCH_ROLE,
             variables: { data: datas },
@@ -97,7 +98,7 @@ class AdminRoles extends React.Component {
                         <div className="d-block">
                             <div>
                                 Key Roles
-                             </div>
+                            </div>
                         </div>
                     </div>
                 },
@@ -110,13 +111,18 @@ class AdminRoles extends React.Component {
             {
                 title: "Action",
                 dataIndex: 'operation',
+                className: RoleViewFunction('edit_roles') || RoleViewFunction('delete_roles') ? '' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
                         <span title="...." className="d-flex d-sm-inline justify-content-around">
-                            <span className='cursor_point' onClick={() => { this.props.history.push(`/admin-roles/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
-                            <Popconfirm title="Sure to delete the user ?" onConfirm={() => this.handleDelete(record._id)}>
-                                <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
-                            </Popconfirm>
+                            <RoleView permission="edit_roles">
+                                <span className='cursor_point' onClick={() => { this.props.history.push(`/admin-roles/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
+                            </RoleView>
+                            <RoleView permission="delete_roles">
+                                <Popconfirm title="Sure to delete the user ?" onConfirm={() => this.handleDelete(record._id)}>
+                                    <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
+                                </Popconfirm>
+                            </RoleView>
                         </span>
                     ) : null,
             },

@@ -1,11 +1,12 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
-import { GET_ADMIN_USER,SEARCH_ADMIN,DELETE_ADMIN_USER } from '../../../graphql/Admin/roles';
+import { GET_ADMIN_USER, SEARCH_ADMIN, DELETE_ADMIN_USER } from '../../../graphql/Admin/roles';
 import { client } from "../../../apollo";
-import { Table,Icon, Popconfirm } from 'antd';
+import { Table, Icon, Popconfirm } from 'antd';
 import Tag from 'antd/es/tag';
 import Search from "antd/es/input/Search";
 import { Alert_msg } from '../../Comman/alert_msg';
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 class AdminUsers extends React.Component {
     constructor(props) {
         super(props);
@@ -31,7 +32,7 @@ class AdminUsers extends React.Component {
 
         await client.query({
             query: GET_ADMIN_USER,
-            variables: { limit: pager.pageSize, page: pager.current},
+            variables: { limit: pager.pageSize, page: pager.current },
             fetchPolicy: 'no-cache',
         }).then(result => {
             const pagination = { ...this.state.pagination };
@@ -132,13 +133,18 @@ class AdminUsers extends React.Component {
             {
                 title: "Action",
                 dataIndex: 'operation',
+                className: RoleViewFunction('edit_admin') || RoleViewFunction('delete_admin') ? '' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
                         <span title="...." className="d-flex d-sm-inline justify-content-around">
-                            <span className='cursor_point' onClick={() => { this.props.history.push(`/admin-admin/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
-                            <Popconfirm title="Sure to delete the admin ?" onConfirm={() => this.handleDelete(record._id)}>
-                                <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
-                            </Popconfirm>
+                            <RoleView permission="edit_admin">
+                                <span className='cursor_point' onClick={() => { this.props.history.push(`/admin-admin/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
+                            </RoleView>
+                            <RoleView permission="delete_admin">
+                                <Popconfirm title="Sure to delete the admin ?" onConfirm={() => this.handleDelete(record._id)}>
+                                    <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
+                                </Popconfirm>
+                            </RoleView>
                         </span>
                     ) : null,
             },

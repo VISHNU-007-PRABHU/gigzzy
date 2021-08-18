@@ -3,6 +3,7 @@ import { Table, Form, Icon, Row, Col, Modal, Collapse, Button, Tag } from 'antd'
 import { GET_PAYOUT_DETAIL, GET_ALL_PAYOUT, ADMIN_TO_PROVIDER } from '../../../graphql/Admin/booking';
 import { client } from "../../../apollo";
 import { Alert_msg } from '../../Comman/alert_msg';
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 const { Panel } = Collapse;
 
 const EmailSearch = React.lazy(() => import('../User/EmailSearch'));
@@ -151,11 +152,14 @@ class PayoutsTable extends React.Component {
                 title: 'Action',
                 dataIndex: 'operation',
                 key: "provider_opertaion",
+                className: RoleViewFunction('view_payout') ? '' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
-                        <span title="...." className="d-flex d-sm-inline justify-content-around">
-                            <span className='cursor_point' onClick={() => { this.payout_detail(record._id, record?.total_amount) }}><Icon type="eye" theme="twoTone" twoToneColor="#52c41a" className='f_25' /></span>
-                        </span>
+                        <RoleView permission="view_payout">
+                            <span title="...." className="d-flex d-sm-inline justify-content-around">
+                                <span className='cursor_point' onClick={() => { this.payout_detail(record._id, record?.total_amount) }}><Icon type="eye" theme="twoTone" twoToneColor="#52c41a" className='f_25' /></span>
+                            </span>
+                        </RoleView>
 
                     ) : null,
             },
@@ -275,7 +279,9 @@ class PayoutsTable extends React.Component {
                                         <div>
                                             <div className="d-flex justify-content-center">Total</div>
                                             <div className="d-flex justify-content-center m-4 bold">{this.state.provider_total}</div>
-                                            <Button className="d-flex mx-auto" type="primary" onClick={this.payout_to_provider}>Done Payment</Button>
+                                            <RoleView permission="approve_payout">
+                                                <Button className="d-flex mx-auto" type="primary" onClick={this.payout_to_provider}>Done Payment</Button>
+                                            </RoleView>
 
                                             {/* <Button className="d-flex mx-auto" type="primary" onClick={this.payout_to_provider(this.state.provider_data[0]?this.state.provider_data[0]._id:"")}>Done Payment</Button> */}
                                         </div>

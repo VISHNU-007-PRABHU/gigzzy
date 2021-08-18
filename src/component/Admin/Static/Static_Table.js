@@ -4,6 +4,7 @@ import { GET_STATIC, DELETE_STATIC } from '../../../graphql/Admin/static';
 import { client } from "../../../apollo";
 import { Table, Button, Icon, Popconfirm } from 'antd';
 import { Alert_msg } from '../../Comman/alert_msg';
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 
 class StaticTable extends React.Component {
     constructor(props) {
@@ -88,13 +89,18 @@ class StaticTable extends React.Component {
             {
                 title: 'Action',
                 dataIndex: 'operation',
+                className: RoleViewFunction('edit_staticContent') || RoleViewFunction('delete_staticContent') ? '' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
                         <span title="...." className="d-flex d-sm-inline justify-content-around">
-                            <span className="cursor_point" onClick={() => { this.props.history.push(`/admin-static/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
-                            <Popconfirm title="Sure to delete Static data ?" onConfirm={() => this.handleDelete(record._id)}>
-                                <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
-                            </Popconfirm>
+                            <RoleView permission="edit_staticContent">
+                                <span className="cursor_point" onClick={() => { this.props.history.push(`/admin-static/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
+                            </RoleView>
+                            <RoleView permission="delete_staticContent">
+                                <Popconfirm title="Sure to delete Static data ?" onConfirm={() => this.handleDelete(record._id)}>
+                                    <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
+                                </Popconfirm>
+                            </RoleView>I
                         </span>
                     ) : null,
             },
@@ -103,11 +109,13 @@ class StaticTable extends React.Component {
 
         return (
             <div>
-                <div className='my-3'>
-                    <Button type="primary" onClick={() => { this.props.history.push('/admin-static/add'); }}>
-                        Add Static Pages
-                    </Button>
-                </div>
+                <RoleView permission="add_staticContent">
+                    <div className='my-3'>
+                        <Button type="primary" onClick={() => { this.props.history.push('/admin-static/add'); }}>
+                            Add Static Pages
+                        </Button>
+                    </div>
+                </RoleView>
                 <div id="no-more-tables">
                     <Table
                         rowClassName={() => 'editable-row'}

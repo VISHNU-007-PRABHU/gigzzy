@@ -7,6 +7,7 @@ export const ADMIN_LOGIN = gql`
                   email
                   password
                   name
+                  GizzyDeveloper
                   full_permission_list{
                         name
                         _id
