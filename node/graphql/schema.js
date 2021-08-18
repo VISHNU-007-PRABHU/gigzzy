@@ -81,6 +81,12 @@ const typeDefs = gql`
         role_based_permissions_detail(data:JSON):[Permission]
         individual_based_permissions_detail(data:JSON):[Permission]
         admin_role_detail(data:JSON):Roles
+        get_admin_roles_all:Roles
+        get_all_admin_permission:[Permission]
+        non_role_permissions_detail:[Permission]
+        admin_search(data:JSON):[Admin]
+        full_permission_list(data:JSON):[Admin]
+        roles_search(data:JSON):[Roles]
     }
 
     # sub category pagination data  
@@ -234,14 +240,19 @@ const typeDefs = gql`
         email:String
         password:String
         permissions:[ID]
+        roles_permissions:[ID]
         role_based_permissions_detail:[Permission]
         individual_based_permissions_detail:[Permission]
+        non_role_permissions_detail:[Permission]
         admin_role_detail:Roles
+        get_admin_roles_all:[Roles]
+        full_permission_list:[Permission]
         roles:ID
         info:JSON
         count:Int
         msg:String
         status:String
+        admin_search:[Admin]
     }
     type Roles{
         name:String
@@ -251,10 +262,12 @@ const typeDefs = gql`
         _id:ID
         count:Int
         permission:[Permission]
+        permissions:[ID]
         admin_type:Int
         role_based_permissions_detail:[Permission]
         msg:String
         status:String
+        roles_search:[Roles]
     }
     type Permission{
         name:String
@@ -727,9 +740,11 @@ const typeDefs = gql`
             delete_admin_roles(_id:ID):Roles
             update_admin_user_permission(
                 _id:ID
-                fun_permission:String
+                name:String
+                email:String
+                password:String
+                roles_permissions:[ID]
                 roles:ID
-                fun_type:String
                 permissions:[ID]
             ):Admin
             add_admin_permission(
@@ -742,6 +757,9 @@ const typeDefs = gql`
             delete_admin_permission(
                 _id:ID
             ):Permission
+            delete_admin_user(
+                _id:ID
+            ):Admin
         modified_address(
             option:Int  
             is_default:Int

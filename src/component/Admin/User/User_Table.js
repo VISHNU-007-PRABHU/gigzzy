@@ -5,10 +5,12 @@ import { client } from "../../../apollo";
 import { Table, Button, Icon, Popconfirm } from 'antd';
 import { Alert_msg } from '../../Comman/alert_msg';
 import Search from "antd/lib/input/Search";
+import RoleView,{RoleViewFunction} from '../../Comman/roles_permission_view'
 class UserTable extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            add_user: false,
             dataSource: [],
             search_user: [],
             loading: false,
@@ -71,7 +73,7 @@ class UserTable extends React.Component {
 
     onFilter = async (value) => {
         console.log(value.target.value);
-        var datas = { delete: 0, role: 1, $or: [{ 'name': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }, { 'email': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }, { 'phone_no': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }] }
+        var datas = { delete: 0, role: 1, $or: [{ 'name': { $regex: '.*' + value.target.value + '.*', $options: 'i' } }, { 'email': { $regex: '.*' + value.target.value + '.*', $options: 'i' } }, { 'phone_no': { $regex: '.*' + value.target.value + '.*', $options: 'i' } }] }
         await client.query({
             query: USER_EMAIL_QUERY,
             variables: { data: datas },
@@ -82,7 +84,6 @@ class UserTable extends React.Component {
     }
     render() {
         const { dataSource } = this.state;
-
         const columns = [
             {
                 title: "Name",
@@ -98,7 +99,7 @@ class UserTable extends React.Component {
                         <div className="d-block">
                             <div>
                                 Email
-                             </div>
+                            </div>
                             {/* <>
                                 <Suspense fallback={<div>.......</div>}>
                                     <EmailSearch role='1' value='email' placeholder='Enter Email'  passedFunction={this.onFilter}/>
@@ -118,7 +119,7 @@ class UserTable extends React.Component {
                     return <div>
                         <div>
                             Phone Number
-                             </div>
+                        </div>
                         {/* <>
                                 <Suspense fallback={<div>.......</div>}>
                                     <EmailSearch role='1' value='phone_no' placeholder='Enter Phone Number' passedFunction={this.onFilter}/>
@@ -135,27 +136,34 @@ class UserTable extends React.Component {
             {
                 title: "Action",
                 dataIndex: 'operation',
+                className: RoleViewFunction('edit_user') || RoleViewFunction('delete_user') ? '':'d-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
-                        <span title="...." className="d-flex d-sm-inline justify-content-around">
+                    <span title="...." className="d-flex d-sm-inline justify-content-around">
+                        <RoleView permission="edit_user">
                             <span className='cursor_point' onClick={() => { this.props.history.push(`/admin-user/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
+                        </RoleView>
+                        <RoleView permission="delete_user">
                             <Popconfirm title="Sure to delete the user ?" onConfirm={() => this.handleDelete(record._id)}>
                                 <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
                             </Popconfirm>
-                        </span>
-                    ) : null,
+                        </RoleView>
+                    </span>
+                ) : null,
             },
         ];
 
 
         return (
             <div>
-                <div className='mx-2 mx-sm-0 my-3'>
-                    <Button type="primary" onClick={() => { this.props.history.push('/admin-user/add'); }}>
-                        Add User
-                    </Button>
-                    <Search className='mt-3' size="large" placeholder="search" onKeyUp={(event) => { this.onFilter(event) }} loading={false} />
-                </div>
+                <RoleView permission="add_user">
+                    <div className='mx-2 mx-sm-0'>
+                        <Button type="primary" onClick={() => { this.props.history.push('/admin-user/add'); }}>
+                            Add User
+                        </Button>
+                    </div>
+                </RoleView>
+                <Search className='my-3' size="large" placeholder="search" onKeyUp={(event) => { this.onFilter(event) }} loading={false} />
                 <div id="no-more-tables">
                     <Table
                         rowClassName={() => 'editable-row'}

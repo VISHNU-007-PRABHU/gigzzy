@@ -1,6 +1,6 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
-import { GET_ADMIN_ROLES } from '../../../graphql/Admin/roles';
+import { GET_ADMIN_ROLES,DELETE_ADMIN_ROLES,SEARCH_ROLE } from '../../../graphql/Admin/roles';
 import { client } from "../../../apollo";
 import { Table, Button, Icon, Popconfirm } from 'antd';
 import { Alert_msg } from '../../Comman/alert_msg';
@@ -56,30 +56,29 @@ class AdminRoles extends React.Component {
         });
     }
 
-    // handleDelete = async (_id) => {
-    //     console.log(_id);
-    //     await client.mutate({
-    //         mutation: DELETE_USER,
-    //         variables: { _id: _id },
-    //     }).then((result, loading, error) => {
-    //         Alert_msg(result.data.deleteDetails);
-    //         if (result.data.deleteDetails.status === 'success') {
-    //             this.fetch_user();
-    //         }
-    //     });
-    // }
+    handleDelete = async (_id) => {
+        await client.mutate({
+            mutation: DELETE_ADMIN_ROLES,
+            variables: { _id: _id },
+        }).then((result, loading, error) => {
+            Alert_msg(result.data.delete_admin_roles);
+            if (result.data.delete_admin_roles.status === 'success') {
+                this.fetch_user();
+            }
+        });
+    }
 
-    // onFilter = async (value) => {
-    //     console.log(value.target.value);
-    //     var datas = { delete: 0, role: 1, $or: [{ 'name': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }, { 'email': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }, { 'phone_no': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }] }
-    //     await client.query({
-    //         query: USER_EMAIL_QUERY,
-    //         variables: { data: datas },
-    //         fetchPolicy: 'no-cache',
-    //     }).then(result => {
-    //         this.setState({ dataSource: result?.data?.user_search });
-    //     });
-    // }
+    onFilter = async (value) => {
+        console.log(value.target.value);
+        var datas = { $or: [{ 'name': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }, { 'key': { $regex: '.*' + value.target.value + '.*',$options:'i'  } }] }
+        await client.query({
+            query: SEARCH_ROLE,
+            variables: { data: datas },
+            fetchPolicy: 'no-cache',
+        }).then(result => {
+            this.setState({ dataSource: result?.data?.roles_search });
+        });
+    }
     render() {
         const { dataSource } = this.state;
 
@@ -114,7 +113,7 @@ class AdminRoles extends React.Component {
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
                         <span title="...." className="d-flex d-sm-inline justify-content-around">
-                            <span className='cursor_point' onClick={() => { this.props.history.push(`/admin-user/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
+                            <span className='cursor_point' onClick={() => { this.props.history.push(`/admin-roles/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
                             <Popconfirm title="Sure to delete the user ?" onConfirm={() => this.handleDelete(record._id)}>
                                 <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
                             </Popconfirm>

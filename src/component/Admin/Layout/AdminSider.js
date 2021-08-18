@@ -3,6 +3,7 @@ import { Menu, Icon, Layout } from "antd";
 import { BrowserRouter as Router,Link, withRouter } from "react-router-dom";
 import main from "../../../image/Gigzzy.png";
 import "../../../scss/template.scss";
+import RoleView,{RoleViewFunction} from '../../Comman/roles_permission_view'
 
 const { Sider } = Layout;
 
@@ -44,7 +45,7 @@ class AdminSider extends React.Component {
               <span>Dashboard</span>
               <Link to="/admin-dashboard" />
             </Menu.Item>
-            <Menu.Item key="/admin-user">
+            <Menu.Item key="/admin-user" className={RoleViewFunction('view_user') ? '':'d_none'}>
               <Icon type="user" />
               <span>Users</span>
               <Link to="/admin-user" />

@@ -29,6 +29,7 @@ import Home_Page from './component/User/HomePage/Home_Page';
 import Profile_Page from './component/User/Profile/Profile';
 import Bookings_Page from './component/User/Book/Bookings';
 import NotFound from './component/Comman/NotFound';
+import NotAccess from './component/Comman/NotAccess';
 import Description_Page from './component/User/Book/Description';
 import Payouts from './component/Admin/Payouts/Payouts';
 import Review from './component/Admin/Review/Review';
@@ -48,21 +49,39 @@ import { Alert_msg } from './component/Comman/alert_msg';
 import StaticPage from './component/Comman/static_page';
 import Roles from './component/Admin/Roles/Roles';
 import Add_Admin from './component/Admin/Roles/Add_Admin';
+import AdminRoles from './component/Admin/Roles/Add_Roles';
+import RoleView, { RoleViewFunction } from './component/Comman/roles_permission_view'
 
-function PrivateRoute({ component: Component, ...rest }) {
+function PrivateRoute({ permission, component: Component, ...rest }) {
+  console.log("PrivateRoute -> permission", permission)
+  let permission_condition = true
+  if (permission) {
+    permission_condition = RoleViewFunction(permission)
+  }
+  console.log("PrivateRoute -> permission_condition", permission_condition)
+
   return (
     <Route
       {...rest}
-      render={props =>
-        localStorage.getItem('adminLogin') === "success" ? (
-          <Component {...props} />
-        ) : (
-            <Redirect
+      render={props => {
+        if (localStorage.getItem('adminLogin') === "success") {
+          if (permission_condition) {
+            return (<Component {...props} />)
+          } else {
+            return <Redirect
               to={{
-                pathname: "/admin",
+                pathname: "/notaccess",
               }}
             />
-          )
+          }
+        } else {
+          return <Redirect
+            to={{
+              pathname: "/admin",
+            }}
+          />
+        }
+      }
       }
     />
   );
@@ -78,7 +97,7 @@ const isDemo = async () => {
       if (result.data.check_demo_app.status === 'success') {
         localStorage.setItem('userLogin', '');
         localStorage.removeItem('user');
-        Alert_msg({msg:"Your demo account is ended",status:"failed"});
+        Alert_msg({ msg: "Your demo account is ended", status: "failed" });
       }
     });
   }
@@ -91,7 +110,7 @@ const isDemo = async () => {
       if (result.data.check_demo_app.status === 'success') {
         localStorage.setItem('providerLogin', '');
         localStorage.removeItem('provider');
-        Alert_msg({msg:"Your demo account is ended",status:"failed"});
+        Alert_msg({ msg: "Your demo account is ended", status: "failed" });
       }
     });
   }
@@ -106,12 +125,12 @@ function UserRoute({ component: Component, ...rest }) {
         localStorage.getItem('userLogin') === 'success' ? (
           <Component {...props} />
         ) : (
-            <Redirect
-              to={{
-                pathname: "/login",
-              }}
-            />
-          )
+          <Redirect
+            to={{
+              pathname: "/login",
+            }}
+          />
+        )
       }
     />
   );
@@ -124,12 +143,12 @@ function ProviderRoute({ component: Component, ...rest }) {
         localStorage.getItem('providerLogin') === 'success' ? (
           <Component {...props} />
         ) : (
-            <Redirect
-              to={{
-                pathname: "/provider_login",
-              }}
-            />
-          )
+          <Redirect
+            to={{
+              pathname: "/provider_login",
+            }}
+          />
+        )
       }
     />
   );
@@ -141,38 +160,40 @@ ReactDOM.render(
         <Switch>
           <Route exact path="/admin" component={LoginPage} />
           <PrivateRoute path="/admin-dashboard" component={Dashboard} />
-          <PrivateRoute path="/admin-category/add" component={Add_Category} exact />
-          <PrivateRoute path="/admin-category/add/:id" component={Add_Category} exact />
-          <PrivateRoute path="/admin-category" component={Category} />
-          <PrivateRoute path="/admin-subcategory" component={Subcategory} />
-          <PrivateRoute path="/admin-add-subcategory/:id" component={Add_Subcategory} />
-          <PrivateRoute path="/admin-add-subcategory" component={Add_Subcategory} />
-          <PrivateRoute path="/admin-booking" component={Booking} />
-          <PrivateRoute path="/admin-booking-detail" component={Booking_Details} />
-          <PrivateRoute path="/admin-request" component={Request} />
-          <PrivateRoute path="/admin-payouts" component={Payouts} />
-          <PrivateRoute path="/admin-provider/add" component={Add_Provider} exact />
-          <PrivateRoute path="/admin-provider/add/:id" component={Add_Provider} exact />
-          <PrivateRoute path="/admin-provider/view/:id" component={Provider_Verified} exact />
-          <PrivateRoute path="/admin-provider" component={Provider} exact />
-          <PrivateRoute path="/admin-review" component={Review} exact />
-          <PrivateRoute path="/admin-certificate" component={Certificate} exact />
+          <PrivateRoute permission="add_category" path="/admin-category/add" component={Add_Category} exact />
+          <PrivateRoute permission="edit_category" path="/admin-category/add/:id" component={Add_Category} exact />
+          <PrivateRoute permission="view_category" path="/admin-category" component={Category} />
+          <PrivateRoute permission="view_subcategory" path="/admin-subcategory" component={Subcategory} />
+          <PrivateRoute permission="edit_subcategory" path="/admin-add-subcategory/:id" component={Add_Subcategory} />
+          <PrivateRoute permission="add_subcategory" path="/admin-add-subcategory" component={Add_Subcategory} />
+          <PrivateRoute permission="view_booking" path="/admin-booking" component={Booking} />
+          <PrivateRoute permission="view_booking_detail" path="/admin-booking-detail" component={Booking_Details} />
+          <PrivateRoute permission="view_booking_request" path="/admin-request" component={Request} />
+          <PrivateRoute permission="view_payout" path="/admin-payouts" component={Payouts} />
+          <PrivateRoute permission="add_provider" path="/admin-provider/add" component={Add_Provider} exact />
+          <PrivateRoute permission="edit_provider" path="/admin-provider/add/:id" component={Add_Provider} exact />
+          <PrivateRoute permission="approve_provider" path="/admin-provider/view/:id" component={Provider_Verified} exact />
+          <PrivateRoute permission="view_provider" path="/admin-provider" component={Provider} exact />
+          <PrivateRoute permission="view_review" path="/admin-review" component={Review} exact />
+          <PrivateRoute permission="view_certificate" path="/admin-certificate" component={Certificate} exact />
           <Route path="/admin-booking-invoice/:id" component={Invoice} exact />
-          <PrivateRoute path="/admin-user/add" component={Add_User} exact />
-          <PrivateRoute path="/admin-user/add/:id" component={Add_User} exact />
-          <PrivateRoute path="/admin-user" component={User} exact />
-          <PrivateRoute path="/admin-static/add" component={Add_Static} exact />
-          <PrivateRoute path="/admin-static/add/:id" component={Add_Static} exact />
-          <PrivateRoute path="/admin-static" component={Static} exact />
+          <PrivateRoute permission="add_user" path="/admin-user/add" component={Add_User} exact />
+          <PrivateRoute permission="edit_user" path="/admin-user/add/:id" component={Add_User} exact />
+          <PrivateRoute permission="view_user" path="/admin-user" component={User} exact />
+          <PrivateRoute permission="add_static" path="/admin-static/add" component={Add_Static} exact />
+          <PrivateRoute permission="edit_user" path="/admin-static/add/:id" component={Add_Static} exact />
+          <PrivateRoute permission="view_user" path="/admin-static" component={Static} exact />
           <PrivateRoute path="/admin-settings" component={Settings} exact />
-          <PrivateRoute path="/admin-roles" component={Roles} exact />
-          <PrivateRoute path="/admin-admin/add" component={Add_Admin} exact />
-          <PrivateRoute path="/admin-admin/add/:id" component={Add_Admin} exact />
+          <PrivateRoute permission="view_roles" path="/admin-roles" component={Roles} exact />
+          <PrivateRoute permission="add_roles" path="/admin-roles/add" component={AdminRoles} exact />
+          <PrivateRoute permission="edit_roles" path="/admin-roles/add/:id" component={AdminRoles} exact />
+          <PrivateRoute permission="add_admin" path="/admin-admin/add" component={Add_Admin} exact />
+          <PrivateRoute permission="edit_admin" path="/admin-admin/add/:id" component={Add_Admin} exact />
           <Route exact path="/" component={Home_Page} />
           <Route exact path="/login" component={User_Login} />
           <Route exact path="/Confrim_password/:id" component={ConfrimPassword} />
           <Route exact path="/signup" component={Email_Login} />
-          <Route exact path="/static_page/:id" component={StaticPage}/>
+          <Route exact path="/static_page/:id" component={StaticPage} />
           <UserRoute exact path="/profile" component={Profile_Page} />
           <UserRoute exact path="/description/:id" component={Description_Page} />
           <UserRoute exact path="/bookings" component={Bookings_Page} />
@@ -182,6 +203,7 @@ ReactDOM.render(
           <ProviderRoute exact path="/provider_earnings" component={provider_earnings} />
           <ProviderRoute exact path="/provider-booking-detail" component={Booking_Detail} />
           <Route component={NotFound} />
+          <Route exact path="/notaccess" component={NotFound} />
         </Switch>
       </ApolloProviderHooks>
     </ApolloProvider>

@@ -6,7 +6,12 @@ export const ADMIN_LOGIN = gql`
                   info
                   email
                   password
-                  username
+                  name
+                  full_permission_list{
+                        name
+                        _id
+                        key
+                  }
             }
       }
 `;

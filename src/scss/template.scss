@@ -17,7 +17,10 @@ $zero:0px;
     align-items: center !important;
     font-size: 15px !important;
 }
-
+.ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #52c41a !important;
+    border-color: #52c41a !important;
+}
 .ant-menu.ant-menu-dark .ant-menu-item-selected,
 .ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected {
     background-color: #07cb79 !important;
@@ -1509,4 +1512,8 @@ p.ant-scroll-number-only-unit.current {
     background: black;
     padding: 10px;
     border-radius: 25px;
+}
+
+.d_none{
+    display: none !important;
 }
