@@ -54,6 +54,11 @@ class DrawerForm extends React.Component {
               <span>Providers</span>
               <Link to="/admin-provider" />
             </Menu.Item>
+            <Menu.Item key="/admin-company" className={RoleViewFunction('view_company') ? '':''}>
+              <Icon type="bank" />
+              <span>Companys</span>
+              <Link to="/admin-company" />
+            </Menu.Item>
             <Menu.Item key="/admin-category" className={RoleViewFunction('view_category') ? '':'d_none'}>
               <Icon type="deployment-unit" />
               <span>Categories</span>
@@ -95,7 +100,7 @@ class DrawerForm extends React.Component {
               <Link to="/admin-static" />
             </Menu.Item>
             <Menu.Item key="/admin-roles"  className={RoleViewFunction('view_admin') ? '':'d_none'}>
-              <Icon type="book" />
+              <Icon type="usergroup-add" />
               <span>Manage Admin</span>
               <Link to="/admin-roles" />
             </Menu.Item>

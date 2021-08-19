@@ -11,7 +11,7 @@ const senderAddress = process.env.senderAddress;
 const smtpUsername = process.env.smtpUsername;
 const smtpPassword = process.env.smtpPassword;
 const SMS_SENDERID = process.env.AFRICASTALKING_SENDERID;
-var serverKey =process.env.PUSHNOTIFICATION_KEY;
+var serverKey = process.env.PUSHNOTIFICATION_KEY;
 var fcm = new FCM(serverKey);
 const env = process.env;
 const africa = require("africastalking")({
@@ -125,7 +125,7 @@ module.exports.send_sms = async (country_code, phone_no, type, data) => {
     }
     sms.send(options)
       .then((suc) => {
-        console.log("send sms ==>",suc['SMSMessageData']['Recipients']);
+        console.log("send sms ==>", suc['SMSMessageData']['Recipients']);
       })
       .catch((err) => {
         console.log("error sms ===>", err);
@@ -181,6 +181,12 @@ const static_mail_template = (type, data) => {
         text: "Your reset password link",
         html: `<b>${link}</b>`
       }
+    case "new_company_register":
+      return {
+        subject: "GIGZZY PRO✔",
+        text: "Please accept your company request through  below the link",
+        html: `<b>${link}</b>`
+      }
     default:
       return {
         subject: "GIGZZY ✔",
@@ -203,7 +209,7 @@ module.exports.send_mail_sendgrid = async (email, type, datas) => {
     let data = await sgMail.send(mail_msg);
     return true
   } catch (error) {
-    console.log("module.exports.send_mail_sendgrid -> error", error)
+    console.log("module.exports.send_mail_sendgrid -> error", error.response.body)
     return false
   }
 }

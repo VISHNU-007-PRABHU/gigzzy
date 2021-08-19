@@ -89,8 +89,35 @@ query USEREMAILQUERY($data:JSON) {
         proof_status
         phone_no
         name
+        role
+    }
+}
+`;
+
+export const GET_COMPANY = gql`
+ query GETCOMPANY($limit: Int,$page:Int,$search:JSON) {
+    get_company_detail(limit:$limit,page:$page,search:$search) {
+        pageInfo{
+            totalDocs
+            page
+        }
+        data{
+            _id
+            name
+            address
+            about
+            website_url
+        }
     }
 }
 `;
 
 
+
+export const DELETE_COMPANY = gql`
+    mutation DELETECOMPANY($company_id: ID)  {
+        deleteCompany(company_id:$company_id){
+        msg
+        status         
+    }
+}`

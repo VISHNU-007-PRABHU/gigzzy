@@ -11,6 +11,7 @@ const { ApolloServer, gql, SchemaDirectiveVisitor } = require('apollo-server-exp
 const { defaultFieldResolver, GraphQLString } = require('graphql');
 const { typeDefs } = require('./node/graphql/schema');
 const { resolvers, confrimation_call, c2b_confirmation, c2b_validation } = require('./node/graphql/resolver');
+const { confrimation_company_worker } = require('./node/graphql/resolvers/user')
 const moment = require('moment');
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true, parameterLimit: 5000000 }));
@@ -20,12 +21,8 @@ const fs = require('fs');
 const cwd = process.cwd();
 const dotenv = require('dotenv');
 const expressStaticGzip = require('express-static-gzip');
-// const i18n = require("i18n");
+const _ = require("lodash");
 dotenv.config();
-// i18n.configure({
-//   locales: ['en', 'es'],
-//   directory: __dirname + '/locales'
-// });
 class refDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
@@ -190,6 +187,18 @@ app.use("/document", express.static(path.join(__dirname, "./node/document")));
 app.use('/static', express.static(__dirname + '/public'));
 
 
+app.get('/company_user_accepted', async (req, res, next) => {
+  try {
+    if (req.query['sid']) {
+      res.redirect(301, '/errors');
+    }
+    let { status, msg, link } = await confrimation_company_worker(req.query)
+    res.redirect(301, link);
+  } catch (error) {
+    res.redirect(301, '/errors');
+  }
+})
+
 app.post('/confirmation', async (req, res, next) => {
   try {
     let confirm_data = await confrimation_call(req.body)
@@ -200,6 +209,7 @@ app.post('/confirmation', async (req, res, next) => {
     return res.send(error)
   }
 })
+
 
 app.post('/refund_confirmation', async (req, res, next) => {
   try {
@@ -225,7 +235,7 @@ app.post('/c2b_validation', async (req, res, next) => {
       "ResultDesc": "Accepted"
     })
   } catch (error) {
-    console.log("ops, not valid data",error)
+    console.log("ops, not valid data", error)
     return res.send({
       "ResultCode": 1,
       "ResultDesc": "Rejected"
@@ -246,14 +256,19 @@ app.post('/c2b_confirmation', async (req, res, next) => {
 app.use(async (req, res, next) => {
   const url = req.url;
   // console.log(url);
+  let SubURL = ['graphql',
+    'c2b_confirmation',
+    'c2b_validation',
+    'confirmation',
+    'validation',
+    'cancelled'
+  ]
   const uriArray = url.split('/');
-  if (uriArray[1] !== 'graphql' && uriArray[1] !== "c2b_confirmation" && uriArray[1] !== "c2b_validation" && uriArray[1] !== "confirmation" && uriArray[1] !== "validation" && uriArray[1] !== "cancelled") {
-    // console.log("react run");
+  if (!_.includes(SubURL, uriArray[1])) {
+    console.log("react run");
     const readFile = util.promisify(fs.readFile)
     try {
-
       var text = await readFile(cwd + '/build/index.html', 'utf8');
-
       return res.send(text);
     } catch (error) {
       return res.send(error.message)

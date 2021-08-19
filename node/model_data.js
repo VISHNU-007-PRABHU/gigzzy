@@ -1,4 +1,3 @@
-
 module.exports = {
     user : require('./model/userDetail/user'),
     payout: require('./model/userDetail/payout'),
@@ -16,5 +15,7 @@ module.exports = {
     site_setting:require('./model/Admin/site'),
     address:require('./model/userDetail/address'),
     roles:require('./model/Admin/roles'),
-    permission:require('./model/Admin/permission')
+    permission:require('./model/Admin/permission'),
+    companyProvider:require('./model/userDetail/company_provider'),
+    company:require('./model/userDetail/company'),
 }

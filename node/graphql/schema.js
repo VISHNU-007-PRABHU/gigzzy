@@ -87,6 +87,9 @@ const typeDefs = gql`
         admin_search(data:JSON):[Admin]
         full_permission_list(data:JSON):[Admin]
         roles_search(data:JSON):[Roles]
+        # company detail
+        get_company_detail(data:JSON,search:JSON,_id:ID,page:Int,limit:Int,company_id:ID,user_id:ID,provider_id:ID):CompanyConnection
+        get_parent_company_provider(provider_id:Boolean,user_id:Boolean):[CompanyProvider]
     }
 
     # sub category pagination data  
@@ -104,6 +107,11 @@ const typeDefs = gql`
      # user pagination data
      type UserConnection {
         data:[Detail]
+        pageInfo: PageInfo!
+    }
+     # Company pagination data
+     type CompanyConnection {
+        data:[Company]
         pageInfo: PageInfo!
     }
     # Admin pagination data
@@ -233,6 +241,50 @@ const typeDefs = gql`
         pagingCounter: Int
         prevPage: String
         nextPage: String
+    }
+    # biding schema
+    type Biding{
+        _id:ID
+        data: JSON 
+    }
+    type UserBiding{
+        _id:ID
+        data: JSON 
+    }
+    type BidingImages{
+        _id:ID
+        data: JSON 
+    }
+      # milestone schema
+    type MilestoneImages{
+        _id:ID
+        data: JSON 
+    }
+    type Milestone{
+        _id:ID
+        data: JSON 
+    }
+    type Company{
+        _id:ID
+        msg:String
+        status:String
+        name:String
+        website_url:String
+        address:[JSON]
+        about:String
+        provider_email:[String]
+        workers:[CompanyProvider]
+        get_parent_company_provider(company_id:ID,provider_id:ID,):[CompanyProvider]
+        data: JSON 
+    }
+    type CompanyProvider{
+        _id:ID
+        email:String
+        register_status:String
+        register_link_status:String
+        provider_id:ID
+        provider_detail:[Detail]
+        data: JSON 
     }
     type Admin{
         _id:ID
@@ -684,6 +736,7 @@ const typeDefs = gql`
         deletesubCategory(_id:ID,category_name:String,category_id:String,subCategory_name:String):subCategory
         deleteProvider_Category(user_id: ID,provider_subCategoryID:[ID]):Detail
         deleteBooking(_id:ID,user_id:ID):Booking
+        deleteCompany(company_id:ID):Company
          # --------------------- delete function ------------------------------------ #
 
         remove_providerDocument(user_id:ID,document:[String]):Detail
@@ -779,7 +832,24 @@ const typeDefs = gql`
             zip_code: String,
             distance:String,
             ):UserAddress
-        }
+        # add company_detail
+        update_company_detail(
+            option:String  
+            _id:ID
+            user_id: String,
+            provider_ID:ID,
+            company_data:[JSON]
+        ):Company
+        # update biding 
+         update_biding(
+            option:String  
+            _id:ID
+            user_id: String
+            provider_ID:ID
+            company_id:ID
+            biding_data:[JSON]
+        ):Company
+    }
 `;
 module.exports.typeDefs = typeDefs;
 module.exports.JSON = (data) => {

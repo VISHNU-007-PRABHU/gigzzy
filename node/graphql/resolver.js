@@ -207,6 +207,8 @@ const resolvers = {
         get_all_admin_permission:rolesResolver.get_all_admin_permission,
         admin_search:rolesResolver.admin_search,
         roles_search:rolesResolver.roles_search,
+        // company detail
+        get_company_detail:userResolver.get_company_detail,
         get_my_appointments: async (parent, args, context, info) => {
             try {
 
@@ -303,7 +305,9 @@ const resolvers = {
         provider_rate: userResolver.provider_rate,
 
     },
-
+    Company:{
+        get_parent_company_provider:userResolver.get_parent_company_provider,
+    },
     Booking: {
         user: userResolver.user,
         booking_provider: userResolver.available_booking_povider,
@@ -326,6 +330,9 @@ const resolvers = {
 
     Mutation: {
         adminLogin: adminResolver.adminlogin,
+        // company detiail
+        update_company_detail:userResolver.update_company_detail,
+        deleteCompany:userResolver.deleteCompany,
         addUser: async (_, args) => {
             const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
             // console.log(user);

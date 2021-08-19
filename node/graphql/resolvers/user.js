@@ -1,14 +1,11 @@
 const model = require('../../model_data');
-const nodemailer = require("nodemailer");
 const moment = require('moment');
 var ObjectId = require('mongodb').ObjectID;
 const { createWriteStream, existsSync, mkdirSync, fs } = require("fs");
 const path = require("path");
-const express = require("express");
 const _ = require("lodash");
 var commonHelper = require('../commonHelper');
 var saf = require('../safaricom');
-var CronJob = require('cron').CronJob;
 const dotenv = require('dotenv');
 var getDistanceBetweenPoints = require('get-distance-between-points');
 dotenv.config();
@@ -19,6 +16,8 @@ var Status_model = model.status;
 var Detail_model = model.detail;
 var Booking_model = model.booking;
 var Address_model = model.address;
+var Company_model = model.company;
+var CompanyProvider_model = model.companyProvider;
 module.exports.testmail = async (parent, args, context, info) => {
     return {
         msg: "test"
@@ -707,12 +706,12 @@ module.exports.kilometer = async (parent, args, context, info) => {
             result = await Booking_model.findOne({ _id: parent._id });
 
             if (!_.size(result) || !result.location.coordinates[1] || !result.location.coordinates[0] || !args.lat || !args.lng) {
-                console.log("module.exports.kilometer -> error","size zero")
+                console.log("module.exports.kilometer -> error", "size zero")
                 return { kilometre: 0 };
             }
 
             if (args.lat == result.location.coordinates[1] && args.lng == result.location.coordinates[0]) {
-                console.log("module.exports.kilometer -> error","zero")
+                console.log("module.exports.kilometer -> error", "zero")
                 return { kilometre: 0 };
             }
             var distanceInMeters = getDistanceBetweenPoints.getDistanceBetweenPoints(
@@ -722,7 +721,7 @@ module.exports.kilometer = async (parent, args, context, info) => {
             if (distanceInMeters && distanceInMeters > 0) {
                 return { kilometre: String(parseFloat(distanceInMeters * 0.001).toFixed(2)) };
             } else {
-                console.log("module.exports.kilometer -> error",distanceInMeters)
+                console.log("module.exports.kilometer -> error", distanceInMeters)
 
                 return { kilometre: 0 }
             }
@@ -777,7 +776,7 @@ module.exports.user_address = async (parent, args, context, info) => {
 
 
 module.exports.user_search = async (parent, args, context, info) => {
-    // console.log(args)
+    console.log(args)
     return await Detail_model.find(args.data);
 }
 
@@ -798,5 +797,200 @@ module.exports.check_demo_app = async (parent, args, context, info) => {
     }
 }
 
+module.exports.get_company_detail = async (parent, args, context, info) => {
+    try {
+        var limit = args.limit || 10;
+        var page = args.page || 1;
+        var offset = Number(page - 1) * Number(limit);
+        var total = 0;
+        var result = [];
+        let find_query= { delete: false }
+        if(args['search']){
+            find_query = {...find_query,...args['search']}
+        }
+        if(args['company_id']){
+            find_query['_id'] = args['company_id']
+        }
+        total = await Company_model.count(find_query);
+        result = await Company_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
+        var pageInfo = { totalDocs: total, page: args.page }
+        return { data: result, pageInfo };
+    } catch (error) {
+        return []
+    }
+};
 
+module.exports.get_company_provider = async (parent, args, context, info) => {
+    try {
+        var limit = args.limit || 10;
+        var page = args.page || 1;
+        var offset = Number(page - 1) * Number(limit);
+        var total = 0;
+        var result = [];
+        let find_query= { delete: false }
+        if(args['search']){
+            find_query = {...find_query,...args['search']}
+        }
+        if(args['provider_id']){
+            find_query['provider_id']=args['provider_id']
+        }
+        total = await CompanyProvider_model.count(find_query);
+        result = await CompanyProvider_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
+        var pageInfo = { totalDocs: total, page: args.page }
+        console.log("module.exports.get_company_detail -> pageInfo", pageInfo)
+        return { data: result, pageInfo };
+    } catch (error) {
+        return []
+    }
+};
 
+module.exports.get_parent_company_provider = async (parent, args, context, info) => {
+    try {
+        let find_query ={}
+        if(args['provider_id']){
+            find_query['provider_id']=args['provider_id']
+        }
+        if(args['company_id']){
+            find_query['company_id']=args['company_id']
+        }
+        result = await CompanyProvider_model.find(find_query);
+        return result;
+    } catch (error) {
+        return []
+    }
+};
+
+module.exports.deleteCompany = async (parent, args, context, info) => {
+    try {
+        let company_query ={}
+        let company_pro_query ={}
+        if(args['company_id']){
+            company_query['_id'] =  args['company_id']
+            company_pro_query['company_id']=args['company_id']
+        }
+        await Company_model.updateOne(company_query,{delete:true}).exec();
+        await CompanyProvider_model.updateOne(company_pro_query,{delete:true}).exec();
+        return {status:"success",msg:"Deleted success"};
+    } catch (error) {
+        return {status:"failed",msg:"Deleted failed"};
+    }
+};
+
+module.exports.delete_company_provider = async (parent, args, context, info) => {
+    try {
+        let find_query ={}
+        if(args['provider_id']){
+            find_query['provider_id']=args['provider_id']
+        }
+        if(args['company_id']){
+            find_query['company_id']=args['company_id']
+        }
+        await CompanyProvider_model.updateOne(find_query,{delete:true}).exec();
+        return {status:"success",msg:"Deleted success"};
+    } catch (error) {
+        return {status:"failed",msg:"Deleted failed"};
+    }
+};
+
+module.exports.update_company_detail = async (parent, args, context, info) => {
+    try {
+        let company_data = args['company_data'][0][0]
+        if (!_.size(company_data)) {
+            return { msg: "Invalid company data", status: 'failed' };
+        }
+        if (args['_id']) {
+            let find_query = { _id: args['_id'] }
+            if (company_data['provider_email'] && _.size(company_data['provider_email'])) {
+                let CompanyProviderDetail = await this.SendCompanyProviders(args['_id'], company_data['provider_email'])
+            }
+            let update_company_detail = await Company_model.updateOne(find_query, company_data).exec()
+            let fetch_data = await Company_model.findOne(find_query).lean()
+            fetch_data['msg'] = "updated success"
+            fetch_data['status'] = "success"
+            return fetch_data;
+        } else {
+            let add_company_detail = new Company_model(company_data)
+            let added_detail = await add_company_detail.save()
+            if (company_data['provider_email'] && _.size(company_data['provider_email'])) {
+                let CompanyProviderDetail = await this.SendCompanyProviders(added_detail['_id'], company_data['provider_email'])
+            }
+            added_detail['msg'] = "updated success"
+            added_detail['status'] = "success"
+            return added_detail;
+        }
+    } catch (error) {
+        console.error("module.exports.update_company_detail -> error", error);
+        let error_msg ="Update failed"
+        if(error.message){
+            error_msg = error.message
+        }
+        return { msg: error_msg, status: 'failed' };
+    }
+}
+
+exports.SendCompanyProviders = (company_id, emails) => {
+    try {
+        _.forEach(emails, async emailData => {
+            let find_query = {
+                email: emailData,
+                company_id: company_id,
+                delete:false,
+            }
+            let update_query ={
+                email: emailData,
+                company_id: company_id,
+                register_link_status: "Pending",
+                register_status: "Pending",
+            }
+            let fetch_data = await CompanyProvider_model.findOne(find_query).lean()
+            if (_.size(fetch_data)) {
+                console.log("already send register link in this email in same company")
+            } else {
+                console.log("new send register link in this email")
+                let add_email = new CompanyProvider_model(update_query)
+                let added_detail = await add_email.save()
+                let link = `${process.env.APP_URL}/company_user_accepted?sid=${added_detail['_id']}`
+                await commonHelper.send_mail_sendgrid(emailData, "new_company_register", { link });
+            }
+        })
+        return true
+    } catch (error) {
+        return false
+    }
+}
+
+module.exports.confrimation_company_worker = async (data) => {
+    try {
+        let { sid } = data
+        let link = '/provider_login'
+        let error_link = '/ops'
+        let find_query = { _id: sid }
+        let update_query = { register_link_status: "accepted" }
+        let fetch_provider = await CompanyProvider_model.findOne(find_query).lean()
+        let fetch_provider_by_email = await CompanyProvider_model.findOne({
+            register_link_status: "accepted",
+            register_status:"success",
+            email:fetch_provider['email'],
+            delete:false
+        }).lean()
+        if(fetch_provider_by_email && _.size(fetch_provider_by_email)){
+            return { status: "failed", msg: "This email already registered to another company",link:error_link }  
+        }
+        if (fetch_provider && _.size(fetch_provider)) {
+            let detail_find_query = {
+                email: fetch_provider['email'],
+                role: 2
+            }
+            let fetch_pro_detail = await Detail_model.findOne(detail_find_query).lean()
+            if (fetch_pro_detail && _.size(fetch_pro_detail)) {
+                update_query['provider_id'] = fetch_pro_detail['_id']
+                update_query['register_status'] = "success"
+            }
+        }
+        let update_email_data = await CompanyProvider_model.updateOne(find_query, update_query).exec()
+        return { status: "success", msg: "User acepted", link }
+    } catch (error) {
+        let error_link = '/ops'
+        return { status: "failed", msg: "User acepted failed",link:error_link }
+    }
+}

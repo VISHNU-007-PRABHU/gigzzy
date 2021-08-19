@@ -13,6 +13,8 @@ import { LoginPage } from './component/Admin/Layout/LoginPage';
 import Dashboard from './component/Admin/Dashboard/Dashboard';
 import Category from './component/Admin/Category/Category';
 import Add_Category from './component/Admin/Category/Add_Category';
+import Company from './component/Admin/Company/Company';
+import Add_Company from './component/Admin/Company/Add_Company';
 import Subcategory from './component/Admin/subcategory/Subcategory';
 import Add_Subcategory from './component/Admin/subcategory/Add_Subcategory';
 import Booking from './component/Admin/Booking/Booking';
@@ -58,7 +60,6 @@ function PrivateRoute({ permission, component: Component, ...rest }) {
   if (permission) {
     permission_condition = RoleViewFunction(permission)
   }
-  console.log("PrivateRoute -> permission_condition", permission_condition)
 
   return (
     <Route
@@ -66,6 +67,7 @@ function PrivateRoute({ permission, component: Component, ...rest }) {
       render={props => {
         if (localStorage.getItem('adminLogin') === "success") {
           if (permission_condition) {
+            console.log("PrivateRoute -> permission_condition", "permission_condition")
             return (<Component {...props} />)
           } else {
             return <Redirect
@@ -163,6 +165,9 @@ ReactDOM.render(
           <PrivateRoute permission="add_category" path="/admin-category/add" component={Add_Category} exact />
           <PrivateRoute permission="edit_category" path="/admin-category/add/:id" component={Add_Category} exact />
           <PrivateRoute permission="view_category" path="/admin-category" component={Category} />
+          <PrivateRoute permission="" path="/admin-company/add" component={Add_Company} exact />
+          <PrivateRoute permission="" path="/admin-company/add/:id" component={Add_Company} exact />
+          <PrivateRoute path="/admin-company" component={Company} />
           <PrivateRoute permission="view_subcategory" path="/admin-subcategory" component={Subcategory} />
           <PrivateRoute permission="edit_subcategory" path="/admin-add-subcategory/:id" component={Add_Subcategory} />
           <PrivateRoute permission="add_subcategory" path="/admin-add-subcategory" component={Add_Subcategory} />
