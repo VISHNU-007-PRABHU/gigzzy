@@ -256,6 +256,9 @@ module.exports.update_admin_user_permission = async (parent, args) => {
             if (args['permissions']) {
                 update_query['permissions'] = args['permissions']
             }
+            if (args['GizzyDeveloper']) {
+                update_query['GizzyDeveloper'] = args['GizzyDeveloper']
+            }
             if (args['roles']) {
                 update_query['roles'] = args['roles']
                 const fetch_roles = await Roles_model.findOne({ _id: args['roles'] }).exec();

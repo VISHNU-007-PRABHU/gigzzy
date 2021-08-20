@@ -797,6 +797,7 @@ const typeDefs = gql`
                 name:String
                 email:String
                 password:String
+                GizzyDeveloper:Boolean
                 roles_permissions:[ID]
                 roles:ID
                 permissions:[ID]
