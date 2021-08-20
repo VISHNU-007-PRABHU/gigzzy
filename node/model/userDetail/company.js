@@ -28,7 +28,7 @@ var companySchema = new Schema({
   country_code: { type: String, },
   phone_no: { type: String, },
   website_url: { type: String },
-  address: { type: [] },
+  address: { type: String },
   location: {
     type: { type: String },
     coordinates: []

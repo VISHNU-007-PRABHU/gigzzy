@@ -125,7 +125,7 @@ class CompanyTable extends React.Component {
                 dataIndex: 'address',
                 width: '25%',
                 render: (text, record) => {
-                    return <span title="Address">{record?.address[0].address}</span>;
+                    return <span title="Address">{record?.address}</span>;
                 },
             },
             {

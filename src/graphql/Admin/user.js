@@ -95,8 +95,8 @@ query USEREMAILQUERY($data:JSON) {
 `;
 
 export const GET_COMPANY = gql`
- query GETCOMPANY($limit: Int,$page:Int,$search:JSON) {
-    get_company_detail(limit:$limit,page:$page,search:$search) {
+ query GETCOMPANY($limit: Int,$page:Int,$search:JSON,$company_id:ID,$provider_search:JSON) {
+    get_company_detail(limit:$limit,page:$page,search:$search,company_id:$company_id) {
         pageInfo{
             totalDocs
             page
@@ -107,6 +107,14 @@ export const GET_COMPANY = gql`
             address
             about
             website_url
+            get_parent_company_provider(provider_search:$provider_search,company_id:$company_id) {
+                email
+                created_at
+                provider_id
+                register_status
+                register_link_status
+                _id
+            }
         }
     }
 }
@@ -114,9 +122,26 @@ export const GET_COMPANY = gql`
 
 
 
+export const UPDATE_COMPANY_DETAIL = gql`
+    mutation UPDATECOMPANYDETAIL($_id: ID,$company_data:[JSON])  {
+        update_company_detail(_id:$_id,company_data:$company_data){
+        msg
+        status         
+    }
+}`
+
 export const DELETE_COMPANY = gql`
     mutation DELETECOMPANY($company_id: ID)  {
         deleteCompany(company_id:$company_id){
+        msg
+        status         
+    }
+}`
+
+
+export const DELETE_COMPANY_PROVIDER = gql`
+    mutation DELETECOMPANYPROVIDER($_id:ID,$company_id: ID)  {
+        deleteCompanyProvider(_id:$_id,company_id:$company_id){
         msg
         status         
     }

@@ -846,7 +846,10 @@ module.exports.get_company_provider = async (parent, args, context, info) => {
 
 module.exports.get_parent_company_provider = async (parent, args, context, info) => {
     try {
-        let find_query ={}
+        let find_query= { delete: false }
+        if(args['provider_search']){
+            find_query = {...find_query,...args['provider_search']}
+        }
         if(args['provider_id']){
             find_query['provider_id']=args['provider_id']
         }
@@ -876,7 +879,7 @@ module.exports.deleteCompany = async (parent, args, context, info) => {
     }
 };
 
-module.exports.delete_company_provider = async (parent, args, context, info) => {
+module.exports.deleteCompanyProvider = async (parent, args, context, info) => {
     try {
         let find_query ={}
         if(args['provider_id']){
@@ -884,6 +887,9 @@ module.exports.delete_company_provider = async (parent, args, context, info) => 
         }
         if(args['company_id']){
             find_query['company_id']=args['company_id']
+        }
+        if(args['_id']){
+            find_query['_id']=args['_id']
         }
         await CompanyProvider_model.updateOne(find_query,{delete:true}).exec();
         return {status:"success",msg:"Deleted success"};
@@ -932,12 +938,12 @@ exports.SendCompanyProviders = (company_id, emails) => {
     try {
         _.forEach(emails, async emailData => {
             let find_query = {
-                email: emailData,
+                email: _.trim(emailData),
                 company_id: company_id,
                 delete:false,
             }
             let update_query ={
-                email: emailData,
+                email: _.trim(emailData),
                 company_id: company_id,
                 register_link_status: "Pending",
                 register_status: "Pending",

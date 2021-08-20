@@ -5,6 +5,7 @@ const moment = require("moment");
 const path = require("path");
 var CronJob = require('cron').CronJob;
 const pubsub = new PubSub();
+global.pubsub = pubsub
 const { createWriteStream } = require("fs");
 var userResolver = require('./resolvers/user');
 var categoryResolver = require('./resolvers/category');
@@ -16,6 +17,7 @@ var certificateResolver = require('./resolvers/certificate');
 var staticResolver = require('./resolvers/static');
 var settingResolver = require('./resolvers/setting');
 var rolesResolver = require('./resolvers/roles');
+var contractResolver = require('./resolvers/contract');
 const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
@@ -47,8 +49,8 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([TEST_MSG]),
                 (payload, variables) => {
-                    // console.log("Message created");
-                    // console.log(payload);
+                    console.log("Message created");
+                    console.log(payload);
                     // console.log(variables);
                     return true;
                 })
@@ -330,9 +332,13 @@ const resolvers = {
 
     Mutation: {
         adminLogin: adminResolver.adminlogin,
+        // contract job
+        update_contract:contractResolver.update_contract,
+        ContractJobFileUpload:contractResolver.ContractJobFileUpload,
         // company detiail
         update_company_detail:userResolver.update_company_detail,
         deleteCompany:userResolver.deleteCompany,
+        deleteCompanyProvider:userResolver.deleteCompanyProvider,
         addUser: async (_, args) => {
             const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
             // console.log(user);

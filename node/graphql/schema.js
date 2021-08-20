@@ -88,8 +88,8 @@ const typeDefs = gql`
         full_permission_list(data:JSON):[Admin]
         roles_search(data:JSON):[Roles]
         # company detail
-        get_company_detail(data:JSON,search:JSON,_id:ID,page:Int,limit:Int,company_id:ID,user_id:ID,provider_id:ID):CompanyConnection
-        get_parent_company_provider(provider_id:Boolean,user_id:Boolean):[CompanyProvider]
+        get_company_detail(data:JSON,provider_search:JSON,search:JSON,_id:ID,page:Int,limit:Int,company_id:ID,user_id:ID,provider_id:ID):CompanyConnection
+        get_parent_company_provider(provider_search:JSON,provider_id:Boolean,user_id:Boolean,company_id:ID):[CompanyProvider]
     }
 
     # sub category pagination data  
@@ -264,17 +264,31 @@ const typeDefs = gql`
         _id:ID
         data: JSON 
     }
+    type ContractJob{
+        _id:ID
+        msg:String
+        status:String
+        name:String
+        website_url:String
+        address:String
+        description:String
+        lat:Float
+        lng:Float
+        budget:String
+        timeline:String
+        timeline_type:String
+    }
     type Company{
         _id:ID
         msg:String
         status:String
         name:String
         website_url:String
-        address:[JSON]
+        address:String
         about:String
         provider_email:[String]
         workers:[CompanyProvider]
-        get_parent_company_provider(company_id:ID,provider_id:ID,):[CompanyProvider]
+        get_parent_company_provider(provider_search:JSON,company_id:ID,provider_id:ID,):[CompanyProvider]
         data: JSON 
     }
     type CompanyProvider{
@@ -284,7 +298,10 @@ const typeDefs = gql`
         register_link_status:String
         provider_id:ID
         provider_detail:[Detail]
+        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         data: JSON 
+        msg:String
+        status:String
     }
     type Admin{
         _id:ID
@@ -737,6 +754,7 @@ const typeDefs = gql`
         deleteProvider_Category(user_id: ID,provider_subCategoryID:[ID]):Detail
         deleteBooking(_id:ID,user_id:ID):Booking
         deleteCompany(company_id:ID):Company
+        deleteCompanyProvider(company_id:ID,_id:ID,provider_id:ID):CompanyProvider
          # --------------------- delete function ------------------------------------ #
 
         remove_providerDocument(user_id:ID,document:[String]):Detail
@@ -841,6 +859,9 @@ const typeDefs = gql`
             provider_ID:ID,
             company_data:[JSON]
         ):Company
+        # contract jobs
+        update_contract(_id:ID,contract_data:[JSON],search_data:JSON):ContractJob
+        ContractJobFileUpload(_id:ID,contact_id:ID,contract_job_image:[JSON]):ContractJob
         # update biding 
          update_biding(
             option:String  

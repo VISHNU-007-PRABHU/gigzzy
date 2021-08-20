@@ -14,6 +14,7 @@ import Dashboard from './component/Admin/Dashboard/Dashboard';
 import Category from './component/Admin/Category/Category';
 import Add_Category from './component/Admin/Category/Add_Category';
 import Company from './component/Admin/Company/Company';
+import CompanyWorkerAdmin from './component/Admin/Company/CompanyWorkerAdmin';
 import Add_Company from './component/Admin/Company/Add_Company';
 import Subcategory from './component/Admin/subcategory/Subcategory';
 import Add_Subcategory from './component/Admin/subcategory/Add_Subcategory';
@@ -53,6 +54,7 @@ import Roles from './component/Admin/Roles/Roles';
 import Add_Admin from './component/Admin/Roles/Add_Admin';
 import AdminRoles from './component/Admin/Roles/Add_Roles';
 import RoleView, { RoleViewFunction } from './component/Comman/roles_permission_view'
+import Contract from './component/Admin/Contract/Contract';
 
 function PrivateRoute({ permission, component: Component, ...rest }) {
   console.log("PrivateRoute -> permission", permission)
@@ -168,6 +170,8 @@ ReactDOM.render(
           <PrivateRoute permission="" path="/admin-company/add" component={Add_Company} exact />
           <PrivateRoute permission="" path="/admin-company/add/:id" component={Add_Company} exact />
           <PrivateRoute path="/admin-company" component={Company} />
+          <PrivateRoute path="/admin-company-worker-detail" component={CompanyWorkerAdmin} />
+          <PrivateRoute path="/admin-contract" component={Contract} />
           <PrivateRoute permission="view_subcategory" path="/admin-subcategory" component={Subcategory} />
           <PrivateRoute permission="edit_subcategory" path="/admin-add-subcategory/:id" component={Add_Subcategory} />
           <PrivateRoute permission="add_subcategory" path="/admin-add-subcategory" component={Add_Subcategory} />

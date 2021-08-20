@@ -78,6 +78,11 @@ class AdminSider extends React.Component {
               <span>Bookings</span>
               <Link to="/admin-booking" />
             </Menu.Item>
+            <Menu.Item key="/admin-contract" className={RoleViewFunction('') ? '':'d_none'}>
+              <Icon type="hourglass" />
+              <span>Contract</span>
+              <Link to="/admin-contract" />
+            </Menu.Item>
             <Menu.Item key="/admin-review" className={RoleViewFunction('view_review') ? '':'d_none'}>
               <Icon type="star" />
               <span>Reviews</span>
