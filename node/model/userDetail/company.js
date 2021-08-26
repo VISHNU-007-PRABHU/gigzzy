@@ -25,8 +25,7 @@ var companySchema = new Schema({
   first_name:{ type: String,},
   last_name:{ type: String },
   confirm_password:{ type: String, },
-  mobileNumber:{ type: String,unique:true },
-  company_name:{ type: String,unique:true },
+  company_name:{ type: String },
   company_website:{ type: String },
   companyCategory:{ type: String },
   about_company:{ type: String},
@@ -34,7 +33,7 @@ var companySchema = new Schema({
   password: { type: String, },
   email: { type: String, },
   country_code: { type: String, },
-  phone_no: { type: String, },
+  phone_no: { type: String },
   website_url: { type: String },
   address: { type: String },
   location: {
