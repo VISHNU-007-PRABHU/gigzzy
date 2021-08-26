@@ -293,7 +293,7 @@ const typeDefs = gql`
         about_company:String
         add_later:Boolean
         password:String
-        address:String:String
+        address:String
         provider_email:[String]
         workers:[CompanyProvider]
         get_parent_company_provider(provider_search:JSON,company_id:ID,provider_id:ID,):[CompanyProvider]
