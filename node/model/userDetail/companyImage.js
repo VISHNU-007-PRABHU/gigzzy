@@ -14,8 +14,8 @@ var schemaOptions = {
     timestamps: true
 };
 
-const ContractJobImagesSchema = mongoose.Schema({
-    contract_id: { type: mongoose.Schema.Types.ObjectId, ref: 'contract' },
+const CompanyImageSchema = mongoose.Schema({
+    company_id: { type: mongoose.Schema.Types.ObjectId, ref: 'company' },
     small_image: { type: String, default: '' },
     large_image: { type: String, default: '' },
     image_tag: { type: String, default: '' },
@@ -25,7 +25,7 @@ const ContractJobImagesSchema = mongoose.Schema({
     delete:{ type: Boolean, default: false },
 }, schemaOptions);
 
-ContractJobImagesSchema.pre('save', function (next) {
+CompanyImageSchema.pre('save', function (next) {
     // get the current date
     var currentDate = moment();
     this.updated_at = currentDate;
@@ -35,11 +35,11 @@ ContractJobImagesSchema.pre('save', function (next) {
     next();
 });
 
-ContractJobImagesSchema.virtual('created_date').get(function () {
+CompanyImageSchema.virtual('created_date').get(function () {
     var created_date = moment(this.created_at);
     return created_date.format('DD/MM/YYYY');
 });
 
-ContractJobImagesSchema.plugin(mongoosePaginate);
+CompanyImageSchema.plugin(mongoosePaginate);
 mongoose.set('useCreateIndex', true);
-module.exports = mongoose.model('ContractJobImage', ContractJobImagesSchema);
+module.exports = mongoose.model('CompanyImage', CompanyImageSchema);

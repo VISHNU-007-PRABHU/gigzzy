@@ -2,6 +2,7 @@ const model = require('../../model_data');
 const moment = require('moment');
 var ObjectId = require('mongodb').ObjectID;
 const { createWriteStream, existsSync, mkdirSync, fs } = require("fs");
+var Jimp = require('jimp');
 const path = require("path");
 const _ = require("lodash");
 var commonHelper = require('../commonHelper');
@@ -17,6 +18,7 @@ var Detail_model = model.detail;
 var Booking_model = model.booking;
 var Address_model = model.address;
 var Company_model = model.company;
+var CompanyImage_model = model.company_images;
 var CompanyProvider_model = model.companyProvider;
 module.exports.testmail = async (parent, args, context, info) => {
     return {
@@ -898,6 +900,51 @@ module.exports.deleteCompanyProvider = async (parent, args, context, info) => {
     }
 };
 
+
+module.exports.CompanyFileUpload = (args,id) => {
+    try {
+        let files = ['logo_file','profile_file']
+        _.forEach(files, async file => {
+            if (args[file]) {
+                const { createReadStream, filename } = await args[file];
+                var file_name = `${id}_${moment().valueOf()}_${filename}`;
+                var small_file_name = `${id}_${moment().valueOf()}_${filename}_small.jpg`;
+                await new Promise(res =>
+                    createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/company", file_name))).on("close", res)
+                );
+                args['image'] = file_name;
+                var file_resize = await Jimp.read(path.join(__dirname, "../../images/company", file_name))
+                    .then(image => {
+                        image.resize(260, Jimp.AUTO)
+                            .quality(30)
+                            .write(path.join(__dirname, "../../images/company", small_file_name));
+                    })
+                    .catch(err => {
+                    });
+
+                /**
+                 * @info add company info after file update
+                 */ 
+                let img_data = {
+                    company_id: _id,
+                    small_image: small_file_name,
+                    large_image: file_name,
+                    image_tag: file,
+                    doc_category: "Approvals",
+                }
+                let add_company_image_job = new CompanyImage_model(img_data)
+                let added_company_image_job = await add_company_image_job.save()
+                added_company_image_job['status'] = "success";
+                added_company_image_job['msg'] = "company profiles added success"
+                // return added_company_image_job
+            }
+        })
+        return { status: "success", msg: "File upload success" }
+    } catch (error) {
+        return { status: "failed", msg: "File upload failed" }
+    }
+}
+
 module.exports.update_company_detail = async (parent, args, context, info) => {
     try {
         let company_data = args['company_data'][0][0]
@@ -911,12 +958,14 @@ module.exports.update_company_detail = async (parent, args, context, info) => {
             }
             let update_company_detail = await Company_model.updateOne(find_query, company_data).exec()
             let fetch_data = await Company_model.findOne(find_query).lean()
+            this.CompanyFileUpload(args,args['_id'])
             fetch_data['msg'] = "updated success"
             fetch_data['status'] = "success"
             return fetch_data;
         } else {
             let add_company_detail = new Company_model(company_data)
             let added_detail = await add_company_detail.save()
+            this.CompanyFileUpload(args,added_detail['_id'])
             if (company_data['provider_email'] && _.size(company_data['provider_email'])) {
                 let CompanyProviderDetail = await this.SendCompanyProviders(added_detail['_id'], company_data['provider_email'])
             }

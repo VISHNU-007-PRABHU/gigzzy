@@ -11,6 +11,9 @@ var subCategory_model = model.sub_category;
 var Detail_model = model.detail;
 var ContractJob_model = model.contract_job;
 var ContractJobImage_model = model.contract_job_images;
+const { createWriteStream, existsSync, mkdirSync } = require("fs");
+const path = require("path");
+var fs = require('fs');
 
 module.exports.get_my_biding = async (root, args) => {
     //console.log(args);
@@ -58,47 +61,79 @@ module.exports.get_biding_milestone_detail = async (root, args) => {
     return result;
 }
 
-module.exports.ContractJobFileUpload = (root, args) => {
-    let {id,contract_id,files,type,lable} = args 
-    if(!_.size(files)){
-        return {msg:"Invalid files size",status:"failed"}
-    }
-    _.forEach(files, async file => {
-        if (file) {
-            const { createReadStream, filename } = await args.file;
-            var file_name = `${id}_${moment().unix()}_${filename}`;
-            await new Promise(res =>
-                createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/contract", file_name))).on("close", res)
-            );
-            args['image'] = file_name;
-            var file_resize = await Jimp.read(path.join(__dirname, "../../images/contract", file_name))
-                .then(image => {
-                    image.resize(260, Jimp.AUTO)
-                        .quality(30)
-                        .write(path.join(__dirname, "../../images/contract", file_name + "_small.jpg"));
-                })
-                .catch(err => {
-                });
+module.exports.DeleteContractJobFile = async (root, args) => {
+    try {
+        let { _id } = args;
+        console.log("module.exports.DeleteContractJobFile -> _id", _id)
+        if (!_id) {
+            return { status: "failed", msg: "Invalid params" }
+        }
+        let fetch_images = await ContractJobImage_model.findOne({ _id: _id }).lean()
+        console.log("module.exports.DeleteContractJobFile -> fetch_images", fetch_images)
+        let image_array = ['small_image', 'large_image']
+        _.forEach(image_array, file_data => {
+            var file = path.join(__dirname, "../../images/contract", fetch_images[file_data]);
+            console.log("module.exports.DeleteContractJobFile -> file", file)
+            fs.unlink(file, function (err) { });
+        })
+        await ContractJobImage_model.updateOne({ _id }, { delete: true }).lean()
 
-            /**
-             * @info add contract info after file update
-             */
-                let img_data ={
+        return { status: "success", msg: "file has been deleted success" }
+
+    } catch (error) {
+        console.log("module.exports.DeleteContractJobFile -> error", error)
+        return { status: "failed", msg: "Delete file has been failed" }
+    }
+}
+
+
+module.exports.ContractJobFileUpload = (root, args) => {
+    try {
+        let { id, contract_id, contract_job_image, type, lable } = args
+        console.log(args.data[0])
+        if (!_.size(contract_job_image)) {
+            return { msg: "Invalid contract_job_image size", status: "failed" }
+        }
+        _.forEach(contract_job_image, async file => {
+            if (file) {
+                const { createReadStream, filename } = await file;
+                var file_name = `${id}_${moment().valueOf()}_${filename}`;
+                var small_file_name = `${id}_${moment().valueOf()}_${filename}_small.jpg`;
+                await new Promise(res =>
+                    createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/contract", file_name))).on("close", res)
+                );
+                args['image'] = file_name;
+                var file_resize = await Jimp.read(path.join(__dirname, "../../images/contract", file_name))
+                    .then(image => {
+                        image.resize(260, Jimp.AUTO)
+                            .quality(30)
+                            .write(path.join(__dirname, "../../images/contract", small_file_name));
+                    })
+                    .catch(err => {
+                    });
+
+                /**
+                 * @info add contract info after file update
+                 */
+                let img_data = {
                     contract_id: contract_id,
-                    small_image: file_name,
+                    small_image: small_file_name,
                     large_image: file_name,
                     image_tag: "Layout plan",
                     doc_type: "pdf",
-                    doc_category:"Approvals"
+                    doc_category: "Approvals",
                 }
-             let add_contract_image_job = new ContractJobImage_model(img_data)
-             let added_contract_images_job = await add_contract_image_job.save()
-             added_contract_images_job['status'] = "success";
-             added_contract_images_job['msg'] = "contract job added success"
-             return added_contract_images_job
-        }
-    })
-    return {}
+                let add_contract_image_job = new ContractJobImage_model(img_data)
+                let added_contract_images_job = await add_contract_image_job.save()
+                added_contract_images_job['status'] = "success";
+                added_contract_images_job['msg'] = "contract job added success"
+                return added_contract_images_job
+            }
+        })
+        return { status: "success", msg: "File upload success" }
+    } catch (error) {
+        return { status: "failed", msg: "File upload failed" }
+    }
 }
 
 /**

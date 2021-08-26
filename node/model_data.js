@@ -18,6 +18,7 @@ module.exports = {
     permission:require('./model/Admin/permission'),
     companyProvider:require('./model/userDetail/company_provider'),
     company:require('./model/userDetail/company'),
+    company_images:require('./model/userDetail/companyImage'),
     contract_job:require('./model/booking/ContractJob'),
     contract_job_images:require('./model/booking/ContractJobImage'),
 }

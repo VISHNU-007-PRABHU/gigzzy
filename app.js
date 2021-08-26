@@ -181,6 +181,8 @@ existsSync(path.join(__dirname, "./node/images/provider/document")) || mkdirSync
 existsSync(path.join(__dirname, "./node/images/provider/profile")) || mkdirSync(path.join(__dirname, "./node/images/provider/profile"));
 existsSync(path.join(__dirname, "./node/images/category")) || mkdirSync(path.join(__dirname, "./node/images/category"));
 existsSync(path.join(__dirname, "./node/images/subcategory")) || mkdirSync(path.join(__dirname, "./node/images/subcategory"));
+existsSync(path.join(__dirname, "./node/images/contract")) || mkdirSync(path.join(__dirname, "./node/images/contract"));
+existsSync(path.join(__dirname, "./node/images/company")) || mkdirSync(path.join(__dirname, "./node/images/company"));
 
 app.use("/images", express.static(path.join(__dirname, "./node/images")));
 app.use("/document", express.static(path.join(__dirname, "./node/document")));

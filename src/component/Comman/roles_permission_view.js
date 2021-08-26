@@ -11,14 +11,14 @@ const RoleView = (props) => {
 
     useEffect(() => {
         setGizzyDeveloper(user['GizzyDeveloper'] || false)
-        if (user && user['full_permission_list'] && props.permission) {
-            let data = find(user['full_permission_list'], { key: props.permission })
-            if (size(data) || GizzyDeveloper) {
-                setPermissionAllow(true)
-            }
-        } else {
+        // if (user && user['full_permission_list'] && props.permission) {
+        //     let data = find(user['full_permission_list'], { key: props.permission })
+        //     if (size(data) || GizzyDeveloper) {
+        //         setPermissionAllow(true)
+        //     }
+        // } else {
             setPermissionAllow(true)
-        }
+        // }
     }, [props.permission])
     if (PermissionAllow) {
         return (
@@ -48,5 +48,5 @@ export const RoleViewFunction = (permission) => {
     else {
         func_data = true
     }
-    return func_data
+    return true
 };

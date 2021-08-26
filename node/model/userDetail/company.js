@@ -22,7 +22,16 @@ var Schema = mongoose.Schema;
 var companySchema = new Schema({
 
   role: { type: Number, },             // 1->user, 2->provider
-  name: { type: String,unique:true },
+  first_name:{ type: String,},
+  last_name:{ type: String },
+  confirm_password:{ type: String, },
+  mobileNumber:{ type: String,unique:true },
+  country_code:{ type: String},
+  company_name:{ type: String,unique:true },
+  company_website:{ type: String },
+  companyCategory:{ type: String },
+  about_company:{ type: String},
+  add_later:{ type: String },
   password: { type: String, },
   email: { type: String, },
   country_code: { type: String, },
@@ -36,6 +45,8 @@ var companySchema = new Schema({
   about: { type: String },
   image: String,
   provider_email: [],
+  contact_person: { type: String,default:"" },
+  company_category:[],
   personal_document: [String],
   professional_document: [String],
   otp: { type: String },                                                          // otp (4 digit no) 

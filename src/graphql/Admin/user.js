@@ -123,8 +123,8 @@ export const GET_COMPANY = gql`
 
 
 export const UPDATE_COMPANY_DETAIL = gql`
-    mutation UPDATECOMPANYDETAIL($_id: ID,$company_data:[JSON])  {
-        update_company_detail(_id:$_id,company_data:$company_data){
+    mutation UPDATECOMPANYDETAIL($_id: ID,$company_data:[JSON],$logo_file:Upload,$profile_file:Upload)  {
+        update_company_detail(_id:$_id,company_data:$company_data,logo_file:$logo_file,profile_file:$profile_file){
         msg
         status         
     }

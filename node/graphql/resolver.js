@@ -335,6 +335,7 @@ const resolvers = {
         // contract job
         update_contract:contractResolver.update_contract,
         ContractJobFileUpload:contractResolver.ContractJobFileUpload,
+        DeleteContractJobFile:contractResolver.DeleteContractJobFile,
         // company detiail
         update_company_detail:userResolver.update_company_detail,
         deleteCompany:userResolver.deleteCompany,

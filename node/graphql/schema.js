@@ -857,11 +857,14 @@ const typeDefs = gql`
             _id:ID
             user_id: String,
             provider_ID:ID,
-            company_data:[JSON]
+            company_data:[JSON],
+            logo_file:Upload,
+            profile_file:Upload
         ):Company
         # contract jobs
         update_contract(_id:ID,contract_data:[JSON],search_data:JSON):ContractJob
-        ContractJobFileUpload(_id:ID,contact_id:ID,contract_job_image:[JSON]):ContractJob
+        ContractJobFileUpload(_id:ID,contact_id:ID,type:String,lable:String,data:[JSON],contract_job_image:[Upload]):ContractJob
+        DeleteContractJobFile(_id:ID):ContractJob
         # update biding 
          update_biding(
             option:String  
