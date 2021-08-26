@@ -283,9 +283,17 @@ const typeDefs = gql`
         msg:String
         status:String
         name:String
-        website_url:String
+        first_name
+        last_name
+        confirm_password
+        mobileNumber
+        company_name
+        company_website
+        companyCategory
+        about_company
+        add_later
+        password
         address:String
-        about:String
         provider_email:[String]
         workers:[CompanyProvider]
         get_parent_company_provider(provider_search:JSON,company_id:ID,provider_id:ID,):[CompanyProvider]
