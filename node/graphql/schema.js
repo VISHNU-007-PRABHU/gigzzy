@@ -892,7 +892,7 @@ const typeDefs = gql`
             _id:ID
             user_id: String,
             provider_ID:ID,
-            company_data:[JSON],
+            company_data:JSON,
             logo_file:Upload,
             profile_file:Upload
         ):Company

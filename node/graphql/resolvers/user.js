@@ -991,7 +991,8 @@ module.exports.CompanyFileUpload = (parent, args, context, info) => {
 
 module.exports.update_company_detail = async (parent, args, context, info) => {
     try {
-        let company_data = args['company_data'][0][0]
+        console.log(args['company_data'])
+        let company_data = args['company_data'][0]
         if (!_.size(company_data)) {
             return { msg: "Invalid company data", status: 'failed' };
         }
