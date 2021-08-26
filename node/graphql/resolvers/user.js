@@ -865,6 +865,28 @@ module.exports.get_parent_company_provider = async (parent, args, context, info)
     }
 };
 
+module.exports.get_company_address_detail = async (parent, args, context, info) => {
+    try {
+        let find_query= { }
+        if(args['company_id']){
+            find_query['company_id'] = args['company_id']
+        }
+        if(args['option']){
+            find_query['option']=args['option']
+        }
+        if(args['type']){
+            find_query['type']=args['type']
+        }
+        console.log("module.exports.get_company_address_detail -> find_query", find_query)
+        result = await Address_model.find(find_query);
+        return result;
+    } catch (error) {
+        return []
+    }
+};
+
+
+
 module.exports.deleteCompany = async (parent, args, context, info) => {
     try {
         let company_query ={}

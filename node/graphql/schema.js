@@ -297,6 +297,7 @@ const typeDefs = gql`
         provider_email:[String]
         workers:[CompanyProvider]
         get_parent_company_provider(provider_search:JSON,company_id:ID,provider_id:ID,):[CompanyProvider]
+        get_company_address_detail(company_id:ID,option:Int,type:String):[UserAddress]
         data: JSON 
     }
     type CompanyProvider{

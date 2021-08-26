@@ -19,6 +19,8 @@ var schemaOptions = {
  */
 const addressSchema = new  mongoose.Schema({
     user_id: String,
+    company_id:String,
+    user_type:String,
     title: String,
     flat_no: String,
     landmark: String,

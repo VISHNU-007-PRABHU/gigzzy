@@ -309,6 +309,7 @@ const resolvers = {
     },
     Company:{
         get_parent_company_provider:userResolver.get_parent_company_provider,
+        get_company_address_detail:userResolver.get_company_address_detail,
     },
     Booking: {
         user: userResolver.user,
