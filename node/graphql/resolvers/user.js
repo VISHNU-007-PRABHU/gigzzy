@@ -923,14 +923,17 @@ module.exports.deleteCompanyProvider = async (parent, args, context, info) => {
 };
 
 
-module.exports.CompanyFileUpload = (args,id) => {
+module.exports.CompanyFileUpload = (parent, args, context, info) => {
     try {
+        if(!args['_id']){
+            return {msg:"Invalid ID",status:"failed"}
+        }
         let files = ['logo_file','profile_file']
         _.forEach(files, async file => {
             if (args[file]) {
                 const { createReadStream, filename } = await args[file];
-                var file_name = `${id}_${moment().valueOf()}_${filename}`;
-                var small_file_name = `${id}_${moment().valueOf()}_${filename}_small.jpg`;
+                var file_name = `${ args['_id']}_${moment().valueOf()}_${filename}`;
+                var small_file_name = `${ args['_id']}_${moment().valueOf()}_${filename}_small.jpg`;
                 await new Promise(res =>
                     createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/company", file_name))).on("close", res)
                 );
@@ -948,7 +951,7 @@ module.exports.CompanyFileUpload = (args,id) => {
                  * @info add company info after file update
                  */ 
                 let img_data = {
-                    company_id: _id,
+                    company_id: args['_id'],
                     small_image: small_file_name,
                     large_image: file_name,
                     image_tag: file,
@@ -980,14 +983,12 @@ module.exports.update_company_detail = async (parent, args, context, info) => {
             }
             let update_company_detail = await Company_model.updateOne(find_query, company_data).exec()
             let fetch_data = await Company_model.findOne(find_query).lean()
-            this.CompanyFileUpload(args,args['_id'])
             fetch_data['msg'] = "updated success"
             fetch_data['status'] = "success"
             return fetch_data;
         } else {
             let add_company_detail = new Company_model(company_data)
             let added_detail = await add_company_detail.save()
-            this.CompanyFileUpload(args,added_detail['_id'])
             if (company_data['provider_email'] && _.size(company_data['provider_email'])) {
                 let CompanyProviderDetail = await this.SendCompanyProviders(added_detail['_id'], company_data['provider_email'])
             }

@@ -865,6 +865,12 @@ const typeDefs = gql`
             distance:String,
             ):UserAddress
         # add company_detail
+        CompanyFileUpload(
+            option:String  
+            _id:ID
+            logo_file:Upload,
+            profile_file:Upload
+        ):Company
         update_company_detail(
             option:String  
             _id:ID

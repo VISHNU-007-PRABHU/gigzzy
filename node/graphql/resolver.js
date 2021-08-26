@@ -339,6 +339,7 @@ const resolvers = {
         DeleteContractJobFile:contractResolver.DeleteContractJobFile,
         // company detiail
         update_company_detail:userResolver.update_company_detail,
+        CompanyFileUpload:userResolver.CompanyFileUpload,
         deleteCompany:userResolver.deleteCompany,
         deleteCompanyProvider:userResolver.deleteCompanyProvider,
         addUser: async (_, args) => {
