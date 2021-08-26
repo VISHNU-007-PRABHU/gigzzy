@@ -888,7 +888,7 @@ module.exports.get_company_images = async (parent, args, context, info) => {
     try {
         let find_query= { }
         if(args['company_id']){
-            find_query['_id'] = args['company_id']
+            find_query['company_id'] = args['company_id']
         }
         if(args['option']){
             find_query['option']=args['option']
