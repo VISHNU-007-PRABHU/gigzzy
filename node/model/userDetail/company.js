@@ -144,13 +144,6 @@ companySchema.pre('save', function (next) {
   next();
 });
 
-companySchema.post('save', function(error, doc, next) {
-  if (error.name === 'MongoError' && error.code === 11000) {
-    next(new Error('Company name already exit'));
-  } else {
-    next();
-  }
-});
 
 companySchema.virtual('created_date').get(function () {
   var created_date = moment(this.created_at);
