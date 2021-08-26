@@ -884,6 +884,25 @@ module.exports.get_company_address_detail = async (parent, args, context, info) 
         return []
     }
 };
+module.exports.get_company_images = async (parent, args, context, info) => {
+    try {
+        let find_query= { }
+        if(args['company_id']){
+            find_query['_id'] = args['company_id']
+        }
+        if(args['option']){
+            find_query['option']=args['option']
+        }
+        if(args['image_tag']){
+            find_query['image_tag']=args['image_tag']
+        }
+        console.log("module.exports.get_company_images -> find_query", find_query)
+        result = await CompanyImage_model.find(find_query);
+        return result;
+    } catch (error) {
+        return []
+    }
+};
 
 
 

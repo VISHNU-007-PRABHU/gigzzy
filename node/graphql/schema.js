@@ -298,6 +298,7 @@ const typeDefs = gql`
         workers:[CompanyProvider]
         get_parent_company_provider(provider_search:JSON,company_id:ID,provider_id:ID,):[CompanyProvider]
         get_company_address_detail(company_id:ID,option:Int,type:String):[UserAddress]
+        get_company_images(company_id:ID,image_tag:String):[CompanyImage]
         data: JSON 
     }
     type CompanyProvider{
@@ -307,6 +308,21 @@ const typeDefs = gql`
         register_link_status:String
         provider_id:ID
         provider_detail:[Detail]
+        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
+        data: JSON 
+        msg:String
+        status:String
+    }
+    type CompanyImage{
+        _id:ID
+        company_id: String,
+        small_image: String @imgSize(format:"small"),
+        large_image: String @imgSize(format:"large"),
+        image_tag: String,
+        doc_type: String,
+        doc_category: String,
+        doc_formate: String,
+        delete: Boolean,
         created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         data: JSON 
         msg:String
