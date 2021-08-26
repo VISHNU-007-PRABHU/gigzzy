@@ -42,6 +42,16 @@ module.exports.booking_view = 5;
 module.exports.no_image = () => {
   return env.APP_URL + "/images/public/no_img.png";
 };
+
+
+exports.url_path =(path,file)=> {
+  if(file){
+      return `${this.getBaseurl()}/images/${path}/${file}`;
+  }else{
+      return this.no_image();
+  }
+}
+
 module.exports.siteName = () => {
   return env.APP_NAME;
 };

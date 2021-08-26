@@ -316,8 +316,8 @@ const typeDefs = gql`
     type CompanyImage{
         _id:ID
         company_id: String,
-        small_image: String @imgSize(format:"small"),
-        large_image: String @imgSize(format:"large"),
+        small_image: String,
+        large_image: String,
         image_tag: String,
         doc_type: String,
         doc_category: String,
