@@ -283,17 +283,17 @@ const typeDefs = gql`
         msg:String
         status:String
         name:String
-        first_name
-        last_name
-        confirm_password
-        mobileNumber
-        company_name
-        company_website
-        companyCategory
-        about_company
-        add_later
-        password
-        address:String
+        first_name:String
+        last_name:String
+        confirm_password:String
+        mobileNumber:String
+        company_name:String
+        company_website:String
+        companyCategory:String
+        about_company:String
+        add_later:Boolean
+        password:String
+        address:String:String
         provider_email:[String]
         workers:[CompanyProvider]
         get_parent_company_provider(provider_search:JSON,company_id:ID,provider_id:ID,):[CompanyProvider]
@@ -720,6 +720,8 @@ const typeDefs = gql`
         delete:Int
         _id:ID
         user_id: String,
+        company_id:ID,
+        user_type:String
         title: String,
         flat_no: String,
         landmark: String,
@@ -847,6 +849,8 @@ const typeDefs = gql`
             delete:Int
             _id:ID
             user_id: String,
+            company_id:ID,
+            user_type:String
             title: String,
             flat_no: String,
             landmark: String,
