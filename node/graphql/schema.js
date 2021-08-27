@@ -218,6 +218,7 @@ const typeDefs = gql`
         pagingCounter: Int
         prevPage: String
         nextPage: String
+        company_id:ID
     }
     type Chat{
         id:ID
@@ -512,6 +513,7 @@ const typeDefs = gql`
         pagingCounter: Int
         prevPage: String
         nextPage: String
+        company_id:ID
     }
     
     type Account{
@@ -761,7 +763,7 @@ const typeDefs = gql`
         addCategory(category_name:String,file:Upload,description:String,base_price:String,hour_price:String,day_price:String,hour_limit:String,day_limit:String,price_type:String,service_fee:String,is_parent:Boolean,certificates:[ID]): Category
         addsubCategory(file: Upload,category_id:ID,subCategory_name:String,base_price:String,hour_price:String,day_price:String,hour_limit:String,day_limit:String,price_type:String,service_fee:String,description:String,certificates:[ID]):subCategory
         addDetails(_id:ID,email:String,password:String,name:String,address:String,rating:Float,comments:String,lat:Float,lng:Float,profile:String,availability:String,Upload_percentage:String,device_id:String):Detail
-        addUser(role:Int,_id:ID,option:String,country_code:String,phone_no:String,email:String,old_password:String,password:String,name:String,provider_subCategoryID:[ID],lat:Float,lng:Float,bank_name:String,payout_option:String,ifsc_code:String,account_no:String,branch_name:String,routing_name:String,account_name:String,device_id:String,kra_pin:String,payout_phone:String,payout_frist_name:String,payout_second_name:String,payout_id:String): Detail!
+        addUser(role:Int,first_name:String,last_name:String,user_type:String,_id:ID,option:String,country_code:String,phone_no:String,email:String,old_password:String,password:String,name:String,provider_subCategoryID:[ID],lat:Float,lng:Float,bank_name:String,payout_option:String,ifsc_code:String,account_no:String,branch_name:String,routing_name:String,account_name:String,device_id:String,kra_pin:String,payout_phone:String,payout_frist_name:String,payout_second_name:String,payout_id:String): Detail!
         addProvider_Category(user_id: ID,provider_subCategoryID:[ID]):Detail
         add_providerDocument(user_id:ID,file:[Upload],option:String):Detail
         delete_providerDocument(user_id:ID,filename:String,option:String):Detail

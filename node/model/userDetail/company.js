@@ -20,7 +20,7 @@ var Schema = mongoose.Schema;
 //create user schema 
 
 var companySchema = new Schema({
-
+  user_id:{ type: String,},
   role: { type: Number, },             // 1->user, 2->provider
   first_name:{ type: String,},
   last_name:{ type: String },
