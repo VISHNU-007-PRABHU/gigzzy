@@ -219,6 +219,7 @@ const typeDefs = gql`
         prevPage: String
         nextPage: String
         company_id:ID
+        user_type:String
     }
     type Chat{
         id:ID
@@ -514,6 +515,7 @@ const typeDefs = gql`
         prevPage: String
         nextPage: String
         company_id:ID
+        user_type:String
     }
     
     type Account{

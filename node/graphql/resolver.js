@@ -71,7 +71,6 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([PROOF_STATUS]),
                 (payload, variables) => {
-                    // console.log(payload);
                     if (payload.proof_status._id == variables._id) {
                         return true;
                     }
@@ -82,8 +81,6 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([MESSAGE_CREATED]),
                 (payload, variables) => {
-                    // console.log(payload.messageSent.booking_id);
-                    // console.log(variables);
                     if (payload.messageSent.booking_id == variables.booking_id) {
                         return true;
                     }
@@ -94,11 +91,7 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([APPOINTMENTS]),
                 (payload, variables) => {
-                    // console.log("Appointment MSG");
-                    // console.log(payload.get_my_appointments);
-                    // console.log(variables);
                     for (let i = 0; i <= payload.get_my_appointments.length; i++) {
-                        //console.log("()()()()()()()()()");
                         if (payload.get_my_appointments[i].provider_id == variables._id) {
                             if (variables.booking_status === 10) {
                                 return true;
@@ -112,9 +105,6 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([SEND_ACCEPT_MSG]),
                 (payload, variables) => {
-                    // console.log("Accepted MSG");
-                    // console.log(payload);
-                    // console.log(payload.send_accept_msg.user_id);
                     if (payload.send_accept_msg.msg_status != undefined && payload.send_accept_msg.msg_status == 'to_provider') {
                         if (payload.send_accept_msg.provider_id == variables._id) {
                             console.log("msg to provider");
@@ -135,21 +125,8 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([SEND_JOB_MSG]),
                 (payload, variables) => {
-                    //console.log("sada");
                     for (let i = 0; i <= payload.send_jobs_provider.available_provider.length; i++) {
-                        // console.log("()()()()()()()()()");
                         if (payload.send_jobs_provider.available_provider[i] == variables._id) {
-                            // console.log("send successfull");
-                            // var message = { 
-                            //     to: 'registration_token', 
-                            //     collapse_key: 'your_collapse_key',
-                            //     notification: {
-                            //         title: 'Title of your push notification', 
-                            //         body: 'Body of your push notification' 
-                            //     },
-
-                            // };
-                            // commonHelper.push_notifiy(message);
                             return true;
                         }
                     }
@@ -159,10 +136,6 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([BOOK_MSG]),
                 (payload, variables) => {
-                    // console.log("Soory MSG");
-                    //console.log(payload);
-                    //console.log(payload.booking_details._id);
-                    //console.log(variables);
                     if (payload.booking_details._id == variables.booking_id) {
                         return true;
                     }
@@ -204,14 +177,14 @@ const resolvers = {
         payout_setting_detail: settingResolver.payout_setting_detail,
         user_address: userResolver.user_address,
         // admin roles and permission
-        get_admin_users:rolesResolver.get_admin_users,
-        get_admin_roles:rolesResolver.get_admin_roles,
-        get_admin_permission:rolesResolver.get_admin_permission,
-        get_all_admin_permission:rolesResolver.get_all_admin_permission,
-        admin_search:rolesResolver.admin_search,
-        roles_search:rolesResolver.roles_search,
+        get_admin_users: rolesResolver.get_admin_users,
+        get_admin_roles: rolesResolver.get_admin_roles,
+        get_admin_permission: rolesResolver.get_admin_permission,
+        get_all_admin_permission: rolesResolver.get_all_admin_permission,
+        admin_search: rolesResolver.admin_search,
+        roles_search: rolesResolver.roles_search,
         // company detail
-        get_company_detail:userResolver.get_company_detail,
+        get_company_detail: userResolver.get_company_detail,
         get_my_appointments: async (parent, args, context, info) => {
             try {
 
@@ -274,16 +247,16 @@ const resolvers = {
         user: userResolver.user,
         provider: userResolver.user
     },
-    Admin:{
-        role_based_permissions_detail:rolesResolver.role_based_permissions_detail,
-        individual_based_permissions_detail:rolesResolver.individual_based_permissions_detail,
-        admin_role_detail:rolesResolver.admin_role_detail,
-        non_role_permissions_detail:rolesResolver.non_role_permissions_detail,
-        get_admin_roles_all:rolesResolver.get_admin_roles_all,
-        full_permission_list:rolesResolver.full_permission_list,
+    Admin: {
+        role_based_permissions_detail: rolesResolver.role_based_permissions_detail,
+        individual_based_permissions_detail: rolesResolver.individual_based_permissions_detail,
+        admin_role_detail: rolesResolver.admin_role_detail,
+        non_role_permissions_detail: rolesResolver.non_role_permissions_detail,
+        get_admin_roles_all: rolesResolver.get_admin_roles_all,
+        full_permission_list: rolesResolver.full_permission_list,
     },
-    Roles:{
-        role_based_permissions_detail:rolesResolver.role_table_based_permissions_detail,
+    Roles: {
+        role_based_permissions_detail: rolesResolver.role_table_based_permissions_detail,
     },
     Category: {
         booking_parent_category: categoryResolver.booking_parent_category,
@@ -308,10 +281,10 @@ const resolvers = {
         provider_rate: userResolver.provider_rate,
 
     },
-    Company:{
-        get_parent_company_provider:userResolver.get_parent_company_provider,
-        get_company_address_detail:userResolver.get_company_address_detail,
-        get_company_images:userResolver.get_company_images,
+    Company: {
+        get_parent_company_provider: userResolver.get_parent_company_provider,
+        get_company_address_detail: userResolver.get_company_address_detail,
+        get_company_images: userResolver.get_company_images,
     },
     Booking: {
         user: userResolver.user,
@@ -336,14 +309,14 @@ const resolvers = {
     Mutation: {
         adminLogin: adminResolver.adminlogin,
         // contract job
-        update_contract:contractResolver.update_contract,
-        ContractJobFileUpload:contractResolver.ContractJobFileUpload,
-        DeleteContractJobFile:contractResolver.DeleteContractJobFile,
+        update_contract: contractResolver.update_contract,
+        ContractJobFileUpload: contractResolver.ContractJobFileUpload,
+        DeleteContractJobFile: contractResolver.DeleteContractJobFile,
         // company detiail
-        update_company_detail:userResolver.update_company_detail,
-        CompanyFileUpload:userResolver.CompanyFileUpload,
-        deleteCompany:userResolver.deleteCompany,
-        deleteCompanyProvider:userResolver.deleteCompanyProvider,
+        update_company_detail: userResolver.update_company_detail,
+        CompanyFileUpload: userResolver.CompanyFileUpload,
+        deleteCompany: userResolver.deleteCompany,
+        deleteCompanyProvider: userResolver.deleteCompanyProvider,
         addUser: async (_, args) => {
             const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
             // console.log(user);
@@ -357,24 +330,16 @@ const resolvers = {
                 } else {
                     args.role = 2;
                 }
-                if (args.phone_no != '') {
-                    if (args.phone_no != null) {
-                        if (args.phone_no != undefined) {
-                            const find_pn = await Detail_model.find({ delete: 0, phone_no: args.phone_no, role: args.role, _id: { $ne: args._id } });
-                            if (find_pn.length > 0) {
-                                return { msg: "mobile no exists", status: 'failed' }
-                            }
-                        }
+                if (args.phone_no) {
+                    const find_pn = await Detail_model.find({ delete: 0, phone_no: args.phone_no, role: args.role, _id: { $ne: args._id } });
+                    if (find_pn.length > 0) {
+                        return { msg: "mobile no exists", status: 'failed' }
                     }
                 }
-                if (args.email != '') {
-                    if (args.email != null) {
-                        if (args.email != undefined) {
-                            const find_email = await Detail_model.find({ delete: 0, email: args.email, role: args.role, _id: { $ne: args._id } });
-                            if (find_email.length > 0) {
-                                return { msg: "Email already exists", status: 'failed' }
-                            }
-                        }
+                if (args.email) {
+                    const find_email = await Detail_model.find({ delete: 0, email: args.email, role: args.role, _id: { $ne: args._id } });
+                    if (find_email.length > 0) {
+                        return { msg: "Email already exists", status: 'failed' }
                     }
                 }
                 args.Upload_percentage = 50;
@@ -435,13 +400,13 @@ const resolvers = {
                 const add_detail = await Detail_model.updateOne({ _id: args._id }, args);
                 // console.log(add_detail);
                 var data = await Detail_model.findOne({ _id: args._id });
-                if(args['user_type'] && args['user_type'] === "company"){
-                    let company_data ={
-                        user_id:data['_id']
+                if (args['user_type'] && args['user_type'] === "company") {
+                    let company_data = {
+                        user_id: data['_id']
                     }
                     let add_company_detail = new Company_model(company_data)
                     var added_com_detail = await add_company_detail.save()
-                    data['company_id']=added_com_detail['_id']
+                    data['company_id'] = added_com_detail['_id']
                 }
                 if (add_detail.n == add_detail.nModified) {
                     data.msg = "User Detail Sucessfully Updated";
@@ -462,7 +427,7 @@ const resolvers = {
                 //console.log(args);
                 const add_user = new Detail_model(args);
                 await add_user.save();
-           
+
                 var data = await Detail_model.findOne({ role: args.role, phone_no: args.phone_no, delete: 0 });
                 if (args.device_id != null && args.device_id != undefined && args.device_id != '') {
                     const add_detail = await Detail_model.updateOne({ _id: data._id }, { device_id: args.device_id });
@@ -938,7 +903,7 @@ const resolvers = {
                         }
                     }
                     if (args.option == 3) {
-                        
+
                         var find_extra = await Extra_fee_model.find({ booking_id: args.booking_id });
                         var find_extra_data = await Extra_fee_model.findOne({ _id: args.extra_fare_id }).lean();
                         if (find_extra.length == 0) {
@@ -1149,7 +1114,7 @@ const resolvers = {
                             return [data]
                         } else {
 
-                            var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(amount),booking_detail.booking_ref)
+                            var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(amount), booking_detail.booking_ref)
                             // console.log("charge", charge)
                             if (charge.status == true && charge.data.ResponseCode === '0') {
                                 // update charge amount
@@ -1285,7 +1250,7 @@ const resolvers = {
                                 var findBooking = await Booking_model.find({ _id: args.booking_id });
                                 return [{ job_status: 14, msg: "job is completed successfully", status: 'success' }];
                             } else {
-                                var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(final_amount),booking_detail.booking_ref)
+                                var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(final_amount), booking_detail.booking_ref)
 
                                 if (charge.status == true && charge.data.ResponseCode === '0') {
                                     // update charge amount
@@ -1408,13 +1373,13 @@ const resolvers = {
         update_static: staticResolver.update_static,
 
         // ------------------admin roles functions.......................//
-        add_admin_permission:rolesResolver.add_admin_permission,
-        delete_admin_permission:rolesResolver.delete_admin_permission,
-        delete_admin_roles:rolesResolver.delete_admin_roles,
-        delete_admin_user:rolesResolver.delete_admin_user,
-        add_admin_roles:rolesResolver.add_admin_roles,
-        update_admin_roles:rolesResolver.update_admin_roles,
-        update_admin_user_permission:rolesResolver.update_admin_user_permission,
+        add_admin_permission: rolesResolver.add_admin_permission,
+        delete_admin_permission: rolesResolver.delete_admin_permission,
+        delete_admin_roles: rolesResolver.delete_admin_roles,
+        delete_admin_user: rolesResolver.delete_admin_user,
+        add_admin_roles: rolesResolver.add_admin_roles,
+        update_admin_roles: rolesResolver.update_admin_roles,
+        update_admin_user_permission: rolesResolver.update_admin_user_permission,
         // ---------------- admin roles function ........................//
         online_status: statusResolver.online_status,
         available_deleteBooking: bookingResolver.available_deleteBooking,
