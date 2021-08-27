@@ -948,9 +948,8 @@ module.exports.CompanyFileUpload = async (parent, args, context, info) => {
         if (!args['_id']) {
             return { msg: "Invalid ID", status: "failed" }
         }
-        _.forEach(args['file'], async file => {
-            if (file) {
-                const { createReadStream, filename } = await file;
+            if (args['file']) {
+                const { createReadStream, filename } = await args['file'];
                 var file_name = `${args['_id']}_${moment().valueOf()}_${filename}`;
                 var small_file_name = `${args['_id']}_${moment().valueOf()}_${filename}_small.jpg`;
                 await new Promise(res =>
@@ -967,7 +966,7 @@ module.exports.CompanyFileUpload = async (parent, args, context, info) => {
                     });
 
                 /**
-                 * @info add company info after file update
+                 * @info add company info after file update 
                  */
                 let img_data = {
                     company_id: args['_id'],
@@ -982,7 +981,6 @@ module.exports.CompanyFileUpload = async (parent, args, context, info) => {
                 added_company_image_job['msg'] = "company profiles added success"
                 // return added_company_image_job
             }
-        })
         return { status: "success", msg: "File upload success" }
     } catch (error) {
         return { status: "failed", msg: "File upload failed" }
