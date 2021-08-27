@@ -942,7 +942,7 @@ module.exports.deleteCompanyProvider = async (parent, args, context, info) => {
 };
 
 
-module.exports.CompanyFileUpload = (parent, args, context, info) => {
+module.exports.CompanyFileUpload =async (parent, args, context, info) => {
     try {
         console.log("module.exports.CompanyFileUpload -> args", args)
         if(!args['_id']){
