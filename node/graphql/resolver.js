@@ -23,6 +23,7 @@ const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
 dotenv.config();
 
+var Company_model = model.company;
 var Detail_model = model.detail;
 var Booking_model = model.booking;
 var subCategory_model = model.sub_category;
@@ -434,6 +435,14 @@ const resolvers = {
                 const add_detail = await Detail_model.updateOne({ _id: args._id }, args);
                 // console.log(add_detail);
                 var data = await Detail_model.findOne({ _id: args._id });
+                if(args['user_type'] && args['user_type'] === "company"){
+                    let company_data ={
+                        user_id:data['_id']
+                    }
+                    let add_company_detail = new Company_model(company_data)
+                    var added_com_detail = await add_company_detail.save()
+                    data['company_id']=added_com_detail['_id']
+                }
                 if (add_detail.n == add_detail.nModified) {
                     data.msg = "User Detail Sucessfully Updated";
                     data.status = "success";
@@ -453,14 +462,7 @@ const resolvers = {
                 //console.log(args);
                 const add_user = new Detail_model(args);
                 await add_user.save();
-                if(args['user_type'] && args['user_type'] === "company"){
-                    let company_data ={
-                        user_id:add_user['_id']
-                    }
-                    let add_company_detail = new Company_model(company_data)
-                    var added_com_detail = await add_company_detail.save()
-                }
-                args['company_id']=added_com_detail['_id']
+           
                 var data = await Detail_model.findOne({ role: args.role, phone_no: args.phone_no, delete: 0 });
                 if (args.device_id != null && args.device_id != undefined && args.device_id != '') {
                     const add_detail = await Detail_model.updateOne({ _id: data._id }, { device_id: args.device_id });
