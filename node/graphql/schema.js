@@ -884,7 +884,7 @@ const typeDefs = gql`
         CompanyFileUpload(
             option:String  
             _id:ID
-            file:Upload,
+            file:[Upload],
         ):Company
         update_company_detail(
             option:String  

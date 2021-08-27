@@ -948,8 +948,9 @@ module.exports.CompanyFileUpload =async (parent, args, context, info) => {
         if(!args['_id']){
             return {msg:"Invalid ID",status:"failed"}
         }
-        if (args['file']) {
-            const { createReadStream, filename } = await args['file'];
+        _.forEach(args['file'],async file =>{
+        if (file) {
+            const { createReadStream, filename } = await file;
             var file_name = `${ args['_id']}_${moment().valueOf()}_${filename}`;
             var small_file_name = `${ args['_id']}_${moment().valueOf()}_${filename}_small.jpg`;
             await new Promise(res =>
