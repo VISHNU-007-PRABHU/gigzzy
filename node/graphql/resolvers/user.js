@@ -806,11 +806,11 @@ module.exports.get_company_detail = async (parent, args, context, info) => {
         var offset = Number(page - 1) * Number(limit);
         var total = 0;
         var result = [];
-        let find_query= { delete: false }
-        if(args['search']){
-            find_query = {...find_query,...args['search']}
+        let find_query = { delete: false }
+        if (args['search']) {
+            find_query = { ...find_query, ...args['search'] }
         }
-        if(args['company_id']){
+        if (args['company_id']) {
             find_query['_id'] = args['company_id']
         }
         total = await Company_model.count(find_query);
@@ -829,12 +829,12 @@ module.exports.get_company_provider = async (parent, args, context, info) => {
         var offset = Number(page - 1) * Number(limit);
         var total = 0;
         var result = [];
-        let find_query= { delete: false }
-        if(args['search']){
-            find_query = {...find_query,...args['search']}
+        let find_query = { delete: false }
+        if (args['search']) {
+            find_query = { ...find_query, ...args['search'] }
         }
-        if(args['provider_id']){
-            find_query['provider_id']=args['provider_id']
+        if (args['provider_id']) {
+            find_query['provider_id'] = args['provider_id']
         }
         total = await CompanyProvider_model.count(find_query);
         result = await CompanyProvider_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
@@ -848,15 +848,15 @@ module.exports.get_company_provider = async (parent, args, context, info) => {
 
 module.exports.get_parent_company_provider = async (parent, args, context, info) => {
     try {
-        let find_query= { delete: false }
-        if(args['provider_search']){
-            find_query = {...find_query,...args['provider_search']}
+        let find_query = { delete: false }
+        if (args['provider_search']) {
+            find_query = { ...find_query, ...args['provider_search'] }
         }
-        if(args['provider_id']){
-            find_query['provider_id']=args['provider_id']
+        if (args['provider_id']) {
+            find_query['provider_id'] = args['provider_id']
         }
-        if(args['company_id']){
-            find_query['company_id']=args['company_id']
+        if (args['company_id']) {
+            find_query['company_id'] = args['company_id']
         }
         result = await CompanyProvider_model.find(find_query);
         return result;
@@ -867,15 +867,15 @@ module.exports.get_parent_company_provider = async (parent, args, context, info)
 
 module.exports.get_company_address_detail = async (parent, args, context, info) => {
     try {
-        let find_query= { }
-        if(args['company_id']){
+        let find_query = {}
+        if (args['company_id']) {
             find_query['company_id'] = args['company_id']
         }
-        if(args['option']){
-            find_query['option']=args['option']
+        if (args['option']) {
+            find_query['option'] = args['option']
         }
-        if(args['type']){
-            find_query['type']=args['type']
+        if (args['type']) {
+            find_query['type'] = args['type']
         }
         console.log("module.exports.get_company_address_detail -> find_query", find_query)
         result = await Address_model.find(find_query);
@@ -886,15 +886,15 @@ module.exports.get_company_address_detail = async (parent, args, context, info) 
 };
 module.exports.get_company_images = async (parent, args, context, info) => {
     try {
-        let find_query= { }
-        if(args['company_id']){
+        let find_query = {}
+        if (args['company_id']) {
             find_query['company_id'] = args['company_id']
         }
-        if(args['option']){
-            find_query['option']=args['option']
+        if (args['option']) {
+            find_query['option'] = args['option']
         }
-        if(args['image_tag']){
-            find_query['image_tag']=args['image_tag']
+        if (args['image_tag']) {
+            find_query['image_tag'] = args['image_tag']
         }
         console.log("module.exports.get_company_images -> find_query", find_query)
         result = await CompanyImage_model.find(find_query);
@@ -908,80 +908,81 @@ module.exports.get_company_images = async (parent, args, context, info) => {
 
 module.exports.deleteCompany = async (parent, args, context, info) => {
     try {
-        let company_query ={}
-        let company_pro_query ={}
-        if(args['company_id']){
-            company_query['_id'] =  args['company_id']
-            company_pro_query['company_id']=args['company_id']
+        let company_query = {}
+        let company_pro_query = {}
+        if (args['company_id']) {
+            company_query['_id'] = args['company_id']
+            company_pro_query['company_id'] = args['company_id']
         }
-        await Company_model.updateOne(company_query,{delete:true}).exec();
-        await CompanyProvider_model.updateOne(company_pro_query,{delete:true}).exec();
-        return {status:"success",msg:"Deleted success"};
+        await Company_model.updateOne(company_query, { delete: true }).exec();
+        await CompanyProvider_model.updateOne(company_pro_query, { delete: true }).exec();
+        return { status: "success", msg: "Deleted success" };
     } catch (error) {
-        return {status:"failed",msg:"Deleted failed"};
+        return { status: "failed", msg: "Deleted failed" };
     }
 };
 
 module.exports.deleteCompanyProvider = async (parent, args, context, info) => {
     try {
-        let find_query ={}
-        if(args['provider_id']){
-            find_query['provider_id']=args['provider_id']
+        let find_query = {}
+        if (args['provider_id']) {
+            find_query['provider_id'] = args['provider_id']
         }
-        if(args['company_id']){
-            find_query['company_id']=args['company_id']
+        if (args['company_id']) {
+            find_query['company_id'] = args['company_id']
         }
-        if(args['_id']){
-            find_query['_id']=args['_id']
+        if (args['_id']) {
+            find_query['_id'] = args['_id']
         }
-        await CompanyProvider_model.updateOne(find_query,{delete:true}).exec();
-        return {status:"success",msg:"Deleted success"};
+        await CompanyProvider_model.updateOne(find_query, { delete: true }).exec();
+        return { status: "success", msg: "Deleted success" };
     } catch (error) {
-        return {status:"failed",msg:"Deleted failed"};
+        return { status: "failed", msg: "Deleted failed" };
     }
 };
 
 
-module.exports.CompanyFileUpload =async (parent, args, context, info) => {
+module.exports.CompanyFileUpload = async (parent, args, context, info) => {
     try {
         console.log("module.exports.CompanyFileUpload -> args", args)
-        if(!args['_id']){
-            return {msg:"Invalid ID",status:"failed"}
+        if (!args['_id']) {
+            return { msg: "Invalid ID", status: "failed" }
         }
-        _.forEach(args['file'],async file =>{
-        if (file) {
-            const { createReadStream, filename } = await file;
-            var file_name = `${ args['_id']}_${moment().valueOf()}_${filename}`;
-            var small_file_name = `${ args['_id']}_${moment().valueOf()}_${filename}_small.jpg`;
-            await new Promise(res =>
-                createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/company", file_name))).on("close", res)
-            );
-            args['image'] = file_name;
-            var file_resize = await Jimp.read(path.join(__dirname, "../../images/company", file_name))
-                .then(image => {
-                    image.resize(260, Jimp.AUTO)
-                        .quality(30)
-                        .write(path.join(__dirname, "../../images/company", small_file_name));
-                })
-                .catch(err => {
-                });
+        _.forEach(args['file'], async file => {
+            if (file) {
+                const { createReadStream, filename } = await file;
+                var file_name = `${args['_id']}_${moment().valueOf()}_${filename}`;
+                var small_file_name = `${args['_id']}_${moment().valueOf()}_${filename}_small.jpg`;
+                await new Promise(res =>
+                    createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/company", file_name))).on("close", res)
+                );
+                args['image'] = file_name;
+                var file_resize = await Jimp.read(path.join(__dirname, "../../images/company", file_name))
+                    .then(image => {
+                        image.resize(260, Jimp.AUTO)
+                            .quality(30)
+                            .write(path.join(__dirname, "../../images/company", small_file_name));
+                    })
+                    .catch(err => {
+                    });
 
-            /**
-             * @info add company info after file update
-             */ 
-            let img_data = {
-                company_id: args['_id'],
-                small_image: small_file_name,
-                large_image: file_name,
-                image_tag: args['option'],
-                doc_category: "Approvals",
+                /**
+                 * @info add company info after file update
+                 */
+                let img_data = {
+                    company_id: args['_id'],
+                    small_image: small_file_name,
+                    large_image: file_name,
+                    image_tag: args['option'],
+                    doc_category: "Approvals",
+                }
+                let add_company_image_job = new CompanyImage_model(img_data)
+                let added_company_image_job = await add_company_image_job.save()
+                added_company_image_job['status'] = "success";
+                added_company_image_job['msg'] = "company profiles added success"
+                // return added_company_image_job
             }
-            let add_company_image_job = new CompanyImage_model(img_data)
-            let added_company_image_job = await add_company_image_job.save()
-            added_company_image_job['status'] = "success";
-            added_company_image_job['msg'] = "company profiles added success"
-            // return added_company_image_job
-        }
+        })
         return { status: "success", msg: "File upload success" }
     } catch (error) {
         return { status: "failed", msg: "File upload failed" }
@@ -1017,8 +1018,8 @@ module.exports.update_company_detail = async (parent, args, context, info) => {
         }
     } catch (error) {
         console.error("module.exports.update_company_detail -> error", error);
-        let error_msg ="Update failed"
-        if(error.message){
+        let error_msg = "Update failed"
+        if (error.message) {
             error_msg = error.message
         }
         return { msg: error_msg, status: 'failed' };
@@ -1031,9 +1032,9 @@ exports.SendCompanyProviders = (company_id, emails) => {
             let find_query = {
                 email: _.trim(emailData),
                 company_id: company_id,
-                delete:false,
+                delete: false,
             }
-            let update_query ={
+            let update_query = {
                 email: _.trim(emailData),
                 company_id: company_id,
                 register_link_status: "Pending",
@@ -1066,12 +1067,12 @@ module.exports.confrimation_company_worker = async (data) => {
         let fetch_provider = await CompanyProvider_model.findOne(find_query).lean()
         let fetch_provider_by_email = await CompanyProvider_model.findOne({
             register_link_status: "accepted",
-            register_status:"success",
-            email:fetch_provider['email'],
-            delete:false
+            register_status: "success",
+            email: fetch_provider['email'],
+            delete: false
         }).lean()
-        if(fetch_provider_by_email && _.size(fetch_provider_by_email)){
-            return { status: "failed", msg: "This email already registered to another company",link:error_link }  
+        if (fetch_provider_by_email && _.size(fetch_provider_by_email)) {
+            return { status: "failed", msg: "This email already registered to another company", link: error_link }
         }
         if (fetch_provider && _.size(fetch_provider)) {
             let detail_find_query = {
@@ -1088,6 +1089,6 @@ module.exports.confrimation_company_worker = async (data) => {
         return { status: "success", msg: "User acepted", link }
     } catch (error) {
         let error_link = '/ops'
-        return { status: "failed", msg: "User acepted failed",link:error_link }
+        return { status: "failed", msg: "User acepted failed", link: error_link }
     }
 }
