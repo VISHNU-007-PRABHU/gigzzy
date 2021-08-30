@@ -317,7 +317,7 @@ const resolvers = {
         CompanyFileUpload: userResolver.CompanyFileUpload,
         deleteCompany: userResolver.deleteCompany,
         deleteCompanyProvider: userResolver.deleteCompanyProvider,
-        addUser: async (_, args) => {
+        addUser: async (parent, args) => {
             try {
                 const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
                 //console.log("user");
