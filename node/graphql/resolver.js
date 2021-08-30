@@ -400,13 +400,10 @@ const resolvers = {
                     const add_detail = await Detail_model.updateOne({ _id: args._id }, args);
                     var data = await Detail_model.findOne({ _id: args._id });
                     if (args['user_type'] && args['user_type'] === "company") {
-                        console.log("data['user_type'] ", data['user_type'] )
-                        if (data['user_type'] === "company") {
-                            console.log("data['user_type'] ","edit data")
-                            let company_data = await Company_model.findOne({ user_id: data['_id'] }, { _id: 1 })
-                            data['company_id'] = _.size(company_data) ? company_data['_id'] : ""
+                        let company_data = await Company_model.findOne({ user_id: data['_id'] }, { _id: 1 })
+                        if ( _.size(company_data)) {
+                            data['company_id'] = company_data['_id'] 
                         } else {
-                            console.log("data['user_type'] ","new data")
                             let company_data = {
                                 user_id: data['_id']
                             }
