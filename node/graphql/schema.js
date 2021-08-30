@@ -27,7 +27,7 @@ const typeDefs = gql`
     type Query {
         testmail:Detail
         user(_id:ID): [Detail]
-        user_search(data:JSON):[Detail]
+        user_search(data:JSON,role:Int,email:String,type:String):[Detail]
         check_demo_app(_id:ID):Detail
         category(_id:ID,is_parent:Boolean,category_type:Int):[Category] 
         sub_category(category_id:ID,_id:ID):[subCategory]

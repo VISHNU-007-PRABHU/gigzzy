@@ -778,8 +778,21 @@ module.exports.user_address = async (parent, args, context, info) => {
 
 
 module.exports.user_search = async (parent, args, context, info) => {
-    console.log(args)
-    return await Detail_model.find(args.data);
+    let find_data = {}
+    if(args.data && _.size(args.data)){
+        find_data = args.data
+    }else{
+        if(args.email){
+            find_data['email'] = { "$regex": `.*${args.email}.*`,  "$options": "i" }
+        }
+        if(args.role){
+            find_data['role'] = args.role
+        }
+        if(args.type){
+            find_data['type'] = args.type
+        }
+    }
+    return await Detail_model.find(find_data);
 }
 
 module.exports.forget_password = async (parent, args, context, info) => {
