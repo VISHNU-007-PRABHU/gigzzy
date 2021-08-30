@@ -1047,9 +1047,6 @@ module.exports.update_company_detail = async (parent, args, context, info) => {
     } catch (error) {
         console.error("module.exports.update_company_detail -> error", error);
         let error_msg = "Update failed"
-        if (error.message) {
-            error_msg = error.message
-        }
         return { msg: error_msg, status: 'failed' };
     }
 }
