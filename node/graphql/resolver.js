@@ -318,13 +318,13 @@ const resolvers = {
         deleteCompany: userResolver.deleteCompany,
         deleteCompanyProvider: userResolver.deleteCompanyProvider,
         addUser: async (_, args) => {
+            try{
             const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
-            console.log(user);
             //console.log("user");
             //add new user 
             if (args.option == "add") {
+            
                 const get_role = await Detail_model.find({ _id: args._id });
-                //console.log(args.email);
                 if (get_role[0].role == 1) {
                     args.role = 1;
                 } else {
@@ -398,27 +398,25 @@ const resolvers = {
                 }
 
                 const add_detail = await Detail_model.updateOne({ _id: args._id }, args);
-                console.log(add_detail,'add_detail');
                 var data = await Detail_model.findOne({ _id: args._id });
-                if (args['user_type'] && args['user_type'] === "company") {
-                    let company_data = {
-                        user_id: data['_id']
+                if(args['user_type'] && args['user_type'] === "company") {
+                    if (data['user_type'] === "company"){
+                        let company_data = await Company_model.findOne({user_id:data['_id']},{_id:1})
+                        data['company_id'] = _.size(company_data) ? company_data['_id'] : ""
+                    }else{
+                        let company_data = {
+                            user_id: data['_id']
+                        }
+                        let add_company_detail = new Company_model(company_data)
+                        var added_com_detail = await add_company_detail.save()
+                        data['company_id'] = added_com_detail['_id']
                     }
-                    let add_company_detail = new Company_model(company_data)
-                    var added_com_detail = await add_company_detail.save()
-                    data['company_id'] = added_com_detail['_id']
                 }
-                if (add_detail.n == add_detail.nModified) {
-                    data.msg = "User Detail Sucessfully Updated";
-                    data.status = "success";
-                    console.log(data,"sucess");
-                    return data
-                } else {
-                    data.msg = "User Detail Update  Process Failed";
-                    data.status = "failed";
-                    console.log(data,"sucess");
-                    return data;
-                }
+              
+                data['msg'] = "User Detail Sucessfully Updated";
+                data['status'] = "success";
+                return data
+                
             } else if (user.length == 0 && args.option == "otp") {
 
                 let otp = String(Math.floor(1000 + Math.random() * 9000));
@@ -480,6 +478,9 @@ const resolvers = {
                     return update_result;
                 }
             }
+        }catch(error){
+                return {msg:"user update failed",status:"failed"};
+        }
         },
         reset_password: userResolver.reset_password,
         admin_add_user: userResolver.admin_add_user,
