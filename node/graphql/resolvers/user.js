@@ -616,16 +616,17 @@ module.exports.checkOtp = async (parent, args) => {
     // console.log(otp_verified);
     if (otp_verified.length == 1) {
         if (result['user_type'] === "company") {
-            let message = { pending_status: 0 ,company_register_status: 0}
+            let message = { pending_status: 0, company_register_status: 0 }
             message['msg'] = "OTP verified";
-            message['status'] = "success" ;
-            let pre_company_result = await Company_model.findOne({user_id:args._id}).lean()
-            if(pre_company_result && _.size(pre_company_result) && !pre_company_result['company_name']){
-                message['company_register_status']  = 1
-            }else if(pre_company_result && _.size(pre_company_result)){
-                let pre_address_result = await Address_model.findOne({company_id:pre_company_result._id}).lean()
-                if(!pre_address_result || !_.size(pre_address_result)){
-                    message['company_register_status']=2
+            message['status'] = "success";
+            let pre_company_result = await Company_model.findOne({ user_id: args._id }).lean()
+            message['company_id'] = pre_company_result['_id']
+            if (pre_company_result && _.size(pre_company_result) && !pre_company_result['company_name']) {
+                message['company_register_status'] = 1
+            } else if (pre_company_result && _.size(pre_company_result)) {
+                let pre_address_result = await Address_model.findOne({ company_id: pre_company_result._id }).lean()
+                if (!pre_address_result || !_.size(pre_address_result)) {
+                    message['company_register_status'] = 2
                 }
             }
             return { ...result._doc, ...message };
