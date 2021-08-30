@@ -610,7 +610,7 @@ module.exports.resend_otp = async (_, args) => {
 };
 
 // check otp from user
-module.exports.checkOtp = async ([parent], args) => {
+module.exports.checkOtp = async (parent, args) => {
     var result = await Detail_model.findOne({ _id: args._id, otp: args.otp });
     const otp_verified = await Detail_model.find({ _id: args._id, otp: args.otp });
     // console.log(otp_verified);
