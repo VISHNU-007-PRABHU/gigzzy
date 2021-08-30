@@ -516,6 +516,7 @@ const typeDefs = gql`
         nextPage: String
         company_id:ID
         user_type:String
+        company_register_status:Int
     }
     
     type Account{

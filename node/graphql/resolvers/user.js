@@ -610,28 +610,45 @@ module.exports.resend_otp = async (_, args) => {
 };
 
 // check otp from user
-module.exports.checkOtp = async (_, args) => {
+module.exports.checkOtp = async ([parent], args) => {
     var result = await Detail_model.findOne({ _id: args._id, otp: args.otp });
     const otp_verified = await Detail_model.find({ _id: args._id, otp: args.otp });
     // console.log(otp_verified);
     if (otp_verified.length == 1) {
-        const check_user = await Detail_model.find({ _id: args._id });
-        if (check_user[0].Upload_percentage == 25) {
-            let message = { pending_status: 1, msg: "new user", status: "success" };
-            result = { ...result._doc, ...message };
+        if (result['user_type'] === "company") {
+            let message = { pending_status: 0 ,company_register_status: 0}
+            message['msg'] = "OTP verified";
+            message['status'] = "success" ;
+            let pre_company_result = await Company_model.findOne({user_id:args._id}).lean()
+            if(pre_company_result && _.size(pre_company_result) && !pre_company_result['company_name']){
+                message['company_register_status']  = 1
+            }else if(pre_company_result && _.size(pre_company_result)){
+                let pre_address_result = await Address_model.findOne({company_id:pre_company_result._id}).lean()
+                if(!pre_address_result || !_.size(pre_address_result)){
+                    message['company_register_status']=2
+                }
+            }
+            return { ...result._doc, ...message };
         } else {
-            let message = {}
-            if (check_user[0].role == 2 && check_user[0].Upload_percentage == 50 && (check_user[0].email_otp_verification == 0)) {
-                message = { pending_status: 2, msg: "Email not verified", status: "success" };
-            } else if (check_user[0].provider_subCategoryID.length == 0 && check_user[0].role == 2 && check_user[0].Upload_percentage == 50) {
-                message = { pending_status: 5, msg: " category not upload", status: "success" };
-            } else if (check_user[0].role == 2 && check_user[0].Upload_percentage == 50 && (check_user[0].personal_document == undefined || check_user[0].personal_document == '')) {
-                message = { pending_status: 6, msg: "personal_document not upload", status: "success" };
-            } else if (check_user[0].role == 2 && check_user[0].Upload_percentage == 50 && (check_user[0].professional_document == undefined || check_user[0].personal_document == '')) {
-                message = { pending_status: 7, msg: "professional_document not upload", status: "success" };
-            } else { message = { pending_status: 0, msg: "OTP verified", status: "success" } };
-            result = { ...result._doc, ...message };
+            const check_user = await Detail_model.find({ _id: args._id });
+            if (check_user[0].Upload_percentage == 25) {
+                let message = { pending_status: 1, msg: "new user", status: "success" };
+                result = { ...result._doc, ...message };
+            } else {
+                let message = {}
+                if (check_user[0].role == 2 && check_user[0].Upload_percentage == 50 && (check_user[0].email_otp_verification == 0)) {
+                    message = { pending_status: 2, msg: "Email not verified", status: "success" };
+                } else if (check_user[0].provider_subCategoryID.length == 0 && check_user[0].role == 2 && check_user[0].Upload_percentage == 50) {
+                    message = { pending_status: 5, msg: " category not upload", status: "success" };
+                } else if (check_user[0].role == 2 && check_user[0].Upload_percentage == 50 && (check_user[0].personal_document == undefined || check_user[0].personal_document == '')) {
+                    message = { pending_status: 6, msg: "personal_document not upload", status: "success" };
+                } else if (check_user[0].role == 2 && check_user[0].Upload_percentage == 50 && (check_user[0].professional_document == undefined || check_user[0].personal_document == '')) {
+                    message = { pending_status: 7, msg: "professional_document not upload", status: "success" };
+                } else { message = { pending_status: 0, msg: "OTP verified", status: "success" } };
+                result = { ...result._doc, ...message };
+            }
         }
+
     } else {
         //console.log("please check the data");
         let message = { msg: "Wrong OTP", status: 'failed' };
@@ -779,16 +796,16 @@ module.exports.user_address = async (parent, args, context, info) => {
 
 module.exports.user_search = async (parent, args, context, info) => {
     let find_data = {}
-    if(args.data && _.size(args.data)){
+    if (args.data && _.size(args.data)) {
         find_data = args.data
-    }else{
-        if(args.email){
-            find_data['email'] = { "$regex": `.*${args.email}.*`,  "$options": "i" }
+    } else {
+        if (args.email) {
+            find_data['email'] = { "$regex": `.*${args.email}.*`, "$options": "i" }
         }
-        if(args.role){
+        if (args.role) {
             find_data['role'] = args.role
         }
-        if(args.type){
+        if (args.type) {
             find_data['type'] = args.type
         }
     }
@@ -961,39 +978,39 @@ module.exports.CompanyFileUpload = async (parent, args, context, info) => {
         if (!args['_id']) {
             return { msg: "Invalid ID", status: "failed" }
         }
-            if (args['file']) {
-                const { createReadStream, filename } = await args['file'];
-                var file_name = `${args['_id']}_${moment().valueOf()}_${filename}`;
-                var small_file_name = `${args['_id']}_${moment().valueOf()}_${filename}_small.jpg`;
-                await new Promise(res =>
-                    createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/company", file_name))).on("close", res)
-                );
-                args['image'] = file_name;
-                var file_resize = await Jimp.read(path.join(__dirname, "../../images/company", file_name))
-                    .then(image => {
-                        image.resize(260, Jimp.AUTO)
-                            .quality(30)
-                            .write(path.join(__dirname, "../../images/company", small_file_name));
-                    })
-                    .catch(err => {
-                    });
+        if (args['file']) {
+            const { createReadStream, filename } = await args['file'];
+            var file_name = `${args['_id']}_${moment().valueOf()}_${filename}`;
+            var small_file_name = `${args['_id']}_${moment().valueOf()}_${filename}_small.jpg`;
+            await new Promise(res =>
+                createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/company", file_name))).on("close", res)
+            );
+            args['image'] = file_name;
+            var file_resize = await Jimp.read(path.join(__dirname, "../../images/company", file_name))
+                .then(image => {
+                    image.resize(260, Jimp.AUTO)
+                        .quality(30)
+                        .write(path.join(__dirname, "../../images/company", small_file_name));
+                })
+                .catch(err => {
+                });
 
-                /**
-                 * @info add company info after file update 
-                 */
-                let img_data = {
-                    company_id: args['_id'],
-                    small_image: small_file_name,
-                    large_image: file_name,
-                    image_tag: args['option'],
-                    doc_category: "Approvals",
-                }
-                let add_company_image_job = new CompanyImage_model(img_data)
-                let added_company_image_job = await add_company_image_job.save()
-                added_company_image_job['status'] = "success";
-                added_company_image_job['msg'] = "company profiles added success"
-                // return added_company_image_job
+            /**
+             * @info add company info after file update 
+             */
+            let img_data = {
+                company_id: args['_id'],
+                small_image: small_file_name,
+                large_image: file_name,
+                image_tag: args['option'],
+                doc_category: "Approvals",
             }
+            let add_company_image_job = new CompanyImage_model(img_data)
+            let added_company_image_job = await add_company_image_job.save()
+            added_company_image_job['status'] = "success";
+            added_company_image_job['msg'] = "company profiles added success"
+            // return added_company_image_job
+        }
         return { status: "success", msg: "File upload success" }
     } catch (error) {
         return { status: "failed", msg: "File upload failed" }
