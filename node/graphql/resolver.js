@@ -319,7 +319,7 @@ const resolvers = {
         deleteCompanyProvider: userResolver.deleteCompanyProvider,
         addUser: async (_, args) => {
             const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
-            // console.log(user);
+            console.log(user);
             //console.log("user");
             //add new user 
             if (args.option == "add") {
@@ -398,7 +398,7 @@ const resolvers = {
                 }
 
                 const add_detail = await Detail_model.updateOne({ _id: args._id }, args);
-                // console.log(add_detail);
+                console.log(add_detail,'add_detail');
                 var data = await Detail_model.findOne({ _id: args._id });
                 if (args['user_type'] && args['user_type'] === "company") {
                     let company_data = {
@@ -411,11 +411,12 @@ const resolvers = {
                 if (add_detail.n == add_detail.nModified) {
                     data.msg = "User Detail Sucessfully Updated";
                     data.status = "success";
-                    //console.log(data);
+                    console.log(data,"sucess");
                     return data
                 } else {
                     data.msg = "User Detail Update  Process Failed";
                     data.status = "failed";
+                    console.log(data,"sucess");
                     return data;
                 }
             } else if (user.length == 0 && args.option == "otp") {
