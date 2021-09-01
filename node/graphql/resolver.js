@@ -185,6 +185,8 @@ const resolvers = {
         roles_search: rolesResolver.roles_search,
         // company detail
         get_company_detail: userResolver.get_company_detail,
+        get_contract_files:contractResolver.get_contract_files,
+        get_contracts:contractResolver.get_contracts,
         get_my_appointments: async (parent, args, context, info) => {
             try {
 
@@ -285,6 +287,9 @@ const resolvers = {
         get_parent_company_provider: userResolver.get_parent_company_provider,
         get_company_address_detail: userResolver.get_company_address_detail,
         get_company_images: userResolver.get_company_images,
+    },
+    ContractJob:{
+        get_contract_files:contractResolver.get_contract_files,
     },
     Booking: {
         user: userResolver.user,

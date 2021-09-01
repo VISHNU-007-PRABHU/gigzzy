@@ -15,6 +15,14 @@ var schemaOptions = {
 //create user schema 
 
 var contractSchema = new Schema({
+    name: { type: String },
+    description: { type: String },
+    budget: { type: String, default: "0" },
+    timeline: { type: String, default: "0" },
+    timeline_type: { type: String },
+    terms_condition: { type: String },
+    company_id: { type: mongoose.Schema.Types.ObjectId, ref: 'company' },
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
     provider_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
     category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'category', unique: false },
     category_type: { type: Number },  // 1-parent category , 2-sub category
@@ -26,12 +34,12 @@ var contractSchema = new Schema({
         coordinates: []
     },
     budget: { type: Number, default: 0.00 },
-    timeline : { type: String, default: 0},
-    timeline_type : { type: String, default: 0},
+    timeline: { type: String, default: 0 },
+    timeline_type: { type: String, default: 0 },
     booked: { type: String },
     contract_status: { type: Number },  // 12.contract,11.user_cancel,8.provider_accept,no_provider],10.user_accept,4.start,13.end,14.completed,15.not available
     availability: [],
-    terms_condition:[],
+    terms_condition: [],
     hours: { type: String },
     contract_date: Date,
     contract_cron_date: String,
@@ -92,6 +100,7 @@ var contractSchema = new Schema({
     payment_type: { type: String, default: "" },
     ctob_shotcode: { type: String, default: "" },
     ctob_billRef: { type: String, default: "" },
+    is_delete: { type: Boolean, default: false },
 }, schemaOptions);
 
 contractSchema.virtual('uid').get(function () {

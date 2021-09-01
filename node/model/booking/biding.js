@@ -15,6 +15,7 @@ var schemaOptions = {
 //create user schema 
 
 var bidingSchema = new Schema({
+
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
   provider_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
   category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'category', unique: false },

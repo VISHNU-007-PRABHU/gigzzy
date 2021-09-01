@@ -14,6 +14,7 @@ var ContractJobImage_model = model.contract_job_images;
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 const path = require("path");
 var fs = require('fs');
+const { pipeline } = require('stream');
 
 module.exports.get_my_biding = async (root, args) => {
     //console.log(args);
@@ -87,52 +88,113 @@ module.exports.DeleteContractJobFile = async (root, args) => {
 }
 
 
-module.exports.ContractJobFileUpload = (root, args) => {
+module.exports.ContractJobFileUpload = async (root, args) => {
     try {
-        let { id, contract_id, contract_job_image, type, lable } = args
-        console.log(args.data[0])
-        if (!_.size(contract_job_image)) {
-            return { msg: "Invalid contract_job_image size", status: "failed" }
-        }
-        _.forEach(contract_job_image, async file => {
-            if (file) {
-                const { createReadStream, filename } = await file;
-                var file_name = `${id}_${moment().valueOf()}_${filename}`;
-                var small_file_name = `${id}_${moment().valueOf()}_${filename}_small.jpg`;
-                await new Promise(res =>
-                    createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/contract", file_name))).on("close", res)
-                );
-                args['image'] = file_name;
-                var file_resize = await Jimp.read(path.join(__dirname, "../../images/contract", file_name))
-                    .then(image => {
-                        image.resize(260, Jimp.AUTO)
-                            .quality(30)
-                            .write(path.join(__dirname, "../../images/contract", small_file_name));
-                    })
-                    .catch(err => {
-                    });
+        let files = args['files']
+        if (files && _.size(files)) {
+            _.forEach(files, async file => {
+                if (file) {
+                    const { createReadStream, filename } = await file;
+                    var extension = filename.split('.').pop();
+                    var file_name = `${args['contract_id']}_${moment().valueOf()}_${filename}`;
+                    var small_file_name = `${args['contract_id']}_${moment().valueOf()}_${filename}_small.jpg`;
+                    await new Promise(res =>
+                        createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/contract", file_name))).on("close", res)
+                    );
+                    args['image'] = file_name;
+                    var file_resize = await Jimp.read(path.join(__dirname, "../../images/contract", file_name))
+                        .then(image => {
+                            image.resize(260, Jimp.AUTO)
+                                .quality(30)
+                                .write(path.join(__dirname, "../../images/contract", small_file_name));
+                        })
+                        .catch(err => {
+                        });
 
-                /**
-                 * @info add contract info after file update
-                 */
-                let img_data = {
-                    contract_id: contract_id,
-                    small_image: small_file_name,
-                    large_image: file_name,
-                    image_tag: "Layout plan",
-                    doc_type: "pdf",
-                    doc_category: "Approvals",
+                    /**
+                     * @info add contract info after file update
+                     */
+                    let img_data = {
+                        contract_id: args['contract_id'],
+                        small_image: small_file_name,
+                        large_image: file_name,
+                        image_tag: args['image_tag'] || "",
+                        doc_type: extension || "",
+                        doc_category: args['category'] || "others",
+                    }
+                    let add_contract_image_job = new ContractJobImage_model(img_data)
+                    let added_contract_images_job = await add_contract_image_job.save()
                 }
-                let add_contract_image_job = new ContractJobImage_model(img_data)
-                let added_contract_images_job = await add_contract_image_job.save()
-                added_contract_images_job['status'] = "success";
-                added_contract_images_job['msg'] = "contract job added success"
-                return added_contract_images_job
+            })
+            return { status: "success", msg: "File added success" }
+        } else {
+            let update_data = {
+                doc_category: "others",
             }
-        })
-        return { status: "success", msg: "File upload success" }
+            if (args['category']) {
+                update_data['doc_category'] = args['category'];
+            }
+            if (args['image_tag']) {
+                update_data['image_tag'] = args['image_tag'];
+            }
+            let add_contract_image_job = await ContractJobImage_model.updateOne({ _id: args['_id'] }, update_data).exec()
+            return { status: "success", msg: "File update success" }
+        }
     } catch (error) {
         return { status: "failed", msg: "File upload failed" }
+    }
+}
+
+
+module.exports.get_contract_files = async (root, args) => {
+    try {
+        let match= {
+            delete:false
+        }
+        if(args['contract_id']){
+            match['contract_id'] = ObjectId(args['contract_id'])
+        }
+        let pipeline = [
+            {
+                $match:match
+            },
+            {
+                $group: {
+                    _id: "$doc_category",
+                    images: { $push: "$$ROOT" } 
+                }
+            }
+        ]
+     
+        let grouped_images = await ContractJobImage_model.aggregate(pipeline)
+        console.log("module.exports.get_contract_files -> grouped_images", grouped_images)
+        return grouped_images
+    } catch (error) {
+        console.log("module.exports.get_contract_files -> error", error)
+        return []
+    }
+}
+
+
+module.exports.get_contracts = async (root, args) => {
+    try {
+        let find_query = {is_delete:false}
+        if(args['_id']){
+            find_query['_id'] = args['_id']
+        }
+        if(args['company_id']){
+            find_query['company_id'] = args['company_id']
+        }
+        if(args['contract_id']){
+            find_query['contract_id'] = args['contract_id']
+        }
+        if(args['user_id']){
+            find_query['user_id'] = args['user_id']
+        }
+        let grouped_images = await ContractJob_model.find(find_query)
+        return grouped_images
+    } catch (error) {
+        return []
     }
 }
 
@@ -146,7 +208,7 @@ module.exports.ContractJobFileUpload = (root, args) => {
 
 module.exports.update_contract = async (root, args) => {
     try {
-        let contract_detail = args['contract_data'][0][0]
+        let contract_detail = args['contract_data'][0]
         if (args['_id']) {
             let find_query = {
                 _id: args["_id"]

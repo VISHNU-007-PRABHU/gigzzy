@@ -90,6 +90,8 @@ const typeDefs = gql`
         # company detail
         get_company_detail(data:JSON,provider_search:JSON,search:JSON,_id:ID,page:Int,limit:Int,company_id:ID,user_id:ID,provider_id:ID):CompanyConnection
         get_parent_company_provider(provider_search:JSON,provider_id:Boolean,user_id:Boolean,company_id:ID):[CompanyProvider]
+        get_contract_files(company_id:ID,user_id:ID,provider_id:ID,contract_id:ID):[CompanyImage]
+        get_contracts(company_id:ID,contract_id:ID,provider_id:ID,user_id:ID):[ContractJob]
     }
 
     # sub category pagination data  
@@ -274,11 +276,13 @@ const typeDefs = gql`
         website_url:String
         address:String
         description:String
+        budget:String, 
+        timeline:String
+        timeline_type:String 
+        terms_condition: String 
         lat:Float
         lng:Float
-        budget:String
-        timeline:String
-        timeline_type:String
+        get_contract_files(contract_id:ID):[CompanyImage]
     }
     type Company{
         _id:ID
@@ -329,6 +333,7 @@ const typeDefs = gql`
         data: JSON 
         msg:String
         status:String
+        images:[CompanyImage]
     }
     type Admin{
         _id:ID
@@ -872,6 +877,7 @@ const typeDefs = gql`
             _id:ID
             user_id: String,
             company_id:ID,
+            contract_id:ID,
             user_type:String
             title: String,
             flat_no: String,
@@ -901,8 +907,8 @@ const typeDefs = gql`
             profile_file:Upload
         ):Company
         # contract jobs
-        update_contract(_id:ID,contract_data:[JSON],search_data:JSON):ContractJob
-        ContractJobFileUpload(_id:ID,contact_id:ID,type:String,lable:String,data:[JSON],contract_job_image:[Upload]):ContractJob
+        update_contract(_id:ID,contract_data:JSON,search_data:JSON):ContractJob
+        ContractJobFileUpload(_id:ID,contract_id:ID,category:String,image_tag:String,data:[JSON],files:[Upload]):CompanyImage
         DeleteContractJobFile(_id:ID):ContractJob
         # update biding 
          update_biding(

@@ -193,7 +193,7 @@ class Add_Company extends React.Component {
 
     showDrawer = () => {
         this.setState({
-            visible: true,
+            visible: !this.state.visible,
         });
     };
 
@@ -209,8 +209,8 @@ class Add_Company extends React.Component {
             <>
                 <Drawer
                     title="Create a Profile document"
-                    width={350}
-                    onClose={this.onClose}
+                    width={500}
+                    onClose={this.showDrawer}
                     visible={this.state.visible}
                     bodyStyle={{ paddingBottom: 80 }}
                 >
@@ -237,38 +237,104 @@ class Add_Company extends React.Component {
                             <Form>
                                 <Row>
                                     <Col span={12} className="px-3">
+                                        {/* left side */}
                                         <Row gutter={12}>
                                             <Col span={24}>
-                                                <Form.Item label="User Name">
-                                                    {form.getFieldDecorator("name", {
-                                                        initialValue: this.state.update_data.name,
+                                                <Form.Item label="Company Name">
+                                                    {form.getFieldDecorator("company_name", {
+                                                        initialValue: this.state.update_data.company_name,
                                                         rules: [{ required: true }]
-                                                    })(<Input placeholder="Name" />)}
+                                                    })(<Input placeholder="Company Name" />)}
                                                 </Form.Item>
                                             </Col>
                                         </Row>
                                         <Row gutter={12}>
                                             <Col span={24}>
-                                                <Form.Item label="Website">
-                                                    {form.getFieldDecorator("website_url", {
-                                                        initialValue: this.state.update_data.website_url,
+                                                <Form.Item label="Company Website">
+                                                    {form.getFieldDecorator("company_website", {
+                                                        initialValue: this.state.update_data.company_website,
                                                         rules: [{ required: true }]
-                                                    })(<Input.TextArea placeholder="Website url" />)}
+                                                    })(<Input placeholder="Company Website" />)}
                                                 </Form.Item>
                                             </Col>
                                         </Row>
                                         <Row gutter={12}>
                                             <Col span={24}>
-                                                <Form.Item label="About">
+                                                <Form.Item label="Company Category">
+                                                    {form.getFieldDecorator("company_category", {
+                                                        initialValue: this.state.update_data.company_category,
+                                                        rules: [{ required: true }]
+                                                    })(<Input placeholder="Company Category" />)}
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                        <Row gutter={12}>
+                                            <Col span={24}>
+                                                <Form.Item label="Company About">
                                                     {form.getFieldDecorator("about", {
-                                                        initialValue: this.state.update_data.about,
+                                                        initialValue: this.state.update_data.about_company,
                                                         rules: [{ required: true }]
-                                                    })(<Input.TextArea placeholder="About" />)}
+                                                    })(<Input.TextArea placeholder="Company About" />)}
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                        <Row gutter={12}>
+                                            <Col span={24}>
+                                                <Form.Item label="Contact Address">
+                                                    {form.getFieldDecorator("title", {
+                                                        initialValue: this.state.update_data.title,
+                                                        rules: [{ required: true }]
+                                                    })(<Input placeholder="contact address" />)}
                                                 </Form.Item>
                                             </Col>
                                         </Row>
                                     </Col>
                                     <Col span={12} className="px-3">
+                                        {/* right side */}
+                                        <Row gutter={12}>
+                                            <Col span={24}>
+                                                <Form.Item label="First Name">
+                                                    {form.getFieldDecorator("first_name", {
+                                                        initialValue: this.state.update_data.first_name,
+                                                        rules: [{ required: true }]
+                                                    })(<Input placeholder="First Name" />)}
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                        <Row gutter={12}>
+                                            <Col span={24}>
+                                                <Form.Item label="Last Name">
+                                                    {form.getFieldDecorator("last_name", {
+                                                        initialValue: this.state.update_data.last_name,
+                                                        rules: [{ required: true }]
+                                                    })(<Input placeholder="Last Name" />)}
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                        <Row gutter={12}>
+                                            <Col span={24}>
+                                                <Form.Item label="Password">
+                                                    {form.getFieldDecorator("password", {
+                                                        initialValue: this.state.update_data.password,
+                                                        rules: [{ required: true }]
+                                                    })(<Input placeholder="Password" />)}
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                        <Row gutter={12}>
+                                            <Col span={24}>
+                                                <Form.Item label="Mobile Number">
+                                                    {form.getFieldDecorator("mobileNumber", {
+                                                        // initialValue: this.state.update_data.address,
+                                                        rules: [{ required: false }]
+                                                    })(<Select mode="tags" style={{ width: '100%' }} placeholder="Enter your worker email" onSearch={this.SearchEmail}>
+                                                        {this.state.emails.map(mailData => (
+                                                            <Option key={mailData.email}>{mailData.email}</Option>
+                                                        ))}
+                                                    </Select>)}
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
                                         <Row gutter={12}>
                                             <Col span={24}>
                                                 <Form.Item label="Email">
@@ -283,26 +349,7 @@ class Add_Company extends React.Component {
                                                 </Form.Item>
                                             </Col>
                                         </Row>
-                                        <Row gutter={12}>
-                                            <Col span={24}>
-                                                <Form.Item label="Address">
-                                                    {form.getFieldDecorator("address", {
-                                                        initialValue: this.state.update_data.address,
-                                                        rules: [{ required: true }]
-                                                    })(<Input.TextArea placeholder="Address" />)}
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
-                                        <Row gutter={12}>
-                                            <Col span={24}>
-                                                <Form.Item label="Contact Person">
-                                                    {form.getFieldDecorator("contact_person", {
-                                                        initialValue: this.state.update_data.contact_person,
-                                                        rules: [{ required: true }]
-                                                    })(<Input.TextArea placeholder="contact person" />)}
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
+
                                     </Col>
                                 </Row>
                             </Form>

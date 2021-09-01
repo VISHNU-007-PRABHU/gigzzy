@@ -16,13 +16,14 @@ var schemaOptions = {
 
 const ContractJobImagesSchema = mongoose.Schema({
     contract_id: { type: mongoose.Schema.Types.ObjectId, ref: 'contract' },
+    company_id: { type: mongoose.Schema.Types.ObjectId, ref: 'company' },
     small_image: { type: String, default: '' },
     large_image: { type: String, default: '' },
     image_tag: { type: String, default: '' },
     doc_type: { type: String, default: '' },
     doc_category: { type: String, default: '' },
     doc_formate: { type: String, default: '' },
-    delete:{ type: Boolean, default: false },
+    delete: { type: Boolean, default: false },
 }, schemaOptions);
 
 ContractJobImagesSchema.pre('save', function (next) {

@@ -104,9 +104,6 @@ export const GET_COMPANY = gql`
         data{
             _id
             name
-            address
-            about
-            website_url
             get_parent_company_provider(provider_search:$provider_search,company_id:$company_id) {
                 email
                 created_at
