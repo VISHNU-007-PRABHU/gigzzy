@@ -148,24 +148,24 @@ module.exports.ContractJobFileUpload = async (root, args) => {
 
 module.exports.get_contract_files = async (root, args) => {
     try {
-        let match= {
-            delete:false
+        let match = {
+            delete: false
         }
-        if(args['contract_id']){
+        if (args['contract_id']) {
             match['contract_id'] = ObjectId(args['contract_id'])
         }
         let pipeline = [
             {
-                $match:match
+                $match: match
             },
             {
                 $group: {
                     _id: "$doc_category",
-                    images: { $push: "$$ROOT" } 
+                    images: { $push: "$$ROOT" }
                 }
             }
         ]
-     
+
         let grouped_images = await ContractJobImage_model.aggregate(pipeline)
         console.log("module.exports.get_contract_files -> grouped_images", grouped_images)
         return grouped_images
@@ -178,17 +178,17 @@ module.exports.get_contract_files = async (root, args) => {
 
 module.exports.get_contracts = async (root, args) => {
     try {
-        let find_query = {is_delete:false}
-        if(args['_id']){
+        let find_query = { is_delete: false }
+        if (args['_id']) {
             find_query['_id'] = args['_id']
         }
-        if(args['company_id']){
+        if (args['company_id']) {
             find_query['company_id'] = args['company_id']
         }
-        if(args['contract_id']){
+        if (args['contract_id']) {
             find_query['contract_id'] = args['contract_id']
         }
-        if(args['user_id']){
+        if (args['user_id']) {
             find_query['user_id'] = args['user_id']
         }
         let grouped_images = await ContractJob_model.find(find_query)
@@ -215,6 +215,9 @@ module.exports.update_contract = async (root, args) => {
             }
             let update_bid = await ContractJob_model.updateOne(find_query, contract_detail).exec()
             let fetch_bid = await ContractJob_model.findOne(find_query).lean()
+            if (fetch_bid['contract_status'] === "c2") {
+                // send notification SMS EMAIL
+            }
             fetch_bid['status'] = "success";
             fetch_bid['msg'] = "contract job update success"
             return fetch_bid
@@ -229,6 +232,24 @@ module.exports.update_contract = async (root, args) => {
         return { status: "failed", msg: "contract job added failed" }
     }
 }
+
+exports.find_provider = async (contract_data) => {
+    try {
+        if(contract_data['cat']){
+            //  send request with in radius
+        }else{
+            //  send request with al the location
+        }
+        let response = {}
+        response['status'] = "success";
+        response['msg'] = "Job sent nearest user"
+        return response
+    } catch (error) {
+        return { status: "failed", msg: "Job failed to send user" }
+    }
+}
+
+
 
 module.exports.update_biding_milestone = async (root, args) => {
     try {

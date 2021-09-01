@@ -282,6 +282,7 @@ const typeDefs = gql`
         terms_condition: String 
         lat:Float
         lng:Float
+        contract_status:String
         get_contract_files(contract_id:ID):[CompanyImage]
     }
     type Company{

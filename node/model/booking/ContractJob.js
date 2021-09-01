@@ -37,7 +37,7 @@ var contractSchema = new Schema({
     timeline: { type: String, default: 0 },
     timeline_type: { type: String, default: 0 },
     booked: { type: String },
-    contract_status: { type: Number },  // 12.contract,11.user_cancel,8.provider_accept,no_provider],10.user_accept,4.start,13.end,14.completed,15.not available
+    contract_status: { type: String,default:"c1" },  // c1.pending,c2.job posted,c3.admin-approved,c4
     availability: [],
     terms_condition: [],
     hours: { type: String },
@@ -101,6 +101,7 @@ var contractSchema = new Schema({
     ctob_shotcode: { type: String, default: "" },
     ctob_billRef: { type: String, default: "" },
     is_delete: { type: Boolean, default: false },
+
 }, schemaOptions);
 
 contractSchema.virtual('uid').get(function () {
