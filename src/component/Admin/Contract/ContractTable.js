@@ -1,7 +1,7 @@
 import * as React from "react";
 import { withRouter } from "react-router-dom";
 import { Table, Modal, Form, Avatar, Popconfirm, Tag, Icon, Switch } from "antd";
-import { GET_CATEGORY, UPDATE_CATEGORY, DELETE_CATEGORY } from '../../../graphql/Admin/category';
+import { GET_CONTRACT_PAGINATION, UPDATE_CATEGORY, DELETE_CATEGORY } from '../../../graphql/Admin/contract';
 import { client } from "../../../apollo";
 import '../../../scss/template.scss';
 import { Alert_msg } from '../../Comman/alert_msg';
@@ -28,22 +28,22 @@ class ContractTable extends React.Component {
         }
     }
     componentDidMount() {
-        // this.fetch_category({ is_parent: false });
+        this.fetch_category();
     }
     handleTableChange = async pagination => {
         const pager = { ...pagination };
         pager.current = pagination.current;
         this.setState({ loading: true });
         await client.query({
-            query: GET_CATEGORY,
+            query: GET_CONTRACT_PAGINATION,
             variables: { limit: pager.pageSize, page: pager.current, data: { is_parent: false } },
             fetchPolicy: 'no-cache',
         }).then(result => {
             const pagination = { ...this.state.pagination };
-            pagination.total = result.data.get_category.pageInfo.totalDocs;
-            pagination.current = result.data.get_category.pageInfo.page;
+            pagination.total = result.data.get_contracts_pagination.pageInfo.totalDocs;
+            pagination.current = result.data.get_contracts_pagination.pageInfo.page;
             console.log(pagination);
-            this.setState({ pagination, loading: false, dataSource: result.data.get_category.data });
+            this.setState({ pagination, loading: false, dataSource: result.data.get_contracts_pagination.data });
         });
     };
 
@@ -60,12 +60,12 @@ class ContractTable extends React.Component {
         let input = {};
         input = data;
         await client.query({
-            query: GET_CATEGORY,
+            query: GET_CONTRACT_PAGINATION,
             variables: { data: input },
             fetchPolicy: 'no-cache',
         }).then(result => {
             const pagination = { ...this.state.pagination };
-            pagination.total = result.data.get_category.pageInfo.totalDocs;
+            pagination.total = result.data.get_contracts_pagination.pageInfo.totalDocs;
             this.setState({ loading: false, pagination, dataSource: result.data.get_category.data });
         });
     }
@@ -106,26 +106,26 @@ class ContractTable extends React.Component {
     render() {
         const columns = [
             {
-                title: <span>Provider Name</span>,
+                title: <span>Name</span>,
                 width: '15%',
                 render: (text, record) => {
-                    return <span title="Biding Category">{record.biding_category}</span>;
+                    return <span title="Biding Category">{record.name}</span>;
                 }
             },
             {
-                title: <span>Biding Category</span>,
+                title: <span>Description</span>,
                 width: '15%',
                 render: (text, record) => {
-                    return <span title="Biding Category">{record.biding_category}</span>;
+                    return <span title="Biding Category">{record.description}</span>;
                 }
             },
-            {
-                title: <span>Type</span>,
-                dataIndex: 'is_parent',
-                render: (text, record) => {
-                    return <span title="Type">{record.is_parent ? <Tag color="green">Parent</Tag> : <Tag color="geekblue">Category</Tag>}</span>;
-                },
-            },
+            // {
+            //     title: <span>Type</span>,
+            //     dataIndex: 'is_parent',
+            //     render: (text, record) => {
+            //         return <span title="Type">{record.is_parent ? <Tag color="green">Parent</Tag> : <Tag color="geekblue">Category</Tag>}</span>;
+            //     },
+            // },
             {
                 title: 'Action',
                 width: '10%',

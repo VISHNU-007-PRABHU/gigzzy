@@ -175,7 +175,34 @@ module.exports.get_contract_files = async (root, args) => {
     }
 }
 
-
+module.exports.get_contracts_pagination = async (parent, args, context, info) => {
+    try {
+        var limit = args.limit || 10;
+        var page = args.page || 1;
+        var offset = Number(page - 1) * Number(limit);
+        var total = 0;
+        var result = [];
+        let find_query = { delete: false }
+        if (args['search']) {
+            find_query = { ...find_query, ...args['search'] }
+        }
+        if (args['company_id']) {
+            find_query['_id'] = args['company_id']
+        }
+        if (args['contract_id']) {
+            find_query['contract_id'] = args['contract_id']
+        }
+        if (args['user_id']) {
+            find_query['user_id'] = args['user_id']
+        }
+        total = await ContractJob_model.count(find_query);
+        result = await ContractJob_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
+        var pageInfo = { totalDocs: total, page: args.page }
+        return { data: result, pageInfo };
+    } catch (error) {
+        return []
+    }
+}; 
 module.exports.get_contracts = async (root, args) => {
     try {
         let find_query = { is_delete: false }
