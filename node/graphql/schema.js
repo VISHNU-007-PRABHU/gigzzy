@@ -529,7 +529,6 @@ const typeDefs = gql`
         company_register_status:Int
         frist_name:String
         last_name:String
-        email:String
     }
     
     type Account{
