@@ -527,7 +527,7 @@ const typeDefs = gql`
         company_id:ID
         user_type:String
         company_register_status:Int
-        frist_name:String
+        first_name:String
         last_name:String
     }
     
