@@ -25,21 +25,16 @@ var contractSchema = new Schema({
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
     provider_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
     category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'category', unique: false },
+    address_id: { type: mongoose.Schema.Types.ObjectId, ref: 'address' },
     category_type: { type: Number },  // 1-parent category , 2-sub category
     contract_ref: { type: String },
-    name: { type: String },
-    description: { type: String },
     location: {
         type: { type: String },
         coordinates: []
     },
-    budget: { type: Number, default: 0.00 },
-    timeline: { type: String, default: 0 },
-    timeline_type: { type: String, default: 0 },
     booked: { type: String },
     contract_status: { type: String,default:"c1" },  // c1.pending,c2.job posted,c3.admin-approved,c4
     availability: [],
-    terms_condition: [],
     hours: { type: String },
     contract_date: Date,
     contract_cron_date: String,

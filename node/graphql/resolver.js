@@ -148,6 +148,7 @@ const resolvers = {
 
     Query: {
         testmail: userResolver.testinfmail,
+        delete_all_user:userResolver.delete_all_user,
         // get data using pagination  
         get_user: userResolver.get_user,
         user_search: userResolver.user_search,

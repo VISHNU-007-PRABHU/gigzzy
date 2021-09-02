@@ -103,7 +103,15 @@ export const GET_COMPANY = gql`
         }
         data{
             _id
-            name
+            company_name
+            company_website
+            companyCategory
+            about_company
+            get_company_address_detail(company_id:$company_id) {
+                address
+                lat
+                lng
+            }
             get_parent_company_provider(provider_search:$provider_search,company_id:$company_id) {
                 email
                 created_at
@@ -120,7 +128,7 @@ export const GET_COMPANY = gql`
 
 
 export const UPDATE_COMPANY_DETAIL = gql`
-    mutation UPDATECOMPANYDETAIL($_id: ID,$company_data:[JSON],$logo_file:Upload,$profile_file:Upload)  {
+    mutation UPDATECOMPANYDETAIL($_id: ID,$company_data:JSON,$logo_file:Upload,$profile_file:Upload)  {
         update_company_detail(_id:$_id,company_data:$company_data,logo_file:$logo_file,profile_file:$profile_file){
         msg
         status         

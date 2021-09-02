@@ -13,6 +13,7 @@ import { Alert_msg } from '../../Comman/alert_msg';
 import size from 'lodash/size'
 import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 import Table from 'antd/es/table'
+import Address from "../../User/Book/Address";
 const { Content } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
@@ -22,6 +23,7 @@ class Add_Company extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            visibleAddress:false,
             modalVisible: false,
             dataSource: [],
             loading: false,
@@ -45,6 +47,7 @@ class Add_Company extends React.Component {
             emails: [],
             company_provider: [],
             visible: false,
+            company_address: []
         };
 
     }
@@ -68,6 +71,7 @@ class Add_Company extends React.Component {
                 update: 1,
                 update_data: result.data.get_company_detail.data[0],
                 company_provider: result.data.get_company_detail.data[0].get_parent_company_provider,
+                company_address: result.data.get_company_detail.data[0].get_company_address_detail
             });
         });
     }
@@ -170,7 +174,7 @@ class Add_Company extends React.Component {
                     update_data['_id'] = this.props.match.params.id
                 }
                 if (size(company_data)) {
-                    update_data['company_data'] = [[company_data]]
+                    update_data['company_data'] = [company_data]
                 }
                 if (this.state.logo_file && size(this.state.logo_file)) {
                     update_data['logo_file'] = this.state.logo_file
@@ -182,6 +186,9 @@ class Add_Company extends React.Component {
                     mutation: UPDATE_COMPANY_DETAIL,
                     variables: update_data
                 }).then((result, loading, error) => {
+                    this.setState({
+                        loading: true
+                    })
                     Alert_msg(result.data.update_company_detail);
                     if (result.data.update_company_detail.status === "success") {
                         history.push('/admin-company');
@@ -196,7 +203,12 @@ class Add_Company extends React.Component {
             visible: !this.state.visible,
         });
     };
-
+    goPage = (page, id) => {
+        if (page === "profile") {
+            let user_url = `/admin-user/add/`
+            this.props.history.push(user_url)
+        }
+    }
     render() {
         const uploadButton = (
             <div>
@@ -228,9 +240,14 @@ class Add_Company extends React.Component {
                                 <Col span={24}>
                                     <div className="d-flex justify-content-between align-items-center">
                                         <Title level={3}>Add Company</Title>
-                                        <Button type="primary" shape="round" size={'small'} onClick={this.showDrawer}>
-                                            Profiles
-                                        </Button>
+                                        <div>
+                                            <Button className="mx-2" type="primary" shape="round" size={'small'} onClick={this.showDrawer}>
+                                                Document
+                                            </Button>
+                                            <Button className="mx-2" type="primary" shape="round" size={'small'} onClick={() => { this.goPage("profile") }}>
+                                                Profile
+                                            </Button>
+                                        </div>
                                     </div>
                                 </Col>
                             </Row>
@@ -260,16 +277,6 @@ class Add_Company extends React.Component {
                                         </Row>
                                         <Row gutter={12}>
                                             <Col span={24}>
-                                                <Form.Item label="Company Category">
-                                                    {form.getFieldDecorator("company_category", {
-                                                        initialValue: this.state.update_data.company_category,
-                                                        rules: [{ required: true }]
-                                                    })(<Input placeholder="Company Category" />)}
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
-                                        <Row gutter={12}>
-                                            <Col span={24}>
                                                 <Form.Item label="Company About">
                                                     {form.getFieldDecorator("about", {
                                                         initialValue: this.state.update_data.about_company,
@@ -278,66 +285,12 @@ class Add_Company extends React.Component {
                                                 </Form.Item>
                                             </Col>
                                         </Row>
-                                        <Row gutter={12}>
-                                            <Col span={24}>
-                                                <Form.Item label="Contact Address">
-                                                    {form.getFieldDecorator("title", {
-                                                        initialValue: this.state.update_data.title,
-                                                        rules: [{ required: true }]
-                                                    })(<Input placeholder="contact address" />)}
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
                                     </Col>
                                     <Col span={12} className="px-3">
                                         {/* right side */}
                                         <Row gutter={12}>
                                             <Col span={24}>
-                                                <Form.Item label="First Name">
-                                                    {form.getFieldDecorator("first_name", {
-                                                        initialValue: this.state.update_data.first_name,
-                                                        rules: [{ required: true }]
-                                                    })(<Input placeholder="First Name" />)}
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
-                                        <Row gutter={12}>
-                                            <Col span={24}>
-                                                <Form.Item label="Last Name">
-                                                    {form.getFieldDecorator("last_name", {
-                                                        initialValue: this.state.update_data.last_name,
-                                                        rules: [{ required: true }]
-                                                    })(<Input placeholder="Last Name" />)}
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
-                                        <Row gutter={12}>
-                                            <Col span={24}>
-                                                <Form.Item label="Password">
-                                                    {form.getFieldDecorator("password", {
-                                                        initialValue: this.state.update_data.password,
-                                                        rules: [{ required: true }]
-                                                    })(<Input placeholder="Password" />)}
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
-                                        <Row gutter={12}>
-                                            <Col span={24}>
-                                                <Form.Item label="Mobile Number">
-                                                    {form.getFieldDecorator("mobileNumber", {
-                                                        // initialValue: this.state.update_data.address,
-                                                        rules: [{ required: false }]
-                                                    })(<Select mode="tags" style={{ width: '100%' }} placeholder="Enter your worker email" onSearch={this.SearchEmail}>
-                                                        {this.state.emails.map(mailData => (
-                                                            <Option key={mailData.email}>{mailData.email}</Option>
-                                                        ))}
-                                                    </Select>)}
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
-                                        <Row gutter={12}>
-                                            <Col span={24}>
-                                                <Form.Item label="Email">
+                                                <Form.Item label="Provider Email">
                                                     {form.getFieldDecorator("provider_email", {
                                                         // initialValue: this.state.update_data.address,
                                                         rules: [{ required: false }]
@@ -349,7 +302,25 @@ class Add_Company extends React.Component {
                                                 </Form.Item>
                                             </Col>
                                         </Row>
+                                        <Row gutter={12}>
+                                            <Col span={24}>
+                                                <Form.Item label="Company Category">
+                                                    {form.getFieldDecorator("company_category", {
+                                                        initialValue: this.state.update_data.company_category,
+                                                        rules: [{ required: true }]
+                                                    })(<Input placeholder="Company Category" />)}
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                        <Row gutter={12}>
+                                            <Col span={24}>
 
+                                            </Col>
+                                        </Row>
+                                        <Card onClick={()=>{this.setState({visibleAddress:true})}}>
+                                            Address
+                                        </Card>
+                                        <Address visible={this.state.visibleAddress}/>
                                     </Col>
                                 </Row>
                             </Form>

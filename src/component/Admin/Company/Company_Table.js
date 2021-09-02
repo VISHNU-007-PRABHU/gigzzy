@@ -109,7 +109,7 @@ class CompanyTable extends React.Component {
                 dataIndex: 'company_name',
                 width: '25%',
                 render: (text, record) => {
-                    return <span title="Company Name">{record.name}</span>;
+                    return <span title="Company Name">{record.company_name}</span>;
                 }
             },
             {
@@ -117,15 +117,7 @@ class CompanyTable extends React.Component {
                 dataIndex: 'website',
                 width: '25%',
                 render: (text, record) => {
-                    return <span title="Website">{<Tag color="geekblue">{record.website_url}</Tag>}</span>;
-                },
-            },
-            {
-                title: <span>Address</span>,
-                dataIndex: 'address',
-                width: '25%',
-                render: (text, record) => {
-                    return <span title="Address">{record?.address}</span>;
+                    return <span title="Website">{<Tag color="geekblue">{record.company_website}</Tag>}</span>;
                 },
             },
             {

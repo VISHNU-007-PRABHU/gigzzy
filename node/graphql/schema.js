@@ -26,6 +26,7 @@ const typeDefs = gql`
     }
     type Query {
         testmail:Detail
+        delete_all_user:User
         user(_id:ID): [Detail]
         user_search(data:JSON,role:Int,email:String,type:String):[Detail]
         check_demo_app(_id:ID):Detail

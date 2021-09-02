@@ -235,8 +235,18 @@ module.exports.update_contract = async (root, args) => {
 
 exports.find_provider = async (contract_data) => {
     try {
+        // get category data
         if(contract_data['cat']){
             //  send request with in radius
+            var filter = {
+                role: 2,
+                online: 1,
+                delete: 0,
+                proof_status: 1,
+                location: { $near: { $maxDistance: 10000, $geometry: { type: "Point", coordinates: [args.lng, args.lat] } } },
+                provider_subCategoryID: { $in: [args.category_id] },
+            };
+            let find_provider = await Detail_model.find(filter);
         }else{
             //  send request with al the location
         }

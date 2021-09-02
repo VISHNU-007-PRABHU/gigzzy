@@ -59,6 +59,14 @@ module.exports.user = async (parent, args, context, info) => {
     return result;
 };
 
+// find user (based on data)
+module.exports.delete_all_user = async (parent, args, context, info) => {
+
+    await Detail_model.remove({});
+    return {status:"false",msg:"ops"};
+};
+
+
 module.exports.confirm_email = async (parent, args, context, info) => {
     var data = args;
     var len = 12;
@@ -726,12 +734,12 @@ module.exports.kilometer = async (parent, args, context, info) => {
             result = await Booking_model.findOne({ _id: parent._id });
 
             if (!_.size(result) || !result.location.coordinates[1] || !result.location.coordinates[0] || !args.lat || !args.lng) {
-                console.log("module.exports.kilometer -> error", "size zero")
+                // console.log("module.exports.kilometer -> error", "size zero")
                 return { kilometre: 0 };
             }
 
             if (args.lat == result.location.coordinates[1] && args.lng == result.location.coordinates[0]) {
-                console.log("module.exports.kilometer -> error", "zero")
+                // console.log("module.exports.kilometer -> error", "zero")
                 return { kilometre: 0 };
             }
             var distanceInMeters = getDistanceBetweenPoints.getDistanceBetweenPoints(
@@ -789,7 +797,7 @@ module.exports.modified_address = async (parent, args, context, info) => {
 }
 
 module.exports.user_address = async (parent, args, context, info) => {
-    console.log(args);
+    // console.log(args);
     var result = await Address_model.find({ user_id: args.user_id, delete: 0 });
     return result;
 }
@@ -874,7 +882,7 @@ module.exports.get_company_provider = async (parent, args, context, info) => {
         total = await CompanyProvider_model.count(find_query);
         result = await CompanyProvider_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
         var pageInfo = { totalDocs: total, page: args.page }
-        console.log("module.exports.get_company_detail -> pageInfo", pageInfo)
+        // console.log("module.exports.get_company_detail -> pageInfo", pageInfo)
         return { data: result, pageInfo };
     } catch (error) {
         return []
