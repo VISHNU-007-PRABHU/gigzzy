@@ -789,7 +789,7 @@ module.exports.modified_address = async (parent, args, context, info) => {
 }
 
 module.exports.user_address = async (parent, args, context, info) => {
-    // console.log(args);
+    console.log(args);
     var result = await Address_model.find({ user_id: args.user_id, delete: 0 });
     return result;
 }
