@@ -182,7 +182,7 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         var offset = Number(page - 1) * Number(limit);
         var total = 0;
         var result = [];
-        let find_query = { delete: false }
+        let find_query = { is_delete : false }
         if (args['search']) {
             find_query = { ...find_query, ...args['search'] }
         }

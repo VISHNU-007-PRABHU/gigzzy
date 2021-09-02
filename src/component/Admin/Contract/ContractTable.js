@@ -66,7 +66,7 @@ class ContractTable extends React.Component {
         }).then(result => {
             const pagination = { ...this.state.pagination };
             pagination.total = result.data.get_contracts_pagination.pageInfo.totalDocs;
-            this.setState({ loading: false, pagination, dataSource: result.data.get_category.data });
+            this.setState({ loading: false, pagination, dataSource: result.data.get_contracts_pagination.data });
         });
     }
 
