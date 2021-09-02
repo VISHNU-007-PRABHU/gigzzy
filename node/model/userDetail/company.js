@@ -44,7 +44,7 @@ var companySchema = new Schema({
   image: String,
   provider_email: [],
   contact_person: { type: String,default:"" },
-  company_category:[],
+  company_category:{ type: String,default:"" },
   personal_document: [String],
   professional_document: [String],
   otp: { type: String },                                                          // otp (4 digit no) 
