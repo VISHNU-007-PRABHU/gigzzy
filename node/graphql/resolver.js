@@ -288,6 +288,7 @@ const resolvers = {
         get_parent_company_provider: userResolver.get_parent_company_provider,
         get_company_address_detail: userResolver.get_company_address_detail,
         get_company_images: userResolver.get_company_images,
+        get_company_user_detail: userResolver.available_booking_user,
     },
     ContractJob:{
         get_contract_files:contractResolver.get_contract_files,

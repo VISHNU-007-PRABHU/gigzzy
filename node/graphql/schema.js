@@ -309,6 +309,7 @@ const typeDefs = gql`
         get_parent_company_provider(provider_search:JSON,company_id:ID,provider_id:ID,):[CompanyProvider]
         get_company_address_detail(company_id:ID,option:Int,type:String):[UserAddress]
         get_company_images(company_id:ID,image_tag:String):[CompanyImage]
+        get_company_user_detail(user_id:ID):[Detail]
         data: JSON 
     }
     type CompanyProvider{
