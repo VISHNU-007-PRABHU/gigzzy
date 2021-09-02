@@ -36,7 +36,7 @@ class CompanyTable extends React.Component {
         this.setState({ loading: true });
         await client.query({
             query: GET_COMPANY,
-            variables: { limit: pager.pageSize, page: pager.current},
+            variables: { limit: pager.pageSize, page: pager.current },
             fetchPolicy: 'no-cache',
         }).then(result => {
             const pagination = { ...this.state.pagination };
@@ -60,7 +60,7 @@ class CompanyTable extends React.Component {
         input = data;
         await client.query({
             query: GET_COMPANY,
-            variables: { limit: this.state.pagination.pageSize, page:  this.state.pagination.current , search:input},
+            variables: { limit: this.state.pagination.pageSize, page: this.state.pagination.current, search: input },
             fetchPolicy: 'no-cache',
         }).then(result => {
             const pagination = { ...this.state.pagination };
@@ -104,6 +104,17 @@ class CompanyTable extends React.Component {
 
     render() {
         const columns = [
+            {
+                title: <span>User Name</span>,
+                width: '25%',
+                render: (text, record) => {
+                    return <div>
+                        <span title="Company Name">{record.get_company_user_detail[0].first_name}</span>
+                        <span title=""> {record.get_company_user_detail[0].last_name}</span>
+                    </div>
+                }
+            },
+
             {
                 title: <span>Company Name</span>,
                 dataIndex: 'company_name',

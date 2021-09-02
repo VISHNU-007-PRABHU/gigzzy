@@ -154,17 +154,18 @@ class Add_Company extends React.Component {
         form.validateFields(async (err, values) => {
             if (!err) {
                 let company_data = {}
-                if (values['name']) {
-                    company_data['name'] = values['name']
+                if (values['company_name']) {
+                    company_data['company_name'] = values['company_name']
                 }
-                if (values['about']) {
-                    company_data['about'] = values['about']
+                if (values['about_company']) {
+                    company_data['about_company'] = values['about_company']
                 }
-                if (values['website_url']) {
-                    company_data['website_url'] = values['website_url']
+                if (values['company_category']) {
+                    company_data['company_category'] = values['company_category']
                 }
-                if (values['address']) {
-                    company_data['address'] = values['address']
+                
+                if (values['company_website']) {
+                    company_data['company_website'] = values['company_website']
                 }
                 if (values['provider_email'] && values['provider_email'].length) {
                     company_data['provider_email'] = values['provider_email']
@@ -281,7 +282,7 @@ class Add_Company extends React.Component {
                                         <Row gutter={12}>
                                             <Col span={24}>
                                                 <Form.Item label="Company About">
-                                                    {form.getFieldDecorator("about", {
+                                                    {form.getFieldDecorator("about_company", {
                                                         initialValue: this.state.update_data.about_company,
                                                         rules: [{ required: true }]
                                                     })(<Input.TextArea placeholder="Company About" />)}

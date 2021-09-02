@@ -106,8 +106,13 @@ export const GET_COMPANY = gql`
             user_id
             company_name
             company_website
-            companyCategory
             about_company
+            company_category
+            get_company_user_detail {
+                first_name
+                last_name
+                role
+            }
             get_company_address_detail(company_id:$company_id) {
                 address
                 lat

@@ -299,7 +299,7 @@ const typeDefs = gql`
         mobileNumber:String
         company_name:String
         company_website:String
-        companyCategory:String
+        company_category:String
         about_company:String
         add_later:Boolean
         password:String
