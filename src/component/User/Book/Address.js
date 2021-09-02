@@ -53,7 +53,10 @@ const Address = (props) => {
     const [edit, setedit] = useState(false);
 
     useEffect(() => {
-        let local_user_id = JSON.parse(localStorage.getItem('user'))._id
+        let local_user_id = ""
+        if(JSON.parse(localStorage.getItem('user'))){
+            local_user_id= JSON.parse(localStorage.getItem('user'))._id
+        }
         if (props.user_id) {
             setuser_id(props.user_id)
         } else if (local_user_id) {

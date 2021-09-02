@@ -23,6 +23,7 @@ class Add_Company extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            user_id:"",
             visibleAddress:false,
             modalVisible: false,
             dataSource: [],
@@ -53,8 +54,11 @@ class Add_Company extends React.Component {
     }
     componentDidMount() {
         const { form } = this.props;
+        let data = localStorage.getItem('hokjighsasd')
+        if(data){
+          this.setState({user_id:JSON.parse(window.atob(data))._id})
+        }
         form.resetFields();
-        console.log(this.props.match.params.id);
         if (this.props.match.params.id !== undefined) {
             this.fetch_find_company();
         }
