@@ -103,6 +103,7 @@ export const GET_COMPANY = gql`
         }
         data{
             _id
+            user_id
             company_name
             company_website
             companyCategory

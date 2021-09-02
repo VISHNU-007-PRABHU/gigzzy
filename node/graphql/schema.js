@@ -288,6 +288,8 @@ const typeDefs = gql`
     }
     type Company{
         _id:ID
+        user_id:ID
+        provider_id:ID
         msg:String
         status:String
         name:String

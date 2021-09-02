@@ -206,6 +206,9 @@ class Add_Company extends React.Component {
     goPage = (page, id) => {
         if (page === "profile") {
             let user_url = `/admin-user/add/`
+            if(this.state.update_data.user_id){
+                user_url = `/admin-user/add/${this.state.update_data.user_id}`
+            }
             this.props.history.push(user_url)
         }
     }
