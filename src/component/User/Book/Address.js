@@ -37,7 +37,7 @@ query ADDRESS($user_id: ID) {
 `;
 const Address = (props) => {
     let location = useLocation();
-
+    const [user_id, setuser_id] = useState("");
     const [service_modal, setservice_modal] = useState(false);
     const [draggable, setdraggable] = useState(true);
     const [zoom, setzoom] = useState(15);
@@ -51,8 +51,17 @@ const Address = (props) => {
     const [center, setcenter] = useState([9.9619289, 78.1288218]);
     const [add, setadd] = useState(false);
     const [edit, setedit] = useState(false);
+
+    useEffect(() => {
+        let local_user_id = JSON.parse(localStorage.getItem('user'))._id
+        if (props.user_id) {
+            setuser_id(props.user_id)
+        } else if (local_user_id) {
+            setuser_id(local_user_id)
+        }
+    }, [props])
     const [updateTodo] = useMutation(ADD_ADDRESS, {
-        refetchQueries: [{ query: GET_ADDRESS, variables: { user_id: JSON.parse(localStorage.getItem('user'))._id } }],
+        refetchQueries: [{ query: GET_ADDRESS, variables: { user_id } }],
         awaitRefetchQueries: true,
     });
 
@@ -214,11 +223,11 @@ const Address = (props) => {
                                                 <div className="my-2 no_color d-flex justify-content-between">
                                                     <div>
                                                         Set location
-                                                </div>
+                                                    </div>
                                                     <div className='primary_color'>
                                                         <Button className='primary_color' type="link" onClick={skip}>
                                                             <GoChevronLeft />  skip
-                                            </Button>
+                                                        </Button>
                                                     </div>
                                                 </div>
                                                 <div className="my-2">
@@ -277,13 +286,13 @@ const Address = (props) => {
                                                     <div className="my-2 d-flex justify-content-around">
                                                         <Button className={title === 'Home' ? "d-flex primary_color" : "d-flex no_color"} type="link" onClick={() => { settitle("Home") }} >
                                                             <Icon type="home" /> Home
-                                                </Button>
+                                                        </Button>
                                                         <Button className={title === 'Work' ? "d-flex primary_color" : "d-flex no_color"} type="link" onClick={() => { settitle('Work') }} >
                                                             <Icon type="shop" />Work
-                                                </Button>
+                                                        </Button>
                                                         <Button className={title !== "Home" && title !== "Work" ? "d-flex primary_color" : "d-flex no_color"} type="link" onClick={() => { settitle('Others') }} >
                                                             <Icon type="security-scan" />Others
-                                                </Button>
+                                                        </Button>
                                                     </div>
                                                     <div className="my-2">
                                                         {edit === true ?

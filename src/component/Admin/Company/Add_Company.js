@@ -324,7 +324,7 @@ class Add_Company extends React.Component {
                                         <Card onClick={()=>{this.setState({visibleAddress:true})}}>
                                             Address
                                         </Card>
-                                        <Address visible={this.state.visibleAddress}/>
+                                        <Address user_id={""} visible={this.state.visibleAddress}/>
                                     </Col>
                                 </Row>
                             </Form>
