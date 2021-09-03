@@ -294,6 +294,9 @@ const resolvers = {
     ContractJob:{
         get_contract_files:contractResolver.get_contract_files,
     },
+    CompanyImage:{
+        get_contract_files:contractResolver.get_contract_files
+    },
     Booking: {
         user: userResolver.user,
         booking_provider: userResolver.available_booking_povider,
