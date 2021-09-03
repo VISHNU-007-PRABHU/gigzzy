@@ -90,7 +90,7 @@ module.exports.DeleteContractJobFile = async (root, args) => {
 
 module.exports.ContractJobFileUpload = async (root, args) => {
     try {
-        let files = args['files']
+        let files = args['file']
         console.log("module.exports.ContractJobFileUpload -> files", files)
         if (files && _.size(files)) {
             _.forEach(files, async file => {
