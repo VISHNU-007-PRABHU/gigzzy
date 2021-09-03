@@ -173,6 +173,29 @@ module.exports.get_contract_files = async (root, args) => {
     }
 }
 
+module.exports.get_contract_all_files = async (root, args) => {
+    try {
+        let match = {
+            delete: false
+        }
+        if (args['contract_id']) {
+            match['contract_id'] = ObjectId(args['contract_id'])
+        }
+        let pipeline = [
+            {
+                $match: match
+            },
+        ]
+
+        let grouped_images = await ContractJobImage_model.aggregate(pipeline)
+        console.log("module.exports.get_contract_files -> grouped_images", grouped_images)
+        return grouped_images
+    } catch (error) {
+        console.log("module.exports.get_contract_files -> error", error)
+        return []
+    }
+}
+
 module.exports.get_contracts_pagination = async (parent, args, context, info) => {
     try {
         var limit = args.limit || 10;

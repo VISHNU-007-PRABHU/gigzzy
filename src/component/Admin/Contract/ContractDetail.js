@@ -104,17 +104,19 @@ class ContractDetail extends React.Component {
         console.log(this.state.u_rate);
         const { booking, booking_category, booking_provider, booking_user, u_rate } = this.state;
         console.log(this.props);
+
+
         return (
             <Layout style={{ height: '100vh' }}>
                 <AdminSider update_collapsed={this.state.collapsed} />
                 <Layout>
                     <AdminHeader />
                     <Content className="main_frame" style={{ background: 'none' }}>
-                        <Card title="Selected bider" loading={false}>
-                            <BidingList></BidingList>
-                        </Card>
                         <Row gutter={12}>
-                            <Col lg={16} md={24}>
+                            <Col lg={18} md={24}>
+                                <Card bordered={0} title="Job Detail" className="mb-3">
+                                    <BidingList></BidingList>
+                                </Card>
                                 <Card bordered={0} title="Job Detail" className="mb-3">
                                     <Row gutter={[12, 12]}>
                                         <Col span={12}>
@@ -303,6 +305,8 @@ class ContractDetail extends React.Component {
                                     </Row>
 
                                 </Card>
+                            </Col>
+                            <Col lg={6} md={24}>
                             </Col>
                         </Row>
                     </Content>

@@ -13,19 +13,9 @@ body {
     }
 }
 
-.demo-infinite-container {
-    border: 1px solid #e8e8e8;
-    border-radius: 4px;
-    overflow: auto;
-    padding: 8px 24px;
-    background: white;
-  }
-  .demo-loading-container {
-    position: absolute;
-    bottom: 40px;
-    width: 100%;
-    text-align: center;
-  }
+.br_7 {
+    border-radius: 7px;
+}
 
 .input_border {
     border-left: none !important;
@@ -250,8 +240,6 @@ span.ant-form-item-children.d-block {
         margin: 13px 0px;
         overflow: hidden;
     }
-    
-    
 }
 
 @media only screen and (min-width: 900px) {

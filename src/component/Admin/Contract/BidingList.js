@@ -1,8 +1,9 @@
 import React, { Suspense } from "react";
 import { withRouter } from "react-router";
 import { client } from "../../../apollo";
-import { List, Avatar, Button, Skeleton } from 'antd';
-
+import { List, Avatar, Button, Skeleton, Col, Card, Row,Typography } from 'antd';
+import { divide } from "lodash";
+const { Title } = Typography;
 const count = 3;
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat&noinfo`;
 
@@ -11,9 +12,11 @@ class BidingList extends React.Component {
     initLoading: true,
     loading: false,
     data: [{
-        name:"vishnu",
-    },{
-        name:"vishnu",
+      name: "vishnu",
+      loading: false
+    }, {
+      name: "vishnu",
+      loading: false
     }],
     list: [],
   };
@@ -29,13 +32,13 @@ class BidingList extends React.Component {
   }
 
   getData = callback => {
-    
+
   };
 
   onLoadMore = () => {
     this.setState({
       loading: true,
-      list: this.state.data.concat([...new Array(count)].map(() => ({ loading: true, name: {} }))),
+      list: this.state.data.concat([...new Array(count)].map(() => ({ loading: true, name: "" }))),
     });
     this.getData(res => {
       const data = this.state.data.concat(res.results);
@@ -56,45 +59,64 @@ class BidingList extends React.Component {
   };
 
   render() {
+    const data = [
+      {
+        title: 'Ant Design Title 1',
+      },
+      {
+        title: 'Ant Design Title 2',
+      },
+      {
+        title: 'Ant Design Title 3',
+      },
+      {
+        title: 'Ant Design Title 4',
+      },
+    ];
     const { initLoading, loading, list } = this.state;
     const loadMore =
-      !initLoading && !loading ? (
-        <div
-          style={{
-            textAlign: 'center',
-            marginTop: 12,
-            height: 32,
-            lineHeight: '32px',
-          }}
-        >
-          <Button onClick={this.onLoadMore}>loading more</Button>
+      true ? (
+        <div className="text-center">
+          <Button className="mt-3" type="dashed" onClick={this.onLoadMore}>View all request</Button>
         </div>
       ) : null;
 
     return (
-      <List
-        className="demo-loadmore-list"
-        loading={false}
-        itemLayout="horizontal"
-        loadMore={loadMore}
-        dataSource={list}
-        renderItem={item => (
-          <List.Item
-            actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}
-          >
-            <Skeleton avatar title={false} loading={item.loading} active>
-              <List.Item.Meta
-                avatar={
-                  <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-                }
-                title={<a href="https://ant.design">{item.name}</a>}
-                description="Ant Design, a design language for background applications, is refined by Ant UED Team"
-              />
-              <div>content</div>
-            </Skeleton>
-          </List.Item>
-        )}
-      />
+      <Row gutter={[12, 12]}>
+        <List
+          itemLayout="horizontal"
+          dataSource={data}
+          loading={false}
+          loadMore={loadMore}
+          renderItem={item => (
+            <Col lg={12}>
+              <Card className="br_7" hoverable="true" bodyStyle={{ padding: "18px 8px" }}>
+                <List.Item className="p-0">
+                  <div className="w-100 d-flex align-items-center">
+                    <div>
+                      <Avatar size={64} src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                    </div>
+                    <div className="w-100 px-1">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div className="normal_font_size">vishnu prabhu testing long name</div>
+                        <div>basde</div>
+                      </div>
+                      <div className="d-flex justify-content-between align-items-end mt-1">
+                        <div>
+                          <div>3.5</div>
+                          <div>Duration: 1 day</div>
+                        </div>
+                        <div className="normal_font_size">Ksh 200000</div>
+                      </div>
+                    </div>
+                  </div>
+                </List.Item>
+              </Card>
+            </Col>
+          )}
+        />
+
+      </Row>
     );
   }
 }
