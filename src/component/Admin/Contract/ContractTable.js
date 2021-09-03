@@ -135,15 +135,9 @@ class ContractTable extends React.Component {
                     this.state.dataSource.length >= 1 ? (
                         <span title="...." className="d-flex d-sm-inline justify-content-around">
                             <RoleView permission="">
-                                <span className="cursor_point" onClick={() => { this.props.history.push(`/admin-contract/view/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
-                            </RoleView>
-                            <RoleView permission="">
-                                <Popconfirm title="Sure to delete this contract ?" onConfirm={() => this.handleDelete(record._id)}>
-                                    <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
-                                </Popconfirm>
+                                <span className="cursor_point" onClick={() => { this.props.history.push(`/admin-contract/view/${record._id}`); }}><Icon type="eye" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
                             </RoleView>
                         </span>
-
                     ) : null,
             },
         ];

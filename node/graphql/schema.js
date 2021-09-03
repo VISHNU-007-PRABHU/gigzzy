@@ -344,6 +344,8 @@ const typeDefs = gql`
         msg:String
         status:String
         images:[CompanyImage]
+        get_contract_files(contract_id:ID):[CompanyImage]
+
     }
     type Admin{
         _id:ID

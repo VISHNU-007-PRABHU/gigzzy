@@ -1,4 +1,4 @@
-import React from 'react'
+import React,{useState,useEffect} from 'react'
 import { useLocation } from "react-router";
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Icon, Empty, List, Skeleton, Button } from 'antd';
@@ -31,14 +31,22 @@ const DELETE_ADDRESS = gql`
 
 
 
-const SetAddress = () => {
+const SetAddress = (props) => {
     let location = useLocation();
+    const [user_id, setuser_id] = useState("");
+    useEffect(() => {
+        if (props['user_id']) {
+            setuser_id(props['user_id'])
+        } else if(JSON.parse(localStorage.getItem('user'))){
+            setuser_id(JSON.parse(localStorage.getItem('user'))._id)
+        }
 
+    }, [props])
     const { loading, error, data } = useQuery(GET_ADDRESS, {
-        variables: { user_id: JSON.parse(localStorage.getItem('user'))._id },
+        variables: { user_id: user_id },
     });
     const [delete_address, { loading: removeLoading }] = useMutation(DELETE_ADDRESS, {
-        refetchQueries: [{ query: GET_ADDRESS, variables: { user_id: JSON.parse(localStorage.getItem('user'))._id } }],
+        refetchQueries: [{ query: GET_ADDRESS, variables: { user_id:user_id} }],
         awaitRefetchQueries: true,
     });
 

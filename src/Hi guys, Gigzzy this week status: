@@ -1,0 +1,20 @@
+Hi guys, Gigzzy this week status:
+
+Api:
+
+1.contract update api
+2.contract image and document upload api (* multiple)
+3.delete contract document api
+4.Modified Address api based in contract
+5.contract pagination api
+6.contract detail api
+7.check twillio api (twillio document)
+8.check mailchimp api (mailchimp document)
+
+Admin
+
+1.Fixed company user update 
+2.Add contract pagination
+3.contract detail page
+
+Android and IOS: (api, function,ui)

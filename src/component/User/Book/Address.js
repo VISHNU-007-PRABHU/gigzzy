@@ -313,7 +313,7 @@ const Address = (props) => {
                                     }
                                 >
                                     {add === false ? <div className="d-block map_modal">
-                                        <SetAddress />
+                                        <SetAddress user_id={user_id}/>
                                     </div> :
                                         <div className="d-block maps_modal">
                                             <div style={{ height: '30vh', width: '100%' }}>
