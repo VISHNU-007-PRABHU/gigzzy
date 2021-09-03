@@ -65,12 +65,10 @@ module.exports.get_biding_milestone_detail = async (root, args) => {
 module.exports.DeleteContractJobFile = async (root, args) => {
     try {
         let { _id } = args;
-        console.log("module.exports.DeleteContractJobFile -> _id", _id)
         if (!_id) {
             return { status: "failed", msg: "Invalid params" }
         }
         let fetch_images = await ContractJobImage_model.findOne({ _id: _id }).lean()
-        console.log("module.exports.DeleteContractJobFile -> fetch_images", fetch_images)
         let image_array = ['small_image', 'large_image']
         _.forEach(image_array, file_data => {
             var file = path.join(__dirname, "../../images/contract", fetch_images[file_data]);
@@ -91,7 +89,6 @@ module.exports.DeleteContractJobFile = async (root, args) => {
 module.exports.ContractJobFileUpload = async (root, args) => {
     try {
         let files = args['file']
-        console.log("module.exports.ContractJobFileUpload -> files", files)
         if (files && _.size(files)) {
             _.forEach(files, async file => {
                 if (file) {
@@ -207,14 +204,11 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
 module.exports.get_contracts = async (root, args) => {
     try {
         let find_query = { is_delete: false }
-        if (args['_id']) {
-            find_query['_id'] = args['_id']
-        }
         if (args['company_id']) {
             find_query['company_id'] = args['company_id']
         }
         if (args['contract_id']) {
-            find_query['contract_id'] = args['contract_id']
+            find_query['_id'] = args['contract_id']
         }
         if (args['user_id']) {
             find_query['user_id'] = args['user_id']
