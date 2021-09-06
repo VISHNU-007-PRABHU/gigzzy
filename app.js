@@ -90,11 +90,14 @@ class UrlDirective extends SchemaDirectiveVisitor {
     const { resolve = defaultFieldResolver } = field;
     const { format } = this.args;
     field.resolve = async function (...args) {
+       const file_type =  args[0].doc_type || "png"
       const img = await resolve.apply(this, args);
-      if (img) {
-        return `${commonHelper.getBaseurl()}/images/${format}/${img}`;;
-      } else {
-        return '';
+      if (img && file_type && file_type !== "pdf") {
+        return `${commonHelper.getBaseurl()}/images/${format}/${img}`;
+      } else if(file_type && file_type === "pdf") {
+        return `${commonHelper.no_image('pdf')}`;
+      }else{
+        return `${commonHelper.no_image()}`;
       }
     };
     // The formatted Date becomes a String, so the field type must change:
@@ -151,7 +154,7 @@ const server = new ApolloServer({
     upper: UpperCaseDirective,
     imgSize: ImgSizeDirective,
     payment: c2bDirective,
-    imgUrl:UrlDirective
+    imgUrl: UrlDirective
   },
   subscriptions: {
     onConnect: () => { },

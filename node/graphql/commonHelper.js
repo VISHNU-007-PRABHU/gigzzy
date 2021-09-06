@@ -39,8 +39,12 @@ module.exports.completed = 3;
 module.exports.chat = 4;
 module.exports.booking_view = 5;
 
-module.exports.no_image = () => {
-  return env.APP_URL + "/images/public/no_img.png";
+module.exports.no_image = (file="normal") => {
+  if(file === "pdf"){
+    return env.APP_URL + "/images/public/pdf.jpeg";
+  }else{
+    return env.APP_URL + "/images/public/no_img.png";
+  }
 };
 
 
