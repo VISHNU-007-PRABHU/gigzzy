@@ -22,6 +22,7 @@ const cwd = process.cwd();
 const dotenv = require('dotenv');
 const expressStaticGzip = require('express-static-gzip');
 const _ = require("lodash");
+const commonHelper = require('./node/graphql/commonHelper')
 dotenv.config();
 class refDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
@@ -84,7 +85,22 @@ class UpperCaseDirective extends SchemaDirectiveVisitor {
     };
   }
 }
-
+class UrlDirective extends SchemaDirectiveVisitor {
+  visitFieldDefinition(field) {
+    const { resolve = defaultFieldResolver } = field;
+    const { format } = this.args;
+    field.resolve = async function (...args) {
+      const img = await resolve.apply(this, args);
+      if (img) {
+        return `${commonHelper.getBaseurl()}/images/${format}/${img}`;;
+      } else {
+        return '';
+      }
+    };
+    // The formatted Date becomes a String, so the field type must change:
+    field.type = GraphQLString;
+  }
+}
 
 class c2bDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
@@ -134,7 +150,8 @@ const server = new ApolloServer({
     date: DateFormatDirective,
     upper: UpperCaseDirective,
     imgSize: ImgSizeDirective,
-    payment: c2bDirective
+    payment: c2bDirective,
+    imgUrl:UrlDirective
   },
   subscriptions: {
     onConnect: () => { },

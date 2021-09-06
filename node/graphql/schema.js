@@ -12,6 +12,8 @@ const typeDefs = gql`
     directive @upper on FIELD_DEFINITION
     directive @date(format: String) on FIELD_DEFINITION
     directive @imgSize(format: String) on FIELD_DEFINITION
+    directive @imgUrl(format: String) on FIELD_DEFINITION
+
 
     type Subscription {
         messageSent(limit: Int,page:Int,user_id:ID,provider_id:ID,booking_id:ID):Chat
@@ -333,8 +335,8 @@ const typeDefs = gql`
     type CompanyImage{
         _id:ID
         company_id: String,
-        small_image: String,
-        large_image: String,
+        small_image: String  @imgUrl(format: "contract"),
+        large_image: String  @imgUrl(format: "contract"),
         image_tag: String,
         doc_type: String,
         doc_category: String,
