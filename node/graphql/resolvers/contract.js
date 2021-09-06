@@ -14,7 +14,6 @@ var ContractJobImage_model = model.contract_job_images;
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 const path = require("path");
 var fs = require('fs');
-const { pipeline } = require('stream');
 
 module.exports.get_my_biding = async (root, args) => {
     //console.log(args);
@@ -85,12 +84,10 @@ module.exports.DeleteContractJobFile = async (root, args) => {
     }
 }
 
-
-module.exports.ContractJobFileUpload = async (root, args) => {
-    try {
-        let files = args['file']
-        if (files && _.size(files)) {
-            _.forEach(files, async file => {
+exports.uploading_files = async (files, args) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            _.forEach(files, async (file, i) => {
                 if (file) {
                     const { createReadStream, filename } = await file;
                     var extension = filename.split('.').pop();
@@ -123,7 +120,21 @@ module.exports.ContractJobFileUpload = async (root, args) => {
                     let add_contract_image_job = new ContractJobImage_model(img_data)
                     let added_contract_images_job = await add_contract_image_job.save()
                 }
+                if (_.size(files) === i + 1) {
+                    return resolve(true)
+                }
             })
+        } catch (error) {
+            reject(false)
+        }
+    })
+}
+
+module.exports.ContractJobFileUpload = async (root, args) => {
+    try {
+        let files = args['file']
+        if (files && _.size(files)) {
+            let filesUpload = await this.uploading_files(files, args)
             return { status: "success", msg: "File added success" }
         } else {
             let update_data = {
@@ -139,6 +150,7 @@ module.exports.ContractJobFileUpload = async (root, args) => {
             return { status: "success", msg: "File update success" }
         }
     } catch (error) {
+        console.log("module.exports.ContractJobFileUpload -> error", error)
         return { status: "failed", msg: "File upload failed" }
     }
 }
@@ -203,7 +215,7 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         var offset = Number(page - 1) * Number(limit);
         var total = 0;
         var result = [];
-        let find_query = { is_delete : false }
+        let find_query = { is_delete: false }
         if (args['search']) {
             find_query = { ...find_query, ...args['search'] }
         }
@@ -223,7 +235,7 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
     } catch (error) {
         return []
     }
-}; 
+};
 module.exports.get_contracts = async (root, args) => {
     try {
         let find_query = { is_delete: false }
@@ -281,7 +293,7 @@ module.exports.update_contract = async (root, args) => {
 exports.find_provider = async (contract_data) => {
     try {
         // get category data
-        if(contract_data['cat']){
+        if (contract_data['cat']) {
             //  send request with in radius
             var filter = {
                 role: 2,
@@ -292,7 +304,7 @@ exports.find_provider = async (contract_data) => {
                 provider_subCategoryID: { $in: [args.category_id] },
             };
             let find_provider = await Detail_model.find(filter);
-        }else{
+        } else {
             //  send request with al the location
         }
         let response = {}

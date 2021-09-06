@@ -38,40 +38,34 @@ class BidingList extends React.Component {
   onLoadMore = () => {
     this.setState({
       loading: true,
-      list: this.state.data.concat([...new Array(count)].map(() => ({ loading: true, name: "" }))),
-    });
-    this.getData(res => {
-      const data = this.state.data.concat(res.results);
-      this.setState(
-        {
-          data,
-          list: data,
-          loading: false,
-        },
-        () => {
-          // Resetting window's offsetTop so as to display react-virtualized demo underfloor.
-          // In real scene, you can using public method of react-virtualized:
-          // https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
-          window.dispatchEvent(new Event('resize'));
-        },
-      );
     });
   };
 
   render() {
     const data = [
       {
-        title: 'Ant Design Title 1',
+        name: 'Ant Design Title 1',
+        price:'20000 Ksh',
+        basde:"basde",
+        time:"3.5",
+        year:"1 day"
+
       },
       {
-        title: 'Ant Design Title 2',
+        name: 'Ant Design Title 1',
+        price:'20000 Ksh',
+        basde:"basde",
+        time:"3.5",
+        year:"1 day"
       },
       {
-        title: 'Ant Design Title 3',
+        name: 'Ant Design Title 1',
+        price:'20000 Ksh',
+        basde:"basde",
+        time:"3.5",
+        year:"1 day"
       },
-      {
-        title: 'Ant Design Title 4',
-      },
+     
     ];
     const { initLoading, loading, list } = this.state;
     const loadMore =
@@ -86,7 +80,7 @@ class BidingList extends React.Component {
         <List
           itemLayout="horizontal"
           dataSource={data}
-          loading={false}
+          loading={loading}
           loadMore={loadMore}
           renderItem={item => (
             <Col lg={12}>
@@ -98,15 +92,15 @@ class BidingList extends React.Component {
                     </div>
                     <div className="w-100 px-1">
                       <div className="d-flex justify-content-between align-items-center">
-                        <div className="normal_font_size">vishnu prabhu testing long name</div>
-                        <div>basde</div>
+                        <div className="normal_font_size">{item.name}</div>
+                        <div>{item.basde}</div>
                       </div>
                       <div className="d-flex justify-content-between align-items-end mt-1">
                         <div>
-                          <div>3.5</div>
-                          <div>Duration: 1 day</div>
+                          <div>{item.time}</div>
+                          <div>Duration: {item.year}</div>
                         </div>
-                        <div className="normal_font_size">Ksh 200000</div>
+                        <div className="normal_font_size">{item.price}</div>
                       </div>
                     </div>
                   </div>
