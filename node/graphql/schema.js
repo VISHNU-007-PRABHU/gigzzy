@@ -94,6 +94,7 @@ const typeDefs = gql`
         get_contract_files(company_id:ID,user_id:ID,provider_id:ID,contract_id:ID):[CompanyImage]
         get_contracts(company_id:ID,contract_id:ID,provider_id:ID,user_id:ID):[ContractJob]
         get_contracts_pagination(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
+        get_contract_all_files(contract_id:ID):[CompanyImage]
     }
 
     # sub category pagination data  
