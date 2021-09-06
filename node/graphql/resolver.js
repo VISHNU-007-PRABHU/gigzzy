@@ -189,6 +189,7 @@ const resolvers = {
         get_contract_files:contractResolver.get_contract_files,
         get_contracts:contractResolver.get_contracts,
         get_contracts_pagination:contractResolver.get_contracts_pagination,
+        get_contract_all_files:contractResolver.get_contract_all_files,
         get_my_appointments: async (parent, args, context, info) => {
             try {
 
