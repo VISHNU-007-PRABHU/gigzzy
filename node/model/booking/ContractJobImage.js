@@ -16,7 +16,7 @@ var schemaOptions = {
 };
 
 function url_path(data){
-    return commonHelper.url_path('company',data)
+    return commonHelper.url_path('contract',data)
  }
 
 const ContractJobImagesSchema = mongoose.Schema({
