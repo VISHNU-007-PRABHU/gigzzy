@@ -90,11 +90,11 @@ class BidingList extends React.Component {
           loadMore={loadMore}
           renderItem={item => (
             <Col lg={12}>
-              <Card className="br_7" hoverable="true" bodyStyle={{ padding: "18px 8px" }}>
+              <Card className="br_14" hoverable="true" bodyStyle={{ padding: "18px 8px" }}>
                 <List.Item className="p-0">
                   <div className="w-100 d-flex align-items-center">
                     <div>
-                      <Avatar size={64} src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                      <Avatar className="biding_avatar" size={64} src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
                     </div>
                     <div className="w-100 px-1">
                       <div className="d-flex justify-content-between align-items-center">

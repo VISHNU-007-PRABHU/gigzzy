@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const moment = require("moment");
 mongoose.set('useFindAndModify', false);
 var mongoosePaginate = require('mongoose-paginate-v2');
+const commonHelper = require('../../graphql/commonHelper')
 //create schemaOptions
 var schemaOptions = {
     toObject: {
@@ -14,11 +15,15 @@ var schemaOptions = {
     timestamps: true
 };
 
+function url_path(data){
+    return commonHelper.url_path('company',data)
+ }
+
 const ContractJobImagesSchema = mongoose.Schema({
     contract_id: { type: mongoose.Schema.Types.ObjectId, ref: 'contract' },
     company_id: { type: mongoose.Schema.Types.ObjectId, ref: 'company' },
-    small_image: { type: String, default: '' },
-    large_image: { type: String, default: '' },
+    small_image: { type: String, default: '',get:url_path  },
+    large_image: { type: String, default: '',get:url_path  },
     image_tag: { type: String, default: '' },
     doc_type: { type: String, default: '' },
     doc_category: { type: String, default: '' },
