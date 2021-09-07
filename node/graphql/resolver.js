@@ -305,7 +305,7 @@ const resolvers = {
         booking_provider: userResolver.available_booking_povider,
         find_kilometre: userResolver.kilometer,
         booking_user: userResolver.available_booking_user,
-        booking_category: 
+        booking_category: categoryResolver.available_booking_category,
         get_my_appointments: bookingResolver.available_booking,
         get_booking_on_status: bookingResolver.booking,
         // payout:bookingResolver.get_total_payout,
