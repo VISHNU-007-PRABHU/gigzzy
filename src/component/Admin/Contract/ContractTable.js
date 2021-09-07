@@ -119,13 +119,13 @@ class ContractTable extends React.Component {
                     return <span title="Biding Category">{record.description}</span>;
                 }
             },
-            // {
-            //     title: <span>Type</span>,
-            //     dataIndex: 'is_parent',
-            //     render: (text, record) => {
-            //         return <span title="Type">{record.is_parent ? <Tag color="green">Parent</Tag> : <Tag color="geekblue">Category</Tag>}</span>;
-            //     },
-            // },
+            {
+                title: <span>Budget</span>,
+                width: '15%',
+                render: (text, record) => {
+                    return <span title="Type">{record.budget}</span>;
+                },
+            },
             {
                 title: 'Action',
                 width: '10%',

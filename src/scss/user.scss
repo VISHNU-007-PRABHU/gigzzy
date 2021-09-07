@@ -2,8 +2,10 @@
 body {
     font-family: "BalooTamma2", cursive !important;
 }
-.primary_color {
-    color: #07cb79 !important;
+$primarycolor: #99d332;
+
+.primary_color,.text-success{
+    color: $primarycolor !important;
 }
 
 @media (max-width: 1023px) and(orientation: landscape) {
@@ -175,11 +177,11 @@ body {
 }
 
 .certain-category-search.ant-select-focused .certain-category-icon {
-    color: #07cb79;
+    color: $primarycolor;
 }
 
 .avatar_shadow {
-    box-shadow: 0px 0px 0px 3px #28a745;
+    box-shadow: 0px 0px 0px 3px $primarycolor;
 }
 
 span.ant-form-item-children.d-block {
@@ -258,8 +260,8 @@ span.ant-form-item-children.d-block {
 // }
 
 .ant-timeline-item-head-green {
-    color: #06cb79;
-    border-color: #06cb79 !important;
+    color: $primarycolor;
+    border-color: $primarycolor !important;
 }
 
 .ant-timeline-item-head {

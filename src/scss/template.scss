@@ -1,5 +1,5 @@
-$primarycolor: #84CB07;
-$secondarycolor:#07CB79;
+$primarycolor: #99d332;
+$secondarycolor:#99d332;
 $bdr-color: #dfdfdf;
 $screen-sm-min: 767px;
 $screen-md-min: 1000px;
@@ -8,27 +8,31 @@ $screen-xs-min: 599px;
 $xsm-width: 700px;
 $zero:0px;
 .bg-gradient {
-    background: linear-gradient(87deg, hsl(138, 43%, 55%), #12e58c) !important;
+    background: linear-gradient(87deg, hsl(90, 58%, 35%), $primarycolor) !important;
     // background: white;
 }
-
+.ant-btn-dashed:hover, .ant-btn-dashed:focus {
+    color: $primarycolor;
+    background-color: #fff;
+    border-color: $primarycolor !important;
+}
 .ant-menu-item {
     display: flex !important;
     align-items: center !important;
     font-size: 15px !important;
 }
 .ant-checkbox-checked .ant-checkbox-inner {
-    background-color: #52c41a !important;
-    border-color: #52c41a !important;
+    background-color:$primarycolor !important;
+    border-color: $primarycolor !important;
 }
 .ant-menu.ant-menu-dark .ant-menu-item-selected,
 .ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected {
-    background-color: #07cb79 !important;
+    background-color: $primarycolor !important;
     font-weight: bold;
 }
 
 .ant-menu-item .ant-menu-item-active .ant-menu-item-selected {
-    background-color: #07cb79 !important;
+    background-color: $primarycolor !important;
     color: black !important;
 }
 
@@ -135,7 +139,7 @@ $zero:0px;
 
 a,
 .ant-menu-dark .ant-menu-item-selected>a:hover {
-    color: #07cb79 !important;
+    color: $primarycolor !important;
 }
 
 // .ant-form-item{
@@ -270,7 +274,7 @@ html {
 .jiffy_btn_primary:focus {
     background-color: #e7f8f1 !important;
     border-color: #e7f8f1 !important;
-    color: #20b978 !important;
+    color: $primarycolor !important;
 }
 
 .footer_bg {
@@ -285,6 +289,10 @@ html {
 
 .p-1 {
     padding: 1em !important;
+}
+
+.h_18_em{
+    height: 18em;
 }
 
 .p-0 {
@@ -341,7 +349,7 @@ html {
 
 .banner_section .ant-carousel .slick-dots-bottom li.slick-active,
 .banner_section .ant-carousel .slick-dots-bottom li.slick-active button {
-    background: #07cb79;
+    background: $primarycolor;
 }
 
 .biding_avatar{
@@ -372,6 +380,9 @@ html {
 
 .h-50x {
     height: 50px !important;
+}
+.h_200x{
+    height: 200px !important;
 }
 
 .banner_center button i,
@@ -600,8 +611,8 @@ html {
 .primary-bg:focus,
 .primary-bg:active,
 .primary-bg.active {
-    background: #07cb79 !important;
-    border: 1px solid #07cb79 !important;
+    background: $primarycolor !important;
+    border: 1px solid $primarycolor !important;
     color: #fff !important;
 }
 
@@ -662,7 +673,7 @@ html {
     transform: rotate(-90deg);
     position: relative;
     top: 9px;
-    fill: #01cc79;
+    fill:$primarycolor;
 }
 
 .new_modal .ant-collapse-arrow svg {
@@ -683,14 +694,14 @@ html {
 }
 
 .spy_section ul li.is-current a {
-    color: #01cc79 !important;
+    color: $primarycolor !important;
 }
 
 .spy_section ul li.is-current:after {
     height: 5px;
     position: absolute;
     width: 50px;
-    background: #07cb79;
+    background: $primarycolor;
     border-radius: 50px;
     content: '';
     bottom: 0px;
@@ -974,7 +985,7 @@ html {
     background: #07cb791f;
     padding: 10px;
     border-radius: 50px;
-    color: #07cb79;
+    color: $primarycolor;
 }
 
 .new_modal .ant-modal-close-x {
@@ -1000,7 +1011,7 @@ html {
 .new_modal .price_section p.price {
     font-size: 3em;
     font-weight: 600;
-    color: #07cb79;
+    color: $primarycolor;
     margin: 0px;
 }
 
@@ -1034,7 +1045,7 @@ html {
 }
 
 .new_modal .profile img {
-    border: 5px solid #07cb79;
+    border: 5px solid $primarycolor;
     height: 100px;
     width: 100px;
     border-radius: 100px;
@@ -1094,7 +1105,7 @@ html {
 }
 
 .profile_img .profile_pic {
-    border: 3px solid #07cb79;
+    border: 3px solid $primarycolor;
 }
 
 .text-indent-zero {
@@ -1103,9 +1114,9 @@ html {
 }
 
 .bookings_page .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
-    background: #07cb79 !important;
+    background: $primarycolor !important;
     color: #fff !important;
-    border-color: #07cb79 !important;
+    border-color: $primarycolor !important;
 }
 
 .bookings_div {
@@ -1124,7 +1135,7 @@ html {
     right: 15px;
     top: 50%;
     transform: translate(-50%, -50%);
-    color: #07cb79;
+    color: $primarycolor;
 }
 
 .t-40 {
@@ -1154,7 +1165,7 @@ html {
 
 .history_ul li:before {
     background: #fff;
-    border: 4px solid #07cb79;
+    border: 4px solid $primarycolor;
     content: '';
     position: absolute;
     width: 0px;
@@ -1166,7 +1177,7 @@ html {
 }
 
 .ant-statistic-content-value {
-    border: 5px solid #41cb79;
+    border: 5px solid $primarycolor;
     border-radius: 50px;
     z-index: 1000;
     background: white;
@@ -1198,7 +1209,7 @@ html {
     right: 100%;
     bottom: 0;
     left: 0;
-    background: #41cb79;
+    background: $primarycolor;
     width: 0;
     animation: borealisBar 2s linear infinite;
 }
@@ -1480,7 +1491,7 @@ span.ant-form-item-children {
     top: 4em;
     font-size: 2em;
     right: 36px;
-    color: #06cb79;
+    color: $primarycolor;
     cursor: pointer;
 }
 
