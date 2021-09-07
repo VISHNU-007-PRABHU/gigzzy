@@ -294,7 +294,7 @@ const typeDefs = gql`
         contract_status:String
         category_id:ID
         category_type:Int
-        get_contract_category:(contract_id:ID,_id:ID,category_type:Int):[Category]
+        get_contract_category(contract_id:ID,_id:ID,category_type:Int):[Category]
         get_contract_files(contract_id:ID):[CompanyImage]
     }
     type Company{
