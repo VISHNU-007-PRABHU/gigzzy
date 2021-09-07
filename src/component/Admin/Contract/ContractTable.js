@@ -137,11 +137,15 @@ class ContractTable extends React.Component {
                 width: '15%',
                 render: (text, record) => {
                     if (record && record.get_contract_category && record.get_contract_category[0]?.category_type === 1) {
-                        return <span title="Category">{record.get_contract_category[0]?.category_name}</span>;
+                        return <span title="Category">
+                            <Tag color="geekblue">{record.get_contract_category[0]?.category_name}</Tag>
+                        </span>;
                     }
-                    else if ( record && record.get_contract_category && record.get_contract_category[0]?.category_type === 2) {
-                        return <span title="Category">{record.get_contract_category[0]?.subCategory_name}</span>;
-                    }else{
+                    else if (record && record.get_contract_category && record.get_contract_category[0]?.category_type === 2) {
+                        return <span title="Category">
+                            <Tag color="geekblue">{record.get_contract_category[0]?.subCategory_name}</Tag>
+                        </span>;
+                    } else {
                         return <span title="Category">{"Not Found!"}</span>;
                     }
                 },

@@ -1,11 +1,18 @@
 import React, { Suspense } from "react";
 import { withRouter } from "react-router";
 import { client } from "../../../apollo";
-import filter_img  from "../../../image/fil2.png";
+import filter_img from "../../../image/fil2.png";
 import sort_img from "../../../image/fil1.png";
-import { List, Avatar, Button, Skeleton, Col, Card, Row, Typography, Drawer } from 'antd';
+import { List, Avatar, Button, Skeleton, Popover, Col, Card, Row, Typography, Drawer } from 'antd';
 import BiderDetail from "./biderDetail";
 const { Title } = Typography;
+const text = <span>Title</span>;
+const content = (
+  <div>
+    <p>Content</p>
+    <p>Content</p>
+  </div>
+);
 const count = 3;
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat&noinfo`;
 class BidingList extends React.Component {
@@ -111,8 +118,13 @@ class BidingList extends React.Component {
                 Job Applicants
               </div>
               <div className="d-flex cursor_point">
-                <div className="px-2"><img className="pr-2" loading="lazy" src={sort_img}></img>Sort</div>
-                <div className="px-2"> <img  className="pr-2" loading="lazy" src={filter_img}></img>Filter</div>
+                <Popover placement="bottom" trigger="click" title={text} content={content}>
+                  <div className="px-2"><img className="pr-2" loading="lazy" src={sort_img}></img>Sort</div>
+                </Popover>
+
+                <Popover placement="bottom" trigger="click" title={text} content={content}>
+                  <div className="px-2"> <img className="pr-2" loading="lazy" src={filter_img}></img>Filter</div>
+                </Popover>
               </div>
             </div>
           </Col>
