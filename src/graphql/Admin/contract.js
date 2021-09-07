@@ -42,10 +42,11 @@ export const GET_CONTRACT_PAGINATION = gql`
            name
            description
            budget
+           contract_ref
            get_contract_category{
-            subCategory_name
-            category_name
-            category_type
+                subCategory_name
+                category_name
+                category_type
            }
         }
     }

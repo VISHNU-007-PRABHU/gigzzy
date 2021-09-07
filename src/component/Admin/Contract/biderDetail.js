@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import { withRouter } from "react-router";
 import { client } from "../../../apollo";
 import test_image from "../../../image/test.png";
+import { Icon } from 'antd';
 import { Modal, Avatar, Button, Skeleton, Col, Tag, Row, Typography } from 'antd';
 const { Title, Paragraph } = Typography;
 const { confirm } = Modal;
@@ -14,6 +15,7 @@ class BiderDetail extends React.Component {
         initLoading: true,
         loading: false,
         price_visible: false,
+        company_visible: false,
         data: {
             name: "Garding setup",
             company_name: "XYZ Pct ltd",
@@ -113,7 +115,7 @@ class BiderDetail extends React.Component {
                                     </Paragraph>
                                 </div>
                                 <div>
-                                    <Button type="primary"> Company Detail</Button>
+                                    <Button type="primary" onClick={() => { this.setState({ company_visible: !this.state.company_visible }) }}> Company Detail</Button>
                                 </div>
                             </div>
                         </div>
@@ -172,7 +174,7 @@ class BiderDetail extends React.Component {
                 <Row gutter={[12, 24]}>
                     <Col>
                         <Title level={4} className="font-weight-normal">Company Legal Document</Title>
-                         <img loading="lazy" alt="example" className="h_200x w-100"  src={test_image} />
+                        <img loading="lazy" alt="example" className="h_200x w-100" src={test_image} />
                     </Col>
                 </Row>
                 <Row gutter={[12, 32]}>
@@ -204,6 +206,7 @@ class BiderDetail extends React.Component {
                     title="Please fund the Project"
                     visible={this.state.price_visible}
                     footer={null}
+                    onCancel={()=>{this.setState({price_visible:!this.state.price_visible})}}
                 >
                     <Row gutter={[12, 24]}>
                         <Col span={24}>
@@ -220,7 +223,7 @@ class BiderDetail extends React.Component {
 
                     <Row gutter={[12, 24]}>
                         <Col span={24}>
-                            <Tag color="#87d068" className="w-100">
+                            <Tag color={'#99d332'} className="w-100">
                                 <div className="d-flex justify-content-between align-items-center">
                                     <div className="d-flex flex-column">
                                         <div> Service fees</div>
@@ -231,6 +234,64 @@ class BiderDetail extends React.Component {
                             </Tag>
                         </Col>
 
+                    </Row>
+                </Modal>
+                <Modal
+                    visible={this.state.company_visible}
+                    footer={null}
+                    header={null}
+                    className="company_detail_modal"
+                    onCancel={()=>{this.setState({company_visible:!this.state.company_visible})}}
+                >
+                    <Row gutter={[12, 24]} className="mt-5">
+                        <Col span={24}>
+                            <div className="d-flex normal_font_size justify-content-between align-items-center">
+                                <div>
+                                    <div className="bold">
+                                        XYZ PRIVATE LT
+                                    </div>
+                                    <div >
+                                        WWW.test.com
+                                    </div>
+                                </div>
+                                <div>
+                                    <Avatar className="biding_avatar" size={64} src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                                </div>
+                            </div>
+                        </Col>
+                    </Row>
+
+                    <Row gutter={[12, 24]}>
+                        <Col>
+                            <div>
+                                <Paragraph ellipsis={{ rows: 3, expandable: true }}>
+                                    Ant Design, a design language for background applications, is refined by Ant UED Team. Ant
+                                    Design, a design language for background applications, is refined by Ant UED Team. Ant Design,
+                                    a design language for background applications, is refined by Ant UED Team. Ant Design, a
+                                    design language for background applications, is refined by Ant UED Team. Ant Design, a design
+                                    language for background applications, is refined by Ant UED Team. Ant Design, a design
+                                    language for background applications, is refined by Ant UED Team.
+                                    Ant Design, a design language for background applications, is refined by Ant UED Team. Ant
+                                    Design, a design language for background applications, is refined by Ant UED Team. Ant Design,
+                                    a design language for background applications, is refined by Ant UED Team. Ant Design, a
+                                    design language for background applications, is refined by Ant UED Team. Ant Design, a design
+                                    language for background applications, is refined by Ant UED Team. Ant Design, a design
+                                    language for background applications, is refined by Ant UED Team.
+                                </Paragraph>
+                            </div>
+                        </Col>
+                    </Row>
+
+                    <Row gutter={[12, 24]}>
+                        <Col span={24}>
+                            <div>
+                                <Button type="link" className="option_blue normal_font_size">
+                                    <div className="d-flex align-items-center"> 
+                                        Dowwnload Profile <Icon type="download" className="px-2"/>
+                                    </div>
+                                </Button>
+                            </div>
+                        </Col>
                     </Row>
                 </Modal>
             </div>

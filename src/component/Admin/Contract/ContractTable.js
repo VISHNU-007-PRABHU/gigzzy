@@ -106,6 +106,13 @@ class ContractTable extends React.Component {
     render() {
         const columns = [
             {
+                title: <span>Contract Ref</span>,
+                width: '15%',
+                render: (text, record) => {
+                    return <span title="Contract Ref">{record.contract_ref}</span>;
+                }
+            },
+            {
                 title: <span>Name</span>,
                 width: '15%',
                 render: (text, record) => {
@@ -124,6 +131,19 @@ class ContractTable extends React.Component {
                 width: '15%',
                 render: (text, record) => {
                     return <span title="Type">{record.budget}</span>;
+                },
+            }, {
+                title: <span>Category</span>,
+                width: '15%',
+                render: (text, record) => {
+                    if (record && record.get_contract_category && record.get_contract_category[0]?.category_type === 1) {
+                        return <span title="Category">{record.get_contract_category[0]?.category_name}</span>;
+                    }
+                    else if ( record && record.get_contract_category && record.get_contract_category[0]?.category_type === 2) {
+                        return <span title="Category">{record.get_contract_category[0]?.subCategory_name}</span>;
+                    }else{
+                        return <span title="Category">{"Not Found!"}</span>;
+                    }
                 },
             },
             {

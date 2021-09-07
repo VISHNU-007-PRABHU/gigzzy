@@ -77,6 +77,14 @@ class Biding extends React.Component {
             <>
                 <Row gutter={[12, 24]}>
                     <Col span={24}>
+                        <div className="d-flex justify-content-between normal_font_size">
+                            <div>Contract Detail</div>
+                            <div>Contract Ref : 90879278958924357089</div>
+                        </div>
+                    </Col>
+                </Row>
+                <Row gutter={[12, 24]}>
+                    <Col span={24}>
                         <img alt='' src={require("../../../image/handyman.jpg")} loading="lazy" className="w-100 br_14 h_18_em lazyload" />
                     </Col>
                 </Row>

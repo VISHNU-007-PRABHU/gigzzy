@@ -1,7 +1,9 @@
 var mongoose = require('mongoose');
 const moment = require("moment");
 const commonHelper = require('../../graphql/commonHelper');
+const shortid = require('shortid');
 mongoose.set('useFindAndModify', false);
+
 var Schema = mongoose.Schema;
 var schemaOptions = {
     toObject: {
@@ -27,7 +29,7 @@ var contractSchema = new Schema({
     category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'category', unique: false },
     address_id: { type: mongoose.Schema.Types.ObjectId, ref: 'address' },
     category_type: { type: Number },  // 1-parent category , 2-sub category
-    contract_ref: { type: String },
+    contract_ref: { type: String, 'default': shortid.generate },
     location: {
         type: { type: String },
         coordinates: []

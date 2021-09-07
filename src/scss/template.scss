@@ -1,5 +1,6 @@
 $primarycolor: #99d332;
 $secondarycolor:#99d332;
+$optioncolor:#3504eb;
 $bdr-color: #dfdfdf;
 $screen-sm-min: 767px;
 $screen-md-min: 1000px;
@@ -40,6 +41,9 @@ $zero:0px;
     background-color: white !important;
 }
 
+.option_blue{
+    color: $optioncolor !important;
+}
 .logo {
     background: rgba(255, 255, 255, 0.2);
     margin: 1rem 1.5rem;
@@ -1533,4 +1537,8 @@ p.ant-scroll-number-only-unit.current {
 
 .d_none{
     display: none !important;
+}
+
+.company_detail_modal .ant-modal-close{
+    right: initial !important;
 }
