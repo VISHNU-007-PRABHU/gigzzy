@@ -5,6 +5,7 @@ import { Icon, Empty, List, Skeleton, Button } from 'antd';
 import gql from 'graphql-tag';
 import { LocationContext, EditLocationContext } from '../../context/Location'
 import { Alert_msg } from "../../Comman/alert_msg";
+import size from 'lodash/size'
 
 const GET_ADDRESS = gql`
 query ADDRESS($user_id: ID) {
@@ -71,7 +72,9 @@ const SetAddress = (props) => {
         });
     }
     const loader = (values) => {
-        values.no_data();
+        if(values && size(values)){
+            values.no_data();
+        }
     }
     return (
         <LocationContext.Consumer>
