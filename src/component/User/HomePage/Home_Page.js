@@ -18,14 +18,6 @@ import PlacesAutocomplete, {
     geocodeByAddress,
     getLatLng,
 } from 'react-places-autocomplete';
-import { layoutGenerator } from 'react-break';
-
-const layout = layoutGenerator({
-    mobile: 0,
-    phablet: 480,
-    tablet: 600,
-    desktop: 1024,
-});
 
 const { Content } = Layout;
 const UserHeader = React.lazy(() => import('../Layout/UserHeader'));
