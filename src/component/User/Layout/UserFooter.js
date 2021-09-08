@@ -24,7 +24,7 @@ const UserFooter = () => {
             <div>
               <ul>
                 <li>
-                  <h6 style={{ color: "green" }}>Company</h6>
+                  <h6 className="text-success pb-2">Company</h6>
                 </li>
                 <li>
                   <Link to="/static_page/about_us" target="_blank" className="mr-1">About</Link>
@@ -45,7 +45,7 @@ const UserFooter = () => {
             <div>
               <ul>
                 <li>
-                  <h6 style={{ color: "green" }}>Legal</h6>
+                  <h6 className="text-success pb-2">Legal</h6>
                 </li>
                 <li>
                   <Link to="/static_page/terms" target="_blank" className="mr-1">
@@ -74,7 +74,7 @@ const UserFooter = () => {
             <div>
               <ul>
                 <li>
-                  <h6 style={{ color: "green" }}>Resources</h6>
+                  <h6 className="text-success pb-2">Resources</h6>
                 </li>
                 <li>
                   <Link to="/provider_login" target="_blank" className="mr-1">
@@ -103,7 +103,7 @@ const UserFooter = () => {
             <div>
               <ul>
                 <li>
-                  <h6 style={{ color: "green" }}>Contact Us</h6>
+                  <h6 className="text-success pb-2">Contact Us</h6>
                 </li>
                 <li>1. HQ ,USA 14314 S Myers Park Rd</li>
                 <li>Cheney WA 99004 ,USA.</li>

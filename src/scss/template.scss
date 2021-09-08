@@ -1,6 +1,7 @@
 $primarycolor: #99d332;
 $secondarycolor:#99d332;
 $optioncolor:#3504eb;
+$light_black:#474747;
 $bdr-color: #dfdfdf;
 $screen-sm-min: 767px;
 $screen-md-min: 1000px;
@@ -282,7 +283,7 @@ html {
 }
 
 .footer_bg {
-    background-color: #231f20 !important;
+    background-color: $light_black !important;
     //padding: 0px !important;
     color: #fff !important;
 }
@@ -343,17 +344,6 @@ html {
 .banner_section .ant-carousel .slick-dots-bottom li {
     padding: 2px;
     margin: 0 4px;
-}
-
-.banner_section .ant-carousel .slick-dots-bottom li,
-.banner_section .ant-carousel .slick-dots-bottom li button {
-    background: #afeed4;
-    border-radius: 30px;
-}
-
-.banner_section .ant-carousel .slick-dots-bottom li.slick-active,
-.banner_section .ant-carousel .slick-dots-bottom li.slick-active button {
-    background: $primarycolor;
 }
 
 .biding_avatar{

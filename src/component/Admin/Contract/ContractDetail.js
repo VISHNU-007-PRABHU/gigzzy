@@ -112,7 +112,7 @@ class ContractDetail extends React.Component {
                     <AdminHeader />
                     <Content className="main_frame" style={{ background: 'none' }}>
                         <Row gutter={12}>
-                            <Col lg={24} md={24}>
+                            <Col lg={18} md={24}>
                                 <Card bordered={0}>
                                     <Biding></Biding>   
                                     <Card bordered={0} >

@@ -56,6 +56,7 @@ import AdminRoles from './component/Admin/Roles/Add_Roles';
 import RoleView, { RoleViewFunction } from './component/Comman/roles_permission_view'
 import Contract from './component/Admin/Contract/Contract';
 import ContractDetail from './component/Admin/Contract/ContractDetail';
+import ContractBooking from './component/User/Book/contract/ContractBooking';
 
 function PrivateRoute({ permission, component: Component, ...rest }) {
   console.log("PrivateRoute -> permission", permission)
@@ -207,6 +208,7 @@ ReactDOM.render(
           <Route exact path="/static_page/:id" component={StaticPage} />
           <UserRoute exact path="/profile" component={Profile_Page} />
           <UserRoute exact path="/description/:id" component={Description_Page} />
+          <Route exact path="/contract_booking" component={ContractBooking} />
           <UserRoute exact path="/bookings" component={Bookings_Page} />
           <Route exact path="/provider_login" component={Provider_Login} />
           <Route exact path="/provider_signup" component={Provider_Email_Login} />

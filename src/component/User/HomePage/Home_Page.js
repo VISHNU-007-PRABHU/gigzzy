@@ -36,6 +36,9 @@ import PlacesAutocomplete, {
 const { Content } = Layout;
 const UserHeader = React.lazy(() => import('../Layout/UserHeader'));
 const UserFooter = React.lazy(() => import('../Layout/UserFooter'));
+const DownloadApp = React.lazy(() => import('./DownloadApp'));
+const HomeAdons = React.lazy(() => import('./HomeAdons'));
+const ChooseJobCategory = React.lazy(() => import('./ChooseJobCategory'));
 
 class Home_Page extends React.Component {
 
@@ -116,7 +119,8 @@ class Home_Page extends React.Component {
             category_values: '',
             center: [9.9252, 78.1198],
             current_page: 1,
-            total: 0
+            total: 0,
+            VisibleChooseCategory:false,
         };
     }
     componentDidMount() {
@@ -294,12 +298,14 @@ class Home_Page extends React.Component {
         }
     }
     _trending_book = async (data) => {
-
-        if (localStorage.getItem('userLogin') === 'success') {
-            this.props.history.push({ pathname: `/description/${data._id}`, state: { type: data.category_type, location: this.state.center, location_detail: this.state.home_page_city } });
-        } else {
-            this.props.history.push('/login');
-        }
+        this.setState({
+            VisibleChooseCategory:true
+        })
+        // if (localStorage.getItem('userLogin') === 'success') {
+        //     this.props.history.push({ pathname: `/description/${data._id}`, state: { type: data.category_type, location: this.state.center, location_detail: this.state.home_page_city } });
+        // } else {
+        //     this.props.history.push('/login');
+        // }
     }
     _subcategory_book = async (item) => {
         if (localStorage.getItem('userLogin') === 'success') {
@@ -570,41 +576,23 @@ class Home_Page extends React.Component {
                                 }
                             </div>
 
-                            <div className="download_section position-relative pt-5 text-center">
-                                <h2 className="bold mb-5 text-center">Download the App</h2>
-                                <p className="normal_font_size">Choose and book 100+ services and track them on Gigzzy App</p>
-                                <a rel="noopener noreferrer" href="https://play.google.com/store/apps/details?id=com.gigzzy.user" target="_blank">
-                                    <img alt='' loading="lazy" className="lazyload mr-3" src={require("../../../image/play_store.png")} />
-                                </a>
-                                <a rel="noopener noreferrer" href="https://apps.apple.com/us/app/gigzzy-user/id1574904567" target="_blank">
-                                    <img alt='' loading="lazy" className="lazyload ml-3" src={require("../../../image/app_store.png")} />
-                                </a>
-                            </div>
-                            <div className="feature_section pt-5 container mb-5">
-                                <Row>
-                                    <Col sm={{ span: 8 }} className="px-1">
-                                        <div className="image_head"><img alt='' loading="lazy" className="lazyload" src={require("../../../image/quality.png")} /></div>
-                                        <p className="normal_font_size my-3 bold">High Quality & Trusted Professionals</p>
-                                        <label>We Provide only verified, background checked and high quality Professionals</label>
-                                    </Col>
-                                    <Col sm={{ span: 8 }} className="px-1">
-                                        <div className="image_head"><img alt='' loading="lazy" className="lazyload" src={require("../../../image/budget-management.png")} /></div>
-                                        <p className="normal_font_size my-3 bold">Matched to Your Needs</p>
-                                        <label>We match you with the right professional within your budget.</label>
-                                    </Col>
-                                    <Col sm={{ span: 8 }} className="px-1">
-                                        <div className="image_head"><img alt='' loading="lazy" className="lazyload" src={require("../../../image/like.png")} /></div>
-                                        <p className="normal_font_size my-3 bold">Hustle Free Services</p>
-                                        <label>Super convenient, guaranteed service from booking to delivery</label>
-                                    </Col>
-                                </Row>
-                            </div>
                         </Col>
                     </Row>
                 </Content>
                 <Suspense fallback={<Skeleton active />}>
+                    <DownloadApp></DownloadApp>
+                </Suspense>
+                <Suspense fallback={<Skeleton active />}>
+                    <HomeAdons></HomeAdons>
+                </Suspense>
+                <Suspense fallback={<Skeleton active />}>
                     <UserFooter />
                 </Suspense>
+                <Modal footer={null} centered visible={this.state.VisibleChooseCategory} onCancel={()=>{this.setState({VisibleChooseCategory:false})}}>
+                    <Suspense fallback={<Skeleton active />}>
+                        <ChooseJobCategory />
+                    </Suspense>
+                </Modal>
             </Layout >
         );
     }

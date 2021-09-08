@@ -1,6 +1,6 @@
-import React from "react";
+import React, { Suspense } from "react";
 import 'antd/dist/antd.css';
-import { Button, Row, Col, Typography, Form, Input } from 'antd';
+import { Button, Row, Col, Typography, Form, Input,Skeleton } from 'antd';
 import jiffy from '../../../image/Gigzzy.png';
 import main from '../../../image/Gigzzy.png';
 import PhoneInput from 'react-phone-input-2';
@@ -13,17 +13,24 @@ import { ADD_USER, CHECK_OPT, EMAIL_LOGIN } from '../../../graphql/User/login';
 import { client } from "../../../apollo";
 import { Alert_msg } from "../../Comman/alert_msg";
 const { Text, Title } = Typography;
+
+const ChooseRegistration = React.lazy(() => import('./ChooseRegistration'));
+const CompanyRegistrationDetail = React.lazy(() => import('./CompanyRegistrationDetail'));
+const CompanyWorkerDetail = React.lazy(() => import('./CompanyWorkerDetail'));
 class User_Login extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             otp: '',
             register: 0,
-            otp_login: 1,
+            otp_login: 0,
             email_login: 0,
+            choose_registration:false,
+            company_registration_detail:false,
+            company_worker_detail:true,
             country_code: '',
             login: 1,
-            m_no:'',
+            m_no: '',
         };
     }
     get_otp = async () => {
@@ -141,7 +148,7 @@ class User_Login extends React.Component {
             <Row style={{ overflow: 'auto', height: '100vh' }}>
                 <Col lg={12} className="d-none d-lg-flex d-xl-flex justify-content-center align-items-center overflow-hidden h-100">
                     <div className="d-flex justify-content-around">
-                        <img src={jiffy} alt="jiffy" style={{width:300}} />
+                        <img src={jiffy} alt="jiffy" style={{ width: 300 }} />
                     </div>
                 </Col>
                 <Col lg={12} md={24} sm={24} className="froms" style={{ overflow: 'auto', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -166,16 +173,16 @@ class User_Login extends React.Component {
                                             inputStyle={{ height: '46px' }}
                                             country={'ke'}
                                             mask={{ in: '..........' }}
-                                            onKeyDown={(event)=>{
-                                                if(event.keyCode === 13){
+                                            onKeyDown={(event) => {
+                                                if (event.keyCode === 13) {
                                                     this.get_otp();
                                                 }
                                             }}
                                             onChange={(value, data, event) => {
                                                 this.setState({
-                                                    m_no:value.replace(/[^0-9]+/g, '').slice(data.dialCode.length),
-                                                    country_code: data.dialCode 
-                                                    });
+                                                    m_no: value.replace(/[^0-9]+/g, '').slice(data.dialCode.length),
+                                                    country_code: data.dialCode
+                                                });
                                             }} />
 
                                         )}
@@ -239,7 +246,7 @@ class User_Login extends React.Component {
                                     <Form.Item label="Password">
                                         {form.getFieldDecorator("password", {
                                             rules: this.state.email_login ? [{ required: true }] : []
-                                        })(<Input.Password placeholder="Password" className="input_border border_less" onPressEnter={this.check_otp}/>)}
+                                        })(<Input.Password placeholder="Password" className="input_border border_less" onPressEnter={this.check_otp} />)}
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -270,21 +277,21 @@ class User_Login extends React.Component {
                                     <Form.Item label="Full Name">
                                         {form.getFieldDecorator("name", {
                                             rules: this.state.register ? [{ required: true }] : []
-                                        })(<Input  className="input_border" />)}
+                                        })(<Input className="input_border" />)}
                                     </Form.Item>
                                 </Col>
                                 <Col className="" lg={24}>
                                     <Form.Item label="Email">
                                         {form.getFieldDecorator("email", {
                                             rules: this.state.register ? [{ required: true }] : []
-                                        })(<Input  className="input_border" />)}
+                                        })(<Input className="input_border" />)}
                                     </Form.Item>
                                 </Col>
                                 <Col className="" lg={24}>
                                     <Form.Item label="Password">
                                         {form.getFieldDecorator("password", {
                                             rules: this.state.register ? [{ required: true }] : []
-                                        })(<Input.Password  className="input_border" />)}
+                                        })(<Input.Password className="input_border" />)}
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -301,7 +308,21 @@ class User_Login extends React.Component {
                             </Col>
                         </Row>
                     </div>
-
+                    <div className={this.state.choose_registration ? "w-75 mw-450" : " d-none"}>
+                        <Suspense fallback={<Skeleton />}>
+                                <ChooseRegistration></ChooseRegistration>
+                        </Suspense>
+                    </div>
+                    <div className={this.state.company_registration_detail ? "w-75 mw-450" : " d-none"}>
+                        <Suspense fallback={<Skeleton />}>
+                                <CompanyRegistrationDetail></CompanyRegistrationDetail>
+                        </Suspense>
+                    </div>
+                    <div className={this.state.company_worker_detail ? "w-75 mw-450" : " d-none"}>
+                        <Suspense fallback={<Skeleton />}>
+                                <CompanyWorkerDetail></CompanyWorkerDetail>
+                        </Suspense>
+                    </div>
                 </Col>
             </Row>
         );
