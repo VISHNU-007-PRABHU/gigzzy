@@ -209,7 +209,7 @@ ReactDOM.render(
           <UserRoute exact path="/profile" component={Profile_Page} />
           <UserRoute exact path="/description/:id" component={Description_Page} />
           <Route exact path="/contract_booking" component={ContractBooking} />
-          <UserRoute exact path="/bookings" component={Bookings_Page} />
+          <Route exact path="/bookings" component={Bookings_Page} />
           <Route exact path="/provider_login" component={Provider_Login} />
           <Route exact path="/provider_signup" component={Provider_Email_Login} />
           <ProviderRoute exact path="/provider_detail" component={provider_detail} />

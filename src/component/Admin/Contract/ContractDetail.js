@@ -17,6 +17,7 @@ const { Meta } = Card;
 const { Title } = Typography;
 
 const DescriptionValue = React.lazy(() => import('../../User/Book/DescriptionValue'));
+const Milestone = React.lazy(() => import('./Milestone'));
 class ContractDetail extends React.Component {
     constructor(props) {
         super(props);
@@ -114,6 +115,9 @@ class ContractDetail extends React.Component {
                         <Row gutter={12}>
                             <Col lg={18} md={24}>
                                 <Card bordered={0}>
+                                    <Suspense fallback={<Skeleton active />}>
+                                        <Milestone></Milestone>
+                                    </Suspense>
                                     <Biding></Biding>   
                                     <Card bordered={0} >
                                         <BidingList></BidingList>

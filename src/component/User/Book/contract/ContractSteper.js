@@ -39,6 +39,8 @@ const layout = {
     offset: 8, span: 16
 };
 const ProjectDetail = React.lazy(() => import('./ProjectDetail'));
+const ProjectBudget = React.lazy(() => import('./ProjectBudget'));
+const ProjectImages = React.lazy(() => import('./ProjectImages'));
 
 function ContractSteper(props) {
     const { form } = props;
@@ -78,15 +80,23 @@ function ContractSteper(props) {
             <div className="d-flex justify-content-center pt-5">
                 <Form {...layout} name="nest-messages" className="w-50">
                     <Suspense fallback={<Skeleton active />}>
-                        <ProjectDetail />
-                    </Suspense>
-                    <Suspense fallback={<Skeleton active />}>
-                        <Button type="primary" className="w-50" >
-                            <div className="normal_font_size">Add new address 
-                            <Icon type="plus"/>
-                            </div>
-                        </Button>
-                        <SetAddress user_id={"6136fd283765fd3febbcc435"} />
+                        <div className={current === 3 ? '' : 'd-none'}>
+                            <ProjectImages />
+                        </div>
+                        <div className={current === 2 ? '' : 'd-none'}>
+                            <ProjectBudget />
+                        </div>
+                        <div className={current === 0 ? '' : 'd-none'}>
+                            <ProjectDetail />
+                        </div>
+                        <div className={current === 1 ? '' : 'd-none'}>
+                            <Button type="primary" className="w-50" >
+                                <div className="normal_font_size">Add new address
+                                    <Icon type="plus" />
+                                </div>
+                            </Button>
+                            <SetAddress user_id={"6136fd283765fd3febbcc435"} />
+                        </div>
                     </Suspense>
                 </Form>
 

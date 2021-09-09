@@ -344,9 +344,9 @@ span.ant-form-item-children.d-block {
 @mixin custom_setper($light: true) {
     $steper_color: black;
     @if $light {
-        $steper_color:$light_grey;
+        $steper_color: $light_grey;
     } @else {
-        $steper_color:$primarycolor;
+        $steper_color: $primarycolor;
     }
     padding: 3px 7px;
     border-radius: 25px;
@@ -367,12 +367,12 @@ span.ant-form-item-children.d-block {
 }
 
 .contract_steper {
-    .ant-steps-item-wait{
+    .ant-steps-item-wait {
         .ant-steps-icon {
             @include custom_setper($light: true);
         }
     }
-    .ant-steps-item-finish{
+    .ant-steps-item-finish {
         .ant-steps-icon {
             @include custom_setper($light: false);
         }
@@ -382,3 +382,58 @@ span.ant-form-item-children.d-block {
     }
 }
 
+.milestone_steper {
+    .ant-steps-item{
+        line-height: 4.5;
+    }
+    .ant-steps-item-process {
+        .ant-steps-item-tail::after {
+            background-color: $light_grey !important;
+        }
+        .ant-steps-icon-dot {
+            background-color: $light_grey !important;
+        }
+    }
+    .ant-steps-item-finish {
+        .ant-steps-item-tail::after {
+            background-color: $primarycolor !important;
+        }
+        .ant-steps-icon-dot {
+            background-color: $primarycolor !important;
+        }
+    }
+}
+.ant-radio-checked .ant-radio-inner {
+    border-color: $primarycolor;
+    &:after {
+        background-color: $primarycolor;
+    }
+}
+
+.px_view .ant-upload {
+    width: 100%;
+    height: 12em;
+}
+
+.contract_image {
+    padding: 30px 10px !important;
+    width: 25%;
+    border: 1px solid lightgray;
+    img {
+        width: -webkit-fill-available;
+    }
+}
+
+.ant-upload-select-picture-card i {
+    font-size: 32px;
+    color: #999;
+}
+
+.ant-upload-select-picture-card .ant-upload-text {
+    margin-top: 8px;
+    color: #666;
+}
+
+.milestone_steper .ant-steps-item-content {
+    width: -webkit-fill-available;
+}

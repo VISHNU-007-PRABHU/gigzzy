@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React, { Suspense,useState,useEffect } from 'react'
 import { Query } from "react-apollo";
 import { My_APPOINTMENTS } from '../../../graphql/User/booking';
 import Badge from 'antd/lib/badge';
@@ -11,13 +11,22 @@ import Tooltip from 'antd/lib/tooltip';
 import timer_icon from '../../../image/bookLater.png';
 const AppiontmentsEmpty = React.lazy(() => import('./AppiontmentsEmpty'));
 function Appointments(props) {
+    const [user_id, set_user_id] = useState('');
+  
+    useEffect(() => {
+        if(localStorage.getItem('user')){
+            set_user_id(JSON.parse(localStorage.getItem('user'))._id,)
+        }else{
+            set_user_id('6136fd283765fd3febbcc435')
+        }
+    }, [localStorage.getItem('user')])
     return (
         <Query
             query={My_APPOINTMENTS}
             variables={{
                 limit: 10,
                 page: props.page,
-                _id: JSON.parse(localStorage.getItem('user'))._id,
+                _id:user_id,
                 role: 1,
                 booking_status: Number(props.status)
             }}
