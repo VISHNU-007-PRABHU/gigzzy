@@ -286,6 +286,7 @@ module.exports.update_contract = async (root, args) => {
             return added_contract_job
         }
     } catch (error) {
+        console.log("module.exports.update_contract -> error", error)
         return { status: "failed", msg: "contract job added failed" }
     }
 }
