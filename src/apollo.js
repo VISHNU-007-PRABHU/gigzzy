@@ -4,7 +4,7 @@ import { createUploadLink } from "apollo-upload-client";
 import { WebSocketLink } from 'apollo-link-ws';
 import { split } from 'apollo-link';
 import { getMainDefinition } from 'apollo-utilities';
-const local = true
+const local = false
 const ssl = local ? 'http' : 'https'
 const socket_ssl = local ? 'ws' :'wss'
 const uri_link = local ? 'localhost:8990':'company.gigzzy.com'
