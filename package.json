@@ -83,6 +83,7 @@
         "stripe": "^7.14.0",
         "twilio": "^3.67.2",
         "url": "^0.11.0",
+        "use-mobile-detect-hook": "^1.0.4",
         "use-react-router": "1.0.7"
     },
     "eslintConfig": {
