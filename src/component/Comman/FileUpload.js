@@ -9,41 +9,11 @@ const content_data = {
     data3: "NEXT",
 }
 
-const fileList = [
-    {
-        uid: '-1',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-    {
-        uid: '-2',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-    {
-        uid: '-3',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-    {
-        uid: '-4',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-    {
-        uid: '-5',
-        name: 'image.png',
-        status: 'error',
-    },
-]
 
 const FileUpload = (props) => {
     let history = useHistory();
     const [img_url, setimg_url] = useState("");
+    const [fileList, set_fileList] = useState([]);
     const [fileList_status, setfileList_status] = useState(false);
     const [custom_class, setcustom_class] = useState("avatar-uploader d-flex ");
     const [user_data, setuser_data] = useState("");
@@ -90,7 +60,7 @@ const FileUpload = (props) => {
     const handleChange = async info => {
         setloading(true);
         if (info.file.status) {
-            console.log(info.file.originFileObj);
+            props.onFileUpload(info.file.originFileObj)
             getBase64(info.file.originFileObj, imageUrl => {
                 setimg_url(imageUrl)
                 setloading(false)
@@ -101,9 +71,9 @@ const FileUpload = (props) => {
 
     const uploadButton = (
         <div>
-            <Icon type={loading ? 'loading' : 'plus'} className="py-3" />
+            <Icon type={loading ? 'loading' : 'plus'} className="" />
             <div className="ant-upload-text">
-                <div className="bold normal_font_size">{content}</div>
+                {/* <div className="bold normal_font_size">{content}</div> */}
                 <div>{subcontent}</div>
             </div>
         </div>

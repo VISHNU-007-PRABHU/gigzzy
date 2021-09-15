@@ -68,6 +68,7 @@ function ContractSteper(props) {
             let finaldata = await contract_detail.refetch({ contract_id: localStorage.getItem('current_contract_id') })
             set_contract_detail(finaldata.data.get_contracts[0])
             set_address_id(finaldata.data.get_contracts[0]?.address_id)
+            setCurrent(Number(finaldata.data.get_contracts[0].current_page) + 1)
         }
     }, [localStorage.getItem('current_contract_id')])
     const next = (id) => {
@@ -75,8 +76,8 @@ function ContractSteper(props) {
         form.validateFields(async (err, values) => {
             console.log("next -> values", values)
             if (!err) {
-                if(current === 2 && (!values['budget'] || !values['timeline'] || !values['timeline_type'])){
-                    Alert_msg({status:'failed',msg:"Please fill all the data"})
+                if (current === 2 && (!values['budget'] || !values['timeline'] || !values['timeline_type'])) {
+                    Alert_msg({ status: 'failed', msg: "Please fill all the data" })
                     return false
                 }
                 let input_data = {}
@@ -150,7 +151,7 @@ function ContractSteper(props) {
             <div className="d-flex justify-content-center pt-5">
                 <Form  {...layout} name="nest-messages" className="w-50">
                     <Suspense fallback={<Skeleton active />}>
-                        <div className={current === 3 ? '' : 'd-none'}>
+                        <div className={current === 3 ? 'contract_images_section' : 'd-none'}>
                             <ProjectImages contract_detail_data={contract_detail_data} current={current} customform={form} />
                         </div>
                         <div className={current === 2 ? '' : 'd-none'}>

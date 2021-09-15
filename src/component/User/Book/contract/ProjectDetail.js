@@ -15,7 +15,7 @@ const ProjectDetail = (props) => {
                 <Col span={24}>
                     <Form.Item label="Project Name">
                         {form.getFieldDecorator("name", {
-                            initialValue: contract_detail_data.name,
+                            initialValue: contract_detail_data?.name,
                             rules: [{ required: true }]
                         })(<Input size={"large"} className="" placeholder={"e.g. i need a cleaner for my office"} />)}
                     </Form.Item>
@@ -25,7 +25,7 @@ const ProjectDetail = (props) => {
                 <Col span={24}>
                     <Form.Item label="Project Description">
                         {form.getFieldDecorator("description", {
-                            initialValue: contract_detail_data.description,
+                            initialValue: contract_detail_data?.description,
                             rules: [{ required: true }]
                         })(<TextArea size={"large"} rows={6} />)}
                     </Form.Item>

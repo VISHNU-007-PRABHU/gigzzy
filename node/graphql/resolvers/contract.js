@@ -85,6 +85,7 @@ module.exports.DeleteContractJobFile = async (root, args) => {
 }
 
 exports.uploading_files = async (files, args) => {
+    console.log("exports.uploading_files -> files, args", files, args)
     return new Promise(async function (resolve, reject) {
         try {
             _.forEach(files, async (file, i) => {
@@ -177,7 +178,6 @@ module.exports.get_contract_files = async (root, args) => {
         ]
 
         let grouped_images = await ContractJobImage_model.aggregate(pipeline)
-        console.log("module.exports.get_contract_files -> grouped_images", grouped_images)
         return grouped_images
     } catch (error) {
         console.log("module.exports.get_contract_files -> error", error)
@@ -200,7 +200,6 @@ module.exports.get_contract_all_files = async (root, args) => {
         ]
 
         let grouped_images = await ContractJobImage_model.aggregate(pipeline)
-        console.log("module.exports.get_contract_files -> grouped_images", grouped_images)
         return grouped_images
     } catch (error) {
         console.log("module.exports.get_contract_files -> error", error)
@@ -244,7 +243,6 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         }
 
         total = await ContractJob_model.count(find_query);
-        console.log("module.exports.get_contracts_pagination -> find_query", find_query)
         result = await ContractJob_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
         var pageInfo = { totalDocs: total, page: args.page }
         return { data: result, pageInfo };

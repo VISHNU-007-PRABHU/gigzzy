@@ -45,7 +45,7 @@ const ProjectBudget = (props) => {
                 <Col span={24}>
                     <Form.Item label="Project Budget">
                         {form.getFieldDecorator("budget", {
-                            initialValue: contract_detail_data.budget,
+                            initialValue: contract_detail_data?.budget,
                         })(<Input size={"large"} className="" addonAfter="Ksh" />)}
                     </Form.Item>
                 </Col>
@@ -54,7 +54,7 @@ const ProjectBudget = (props) => {
                 <Col span={24}>
                     <Form.Item label="Project Timeline">
                         {form.getFieldDecorator("timeline", {
-                            initialValue: contract_detail_data.timeline,
+                            initialValue: contract_detail_data?.timeline,
                         })(<Input size={"large"} className="" addonAfter="Days" />)}
                     </Form.Item>
                 </Col>
@@ -63,9 +63,9 @@ const ProjectBudget = (props) => {
                 <Col span={24}>
                     <Form.Item label="Project Timeline">
                         {form.getFieldDecorator("timeline_type", {
-                            initialValue: contract_detail_data.timeline_type,
+                            initialValue: contract_detail_data?.timeline_type,
                         })(
-                            <Radio.Group value={contract_detail_data.timeline_type} onChange={onChange1} size={'large'} className="d-flex w-100">
+                            <Radio.Group value={contract_detail_data?.timeline_type} onChange={onChange1} size={'large'} className="d-flex w-100">
                                 <div className="d-flex flex-column w-50 ml-5">
                                     <Radio value={"1"}>One time</Radio>
                                     <Radio value={"2"}>Monthly</Radio>
@@ -90,7 +90,7 @@ const ProjectBudget = (props) => {
                     <div className={show_terms ? '' : 'd-none'}>
                         <Form.Item label="">
                             {form.getFieldDecorator("terms_condition", {
-                                initialValue: contract_detail_data.terms_condition,
+                                initialValue: contract_detail_data?.terms_condition,
                             })(<TextArea size={"large"} rows={6} />)}
                         </Form.Item>
                     </div>

@@ -17,6 +17,7 @@ const ChooseJobCategory = (props) => {
     const gopage = (pagetype) => {
         console.log(props)
         if (pagetype === "contract") {
+            localStorage.removeItem('current_contract_id')
             history.push({pathname: `/contract_booking/${props.current_id}`})
         } else {
            history.push(props.comman_data);

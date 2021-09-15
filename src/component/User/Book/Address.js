@@ -12,6 +12,7 @@ import gql from 'graphql-tag';
 import SetAddress from './SetAddress';
 import { GoChevronLeft } from "react-icons/go";
 import { Alert_msg } from "../../Comman/alert_msg";
+import includes from 'lodash/includes'
 import { LocationContext, EditLocationContext } from "../../context/Location";
 const ADD_ADDRESS = gql`
   mutation add_address($company_id:ID,$option: Int,$_id:ID,$user_id: String,$title: String,$flat_no: String ,$landmark: String,$address: String,$lat: String,$lng: String ) {
@@ -152,7 +153,8 @@ const Address = (props) => {
         } else {
             updateTodo({ variables: data }).then(results => {
                 if (results.data.modified_address.status === 'success') {
-                    if (location.pathname !== '/profile'  && location.pathname !== '/login') {
+                    let url_value=['/profile', '/contract_booking','/login']
+                    if (!includes(url_value,location.pathname)) {
                         value.location_change(data);
                     }
                     Alert_msg({ msg: "Address saved", status: "success" });
