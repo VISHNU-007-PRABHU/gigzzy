@@ -9,56 +9,9 @@ const ProjectImages = (props) => {
     let history = useHistory();
     const [img_url, setimg_url] = useState("");
     const [user_data, setuser_data] = useState("");
-    const [get_all_images, set_get_all_images] = useState([{
-        name: "Document",
-        images: [{
-            small_img: "http://localhost:3000/static/media/Gigzzy.ec10c675.png",
-            image_tag: "testing jfkfsj;kjkladska'dsfjj",
-            doc_category: "testing jfkfsj;kjkladska'dsfjj"
-        }, {
-            small_img: "http://localhost:3000/static/media/Gigzzy.ec10c675.png",
-            image_tag: "testing jfkfsj;kjkladska'dsfjj",
-            doc_category: "testing jfkfsj;kjkladska'dsfjj"
-        }, {
-            small_img: "http://localhost:3000/static/media/Gigzzy.ec10c675.png",
-            image_tag: "testing jfkfsj;kjkladska'dsfjj",
-            doc_category: "testing jfkfsj;kjkladska'dsfjj"
-        },
-        {
-            small_img: "http://localhost:3000/static/media/Gigzzy.ec10c675.png",
-            image_tag: "testing jfkfsj;kjkladska'dsfjj",
-            doc_category: "testing jfkfsj;kjkladska'dsfjj"
-        }, {
-            small_img: "http://localhost:3000/static/media/Gigzzy.ec10c675.png",
-            image_tag: "testing jfkfsj;kjkladska'dsfjj",
-            doc_category: "testing jfkfsj;kjkladska'dsfjj"
-        }
-            , {
-            small_img: "http://localhost:3000/static/media/Gigzzy.ec10c675.png",
-            image_tag: "testing jfkfsj;kjkladska'dsfjj",
-            doc_category: "testing jfkfsj;kjkladska'dsfjj"
-        }, {
-            small_img: "http://localhost:3000/static/media/Gigzzy.ec10c675.png",
-            image_tag: "testing jfkfsj;kjkladska'dsfjj",
-            doc_category: "testing jfkfsj;kjkladska'dsfjj"
-        }]
-    }, {
-        name: "Document",
-        images: [{
-            small_img: "http://localhost:3000/static/media/Gigzzy.ec10c675.png",
-            image_tag: "testing jfkfsj;kjkladska'dsfjj",
-            doc_category: "testing jfkfsj;kjkladska'dsfjj"
-        }]
-    }, {
-        name: "Document",
-        images: [{
-            small_img: "http://localhost:3000/static/media/Gigzzy.ec10c675.png",
-            image_tag: "testing jfkfsj;kjkladska'dsfjj",
-            doc_category: "testing jfkfsj;kjkladska'dsfjj"
-        }]
-    }]);
+    const [get_all_images, set_get_all_images] = useState([])
     const [loading, setloading] = useState(false);
-    const { form } = props;
+    const form = props.customform;
     return (
         <>
             <Row>
@@ -79,7 +32,7 @@ const ProjectImages = (props) => {
             <Row gutter={[16, 40]}>
                 <Col span={24}>
                     {
-                        get_all_images.map(all_image_items => {
+                        get_all_images.length ? get_all_images.map(all_image_items => {
                             return (
                                 <div className="pb-3">
                                     <div className='pb-1'>{all_image_items['name']}</div>
@@ -88,7 +41,7 @@ const ProjectImages = (props) => {
                                     </div>
                                 </div>
                             )
-                        })
+                        }) : <></>
                     }
                 </Col>
             </Row>

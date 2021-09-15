@@ -29,6 +29,7 @@ var detailSchema = new Schema({
   password: { type: String, },
   email: { type: String, },
   country_code: { type: String, },
+  location_code:{ type: String, },
   phone_no: { type: String, },
   address: { type: String, },
   location: {

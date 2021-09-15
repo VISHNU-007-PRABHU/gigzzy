@@ -18,6 +18,7 @@ var staticResolver = require('./resolvers/static');
 var settingResolver = require('./resolvers/setting');
 var rolesResolver = require('./resolvers/roles');
 var contractResolver = require('./resolvers/contract');
+var currencyResolver = require('./resolvers/currency');
 const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
@@ -190,6 +191,8 @@ const resolvers = {
         get_contracts:contractResolver.get_contracts,
         get_contracts_pagination:contractResolver.get_contracts_pagination,
         get_contract_all_files:contractResolver.get_contract_all_files,
+        get_currencys:currencyResolver.get_currencys,
+        get_currency:currencyResolver.get_currency,
         get_my_appointments: async (parent, args, context, info) => {
             try {
 
@@ -324,6 +327,8 @@ const resolvers = {
         adminLogin: adminResolver.adminlogin,
         // contract job
         update_contract: contractResolver.update_contract,
+        update_currency:currencyResolver.update_currency,
+        delete_currency:currencyResolver.delete_currency,
         ContractJobFileUpload: contractResolver.ContractJobFileUpload,
         DeleteContractJobFile: contractResolver.DeleteContractJobFile,
         // company detiail
@@ -332,6 +337,7 @@ const resolvers = {
         deleteCompany: userResolver.deleteCompany,
         deleteCompanyProvider: userResolver.deleteCompanyProvider,
         addUser: async (parent, args) => {
+        console.log("args", args)
             try {
                 const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
                 //console.log("user");
@@ -413,8 +419,10 @@ const resolvers = {
 
                     const add_detail = await Detail_model.updateOne({ _id: args._id }, args);
                     var data = await Detail_model.findOne({ _id: args._id });
+                    console.log("args['user_type']", args['user_type'])
                     if (args['user_type'] && args['user_type'] === "company") {
                         let company_data = await Company_model.findOne({ user_id: data['_id'] }, { _id: 1 })
+                        console.log("company_data", company_data)
                         if ( _.size(company_data)) {
                             data['company_id'] = company_data['_id'] 
                         } else {
@@ -424,6 +432,7 @@ const resolvers = {
                             let add_company_detail = new Company_model(company_data)
                             var added_com_detail = await add_company_detail.save()
                             data['company_id'] = added_com_detail['_id']
+                            console.log(" data['company_id']",  data['company_id'])
                         }
                     }
 

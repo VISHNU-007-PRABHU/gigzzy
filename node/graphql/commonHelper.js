@@ -39,20 +39,20 @@ module.exports.completed = 3;
 module.exports.chat = 4;
 module.exports.booking_view = 5;
 
-module.exports.no_image = (file="normal") => {
-  if(file === "pdf"){
+module.exports.no_image = (file = "normal") => {
+  if (file === "pdf") {
     return env.APP_URL + "/images/public/pdf.jpeg";
-  }else{
+  } else {
     return env.APP_URL + "/images/public/no_img.png";
   }
 };
 
 
-exports.url_path =(path,file)=> {
-  if(file){
-      return `${this.getBaseurl()}/images/${path}/${file}`;
-  }else{
-      return this.no_image();
+exports.url_path = (path, file) => {
+  if (file) {
+    return `${this.getBaseurl()}/images/${path}/${file}`;
+  } else {
+    return this.no_image();
   }
 }
 
@@ -132,19 +132,34 @@ module.exports.send_sms = async (country_code, phone_no, type, data) => {
   try {
     let message = await static_sms_template(type, data)
     let phone_number = `${country_code}${phone_no}`
-    const options = {
-      to: `+${phone_number}`,
-      message: message,
-      from: SMS_SENDERID
+
+    if (process.env.SMS_GATEWAY && process.env.SMS_GATEWAY === "africastalking") {
+      let options = {
+        to: `+${phone_number}`,
+        message: message,
+        from: SMS_SENDERID
+      }
+      sms.send(options)
+        .then((suc) => {
+          console.log("send sms ==>", suc['SMSMessageData']['Recipients']);
+        })
+        .catch((err) => {
+          console.log("error sms ===>", err);
+        });
+      return true
+    } else if (process.env.SMS_GATEWAY && process.env.SMS_GATEWAY === "twillo") {
+      const accountSid = process.env.TWILIO_ACCOUNT_SID;
+      const authToken = process.env.TWILIO_AUTH_TOKEN;
+      const client = require('twilio')(accountSid, authToken);
+      let options = {
+        to: `+${phone_number}`,
+        body: message,
+        from: process.env.TWILIO_ACCOUNT_FROM_NO
+      }
+      let smsResult = await client.messages.create(options)
+      // console.log("module.exports.send_sms -> smsResult", smsResult)
+      // .then(message => console.log(message.sid, "twillo"));
     }
-    sms.send(options)
-      .then((suc) => {
-        console.log("send sms ==>", suc['SMSMessageData']['Recipients']);
-      })
-      .catch((err) => {
-        console.log("error sms ===>", err);
-      });
-    return true
   } catch (error) {
     return false
   }

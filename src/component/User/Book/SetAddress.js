@@ -98,7 +98,7 @@ const SetAddress = (props) => {
                                                         dataSource={data.user_address}
                                                         renderItem={item => (
                                                             <List.Item
-                                                                className='cursor_point'
+                                                                className={props && props.address_id ?'cursor_point table-active':'cursor_point'}
                                                                 actions={[
                                                                     <Button type="link primary_color d-flex" size="small"
                                                                         onClick={() => { values.location_edit(item) }} >

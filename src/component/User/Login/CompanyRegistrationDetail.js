@@ -17,6 +17,17 @@ const CompanyRegistrationDetail = (props) => {
     const [user_data, setuser_data] = useState("");
     const [loading, setloading] = useState(false);
     const { form } = props;
+
+    const chooseType = (type) => {
+        props.change_from_type(type)
+    }
+
+    const SubmitData = (type) => {
+        form.validateFields(async (err, values) => {
+            props.submitFromData(values,"COMPANY_REGISTRATION_DETAIL")
+        })
+    }
+
     return (
         <>
             <Row gutter={[16, 32]}>
@@ -42,7 +53,7 @@ const CompanyRegistrationDetail = (props) => {
                         <Row>
                             <Col className="" lg={24}>
                                 <Form.Item label="Company Name">
-                                    {form.getFieldDecorator("name", {
+                                    {form.getFieldDecorator("company_name", {
                                         rules: [{ required: true }]
                                     })(<Input className="input_border" />)}
                                 </Form.Item>
@@ -51,7 +62,7 @@ const CompanyRegistrationDetail = (props) => {
                         <Row>
                             <Col className="" lg={24}>
                                 <Form.Item label="Company Website">
-                                    {form.getFieldDecorator("name", {
+                                    {form.getFieldDecorator("company_website", {
                                         rules: [{ required: true }]
                                     })(<Input className="input_border" />)}
                                 </Form.Item>
@@ -60,7 +71,7 @@ const CompanyRegistrationDetail = (props) => {
                         <Row>
                             <Col className="" lg={24}>
                                 <Form.Item label="Company Category">
-                                    {form.getFieldDecorator("name", {
+                                    {form.getFieldDecorator("company_category", {
                                         rules: [{ required: true }]
                                     })(<Input className="input_border" />)}
                                 </Form.Item>
@@ -69,7 +80,7 @@ const CompanyRegistrationDetail = (props) => {
                         <Row>
                             <Col className="" lg={24}>
                                 <Form.Item label="About Company">
-                                    {form.getFieldDecorator("name", {
+                                    {form.getFieldDecorator("about_company", {
                                         rules: [{ required: true }]
                                     })(<TextArea rows={4} className="pr-1" />)}
                                 </Form.Item>
@@ -93,14 +104,14 @@ const CompanyRegistrationDetail = (props) => {
             <Row>
                 <Col className="" lg={12}>
                     <div className="normal_font_size primary_color d-flex justify-content-center">
-                        <Button type="primary">
+                        <Button type="primary" onClick={() => { chooseType('CHO0SE_REGISTRATION') }}>
                             <div>{content_data['data2']}</div>
                         </Button>
                     </div>
                 </Col>
                 <Col className="" lg={12}>
                     <div className="normal_font_size primary_color d-flex justify-content-center">
-                        <Button type="primary">
+                        <Button type="primary" onClick={() => { SubmitData() }}>
                             <div>{content_data['data3']}</div>
                         </Button>
                     </div>

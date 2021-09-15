@@ -14,7 +14,6 @@ const typeDefs = gql`
     directive @imgSize(format: String) on FIELD_DEFINITION
     directive @imgUrl(format: String) on FIELD_DEFINITION
 
-
     type Subscription {
         messageSent(limit: Int,page:Int,user_id:ID,provider_id:ID,booking_id:ID):Chat
         get_my_appointments(_id:ID,role:Int,booking_status:Int,limit:Int,page:Int):[Booking]
@@ -97,11 +96,18 @@ const typeDefs = gql`
         get_contracts(company_id:ID,contract_id:ID,provider_id:ID,user_id:ID):[ContractJob]
         get_contracts_pagination(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
         get_contract_all_files(contract_id:ID):[CompanyImage]
+        get_currencys(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,pagination:Boolean,page:Int,limit:Int):CurrencyConnection
+        get_currency(_id:ID):Currency
     }
 
     # sub category pagination data  
     type SubCategoryConnection {
         data: [subCategory]
+        pageInfo: PageInfo!
+    }
+    # Location pagination data  
+    type CurrencyConnection {
+        data: [Currency]
         pageInfo: PageInfo!
     }
 
@@ -231,6 +237,8 @@ const typeDefs = gql`
         nextPage: String
         company_id:ID
         user_type:String
+        currency_code:String
+        location_code:String
     }
     type Chat{
         id:ID
@@ -277,6 +285,22 @@ const typeDefs = gql`
         _id:ID
         data: JSON 
     }
+    type Currency{
+        _id:ID,
+        name:String,
+        location_code:String
+        currency_code:String
+        country_code:String
+        is_delete:Boolean
+        code:String 
+        symbol: String 
+        rate:String 
+        location:String 
+        default_currency:String 
+        status:String 
+        msg:String
+        
+    }
     type ContractJob{
         _id:ID
         msg:String
@@ -284,6 +308,7 @@ const typeDefs = gql`
         name:String
         website_url:String
         address:String
+        address_id:ID
         description:String
         budget:String, 
         timeline:String
@@ -297,6 +322,9 @@ const typeDefs = gql`
         contract_ref:String
         get_contract_category(contract_id:ID,_id:ID,category_type:Int):[Category]
         get_contract_files(contract_id:ID):[CompanyImage]
+        currency_code:String
+        location_code:String
+        current_page:String
     }
     type Company{
         _id:ID
@@ -323,6 +351,8 @@ const typeDefs = gql`
         get_company_images(company_id:ID,image_tag:String):[CompanyImage]
         get_company_user_detail(user_id:ID):[Detail]
         data: JSON 
+        currency_code:String
+        location_code:String
     }
     type CompanyProvider{
         _id:ID
@@ -335,6 +365,8 @@ const typeDefs = gql`
         data: JSON 
         msg:String
         status:String
+        currency_code:String
+        location_code:String
     }
     type CompanyImage{
         _id:ID
@@ -542,8 +574,11 @@ const typeDefs = gql`
         company_id:ID
         user_type:String
         company_register_status:Int
-        first_name:String
+        first_name:String 
         last_name:String
+        price(code: String): String @currency
+        currency_code:String
+        location_code:String
     }
     
     type Account{
@@ -595,7 +630,8 @@ const typeDefs = gql`
         totalPages: Int,
         pagingCounter: Int,
         prevPage: String,
-        nextPage: String 
+        nextPage: String,
+        currency_code:String,  
     }
     type subCategory{
         id:ID
@@ -639,7 +675,8 @@ const typeDefs = gql`
         totalPages: Int,
         pagingCounter: Int,
         prevPage: String,
-        nextPage: String 
+        nextPage: String,
+        currency_code:String, 
     }
     
     type Status{
@@ -747,6 +784,8 @@ const typeDefs = gql`
         mpeas_payment_callback:Boolean
         ok:Int
         msg:String
+        location_code:String
+        currency_code:String
     }
 
     type File {
@@ -782,6 +821,7 @@ const typeDefs = gql`
         country: String,
         zip_code: String,
         distance:String,
+        location_code:String
     }
 
 
@@ -793,7 +833,7 @@ const typeDefs = gql`
         addCategory(category_name:String,file:Upload,description:String,base_price:String,hour_price:String,day_price:String,hour_limit:String,day_limit:String,price_type:String,service_fee:String,is_parent:Boolean,certificates:[ID]): Category
         addsubCategory(file: Upload,category_id:ID,subCategory_name:String,base_price:String,hour_price:String,day_price:String,hour_limit:String,day_limit:String,price_type:String,service_fee:String,description:String,certificates:[ID]):subCategory
         addDetails(_id:ID,email:String,password:String,name:String,address:String,rating:Float,comments:String,lat:Float,lng:Float,profile:String,availability:String,Upload_percentage:String,device_id:String):Detail
-        addUser(role:Int,first_name:String,last_name:String,user_type:String,_id:ID,option:String,country_code:String,phone_no:String,email:String,old_password:String,password:String,name:String,provider_subCategoryID:[ID],lat:Float,lng:Float,bank_name:String,payout_option:String,ifsc_code:String,account_no:String,branch_name:String,routing_name:String,account_name:String,device_id:String,kra_pin:String,payout_phone:String,payout_frist_name:String,payout_second_name:String,payout_id:String): Detail!
+        addUser(role:Int,first_name:String,last_name:String,user_type:String,_id:ID,option:String,location_code:String,country_code:String,phone_no:String,email:String,old_password:String,password:String,name:String,provider_subCategoryID:[ID],lat:Float,lng:Float,bank_name:String,payout_option:String,ifsc_code:String,account_no:String,branch_name:String,routing_name:String,account_name:String,device_id:String,kra_pin:String,payout_phone:String,payout_frist_name:String,payout_second_name:String,payout_id:String): Detail!
         addProvider_Category(user_id: ID,provider_subCategoryID:[ID]):Detail
         add_providerDocument(user_id:ID,file:[Upload],option:String):Detail
         delete_providerDocument(user_id:ID,filename:String,option:String):Detail
@@ -929,7 +969,9 @@ const typeDefs = gql`
             profile_file:Upload
         ):Company
         # contract jobs
-        update_contract(_id:ID,contract_data:JSON,search_data:JSON):ContractJob
+        update_contract(currency_code:String,_id:ID,contract_data:JSON,search_data:JSON):ContractJob
+        update_currency(_id:ID,currency_data:JSON):Currency
+        delete_currency(_id:ID,currency_data:JSON):Currency
         ContractJobFileUpload(_id:ID,contract_id:ID,category:String,image_tag:String,data:[JSON],file:[Upload]):CompanyImage
         DeleteContractJobFile(_id:ID):ContractJob
         # update biding 

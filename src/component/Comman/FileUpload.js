@@ -44,6 +44,7 @@ const fileList = [
 const FileUpload = (props) => {
     let history = useHistory();
     const [img_url, setimg_url] = useState("");
+    const [fileList_status, setfileList_status] = useState(false);
     const [custom_class, setcustom_class] = useState("avatar-uploader d-flex ");
     const [user_data, setuser_data] = useState("");
     const [loading, setloading] = useState(false);
@@ -87,11 +88,7 @@ const FileUpload = (props) => {
     }
 
     const handleChange = async info => {
-        if (info.file.status === 'uploading') {
-            setloading(true);
-            return;
-        }
-
+        setloading(true);
         if (info.file.status) {
             console.log(info.file.originFileObj);
             getBase64(info.file.originFileObj, imageUrl => {
@@ -119,7 +116,7 @@ const FileUpload = (props) => {
                 accept=".png"
                 listType="picture-card"
                 className={custom_class}
-                fileList={fileList}
+                fileList={fileList_status && fileList}
                 action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                 showUploadList={true}
                 beforeUpload={beforeUpload}

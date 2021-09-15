@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Row, Col, Form, Input, Radio, Collapse, Button, Icon } from 'antd';
 import { useHistory } from "react-router-dom";
 const { TextArea } = Input;
@@ -28,15 +28,16 @@ const options2 = [
     { label: 'recurring', value: 'Recurring' },
 ];
 
-
 const ProjectBudget = (props) => {
-    let history = useHistory();
-    const [img_url, setimg_url] = useState("");
-    const [user_data, setuser_data] = useState("");
     const [show_terms, setshow_terms] = useState(false);
-    const { form } = props;
+    const [contract_detail_data, set_contract_detail] = useState({});
+    var form = props.customform
+    useEffect(() => {
+        set_contract_detail(props.contract_detail_data)
+    }, [props])
+
     const onChange1 = e => {
-        console.log('radio1 checked', e.target.value);
+        // console.log('radio1 checked', e.target.value);
     };
     return (
         <>
@@ -44,7 +45,7 @@ const ProjectBudget = (props) => {
                 <Col span={24}>
                     <Form.Item label="Project Budget">
                         {form.getFieldDecorator("budget", {
-                            rules: [{ required: true }]
+                            initialValue: contract_detail_data.budget,
                         })(<Input size={"large"} className="" addonAfter="Ksh" />)}
                     </Form.Item>
                 </Col>
@@ -53,23 +54,29 @@ const ProjectBudget = (props) => {
                 <Col span={24}>
                     <Form.Item label="Project Timeline">
                         {form.getFieldDecorator("timeline", {
-                            rules: [{ required: true }]
+                            initialValue: contract_detail_data.timeline,
                         })(<Input size={"large"} className="" addonAfter="Days" />)}
                     </Form.Item>
                 </Col>
             </Row>
             <Row gutter={[16, 40]}>
                 <Col span={24}>
-                    <Radio.Group onChange={onChange1} size={'large'} className="d-flex w-100">
-                        <div className="d-flex flex-column w-50 ml-5">
-                            <Radio value={1}>One time</Radio>
-                            <Radio value={2}>Monthly</Radio>
-                        </div>
-                        <div className="d-flex flex-column w-50">
-                            <Radio value={3}>Yearly</Radio>
-                            <Radio value={4}>Recurring</Radio>
-                        </div>
-                    </Radio.Group>
+                    <Form.Item label="Project Timeline">
+                        {form.getFieldDecorator("timeline_type", {
+                            initialValue: contract_detail_data.timeline_type,
+                        })(
+                            <Radio.Group value={contract_detail_data.timeline_type} onChange={onChange1} size={'large'} className="d-flex w-100">
+                                <div className="d-flex flex-column w-50 ml-5">
+                                    <Radio value={"1"}>One time</Radio>
+                                    <Radio value={"2"}>Monthly</Radio>
+                                </div>
+                                <div className="d-flex flex-column w-50">
+                                    <Radio value={"3"}>Yearly</Radio>
+                                    <Radio value={"4"}>Recurring</Radio>
+                                </div>
+                            </Radio.Group>
+                        )}
+                    </Form.Item>
                 </Col>
             </Row>
             <Row gutter={[16, 40]}>
@@ -82,7 +89,8 @@ const ProjectBudget = (props) => {
                     </Button>
                     <div className={show_terms ? '' : 'd-none'}>
                         <Form.Item label="">
-                            {form.getFieldDecorator("timeline", {
+                            {form.getFieldDecorator("terms_condition", {
+                                initialValue: contract_detail_data.terms_condition,
                             })(<TextArea size={"large"} rows={6} />)}
                         </Form.Item>
                     </div>

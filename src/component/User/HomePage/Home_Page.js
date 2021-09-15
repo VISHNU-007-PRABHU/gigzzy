@@ -117,10 +117,13 @@ class Home_Page extends React.Component {
             trending_booking: [],
             my_booking: [],
             category_values: '',
+            comman_data: {},
+            current_type: "",
             center: [9.9252, 78.1198],
             current_page: 1,
             total: 0,
-            VisibleChooseCategory:false,
+            current_id:"",
+            VisibleChooseCategory: false,
         };
     }
     componentDidMount() {
@@ -260,7 +263,8 @@ class Home_Page extends React.Component {
         console.log(_id, type, is_parent);
         if (is_parent === false || is_parent === null) {
             if (localStorage.getItem('userLogin') === 'success') {
-                this.props.history.push({ pathname: `/description/${_id}`, state: { type, location: this.state.center, location_detail: this.state.home_page_city } });
+                let local_data = { pathname: `/description/${_id}`, state: { type, location: this.state.center, location_detail: this.state.home_page_city } };
+                this.setState({ comman_data: local_data,current_id:_id, current_type: "bookcategory", VisibleChooseCategory: !this.state.VisibleChooseCategory })
             } else {
                 this.props.history.push('/login');
             }
@@ -282,7 +286,8 @@ class Home_Page extends React.Component {
             var data = this.state.category_values.split("_");
             if (data[2] === "false") {
                 if (localStorage.getItem('userLogin') === 'success') {
-                    this.props.history.push({ pathname: `/description/${data[0]}`, state: { type: Number(data[1]), location: this.state.center, location_detail: this.state.home_page_city } });
+                    let local_data = { pathname: `/description/${data[0]}`, state: { type: Number(data[1]), location: this.state.center, location_detail: this.state.home_page_city } };
+                    this.setState({ comman_data: local_data,current_id:data[0], current_type: "bookcategory", VisibleChooseCategory: !this.state.VisibleChooseCategory })
                 } else {
                     this.props.history.push('/login');
                 }
@@ -297,20 +302,20 @@ class Home_Page extends React.Component {
             }
         }
     }
+
+
     _trending_book = async (data) => {
-        this.setState({
-            VisibleChooseCategory:true
-        })
-        // if (localStorage.getItem('userLogin') === 'success') {
-        //     this.props.history.push({ pathname: `/description/${data._id}`, state: { type: data.category_type, location: this.state.center, location_detail: this.state.home_page_city } });
-        // } else {
-        //     this.props.history.push('/login');
-        // }
+        if (localStorage.getItem('userLogin') === 'success') {
+            let local_data = { pathname: `/description/${data._id}`, state: { type: data.category_type, location: this.state.center, location_detail: this.state.home_page_city } }
+            this.setState({ comman_data: local_data,current_id:data._id, current_type: "trending", VisibleChooseCategory: !this.state.VisibleChooseCategory })
+        } else {
+            this.props.history.push('/login');
+        }
     }
     _subcategory_book = async (item) => {
         if (localStorage.getItem('userLogin') === 'success') {
-            let data = { type: 2, location: this.state.center, location_detail: this.state.home_page_city };
-            this.props.history.push({ pathname: `/description/${item._id}`, state: data });
+            let local_data = { pathname: `/description/${item._id}`, state: { type: 2, location: this.state.center, location_detail: this.state.home_page_city } }
+            this.setState({ comman_data: local_data,current_id:item._id, current_type: "subcategory", VisibleChooseCategory: !this.state.VisibleChooseCategory })
         } else {
             this.props.history.push('/login');
         }
@@ -588,9 +593,9 @@ class Home_Page extends React.Component {
                 <Suspense fallback={<Skeleton active />}>
                     <UserFooter />
                 </Suspense>
-                <Modal footer={null} centered visible={this.state.VisibleChooseCategory} onCancel={()=>{this.setState({VisibleChooseCategory:false})}}>
+                <Modal footer={null} centered visible={this.state.VisibleChooseCategory} onCancel={() => { this.setState({ VisibleChooseCategory: false }) }}>
                     <Suspense fallback={<Skeleton active />}>
-                        <ChooseJobCategory />
+                        <ChooseJobCategory current_id={this.state.current_id} comman_data={this.state.comman_data} />
                     </Suspense>
                 </Modal>
             </Layout >

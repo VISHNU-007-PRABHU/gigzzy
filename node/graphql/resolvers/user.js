@@ -6,6 +6,7 @@ var Jimp = require('jimp');
 const path = require("path");
 const _ = require("lodash");
 var commonHelper = require('../commonHelper');
+var CommonFunction = require('../CommonFunction');
 var saf = require('../safaricom');
 const dotenv = require('dotenv');
 var getDistanceBetweenPoints = require('get-distance-between-points');
@@ -28,7 +29,20 @@ module.exports.testmail = async (parent, args, context, info) => {
 
 module.exports.testinfmail = async (parent, args, context, info) => {
     try {
-        let data = await saf.safaricom_ctob_register();
+        // let data = await saf.safaricom_ctob_register();
+        let data ={
+            currency_code:'EUR',
+            convert_code:'INR',
+            amount:"500"
+        }
+    //    let result = await CommonFunction.currency_calculation(data)
+    //    console.log("module.exports.testinfmail -> result", result)
+        // let user_detail ={
+        //     country_code:91,
+        //     phone_no:9894177165
+        // }
+        // await commonHelper.send_sms(user_detail.country_code, user_detail.phone_no, "scheduled_job", {})
+
         // let data = await saf.safaricom_lipesa_simulate('254705924459',"20");
         // let data =  await saf.safaricom_ctob_simulate('254705924459',"20")
         // console.log("module.exports.testinfmail -> data", data)
@@ -39,7 +53,7 @@ module.exports.testinfmail = async (parent, args, context, info) => {
 
         // let chargePayment = await commonHelper.send_sms("254","705924459","otp",{otp:9213})
         // console.log("module.exports.testinfmail -> chargePayment", chargePayment)
-        return { msg: "success test api" };
+        return {price:"500"};
     } catch (error) {
         // console.log("module.exports.testinfmail -> error", error)
         return { msg: error.msg };

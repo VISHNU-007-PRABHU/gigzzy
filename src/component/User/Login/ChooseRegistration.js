@@ -9,9 +9,17 @@ const content_data = {
 }
 
 
-export default function ChooseRegistration() {
+export default function ChooseRegistration(props) {
   let history = useHistory();
-
+  const chooseType=(type)=>{
+      if(type === 1){ 
+          console.log(props)
+          props.change_from_type("COMPANY_REGISTRATION")
+      }else if(type === 2){
+        console.log(props)
+        props.change_from_type("INDIVIDUAL_REGISTRATION")
+      }
+  } 
   return (
     <>
       <Row gutter={[16, 40]}>
@@ -22,7 +30,7 @@ export default function ChooseRegistration() {
       <Row gutter={[16, 40]}>
         <Col span={24}>
           <div className="normal_font_size primary_color d-flex justify-content-center">
-            <Button type="primary" className='w-50'>
+            <Button type="primary" className='w-50' onClick={()=>{chooseType(1)}}>
               <div>{content_data['data2']}</div>
             </Button>
           </div>
@@ -31,7 +39,7 @@ export default function ChooseRegistration() {
       <Row>
         <Col span={24}>
         <div className="normal_font_size primary_color d-flex justify-content-center">
-          <Button type="primary" className='w-50' >
+          <Button type="primary" className='w-50' onClick={()=>{chooseType(2)}}>
             <div>{content_data['data3']}</div>
           </Button>
           </div>

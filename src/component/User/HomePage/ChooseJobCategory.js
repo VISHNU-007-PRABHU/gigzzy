@@ -10,15 +10,16 @@ const content_data = {
     data3: "Post a contract",
 
 }
-const ChooseJobCategory = () => {
+const ChooseJobCategory = (props) => {
     const { history } = useReactRouter();
     const [email, setEmail] = useState("");
-
-    const gopage = (data) => {
-        if (data === "contract") {
-            history.push({pathname: `/contract_booking`})
+    
+    const gopage = (pagetype) => {
+        console.log(props)
+        if (pagetype === "contract") {
+            history.push({pathname: `/contract_booking/${props.current_id}`})
         } else {
-           
+           history.push(props.comman_data);
         }
     }
 
@@ -32,7 +33,7 @@ const ChooseJobCategory = () => {
             <Row gutter={[16, 32]}>
                 <Col span={24}>
                     <div className="normal_font_size primary_color d-flex justify-content-center">
-                        <Button type="primary" className='w-50'>
+                        <Button type="primary" className='w-50' onClick={()=>{gopage("individual")}}>
                             <div>{content_data['data2']}</div>
                         </Button>
                     </div>

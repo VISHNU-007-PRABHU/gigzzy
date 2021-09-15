@@ -23,6 +23,7 @@ const dotenv = require('dotenv');
 const expressStaticGzip = require('express-static-gzip');
 const _ = require("lodash");
 const commonHelper = require('./node/graphql/commonHelper')
+const CommonFunction = require('./node/graphql/CommonFunction')
 dotenv.config();
 class refDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
@@ -118,23 +119,29 @@ class currencyDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
     const { defaultFormat } = this.args;
-
+    
     field.args.push({
       name: 'format',
       type: GraphQLString
     });
-
+    
     field.resolve = async function (
       source,
       { format, ...otherArgs },
       context,
       info,
-    ) {
+      ) {
       const date = await resolve.call(this, source, otherArgs, context, info);
-      // If a format argument was not provided, default to the optional
-      // defaultFormat argument taken by the @date directive:
-      // console.log(`${getSymbolFromCurrency(format || defaultFormat)}${date}`);
-      return `${getSymbolFromCurrency(format || defaultFormat)}${date}`;
+      console.log("currencyDirective -> visitFieldDefinition -> otherArgs", otherArgs.code)
+      let code =  otherArgs.code
+      let inputdata={
+        convert_code:otherArgs.code||defaultFormat,
+        amount: date,
+        currency_code:"INR"
+      }
+      let final_value = await CommonFunction.currency_calculation(inputdata)
+      console.log("currencyDirective -> visitFieldDefinition -> final_value", final_value)
+      return final_value
     };
 
     field.type = GraphQLString;

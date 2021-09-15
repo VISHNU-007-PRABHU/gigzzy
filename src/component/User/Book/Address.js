@@ -14,8 +14,8 @@ import { GoChevronLeft } from "react-icons/go";
 import { Alert_msg } from "../../Comman/alert_msg";
 import { LocationContext, EditLocationContext } from "../../context/Location";
 const ADD_ADDRESS = gql`
-  mutation add_address($option: Int,$_id:ID,$user_id: String,$title: String,$flat_no: String ,$landmark: String,$address: String,$lat: String,$lng: String ) {
-     modified_address(option: $option,_id:$_id,user_id: $user_id,title: $title,flat_no: $flat_no, landmark: $landmark,address: $address,lat: $lat,lng: $lng ) {
+  mutation add_address($company_id:ID,$option: Int,$_id:ID,$user_id: String,$title: String,$flat_no: String ,$landmark: String,$address: String,$lat: String,$lng: String ) {
+     modified_address(company_id:$company_id,option: $option,_id:$_id,user_id: $user_id,title: $title,flat_no: $flat_no, landmark: $landmark,address: $address,lat: $lat,lng: $lng ) {
         msg
         status
     }
@@ -70,6 +70,7 @@ const Address = (props) => {
 
 
     useEffect(() => {
+        console.log(props)
         setservice_modal(props.visible);
         setadd(false);
     }, [props])
@@ -142,13 +143,16 @@ const Address = (props) => {
             lng: String(lng)
         };
         console.log(data)
+        if(props.company){
+            data['company_id'] = localStorage.getItem('user_company_id')
+        }
         if (data.lat === null || data.lat === '' || data.lng === '' || data.lng === null || data.address === '' || data.address === null || data.user_id === '' || data.user_id === null || data.title === '' || data.title === null) {
 
             Alert_msg({ msg: "Please add mandatory field", status: 'failed' })
         } else {
             updateTodo({ variables: data }).then(results => {
                 if (results.data.modified_address.status === 'success') {
-                    if (location.pathname !== '/profile') {
+                    if (location.pathname !== '/profile'  && location.pathname !== '/login') {
                         value.location_change(data);
                     }
                     Alert_msg({ msg: "Address saved", status: "success" });
@@ -171,10 +175,14 @@ const Address = (props) => {
             lng: String(lng)
         };
         console.log(data)
+        if(props.company){
+            console.log("edit_data -> props.company", props.company)
+            data['company_id'] = localStorage.getItem('user_company_id')
+        }
         if (data.lat !== null && data.lat !== '' && data.lng !== '' && data.lng !== null && data.address !== '' && data.address !== null && data._id !== '' && data._id !== null && data.title !== '' && data.title !== null) {
             updateTodo({ variables: data }).then(results => {
                 if (results.data.modified_address.status === 'success') {
-                    if (location.pathname !== '/profile') {
+                    if (location.pathname !== '/profile' && location.pathname !== '/login') {
                         value.location_change(data);
                     }
                     Alert_msg({ msg: "Address update saved", status: "success" });

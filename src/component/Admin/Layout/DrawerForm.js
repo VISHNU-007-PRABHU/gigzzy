@@ -99,6 +99,11 @@ class DrawerForm extends React.Component {
               <span>Static Pages</span>
               <Link to="/admin-static" />
             </Menu.Item>
+            <Menu.Item key="/admin-currency"  className={RoleViewFunction('view_currency') ? '':'d_none'}>
+              <Icon type="dollar" />
+              <span>Currency</span>
+              <Link to="/admin-currency" />
+            </Menu.Item>
             <Menu.Item key="/admin-roles"  className={RoleViewFunction('view_admin') ? '':'d_none'}>
               <Icon type="usergroup-add" />
               <span>Manage Admin</span>

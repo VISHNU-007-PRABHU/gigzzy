@@ -21,4 +21,5 @@ module.exports = {
     company_images:require('./model/userDetail/companyImage'),
     contract_job:require('./model/booking/ContractJob'),
     contract_job_images:require('./model/booking/ContractJobImage'),
+    currency:require('./model/Admin/currency'),
 }
