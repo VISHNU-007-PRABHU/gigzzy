@@ -1,5 +1,3 @@
-
-
 import React, { Suspense } from "react";
 import 'antd/dist/antd.css';
 import { Link } from 'react-router-dom';
@@ -22,6 +20,7 @@ import PlacesAutocomplete, {
 const { Content } = Layout;
 const UserHeader = React.lazy(() => import('../Layout/UserHeader'));
 const UserFooter = React.lazy(() => import('../Layout/UserFooter'));
+const How = React.lazy(() => import('../About/how'));
 
 class Home_Page extends React.Component {
 
@@ -343,21 +342,22 @@ class Home_Page extends React.Component {
                             <div className="banner_section">
                                 <Carousel effect="fade" dots={true} {...settings}>
                                     <div>
-                                        <img alt='' src={require("../../../image/handyman.jpg")} loading="lazy" class="lazyload" />
+                                        <img alt='' src={require("../../../image/handyman.jpg")} loading="lazy" class="lazyload h-100" />
                                     </div>
                                     <div>
-                                        <img alt='' src={require("../../../image/handyman2.jpg")} loading="lazy" class="lazyload" />
+                                        <img alt='' src={require("../../../image/handyman2.jpg")} loading="lazy" class="lazyload h-100" />
                                     </div>
                                     <div>
-                                        <img alt='' src={require("../../../image/handyman3.jpg")} loading="lazy" class="lazyload" />
+                                        <img alt='' src={require("../../../image/handyman3.jpg")} loading="lazy" class="lazyload h-100" />
                                     </div>
                                 </Carousel>
                                 <div className="banner_inner">
                                     <Col span={22} offset={2} className="h-100">
                                         <div className="d-flex h-100 align-items-center">
                                             <div className="banner_center w-100">
-                                                <h3 className="white-text bold">Your home of convenience</h3>
-                                                <p className="normal_font_size white-text">Get instant access to reliable and affordable Gigzzy service providers.</p>
+                                                <h5 className="white-text bold d-none d-md-flex">A marketplace connecting consumers with service providers at an affordable rate</h5>
+                                                <p className="normal_font_size white-text mb-0 bold d-none d-md-flex">Service providers Sign-up for free, no more lead charges for jobs that you don’t get</p>
+                                                <p className="normal_font_size white-text mb-4">Get instant access to reliable and affordable Gigzzy service providers.</p>
                                                 <Col sm={{ span: 4 }} xs={{ span: 22 }} className="mr-4 mb-4">
                                                     <Button icon="environment" className="px-1 jiffy_btn h-50x normal_font_size w-100 text-left" onClick={() => this.setLocationModal(true)}>
                                                         {this.state.home_page_city}
@@ -435,7 +435,7 @@ class Home_Page extends React.Component {
                                     </Col>
                                 </div>
                             </div>
-                            <div className="featured_category container position-relative">
+                            <div className="featured_category container position-relative mt-5">
                                 <div className="d-flex justify-content-around position-absolute w-100 owl-stage-outer">
                                     <Spin size="large" spinning={this.state.categoryloading} />
                                 </div>
@@ -476,6 +476,9 @@ class Home_Page extends React.Component {
 
                                 </Modal>
                             </div>
+                            <Suspense fallback={<p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>}>
+                                <How />
+                            </Suspense>
                             <div className="first_category position-relative pt-5">
                                 {this.state.future_data.length > 0 ?
                                     <>
@@ -494,7 +497,7 @@ class Home_Page extends React.Component {
                             <div className="second_category position-relative pt-5">
                                 {this.state.trending_booking.length > 0 ?
                                     <>
-                                        <h2 className="bold mb-5 text-center">Trending Gigzzy Services</h2>
+                                        <h2 className="bold mb-5 text-center">Ready to Gigzzy it?</h2>
                                         <OwlCarousel
                                             className="owl-theme cursor_point"
                                             items={5}

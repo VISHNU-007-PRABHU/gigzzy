@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import {
@@ -16,11 +16,13 @@ import main from "../../../image/Gigzzy.png";
 import useReactRouter from "use-react-router";
 import { GET_SETTING } from "../../../graphql/Admin/static";
 import { useQuery } from "@apollo/react-hooks";
+import useMobileDetect from 'use-mobile-detect-hook';
 
 const { Header } = Layout;
 
 const UserHeader = () => {
   const location = useLocation();
+  const detectMobile = useMobileDetect();
   const { loading, error, data } = useQuery(GET_SETTING, {});
   const { history } = useReactRouter();
   if (loading)
@@ -42,7 +44,7 @@ const UserHeader = () => {
     console.log(url);
     window.open(url);
   };
- 
+
 
   const menu = (
     <Menu>
@@ -122,19 +124,30 @@ const UserHeader = () => {
         <Icon type="logout" />
         Logout
       </Menu.Item>
-      {/* <Menu.Item
-                className={localStorage.getItem('userLogin') === 'success' ? 'd-none' : "d-flex align-items-center px-3"}
-                onClick={() => { history.push('/login') }}>
-                <Icon type="login" />
-                Login
-            </Menu.Item>
-            <Menu.Divider />
-            <Menu.Item
-                className="d-flex align-items-center px-3"
-                onClick={() => { open_new_tab('/provider_login') }}>
-                <Icon type="shop" theme="twoTone" twoToneColor="#52c41a" />
-                <span className="primary_color">Become a Provider</span>
-            </Menu.Item> */}
+    </Menu>
+  );
+
+  const without_login_menu = (
+    <Menu>
+      <Menu.Item
+        className="d-flex align-items-center px-3"
+        onClick={() => { history.push('/how') }}>
+        <Icon type="question-circle" />
+        How
+      </Menu.Item>
+      <Menu.Item
+        className="d-flex align-items-center px-3"
+        onClick={() => { history.push('/login') }}>
+        <Icon type="login" />
+        Customer Login
+      </Menu.Item>
+      <Menu.Divider />
+      <Menu.Item
+        className="d-flex align-items-center px-3"
+        onClick={() => { open_new_tab('/provider_login') }}>
+        <Icon type="shop" theme="twoTone" twoToneColor="#52c41a" />
+        <span className="primary_color">Service Provider Login</span>
+      </Menu.Item>
     </Menu>
   );
 
@@ -146,21 +159,13 @@ const UserHeader = () => {
             <img
               src={main}
               height="75"
-              width="75"
+              width="120"
               alt={"Jiffy"}
               className="object_fit cursor_point"
               onClick={() => {
                 history.push("/");
               }}
-            />{"    "}
-
-              {location.pathname==="/static_page/about_us" ? "": <Button style={{margin:'0px 0px 0px 10px'}}
-                    onClick={() => {
-                      open_new_tab("/static_page/about_us");
-                    }}
-                  >
-                   About us
-                  </Button>}
+            />
 
             <div className="float-right cursor_point">
               {localStorage.getItem("userLogin") === "success" ? (
@@ -179,25 +184,29 @@ const UserHeader = () => {
                   />
                 </Dropdown>
               ) : (
+                detectMobile.isMobile()?
+                <Dropdown overlay={without_login_menu} placement="bottomRight">
+                  <Avatar
+                    shape="circle"
+                    className="ant-dropdown-link avatar_shadow"
+                    icon={
+                      <Icon type="menu-unfold" style={{ verticalAlign: "baseline" }} />
+                    }
+                  />
+                </Dropdown>:
+              <>
                 <div>
-                  <Button
-                    onClick={() => {
-                      history.push("/login");
-                    }}
-                    style={{ backgroundColor: "black", color: "white" }}
-                  >
-                    Login
+                  <Button onClick={() => { history.push("/how"); }} className="mx-1">
+                    How
                   </Button>
-                  {"  "}
-                  <Button
-                    onClick={() => {
-                      open_new_tab("/provider_login");
-                    }}
-                  >
-                    Pro Login
+                  <Button onClick={() => { history.push("/login"); }} className="mx-1" style={{ backgroundColor: "black", color: "white" }}>
+                    Customer Login
                   </Button>
-                
+                  <Button onClick={() => { open_new_tab("/provider_login"); }} className="mx-1">
+                    Service Provider Login
+                  </Button>
                 </div>
+              </>
               )}
             </div>
           </Col>

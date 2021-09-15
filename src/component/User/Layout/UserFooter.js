@@ -1,166 +1,40 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Layout, Row, Col, Icon } from "antd";
-import {
-  EmailShareButton,
-  FacebookShareButton,
-  TwitterIcon,
-  FacebookIcon,
-  WhatsappIcon,
-  LinkedinIcon,
-  LinkedinShareButton,
-  TwitterShareButton,
-  WhatsappShareButton,
-} from "react-share";
+import { FooterData } from "./FooterData";
+
 const { Footer } = Layout;
+
+
 
 const UserFooter = () => {
   return (
     <div>
       <Footer className="footer_bg">
         <Row gutter={[16, 16]}>
-          <Col className="gutter-row justify-content-around d-flex" xs={12} md={6}>
-            <div>
-              <ul>
-                <li>
-                  <h6 style={{ color: "green" }}>Company</h6>
-                </li>
-                <li>
-                  <Link to="/static_page/about_us" target="_blank" className="mr-1">About</Link>
-                </li>
-                <li>
-                  <Link target="_blank" className="mr-1">Blog</Link>
-                </li>
-                <li>
-                  <Link target="_blank" className="mr-1">Careers</Link>
-                </li>
-                <li>
-                  <Link to="/provider_login" target="_blank" className="mr-1">Become a Pro</Link>
-                </li>
-              </ul>
-            </div>
-          </Col>
-          <Col className="gutter-row justify-content-around d-flex" xs={12} md={6}>
-            <div>
-              <ul>
-                <li>
-                  <h6 style={{ color: "green" }}>Legal</h6>
-                </li>
-                <li>
-                  <Link to="/static_page/terms" target="_blank" className="mr-1">
-                    Terms & Condition
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/static_page/client" target="_blank" className="mr-1">
-                    Client Guarantee
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/static_page/policy" target="_blank" className="mr-1">
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/static_page/conduct" target="_blank" className="mr-1">
-                    Gigzzy Conduct
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </Col>
-          <Col className="gutter-row justify-content-around d-flex" xs={12} md={6}>
-            <div>
-              <ul>
-                <li>
-                  <h6 style={{ color: "green" }}>Resources</h6>
-                </li>
-                <li>
-                  <Link to="/provider_login" target="_blank" className="mr-1">
-                    Pro Login
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/static_page/why_gigzzy" target="_blank" className="mr-1">
-                    Why Gigzzy
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/static_page/professional_screening_process" target="_blank" className="mr-1">
-                    Professional Screening Process
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/static_page/faq" target="_blank" className="mr-1">
-                    FAQs
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </Col>
-          <Col className="gutter-row justify-content-around d-flex" xs={12} md={6}>
-            <div>
-              <ul>
-                <li>
-                  <h6 style={{ color: "green" }}>Contact Us</h6>
-                </li>
-                <li>1. HQ ,USA 14314 S Myers Park Rd</li>
-                <li>Cheney WA 99004 ,USA.</li>
-                <li className="mb-2">Tel +1 (509) 319-6332</li>
-                <li>2. UMEA, Nyago house,</li>
-                <li>Mombasa road 2nd Floor</li>
-                <li className="mb-2">Tel +254 733 494 363</li>
-                <li className="pt-3 ">info@gigzzy.com</li>
-                <li>
-                  <FacebookShareButton
-                    url="https://web.facebook.com/gigzzy"
-                    hashtag="#programing joke"
-                  >
-                    <FacebookIcon
-                      logoFillColor="white"
-                      size={32}
-                      round={true}
-                    />
-                  </FacebookShareButton>
-                  {"    "}
-                  <TwitterShareButton
-                    url="https://twitter.com/Gigzzyafrica"
-                    hashtag="#programing joke"
-                  >
-                    <TwitterIcon logoFillColor="white" size={32} round={true} />
-                  </TwitterShareButton>
-                  {"    "}
-                  <LinkedinShareButton
-                    url="https://www.linkedin.com/company/gigzzy-africa/about/?viewAsMember=true"
-                    hashtag="#programing joke"
-                  >
-                    <LinkedinIcon
-                      logoFillColor="white"
-                      size={32}
-                      round={true}
-                    />
-                  </LinkedinShareButton>
-                  {"     "}
-                  <WhatsappShareButton
-                    url="https://www.whatsapp.com/"
-                    hashtag="#programing joke"
-                  >
-                    <WhatsappIcon
-                      logoFillColor="white"
-                      size={32}
-                      round={true}
-                    />
-                  </WhatsappShareButton>
-                  {/* <a >
-                  <Icon style={{width:40,height:50,fontSize:30}} type="instagram" />
-                  </a> */}
-                </li>
-              </ul>
-            </div>
-          </Col>
+          {FooterData.map(parentdata => {
+            return (
+              <>
+                <Col className="gutter-row justify-content-around d-flex" xs={12} md={6}>
+                  <div>
+                    <ul>
+                      <li>
+                        <h6 style={{ color: "green" }}>{parentdata.title}</h6>
+                      </li>
+                      {parentdata.data.map(innerdata => <>
+                        <li>
+                          <Link to={innerdata.link} target="_blank" className="mr-1">{innerdata.title}</Link>
+                        </li>
+                      </>)}
+                    </ul>
+                  </div>
+                </Col>
+              </>
+            )
+          })}
         </Row>
       </Footer>
-    </div>
+    </div >
   );
 };
 export default UserFooter;

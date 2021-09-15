@@ -242,8 +242,7 @@ html {
 }
 
 .user_header.ant-layout-header {
-    height: 120px;
-    line-height: 120px;
+    line-height: 88px;
 }
 
 .mr-1 {
@@ -299,15 +298,14 @@ html {
 }
 
 .banner_section {
-    height: 450px;
+    height: 320px;
     border-radius: 30px;
     position: relative;
-    margin-bottom: 100px;
 }
 
 .banner_section .ant-carousel img {
     width: 100%;
-    height: 450px;
+    height: 320px !important;
     object-fit: cover;
     border-radius: 30px;
 }
@@ -322,7 +320,7 @@ html {
 }
 
 .banner_section .ant-carousel .slick-dots-bottom {
-    bottom: -35px !important;
+    bottom: 0px !important;
 }
 
 .banner_section .ant-carousel .slick-dots-bottom li {
@@ -330,16 +328,6 @@ html {
     margin: 0 4px;
 }
 
-.banner_section .ant-carousel .slick-dots-bottom li,
-.banner_section .ant-carousel .slick-dots-bottom li button {
-    background: #afeed4;
-    border-radius: 30px;
-}
-
-.banner_section .ant-carousel .slick-dots-bottom li.slick-active,
-.banner_section .ant-carousel .slick-dots-bottom li.slick-active button {
-    background: #07cb79;
-}
 
 .h-100 {
     height: 100%;
