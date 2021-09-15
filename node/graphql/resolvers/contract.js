@@ -231,7 +231,7 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
 
         if (args.role && args.role == 2  && args['user_id']) {
             // if (args.booking_status == 12) {
-            find_query['available_provider'] = { $in: [ObjectId(args.user_id)] }
+            find_query['available_provider'] = { $ne: [ObjectId(args.user_id)] }
             // } else {
             //     if (args.booking_status == 4) {
             //         find_query['provider_id'] = args._id;
@@ -244,6 +244,7 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         }
 
         total = await ContractJob_model.count(find_query);
+        console.log("module.exports.get_contracts_pagination -> find_query", find_query)
         result = await ContractJob_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
         var pageInfo = { totalDocs: total, page: args.page }
         return { data: result, pageInfo };
