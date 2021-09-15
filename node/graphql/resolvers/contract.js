@@ -226,12 +226,12 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
             find_query['contract_id'] = args['contract_id']
         }
         if (args.role && args.role == 1 && args['user_id']) {
-            find_query['user_id'] = args['user_id']
+            find_query['user_id'] = ObjectId(args['user_id'])
         }
 
         if (args.role && args.role == 2  && args['user_id']) {
             // if (args.booking_status == 12) {
-            find_query['available_provider'] = { $in: [args.user_id] }
+            find_query['available_provider'] = { $in: [ObjectId(args.user_id)] }
             // } else {
             //     if (args.booking_status == 4) {
             //         find_query['provider_id'] = args._id;
