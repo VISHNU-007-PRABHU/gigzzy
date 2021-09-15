@@ -318,7 +318,7 @@ app.use(cors({ origin: 'http://localhost:3000' }));
 
 
 
-mongoose.connect(process.env.DB_LINK).then(() => {
+mongoose.connect("mongodb://localhost/gigzzy").then(() => {
 }).catch((err) => {
   // console.log("Not Connected to Database ERROR! ", err);
 });
