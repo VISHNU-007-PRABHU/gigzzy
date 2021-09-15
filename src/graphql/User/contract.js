@@ -11,7 +11,28 @@ export const UPDATE_CONTRACT = gql`
 `
 
 
+export const UPDATE_CONTRACT_FILE = gql`
+    mutation UPDATECONTRACTFILE($contract_id:ID,$file:[Upload]){
+        ContractJobFileUpload(contract_id:$contract_id,file:$file){
+            msg
+            status
+            _id
+        }
+    }
+`
 
+export const GET_CONTRACT_FILES = gql`
+    query GETCONTRACTFILES($contract_id:ID){
+        get_contract_files(contract_id:$contract_id) {
+            _id
+            images{
+                small_image
+                large_image
+                image_tag
+            }
+        }
+    }
+`
 
 export const GET_CONTRACT = gql`
     query GETCONTRACT($contract_id:ID){
