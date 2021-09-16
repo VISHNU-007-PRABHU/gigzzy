@@ -8,19 +8,19 @@ const content = {
 }
 const subcontent = [{
     icon: "message",
-    title: "1.Tell us what your home needs",
-    data: "From routine maintenance and repairs to dream  home renovations , we can help with any project - big or small"
+    title: "1.Signup and complete registration",
+    data: ""
 }, {
     icon: "thunderbolt",
-    title: "2.Tell us what your home needs",
+    title: "2.Post an job or project",
     data: "From routine maintenance and repairs to dream  home renovations , we can help with any project - big or small"
 }, {
     icon: "heart",
-    title: "3.Tell us what your home needs",
+    title: "3.Accept qoutes from service provider(s)",
     data: "From routine maintenance and repairs to dream  home renovations , we can help with any project - big or small"
 }, {
     icon: "bulb",
-    title: "4.Tell us what your home needs",
+    title: "4.Payment is processed after job completion",
     data: "From routine maintenance and repairs to dream  home renovations , we can help with any project - big or small"
 }]
 function How() {
@@ -37,7 +37,7 @@ function How() {
                         <div className="d-flex flex-column align-items-start">
                             <h3 className="bold"><Icon type={itemdata.icon} /> </h3>
                             <h3 className="">{itemdata.title}</h3>
-                            <div className="">{itemdata.data}</div>
+                            {/* <div className="">{itemdata.data}</div> */}
                         </div>
                     </Col>
                 </>)}
@@ -45,7 +45,7 @@ function How() {
             <Row gutter={[24, 24]} >
                 <Col>
                     <div className="d-flex justify-content-around">
-                        <Link to="/static_page/faq" target="_blank" className="normal_font_size">
+                        <Link to="/howlearnmore" target="_blank" className="normal_font_size">
                             {content.btn_text}
                         </Link>
                     </div>

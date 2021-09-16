@@ -59,6 +59,7 @@ import ContractDetail from './component/Admin/Contract/ContractDetail';
 import ContractBooking from './component/User/Book/contract/ContractBooking';
 import Currency from './component/Admin/Currency/Currency'
 import AddCurrency from './component/Admin/Currency/AddCurrency';
+import HowLearnMore from './component/User/About/HowLearnMore';
 function PrivateRoute({ permission, component: Component, ...rest }) {
   console.log("PrivateRoute -> permission", permission)
   let permission_condition = true
@@ -209,7 +210,9 @@ ReactDOM.render(
           <Route exact path="/login" component={User_Login} />
           <Route exact path="/Confrim_password/:id" component={ConfrimPassword} />
           <Route exact path="/signup" component={Email_Login} />
-          <Route exact path="/static_page/:id" component={StaticPage} />
+          <Route exact path="/static_page/:id" component={StaticPage}/>
+          <Route exact path="/howlearnmore" component={HowLearnMore}/>
+
           <UserRoute exact path="/profile" component={Profile_Page} />
           <UserRoute exact path="/description/:id" component={Description_Page} />
           <Route exact path="/contract_booking/:id" component={ContractBooking} />

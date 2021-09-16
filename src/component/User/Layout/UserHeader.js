@@ -128,9 +128,9 @@ const UserHeader = () => {
     <Menu>
       <Menu.Item
         className="d-flex align-items-center px-3"
-        onClick={() => { history.push('/how') }}>
+        onClick={() => { history.push('/howlearnmore') }}>
         <Icon type="question-circle" />
-        How
+        How it works
       </Menu.Item>
       <Menu.Item
         className="d-flex align-items-center px-3"
@@ -182,29 +182,29 @@ const UserHeader = () => {
                   />
                 </Dropdown>
               ) : (
-                detectMobile.isMobile()?
-                <Dropdown overlay={without_login_menu} placement="bottomRight">
-                  <Avatar
-                    shape="circle"
-                    className="ant-dropdown-link avatar_shadow"
-                    icon={
-                      <Icon type="menu-unfold" style={{ verticalAlign: "baseline" }} />
-                    }
-                  />
-                </Dropdown>:
-              <>
-                <div>
-                  <Button onClick={() => { history.push("/how"); }} className="mx-1">
-                    How
-                  </Button>
-                  <Button onClick={() => { history.push("/login"); }} className="mx-1" style={{ backgroundColor: "black", color: "white" }}>
-                    Customer Login
-                  </Button>
-                  <Button onClick={() => { open_new_tab("/provider_login"); }} className="mx-1">
-                    Service Provider Login
-                  </Button>
-                </div>
-              </>
+                detectMobile.isMobile() ?
+                  <Dropdown overlay={without_login_menu} placement="bottomRight">
+                    <Avatar
+                      shape="circle"
+                      className="ant-dropdown-link avatar_shadow"
+                      icon={
+                        <Icon type="menu-unfold" style={{ verticalAlign: "baseline" }} />
+                      }
+                    />
+                  </Dropdown> :
+                  <>
+                    <div>
+                      <Button onClick={() => { history.push("/howlearnmore"); }} className="mx-1">
+                        How it works
+                      </Button>
+                      <Button onClick={() => { history.push("/login"); }} className="mx-1" style={{ backgroundColor: "black", color: "white" }}>
+                        Customer Login
+                      </Button>
+                      <Button onClick={() => { open_new_tab("/provider_login"); }} className="mx-1">
+                        Service Provider Login
+                      </Button>
+                    </div>
+                  </>
               )}
             </div>
           </Col>
