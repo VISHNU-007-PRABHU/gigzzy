@@ -659,9 +659,7 @@ module.exports.checkOtp = async (parent, args) => {
                 result = { ...result._doc, ...message };
             } else {
                 let message = {}
-                if (check_user[0].role == 2 && check_user[0].Upload_percentage == 50 && (check_user[0].email_otp_verification == 0)) {
-                    message = { pending_status: 2, msg: "Email not verified", status: "success" };
-                } else if (check_user[0].provider_subCategoryID.length == 0 && check_user[0].role == 2 && check_user[0].Upload_percentage == 50) {
+                if (check_user[0].provider_subCategoryID.length == 0 && check_user[0].role == 2 && check_user[0].Upload_percentage == 50) {
                     message = { pending_status: 5, msg: " category not upload", status: "success" };
                 } else if (check_user[0].role == 2 && check_user[0].Upload_percentage == 50 && (check_user[0].personal_document == undefined || check_user[0].personal_document == '')) {
                     message = { pending_status: 6, msg: "personal_document not upload", status: "success" };
