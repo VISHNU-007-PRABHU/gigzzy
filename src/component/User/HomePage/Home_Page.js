@@ -356,8 +356,7 @@ class Home_Page extends React.Component {
                                         <div className="d-flex h-100 align-items-center">
                                             <div className="banner_center w-100">
                                                 <h5 className="white-text bold d-none d-md-flex">A marketplace connecting consumers with service providers at an affordable rate</h5>
-                                                <p className="normal_font_size white-text mb-0 bold d-none d-md-flex">Service providers Sign-up for free, no more lead charges for jobs that you don’t get</p>
-                                                <p className="normal_font_size white-text mb-4">Get instant access to reliable and affordable Gigzzy service providers.</p>
+                                                <p className="normal_font_size white-text  mb-4 bold d-none d-md-flex">Service providers Sign-up for free, no more lead charges for jobs that you don’t get</p>
                                                 <Col sm={{ span: 4 }} xs={{ span: 22 }} className="mr-4 mb-4">
                                                     <Button icon="environment" className="px-1 jiffy_btn h-50x normal_font_size w-100 text-left" onClick={() => this.setLocationModal(true)}>
                                                         {this.state.home_page_city}

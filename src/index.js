@@ -46,6 +46,7 @@ import { ConfrimPassword } from './component/User/Login/ConfrimPassword';
 import { CHECK_DEMO } from './graphql/User/login';
 import { Alert_msg } from './component/Comman/alert_msg';
 import StaticPage from './component/Comman/static_page';
+import HowLearnMore from './component/User/About/HowLearnMore';
 
 function PrivateRoute({ component: Component, ...rest }) {
   return (
@@ -168,6 +169,7 @@ ReactDOM.render(
           <Route exact path="/Confrim_password/:id" component={ConfrimPassword} />
           <Route exact path="/signup" component={Email_Login} />
           <Route exact path="/static_page/:id" component={StaticPage}/>
+          <Route exact path="/howlearnmore" component={HowLearnMore}/>
 
           <UserRoute exact path="/profile" component={Profile_Page} />
           <UserRoute exact path="/description/:id" component={Description_Page} />
