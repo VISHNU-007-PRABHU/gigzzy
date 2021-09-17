@@ -303,10 +303,11 @@ const resolvers = {
     ContractJob:{
         get_contract_files:contractResolver.get_contract_files,
         get_contract_category:categoryResolver.available_booking_category,
+        get_contract_all_files:contractResolver.get_contract_all_files,
     },
     CompanyImage:{
         get_contract_files:contractResolver.get_contract_files,
-        get_contract_all_files:contractResolver.get_contract_all_files
+        get_contract_all_files:contractResolver.get_contract_all_files,
     },
     Booking: {
         user: userResolver.user,

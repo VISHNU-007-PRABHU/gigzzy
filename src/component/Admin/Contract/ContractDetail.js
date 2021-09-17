@@ -1,23 +1,16 @@
 import React, { Suspense } from "react";
 import { withRouter } from "react-router";
 import { client } from "../../../apollo";
-import { Layout, Button, Affix, Form, Card, Avatar, Row, Col, Rate, Skeleton, Typography } from 'antd';
+import { Layout,Form, Card,  Row, Col,  Skeleton,  } from 'antd';
 import 'antd/dist/antd.css';
 import '../../../scss/template.scss';
-import { FaBarcode, FaDollarSign, FaRegImage, FaSignInAlt, FaSignOutAlt, FaUserAlt, FaUserCog, FaEye } from 'react-icons/fa';
-import { AiFillTool, AiTwotoneBell, AiFillClockCircle, AiFillTags, AiTwotonePhone, AiTwotoneMail } from 'react-icons/ai';
-import { GET_PARTICULAR_BOOKING, UPDATE_MANUAL_PAYMENT } from '../../../graphql/User/booking';
-import AdminSider from '../Layout/AdminSider';
-import AdminHeader from '../Layout/AdminHeader';
-import Biding from "./biding";
-import { Alert_msg } from '../../Comman/alert_msg';
-import BidingList from "./BidingList";
 const { Content } = Layout;
-const { Meta } = Card;
-const { Title } = Typography;
-const padding_setting = {padding:"0px"}
-const DescriptionValue = React.lazy(() => import('../../User/Book/DescriptionValue'));
+const padding_setting = { padding: "0px" }
+const Biding = React.lazy(() => import('./biding'));
+const BidingList = React.lazy(() => import('./BidingList'));
 const Milestone = React.lazy(() => import('./Milestone'));
+const AdminSider = React.lazy(() => import('../Layout/AdminSider'));
+const AdminHeader = React.lazy(() => import('../Layout/AdminHeader'));
 class ContractDetail extends React.Component {
     constructor(props) {
         super(props);
@@ -87,19 +80,6 @@ class ContractDetail extends React.Component {
         // });
     }
 
-    manual_refund = (id) => {
-        console.log("BookingDetails -> manual_refund -> id", id)
-        client.query({
-            query: UPDATE_MANUAL_PAYMENT,
-            variables: { booking_id: id },
-            fetchPolicy: 'no-cache',
-        }).then(result => {
-            Alert_msg(result.data.update_manual_payment.info);
-            if (result.data.update_manual_payment.info.status === "success") {
-                this.fetch_booking(id)
-            }
-        })
-    }
     render() {
         console.log(this.state.u_rate);
         const { booking, booking_category, booking_provider, booking_user, u_rate } = this.state;
@@ -108,9 +88,13 @@ class ContractDetail extends React.Component {
 
         return (
             <Layout style={{ height: '100vh' }}>
-                <AdminSider update_collapsed={this.state.collapsed} />
+                <Suspense fallback={<Skeleton active />}>
+                    <AdminSider update_collapsed={this.state.collapsed} />
+                </Suspense>
                 <Layout>
-                    <AdminHeader />
+                    <Suspense fallback={<Skeleton active />}>
+                        <AdminHeader />
+                    </Suspense>
                     <Content className="main_frame" style={{ background: 'none' }}>
                         <Row gutter={12}>
                             <Col lg={18} md={24}>
@@ -118,9 +102,13 @@ class ContractDetail extends React.Component {
                                     <Suspense fallback={<Skeleton active />}>
                                         <Milestone></Milestone>
                                     </Suspense>
-                                    <Biding></Biding>
+                                    <Suspense fallback={<Skeleton active />}>
+                                        <Biding></Biding>
+                                    </Suspense>
                                     <Card bordered={0} bodyStyle={padding_setting}>
-                                        <BidingList></BidingList>
+                                        <Suspense fallback={<Skeleton active />}>
+                                            <BidingList></BidingList>
+                                        </Suspense>
                                     </Card>
                                 </Card>
                             </Col>
@@ -131,5 +119,4 @@ class ContractDetail extends React.Component {
         );
     }
 }
-
 export default Form.create()(withRouter(ContractDetail));

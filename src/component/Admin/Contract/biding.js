@@ -1,110 +1,79 @@
 import React, { Suspense } from "react";
 import { withRouter } from "react-router";
 import { client } from "../../../apollo";
-import { List, Avatar, Button, Skeleton, Col, Tag, Row, Typography } from 'antd';
-import { divide } from "lodash";
-const { Title, Paragraph } = Typography;
-const count = 3;
-const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat&noinfo`;
+import { Col, Tag, Row, Typography, Skeleton } from 'antd';
+import { GET_CONTRACT } from '../../../graphql/User/contract';
+const ShowCategory = React.lazy(() => import('../../Comman/ShowCategory'));
+const BannerSlider = React.lazy(() => import('../../Comman/BannerSlider'));
 
+const { Title, Paragraph } = Typography;
 class Biding extends React.Component {
     state = {
-        initLoading: true,
         loading: false,
-        data: {
-            name: "Garding setup",
-            company_name: "XYZ Pct ltd",
-            data1: "Cleaing",
-            data2: "16 bids",
-            data3: "active",
-            price: "20000 Ksh",
-            detail: " Content testing (when performed at the beginning of a project) can save you the frustration of reaching the end of the project, only to find that people don't understand what you're saying. It can also provide designers with context around what users care about, and how to best structure information",
-            duration: "3 day",
-            loading: false
-        },
-        list: [],
+        data: {},
+        catgeory: {}
     };
 
     componentDidMount() {
-        this.getData(res => {
-            this.setState({
-                initLoading: false,
-                data: res.results,
-                list: res.results,
-            });
-        });
+        if (this.props.match.params.id) {
+            this.getData();
+        }
     }
 
-    getData = callback => {
-
-    };
-
-    onLoadMore = () => {
-        this.setState({
-            loading: !this.state.loading,
-        });
+    getData = async () => {
+        this.setState({ loading: true, });
+        client.query({
+            query: GET_CONTRACT,
+            variables: { contract_id: this.props.match.params.id },
+            fetchPolicy: 'no-cache',
+        }).then(result => {
+            console.log("Biding -> getData -> result", result.data.get_contracts)
+            this.setState({
+                loading: false,
+                data: result.data.get_contracts[0],
+                catgeory: result.data.get_contracts[0].get_contract_category[0] || {}
+            });
+        })
     };
 
     render() {
-        const data = [
-            {
-                name: 'Ant Design Title 1',
-                price: '20000 Ksh',
-                basde: "basde",
-                time: "3.5",
-                year: "1 day"
-
-            },
-            {
-                name: 'Ant Design Title 1',
-                price: '20000 Ksh',
-                basde: "basde",
-                time: "3.5",
-                year: "1 day"
-            },
-            {
-                name: 'Ant Design Title 1',
-                price: '20000 Ksh',
-                basde: "basde",
-                time: "3.5",
-                year: "1 day"
-            },
-
-        ];
-        const { initLoading, loading, list } = this.state;
-
+        const { data, catgeory } = this.state
         return (
             <>
                 <Row gutter={[12, 24]}>
                     <Col span={24}>
                         <div className="d-flex flex-column flex-md-row justify-content-between normal_font_size">
                             <div>Contract Detail</div>
-                            <div>Contract Ref : 90879278958924357089</div>
+                            <div>Contract Ref : {data?.contract_ref}</div>
                         </div>
                     </Col>
                 </Row>
                 <Row gutter={[12, 24]}>
                     <Col span={24}>
-                        <img alt='' src={require("../../../image/handyman.jpg")} loading="lazy" className="w-100 br_14 object_fit lazyload" />
+                        <Suspense fallback={<Skeleton active />}>
+                            <BannerSlider parent_images={data.get_contract_all_files} />
+                        </Suspense>
                     </Col>
                 </Row>
                 <Row gutter={[12, 24]}>
                     <Col>
-                        <Title level={4}>{this.state.data.name}</Title>
-                        <Title level={4} className="font-weight-light m-0 mb-1">{this.state.data.company_name}</Title>
-                        <Title level={4} className="font-weight-light m-0 text-success">{"gradening"}</Title>
+                        <Title level={4}>{data.name}</Title>
+                        <Title level={4} className="font-weight-light m-0 mb-1">{data?.company_name}</Title>
+                        <Suspense fallback={<Skeleton active />}>
+                            <ShowCategory parent_catgeory={catgeory} />
+                        </Suspense>
                     </Col>
                 </Row>
                 <Row gutter={[12, 24]}>
                     <Col>
                         <div className="normal_font_size d-flex justify-content-between py-2">
                             <div className="d-flex align-items-center">
-                                <div>{this.state.data.data1}</div>
-                                <div className="px-3">{this.state.data.data2}</div>
+                                <div>{data?.catgeory}</div>
+                                <div className="px-3">{data?.bid_count || 0}Bids</div>
                                 <Tag color="green">green</Tag>
                             </div>
                             <div>
-                                <div>{this.state.data.price}</div>
+                                <div>{data.budget}</div>
                             </div>
                         </div>
                     </Col>
@@ -114,18 +83,7 @@ class Biding extends React.Component {
                         <Title level={4}>{"Project description"}</Title>
                         <div>
                             <Paragraph ellipsis={{ rows: 3, expandable: true }}>
-                                Ant Design, a design language for background applications, is refined by Ant UED Team. Ant
-                                Design, a design language for background applications, is refined by Ant UED Team. Ant Design,
-                                a design language for background applications, is refined by Ant UED Team. Ant Design, a
-                                design language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                language for background applications, is refined by Ant UED Team.
-                                Ant Design, a design language for background applications, is refined by Ant UED Team. Ant
-                                Design, a design language for background applications, is refined by Ant UED Team. Ant Design,
-                                a design language for background applications, is refined by Ant UED Team. Ant Design, a
-                                design language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                language for background applications, is refined by Ant UED Team.
+                                {data?.description}
                             </Paragraph>
                         </div>
 
@@ -133,11 +91,11 @@ class Biding extends React.Component {
                 </Row>
                 <Row gutter={[12, 24]}>
                     <Col>
-                        <div className="d-flex justify-content-around normal_font_size bold">Duration : {this.state.data.duration}</div>
+                        <div className="d-flex justify-content-around normal_font_size bold">Duration : {data?.timeline}</div>
                         <Title level={2} className="font-weight-normal text-success d-flex justify-content-around">
                             <div className="align-items-center d-flex flex-column">
                                 <div>
-                                    {this.state.data.price}
+                                    {data?.budget || 0.0}
                                 </div>
                                 <div className="f_25">
                                     {"Budget"}

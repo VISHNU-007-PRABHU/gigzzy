@@ -54,6 +54,15 @@ export const GET_CONTRACT = gql`
             timeline
             timeline_type
             terms_condition
+            contract_ref
+            get_contract_category{
+                category_name
+                subCategory_name
+                category_type
+            }
+            get_contract_all_files(contract_id:$contract_id){
+                small_image
+            }
             get_contract_files(contract_id:$contract_id) {
                 _id
                 images{
