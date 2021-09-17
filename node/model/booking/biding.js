@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 const moment = require("moment");
+const shortid = require('shortid');
 const commonHelper = require('../../graphql/commonHelper');
 mongoose.set('useFindAndModify', false);
 var Schema = mongoose.Schema;
@@ -19,13 +20,23 @@ var bidingSchema = new Schema({
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
   provider_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
   category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'category', unique: false },
+  contract_id: { type: mongoose.Schema.Types.ObjectId, ref: 'contract', unique: false },
   category_type: { type: Number },  // 1-parent category , 2-sub category
-  booking_ref: { type: String },
+  biding_ref: { type: String, 'default': shortid.generate },
   booked: { type: String },
+  budget: { type: String, default: 0.00 },
+  timeline: String,
+  timeline_type: String,
+  cover_letter: String,
+  description: String,
+  experience: String,
+  no_of_people: String,
+
   location: {
     type: { type: String },
     coordinates: []
   },
+
   booking_status: { type: Number },  // 12.booking,11.user_cancel,8.provider_accept,no_provider],10.user_accept,4.start,13.end,14.completed,15.not available
   availability: [],
   hours: { type: String },
@@ -35,44 +46,12 @@ var bidingSchema = new Schema({
   booking_hour: String,
   start_date: String,
   end_date: String,
-  data: [{}],
-  base_price: { type: String, default: 0.00 },
-  hour_price: { type: String, default: 0.00 },
-  extra_price: { type: String, default: 0.00 },
-  extra_price_reason: { type: [String] },
-  total: { type: String, default: 0.00 },
-  hour_limit: { type: String, default: "0" },
-  price_type: { type: String, default: "job" },
-  day_price: { type: String, default: 0.00 },
-  day_limit: { type: String, default: "0" },
-  service_fee: { type: String, default: 0.00 },
-  admin_fee: { type: String, default: 0.00 },    //admin fee
-  provider_fee: { type: String, default: 0.00 }, //provider fee
-  final_payment: { type: String, default: 0.00 },
-  extra_hour_price: { type: String, default: 0.00 },
   description: { type: String },
-  job_status: { type: Number },    //0.start,10.pending,4.ongoing,13.end,14.completed
-  jobStart_time: { type: Date },
-  jobEnd_time: { type: Date },
-  total_time: { type: String },
-  available_provider: [{ type: mongoose.Schema.Types.ObjectId, ref: 'detail' }],
-  user_image: [],
-  start_job_image: [],
-  end_job_image: [],
-  charge_id: { type: String },
-  provider_rating: { type: Number, default: 0 },
-  provider_comments: { type: String },
-  user_rating: { type: Number, default: 0 },
-  user_comments: { type: String, default: "" },
-  user_comments_status: { type: Number, default: 0 },
-  user_rating_status: { type: Number, default: 0 },
-  provider_rating_status: { type: Number, default: 0 },
-  payment_status: { type: Number, default: 0 }, // 0.base_price_pending,1.base_price_paid,2.refund success,3.refund failed,4.transaction_pending,5.completed
-  booking_type: { type: Number, default: 1 },//1.now,2,later
   created_at: Date,
   booking_alert: { type: Number, default: 0 },
   end_date: Date,
   accept_date: Date,
+  is_delete: { type: Boolean, default: false },
   phone_number: { type: String, default: "" },
   user_msg_is_read: { type: Number, default: 0 },
   provider_msg_is_read: { type: Number, default: 0 },
@@ -106,49 +85,6 @@ bidingSchema.pre('save', function (next, doc) {
 });
 
 
-bidingSchema.virtual('user_image_url').get(function () {
-  if (this.user_image.length > 0) {
-    var img = [];
-    for (let i = 0; i < this.user_image.length; i++) {
-      var data = commonHelper.getBaseurl() + '/images/booking/' + this.user_image[i]
-      img.push(data);
-    }
-    return img
-  } else {
-    var img = [];
-    var data = commonHelper.getBaseurl() + '/images/public/no_img.png';
-    img.push(data);
-    return img;
-  }
-});
-
-bidingSchema.virtual('start_job_image_url').get(function () {
-  if (this.start_job_image.length > 0) {
-    var img = [];
-    for (let i = 0; i < this.start_job_image.length; i++) {
-      var data = commonHelper.getBaseurl() + '/images/booking/' + this.start_job_image[i]
-      img.push(data);
-    }
-    return img
-  } else {
-    var img = [];
-    return img;
-  }
-});
-
-bidingSchema.virtual('end_job_image_url').get(function () {
-  if (this.end_job_image.length > 0) {
-    var img = [];
-    for (let i = 0; i < this.end_job_image.length; i++) {
-      var data = commonHelper.getBaseurl() + '/images/booking/' + this.end_job_image[i]
-      img.push(data);
-    }
-    return img
-  } else {
-    var img = [];
-    return img;
-  }
-});
 
 bidingSchema.virtual('created_date').get(function () {
   var created_date = moment(this.created_at);

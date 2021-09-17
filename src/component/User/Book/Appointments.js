@@ -1,6 +1,6 @@
-import React, { Suspense,useState,useEffect } from 'react'
+import React, { Suspense, useState, useEffect } from 'react'
 import { Query } from "react-apollo";
-import { My_APPOINTMENTS } from '../../../graphql/User/booking';
+import { My_APPOINTMENTS, MY_CONTRACT_APPOINTMENTS } from '../../../graphql/User/booking';
 import Badge from 'antd/lib/badge';
 import Row from 'antd/lib/row';
 import Col from 'antd/lib/col';
@@ -10,28 +10,30 @@ import Pagination from 'antd/lib/pagination';
 import Tooltip from 'antd/lib/tooltip';
 import timer_icon from '../../../image/bookLater.png';
 const AppiontmentsEmpty = React.lazy(() => import('./AppiontmentsEmpty'));
+const AppointmentDetail = React.lazy(() => import('./AppointmentDetail'));
 function Appointments(props) {
     const [user_id, set_user_id] = useState('');
-  
+
     useEffect(() => {
-        if(localStorage.getItem('user')){
-            set_user_id(JSON.parse(localStorage.getItem('user'))._id,)
-        }else{
-            set_user_id('6136fd283765fd3febbcc435')
+        if (!localStorage.getItem('user')) {
+            set_user_id(JSON.parse(localStorage.getItem('user'))._id)
+        } else {
+            set_user_id('61306d9257602fcea82c5fb3')
         }
     }, [localStorage.getItem('user')])
     return (
         <Query
-            query={My_APPOINTMENTS}
+            query={MY_CONTRACT_APPOINTMENTS}
             variables={{
                 limit: 10,
                 page: props.page,
-                _id:user_id,
+                // _id:user_id,
+                user_id: user_id,
                 role: 1,
-                booking_status: Number(props.status)
+                // booking_status: Number(props.status)
             }}
             fetchPolicy='no-cache'
-            pollInterval={25000}
+        // pollInterval={25000}
         >
             {({ loading, error, data, startPolling, stopPolling }) => {
                 if (loading) return <Skeleton />;
@@ -49,47 +51,17 @@ function Appointments(props) {
                                     simple={true}
                                     current={props.page}
                                     onChange={(page) => { handleInfiniteOnLoad(page) }}
-                                    total={data.get_my_appointments.pageInfo.totalDocs} />
+                                    total={data.get_contracts_pagination.pageInfo.totalDocs} />
                             }
                             title={props.heading}
                             loading={loading}>
-                            {data.get_my_appointments.data.length > 0 ?
+                            {data.get_contracts_pagination.data.length > 0 ?
                                 <>
-                                    {data.get_my_appointments.data.map(data => (
-                                        <Card.Grid className='p-1 w-100 col-12 col-sm-6 cursor_point'>
-                                            <div className="" onClick={() => { props.view_booking(true, data._id) }}>
-                                                <Row>
-                                                    <Col xs={24} sm={24} className="d-flex justify-content-between">
-                                                        <div className="d-block">
-                                                            <div>{data.booking_ref}
-                                                                {data?.booking_type === 2 && data?.booking_status === 10 ?
-                                                                    <Tooltip placement="right" title='Booking Later'>
-                                                                        <span className="primary_color mx-2">
-                                                                            <img src={timer_icon} alt="" height='18' />
-                                                                        </span>
-                                                                    </Tooltip>
-                                                                    : ""}
-                                                                <Badge className="px-1" count={data?.user_msg_count} />
-                                                            </div>
-                                                            <div className="bold" style={{ fontSize: '16px' }}>
-                                                                {data.booking_category[0]?.category_type === 1 ? data.booking_category[0]?.category_name : data.booking_category[0]?.subCategory_name}
-                                                            </div>
-                                                            <div className="m-0">
-                                                                {data.booking_date}
-                                                            </div>
-                                                            <div className="primary_color">
-                                                                {data.base_price}
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <img style={{ borderRadius: '1em', boxShadow: '1px 1px 9px grey' }} height="90" width="100" alt='' src={data.booking_category[0]?.category_type === 1 ? data.booking_category[0]?.img_url : data.booking_category[0]?.booking_parent_category[0]?.img_url} />
-                                                        </div>
-                                                    </Col>
-                                                </Row>
-                                            </div>
-                                        </Card.Grid>
-                                    ))
-                                    }</> :
+                                    <Suspense fallback={<Skeleton />}>
+                                        <AppointmentDetail data={data.get_contracts_pagination.data} />
+                                    </Suspense>
+                                </>
+                                :
                                 <>
                                     <Suspense fallback={<Skeleton />}>
                                         <AppiontmentsEmpty />

@@ -12,11 +12,19 @@ export const UPDATE_CONTRACT = gql`
 
 
 export const UPDATE_CONTRACT_FILE = gql`
-    mutation UPDATECONTRACTFILE($contract_id:ID,$file:[Upload]){
-        ContractJobFileUpload(contract_id:$contract_id,file:$file){
+    mutation UPDATECONTRACTFILE($contract_id:ID,$file:[Upload],$category:String,$image_tag:String,$_id:ID){
+        ContractJobFileUpload(contract_id:$contract_id,file:$file,category:$category,image_tag:$image_tag,_id:$_id){
             msg
             status
             _id
+        }
+    }
+`
+export const DELETE_CONTRACT_FILE = gql`
+    mutation DELETECONTRACTFILE($_id:ID){
+        DeleteContractJobFile(_id:$_id){
+            msg
+            status
         }
     }
 `
@@ -27,8 +35,9 @@ export const GET_CONTRACT_FILES = gql`
             _id
             images{
                 small_image
-                large_image
                 image_tag
+                doc_category
+                _id
             }
         }
     }

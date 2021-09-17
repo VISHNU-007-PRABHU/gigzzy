@@ -1,4 +1,3 @@
-var moment = require("moment");
 const model = require('../../model_data');
 const _ = require('lodash');
 const moment = require('moment');
@@ -6,76 +5,84 @@ var Jimp = require('jimp');
 var ObjectId = require('mongodb').ObjectID;
 var CronJob = require('cron').CronJob;
 var commonHelper = require('../commonHelper');
-var Category_model = model.category;
-var subCategory_model = model.sub_category;
-var Detail_model = model.detail;
-var Booking_model = model.booking;
-var Payout_model = model.payout;
-var Extra_model = model.Extra_fee;
+var Biding_model = model.Biding;
 
-module.exports.get_my_biding = async (root, args) => {
-    //console.log(args);
-    var limits = args.limit || 10;
-    var pages = args.page || 1;
-    var offset = Number(pages - 1) * Number(limits);
-    delete args.limit;
-    delete args.page;
-    let fetch_query={
+
+module.exports.get_biding_pagination = async (root, args) => {
+    console.log(args);
+    try {
+
+        var limits = args.limit || 10;
+        var pages = args.page || 1;
+        var offset = Number(pages - 1) * Number(limits);
+        delete args.limit;
+        delete args.page;
+        let fetch_query = {
+            is_delete: false
+        }
+        if (args['provider_id']) {
+            fetch_query['provider_id'] = args['provider_id']
+        }
+        if (args['user_id']) {
+            fetch_query['user_id'] = args['user_id']
+        }
+        if (args['contract_id']) {
+            fetch_query['contract_id'] = args['contract_id']
+        }
+
+        var total = await Biding_model.count(fetch_query);
+        var pageInfo = { totalDocs: total, page: pages }
+        var BidingResult = await Biding_model.find(fetch_query).sort({ created_at: -1 }).skip(Number(offset)).limit(Number(limits));
+        console.log("module.exports.get_biding_pagination -> BidingResult", BidingResult)
+        return { data: BidingResult, pageInfo };
+    } catch (error) {
+        console.log("module.exports.get_biding_pagination -> error", error)
+        return { data: [], pageInfo: { totalDocs: 0, page: 1 } };
+
     }
-    if(args['provider_id']){
-        fetch_query['provider_id']= args['provider_id']
-    }
-    if(args['user_id']){
-        fetch_query['user_id']= args['user_id']
-    }
-  
-    var total = await Biding_model.count(fetch_query);
-    var pageInfo = { totalDocs: total, page: pages }
-    var result = await Biding_model.find(fetch_query).sort({ created_at: -1 }).skip(Number(offset)).limit(Number(limits));
-    return { data: result, pageInfo };
 }
 
 module.exports.get_biding_detail = async (root, args) => {
     //console.log(args);
-    let fetch_query ={
-        _id:args['_id']
+    let fetch_query = {
+        _id: args['_id']
     }
-    var result = await Biding_model.findOne(fetch_query);
-    return result;
+    var { } = await Biding_model.findOne(fetch_query);
+    return {};
 }
 
 
 module.exports.get_biding_milestone_detail = async (root, args) => {
     //console.log(args);
-    let fetch_query ={
+    let fetch_query = {
     }
-    if(args['_id']){
-        _id:args['_id']
+    if (args['_id']) {
+        _id: args['_id']
     }
-    if(args['bid_id']){
-        bid_id:args['bid_id']
+    if (args['bid_id']) {
+        bid_id: args['bid_id']
     }
-    var result = await BidingMilestone_model.findOne(fetch_query);
-    return result;
+    var { } = await BidingMilestone_model.findOne(fetch_query);
+    return {};
 }
 
 exports.BidingFileUpload = (id, files) => {
     _.forEach(files, file => {
         if (file) {
-            const { createReadStream, filename } = await args.file;
-            var file_name = `${id}_${moment().unix()}_${filename}`;
-            await new Promise(res =>
-                createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/biding", file_name))).on("close", res)
-            );
-            args['image'] = file_name;
-            var file_resize = await Jimp.read(path.join(__dirname, "../../images/biding", file_name))
-                .then(image => {
-                    image.resize(260, Jimp.AUTO)
-                        .quality(30)
-                        .write(path.join(__dirname, "../../images/biding", file_name + "_small.jpg"));
-                })
-                .catch(err => {
-                });
+            // const { createReadStream, filename } = await args.file;
+            // var file_name = `${id}_${moment().unix()}_${filename}`;
+            // await new Promise(res =>
+            //     createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/biding", file_name))).on("close", res)
+            // );
+            // args['image'] = file_name;
+            // var file_resize = await Jimp.read(path.join(__dirname, "../../images/biding", file_name))
+            //     .then(image => {
+            //         image.resize(260, Jimp.AUTO)
+            //             .quality(30)
+            //             .write(path.join(__dirname, "../../images/biding", file_name + "_small.jpg"));
+            //     })
+            //     .catch(err => {
+            //     });
         }
     })
 }
@@ -83,7 +90,7 @@ exports.BidingFileUpload = (id, files) => {
 
 module.exports.update_biding = async (root, args) => {
     try {
-        let biding_detail = args['biding_detail'][0][0]
+        let biding_detail = args['biding_data'][0]
         if (args['_id']) {
             let find_query = {
                 _id: args["_id"]
@@ -95,13 +102,16 @@ module.exports.update_biding = async (root, args) => {
             return fetch_bid
 
         } else {
+            console.log("module.exports.update_biding -> biding_detail", biding_detail)
             let add_bid = new Biding_model(biding_detail)
             let added_bid = await add_bid.save()
+            console.log("module.exports.update_biding -> added_bid", added_bid)
             added_bid['status'] = "success";
             added_bid['msg'] = "Biding added success"
             return added_bid
         }
     } catch (error) {
+        console.log("module.exports.update_biding -> error", error)
         return { status: "failed", msg: "Biding added failed" }
     }
 }

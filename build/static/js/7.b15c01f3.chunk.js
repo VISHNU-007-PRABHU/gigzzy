@@ -1,0 +1,2 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[7],{1931:function(e,n,a){"use strict";a.r(n),a.d(n,"default",function(){return s});var t=a(1),o=a.n(t),c=a(1942),i=a.n(c),r=a(246);function s(){return o.a.createElement(o.a.Fragment,null,o.a.createElement(r.a,{image:i.a,imageStyle:{height:200,objectFit:" scale-down"},description:o.a.createElement("span",{className:"bold"},"You have no bookings (Search Service)")}))}},1942:function(e,n,a){e.exports=a.p+"static/media/no_booking.cf173470.png"}}]);
+//# sourceMappingURL=7.b15c01f3.chunk.js.map

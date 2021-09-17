@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense } from 'react'
-import { Icon, Button, message, Steps, Form, Skeleton, Input } from 'antd';
+import { Icon, Button, message, Steps, Form, Skeleton, Modal } from 'antd';
 import { Alert_msg } from '../../../Comman/alert_msg';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { UPDATE_CONTRACT, GET_CONTRACT } from '../../../../graphql/User/contract';
@@ -38,14 +38,11 @@ const original_steps = [
     },
 ];
 
-const layout = {
-    // labelCol: { span: 8 },
-    // wrapperCol: { span: 16 },
-    offset: 8, span: 16
-};
+const layout = { offset: 8, span: 16 };
 const ProjectDetail = React.lazy(() => import('./ProjectDetail'));
 const ProjectBudget = React.lazy(() => import('./ProjectBudget'));
 const ProjectImages = React.lazy(() => import('./ProjectImages'));
+const PostProjectSuccess = React.lazy(() => import('./PostProjectSuccess'));
 
 function ContractSteper(props) {
     const { form } = props;
@@ -66,9 +63,14 @@ function ContractSteper(props) {
         }
         if (localStorage.getItem('current_contract_id')) {
             let finaldata = await contract_detail.refetch({ contract_id: localStorage.getItem('current_contract_id') })
-            set_contract_detail(finaldata.data.get_contracts[0])
-            set_address_id(finaldata.data.get_contracts[0]?.address_id)
-            setCurrent(Number(finaldata.data.get_contracts[0].current_page) + 1)
+            console.log("ContractSteper -> finaldata", finaldata)
+            if(finaldata.data.get_contracts[0].current_page == 5){
+                history.push({pathname: `/contract/view/${localStorage.getItem('current_contract_id')}`})
+            }else{
+                set_contract_detail(finaldata.data.get_contracts[0])
+                set_address_id(finaldata.data.get_contracts[0]?.address_id)
+                setCurrent(Number(finaldata.data.get_contracts[0].current_page) + 1)
+            }
         }
     }, [localStorage.getItem('current_contract_id')])
     const next = (id) => {
@@ -91,6 +93,9 @@ function ContractSteper(props) {
                 if (address_id) {
                     values['address_id'] = address_id
                 }
+                if (id === 5) {
+                    values['contract_status'] = "12"
+                }
                 values['current_page'] = current
                 if (values && size(values)) {
                     input_data['contract_data'] = [values]
@@ -101,12 +106,23 @@ function ContractSteper(props) {
                 let final_data = await update_contract({ variables: input_data });
                 Alert_msg(final_data.data.update_contract)
                 if (final_data.data.update_contract.status === "success") {
-                    localStorage.setItem("current_contract_id", final_data.data.update_contract._id)
-                    const newItems = [...stepsdetail];
-                    let index = findIndex(newItems, ['id', id]);
-                    newItems[index]['status'] = "finish";
-                    setSteps(newItems)
-                    setCurrent(current + 1);
+                    if (id === 5) {
+                        Modal.success({
+                            footer:(null),
+                            content: (
+                                <Suspense fallback={<Skeleton active />}>
+                                    <PostProjectSuccess id={input_data['_id']}/>
+                                </Suspense>
+                            ),
+                        });
+                    } else {
+                        localStorage.setItem("current_contract_id", final_data.data.update_contract._id)
+                        const newItems = [...stepsdetail];
+                        let index = findIndex(newItems, ['id', id]);
+                        newItems[index]['status'] = "finish";
+                        setSteps(newItems)
+                        setCurrent(current + 1);
+                    }
                 }
             }
         })
@@ -126,15 +142,14 @@ function ContractSteper(props) {
         }
     }
     const done = () => {
-        form.validateFields(async (err, values) => {
-            console.log("next -> values", values)
+        let all_completed = original_steps.map(data => {
+            return data.status = "finish"
         })
-        const newItems = [...stepsdetail];
-        newItems[size(newItems) - 1]['status'] = "finish";
-        setSteps(newItems)
+        setSteps(all_completed)
+        setCurrent(4);
+
         message.success('Processing complete!')
     }
-
 
     const on_location_change = (item) => {
         set_address_id(item._id);
@@ -151,6 +166,12 @@ function ContractSteper(props) {
             <div className="d-flex justify-content-center pt-5">
                 <Form  {...layout} name="nest-messages" className="w-50">
                     <Suspense fallback={<Skeleton active />}>
+                        <div className={current === 5 ? '' : 'd-none'}>
+                            <h4 className="text-center">Review and publish your project</h4>
+                            <ProjectDetail contract_detail_data={contract_detail_data} current={current} customform={form} />
+                            <ProjectBudget contract_detail_data={contract_detail_data} current={current} customform={form} />
+                            <ProjectImages hide_common_upload={true} contract_detail_data={contract_detail_data} current={current} customform={form} />
+                        </div>
                         <div className={current === 3 ? 'contract_images_section' : 'd-none'}>
                             <ProjectImages contract_detail_data={contract_detail_data} current={current} customform={form} />
                         </div>
@@ -186,6 +207,11 @@ function ContractSteper(props) {
                         {current === stepsdetail.length - 1 && (
                             <Button type="primary" className="w-50" onClick={() => done()}>
                                 <div className="normal_font_size">Done</div>
+                            </Button>
+                        )}
+                        {current === 5 && (
+                            <Button type="primary" className="w-50" onClick={() => next(5)}>
+                                <div className="normal_font_size">Post Project</div>
                             </Button>
                         )}
                         {current >= 0 && (

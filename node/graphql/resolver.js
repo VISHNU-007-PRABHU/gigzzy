@@ -19,6 +19,7 @@ var settingResolver = require('./resolvers/setting');
 var rolesResolver = require('./resolvers/roles');
 var contractResolver = require('./resolvers/contract');
 var currencyResolver = require('./resolvers/currency');
+var bidingResolver = require('./resolvers/biding');
 const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
@@ -193,6 +194,7 @@ const resolvers = {
         get_contract_all_files:contractResolver.get_contract_all_files,
         get_currencys:currencyResolver.get_currencys,
         get_currency:currencyResolver.get_currency,
+        get_biding_pagination:bidingResolver.get_biding_pagination,
         get_my_appointments: async (parent, args, context, info) => {
             try {
 
@@ -266,6 +268,9 @@ const resolvers = {
     Roles: {
         role_based_permissions_detail: rolesResolver.role_table_based_permissions_detail,
     },
+    Biding:{
+        get_user: userResolver.available_booking_user,
+    },
     Category: {
         booking_parent_category: categoryResolver.booking_parent_category,
         sub_category: categoryResolver.subcategory,
@@ -331,6 +336,7 @@ const resolvers = {
         delete_currency:currencyResolver.delete_currency,
         ContractJobFileUpload: contractResolver.ContractJobFileUpload,
         DeleteContractJobFile: contractResolver.DeleteContractJobFile,
+        update_biding:bidingResolver.update_biding,
         // company detiail
         update_company_detail: userResolver.update_company_detail,
         CompanyFileUpload: userResolver.CompanyFileUpload,

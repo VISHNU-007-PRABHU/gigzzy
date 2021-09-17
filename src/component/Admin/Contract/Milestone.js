@@ -1,5 +1,5 @@
 import React, { useState, Suspense } from 'react'
-import { Icon, Tag, message, Steps, Form, Skeleton,Badge } from 'antd';
+import { Icon, Timeline, Tag, message, Steps, Form, Skeleton, Badge } from 'antd';
 import step0 from '../../../image/step0.png';
 import findIndex from 'lodash/findIndex';
 import size from 'lodash/size';
@@ -67,12 +67,27 @@ function Milestone(props) {
 
     return (
         <>
-            <Steps progressDot current={1} direction="vertical" className="milestone_steper">
-                <Step title="Started" description="24 Aug 2010" status={"process"}/>
-                <Step  status={"process"} title={<div className="normal_font_size bold">Milestone 1 : Gardening</div>} description={
-                    <div className="d-flex justify-content-between ">
+            <Timeline>
+                <Timeline.Item color="green" className="pb-4">
+                    <div className="normal_font_size bold">Started</div>
+                    <div className="d-flex justify-content-between align-items-center">
                         <div>
-                            <div className="normal_font_size primary_color">KSH 5000</div>
+                            <div className="d-none normal_font_size primary_color py-1">KSH 5000</div>
+                            <div className="d-flex">
+                                <div className="bold">  <Badge className="d-none" status="success" /> 24 Aug 2021</div>
+                                <div className="d-none text-danger px-3">completed</div>
+                            </div>
+                        </div>
+                        <div className="d-none">
+                            <Tag color="green" className="normal_font_size p-2">View Detail</Tag>
+                        </div>
+                    </div>
+                </Timeline.Item>
+                <Timeline.Item color="green">
+                    <div className="normal_font_size bold">Milestone 1 : Gardening</div>
+                    <div className="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div className="normal_font_size primary_color py-1">KSH 5000</div>
                             <div className="d-flex">
                                 <div className="bold">  <Badge status="success" /> 24 Aug 2021</div>
                                 <div className="text-danger px-3">completed</div>
@@ -82,9 +97,11 @@ function Milestone(props) {
                             <Tag color="green" className="normal_font_size p-2">View Detail</Tag>
                         </div>
                     </div>
-                } />
-                <Step  status={"process"} title="Completed" />
-            </Steps>
+                </Timeline.Item>
+                <Timeline.Item color="gray">
+                    <div className="normal_font_size bold">Milestone 1 : Gardening</div>
+                </Timeline.Item>
+            </Timeline>
         </>
 
     )

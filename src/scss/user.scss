@@ -4,6 +4,7 @@ body {
 }
 $primarycolor: #99d332;
 $light_grey: #e6e6e6;
+$drak_grey:gray;
 
 .primary_color,
 .text-success {
@@ -265,6 +266,10 @@ span.ant-form-item-children.d-block {
     color: $primarycolor;
     border-color: $primarycolor !important;
 }
+.ant-timeline-item-head-gray{
+    color: $drak_grey;
+    border-color: $drak_grey !important;
+}
 
 .ant-timeline-item-head {
     border: 3px solid transparent;
@@ -440,13 +445,21 @@ span.ant-form-item-children.d-block {
 .imgHolder {
     height: 115px;
     width: 100px;
-    span {
+    .tags {
         position: absolute;
         color: white;
         background-color: #99d332;
         padding: 0px 8px;
         left: 0;
         top: 0;
+    }
+    .delete{
+        position: absolute;
+        color: white;
+        padding: 0px 8px;
+        right: 0px;
+        bottom: 4px;
+        cursor: pointer;
     }
 }
 

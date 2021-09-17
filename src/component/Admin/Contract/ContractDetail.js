@@ -15,7 +15,7 @@ import BidingList from "./BidingList";
 const { Content } = Layout;
 const { Meta } = Card;
 const { Title } = Typography;
-
+const padding_setting = {padding:"0px"}
 const DescriptionValue = React.lazy(() => import('../../User/Book/DescriptionValue'));
 const Milestone = React.lazy(() => import('./Milestone'));
 class ContractDetail extends React.Component {
@@ -118,8 +118,8 @@ class ContractDetail extends React.Component {
                                     <Suspense fallback={<Skeleton active />}>
                                         <Milestone></Milestone>
                                     </Suspense>
-                                    <Biding></Biding>   
-                                    <Card bordered={0} >
+                                    <Biding></Biding>
+                                    <Card bordered={0} bodyStyle={padding_setting}>
                                         <BidingList></BidingList>
                                     </Card>
                                 </Card>

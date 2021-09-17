@@ -98,6 +98,7 @@ const typeDefs = gql`
         get_contract_all_files(contract_id:ID):[CompanyImage]
         get_currencys(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,pagination:Boolean,page:Int,limit:Int):CurrencyConnection
         get_currency(_id:ID):Currency
+        get_biding_pagination(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int,contract_id:ID):BidingConnection
     }
 
     # sub category pagination data  
@@ -129,6 +130,11 @@ const typeDefs = gql`
      # Company pagination data
      type ContractConnection {
         data:[ContractJob]
+        pageInfo: PageInfo!
+    }
+     # Company pagination data
+     type BidingConnection {
+        data:[Biding]
         pageInfo: PageInfo!
     }
     # Admin pagination data
@@ -266,12 +272,21 @@ const typeDefs = gql`
     # biding schema
     type Biding{
         _id:ID
+        status:String
+        msg:String
+        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         data: JSON 
+        biding_ref:String
+        budget:String
+        timeline:String
+        timeline_type:String
+        cover_letter:String
+        description:String
+        experience:String
+        no_of_people:String
+        get_user:[Detail]
     }
-    type UserBiding{
-        _id:ID
-        data: JSON 
-    }
+
     type BidingImages{
         _id:ID
         data: JSON 
@@ -982,7 +997,7 @@ const typeDefs = gql`
             provider_ID:ID
             company_id:ID
             biding_data:[JSON]
-        ):Company
+        ):Biding
     }
 `;
 module.exports.typeDefs = typeDefs;

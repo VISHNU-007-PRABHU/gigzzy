@@ -15,6 +15,7 @@ const FileUpload = (props) => {
     const [img_url, setimg_url] = useState("");
     const [fileList, set_fileList] = useState([]);
     const [fileList_status, setfileList_status] = useState(false);
+    const [set_show_images, set_set_show_images] = useState(false);
     const [custom_class, setcustom_class] = useState("avatar-uploader d-flex ");
     const [user_data, setuser_data] = useState("");
     const [loading, setloading] = useState(false);
@@ -60,9 +61,12 @@ const FileUpload = (props) => {
     const handleChange = async info => {
         setloading(true);
         if (info.file.status) {
-            props.onFileUpload(info.file.originFileObj)
+            let category_data = props?.custom_category ||  "others"
+            props.onFileUpload(info.file.originFileObj,category_data)
             getBase64(info.file.originFileObj, imageUrl => {
-                setimg_url(imageUrl)
+                if(set_show_images){
+                    setimg_url(imageUrl)
+                }
                 setloading(false)
             }
             );
