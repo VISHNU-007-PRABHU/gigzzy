@@ -13,6 +13,8 @@ export const GET_BIDING_PAGINATION = gql`
                 ref: biding_ref
                 created_at
                 user_id
+                description
+                experience
                 timeline
                 timeline_type
                 get_user {

@@ -52,7 +52,7 @@ class BidingList extends React.Component {
       if (!total || Number(Number(total) / 10) >= page) {
         this.setState({ view_more_btn: false })
       }
-      this.setState({ loading: false, pagination: result.data.get_biding_pagination.pageInfo, data: result.data.get_biding_pagination.data });
+      this.setState({ loading: false, pagination: result.data.get_biding_pagination.pageInfo, data: [...this.state.data, ...result.data.get_biding_pagination.data] });
     })
   };
 
@@ -88,7 +88,7 @@ class BidingList extends React.Component {
         >
           <>
             <Suspense fallback={<Skeleton active />}>
-              <BiderDetail _id={this.props.match.params.id} current_data={this.state.current_item}></BiderDetail>
+              <BiderDetail _id={this.props.match.params.id } close_drawer={this.onProfileDrawe} current_data={this.state.current_item}></BiderDetail>
             </Suspense>
           </>
         </Drawer>
