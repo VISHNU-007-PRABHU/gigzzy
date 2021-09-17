@@ -106,7 +106,6 @@ module.exports.child_category = async (parent, args, context, info) => {
 module.exports.get_category = async (root, args) => {
     var limit = args.limit || 10;
     var page = args.page || 1;
-    var offset = Number(page - 1) * Number(limit);
     var data = {};
     if (args.data) {
         data = args.data;
