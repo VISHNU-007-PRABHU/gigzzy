@@ -274,6 +274,8 @@ const typeDefs = gql`
         _id:ID
         status:String
         msg:String
+        user_id:ID,
+        contract_id:ID
         created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         data: JSON 
         biding_ref:String
