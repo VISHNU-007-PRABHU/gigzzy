@@ -1,12 +1,15 @@
 import React, { Suspense } from "react";
 import { withRouter } from "react-router";
 import { client } from "../../../apollo";
+import useMobileDetect from 'use-mobile-detect-hook';
+import { GET_BIDING_PAGINATION } from '../../../graphql/User/biding';
+import { List, Avatar, Button, Popover, Col, Card, Row, Typography, Drawer, Skeleton, Rate } from 'antd';
 import filter_img from "../../../image/fil2.png";
 import sort_img from "../../../image/fil1.png";
-import { GET_BIDING_PAGINATION } from '../../../graphql/User/biding';
-import { List, Avatar, Button, Popover, Col, Card, Row, Typography, Drawer } from 'antd';
-import BiderDetail from "./biderDetail";
+import white_flag from '../../../image/wbmark.png'
+import green_flag from '../../../image/gbmark.png'
 const { Title } = Typography;
+const detectMobile = useMobileDetect();
 const text = <span>Title</span>;
 const content = (
   <div>
@@ -14,8 +17,7 @@ const content = (
     <p>Content</p>
   </div>
 );
-const count = 3;
-const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat&noinfo`;
+const BiderDetail = React.lazy(() => import('./biderDetail'));
 class BidingList extends React.Component {
   state = {
     view_more_btn: true,
@@ -23,10 +25,11 @@ class BidingList extends React.Component {
     bider_id: 0,
     data: [],
     list: [],
+    current_item: {},
     pagination: {
-      totalDocs:0,
+      totalDocs: 0,
       page: 0,
-  }
+    }
   };
 
   componentDidMount() {
@@ -36,9 +39,9 @@ class BidingList extends React.Component {
   }
 
   getData = async () => {
-    let inputdata = { contract_id: this.props.match.params.id,limit:10 }
-    inputdata['page'] = this.state.pagination.page + 1 ;
-    this.setState({ loading: true});
+    let inputdata = { contract_id: this.props.match.params.id, limit: 10 }
+    inputdata['page'] = this.state.pagination.page + 1;
+    this.setState({ loading: true });
     client.query({
       query: GET_BIDING_PAGINATION,
       variables: inputdata,
@@ -46,37 +49,37 @@ class BidingList extends React.Component {
     }).then(result => {
       let page = result.data.get_biding_pagination.pageInfo.page
       let total = result.data.get_biding_pagination.pageInfo.totalDocs
-      if( !total || Number(Number(total)/10) >= page ){
-        this.setState({view_more_btn:false})
+      if (!total || Number(Number(total) / 10) >= page) {
+        this.setState({ view_more_btn: false })
       }
-      this.setState({ loading: false, pagination:result.data.get_biding_pagination.pageInfo, data: result.data.get_biding_pagination.data });
+      this.setState({ loading: false, pagination: result.data.get_biding_pagination.pageInfo, data: result.data.get_biding_pagination.data });
     })
   };
 
- 
 
-  onProfileDrawer = (_id) => {
+
+  onProfileDrawer = (item) => {
     this.setState({
-      bider_id: _id,
+      current_item: item,
       visible: !this.state.visible,
     });
   };
 
 
   render() {
- 
+
     const { view_more_btn, loading, data } = this.state;
     const loadMore =
       true ? (
         <div className="d-flex justify-content-center w-100">
-          <Button className="mt-3 text-success" type="dashed" onClick={()=>{this.getData()}}>View all request</Button>
+          <Button className="mt-3 text-success" type="dashed" onClick={() => { this.getData() }}>View all request</Button>
         </div>
       ) : null;
 
     return (
       <>
         <Drawer
-          width={500}
+          width={detectMobile.isMobile() ? 320 : 500}
           placement="right"
           title="Bider Detail"
           closable={true}
@@ -84,7 +87,9 @@ class BidingList extends React.Component {
           visible={this.state.visible}
         >
           <>
-            <BiderDetail></BiderDetail>
+            <Suspense fallback={<Skeleton active />}>
+              <BiderDetail _id={this.props.match.params.id} current_data={this.state.current_item}></BiderDetail>
+            </Suspense>
           </>
         </Drawer>
 
@@ -113,23 +118,28 @@ class BidingList extends React.Component {
             loading={loading}
             renderItem={item => (
               <Col lg={12}>
-                <Card className="br_14" hoverable="true" bodyStyle={{ padding: "18px 8px" }} onClick={() => { this.onProfileDrawer(item.id) }} key={`a-${item.id}`}>
+                <Card className="br_14" hoverable="true" bodyStyle={{ padding: "10px 8px" }} onClick={() => { this.onProfileDrawer(item) }} key={`a-${item.id}`}>
                   <List.Item className="p-0">
                     <div className="w-100 d-flex align-items-center">
                       <div>
-                        <Avatar className="biding_avatar" size={64} src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                        <Avatar className="biding_avatar" size={64} src={item.get_user[0]?.img_url} />
                       </div>
                       <div className="w-100 px-1">
                         <div className="d-flex justify-content-between align-items-center">
-                          <div className="normal_font_size">{item.get_user.name}</div>
-                          <div>{item?.budget}</div>
+                          <div className="normal_font_size">{item.get_user[0]?.first_name || ""}{item.get_user[0]?.last_name || ""}</div>
+                          <div>
+                            <img alt='' src={false ? green_flag : white_flag} loading="lazy" className="lazyload" />
+                          </div>
                         </div>
                         <div className="d-flex justify-content-between align-items-end mt-1">
                           <div>
-                            <div>{item.created_at}</div>
-                            <div>Duration: {item.timeline}</div>
+                            <div>
+                              <Rate count={1} value={1} className="mr-2" />
+                              {item.get_user[0]?.rating || "0"}
+                            </div>
+                            <div>Duration: {item.timeline}{item.timeline_type}</div>
                           </div>
-                          <div className="normal_font_size">{item.budget}</div>
+                          <div className="normal_font_size bold">{item.budget}</div>
                         </div>
                       </div>
                     </div>

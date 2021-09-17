@@ -3,101 +3,51 @@ import { withRouter } from "react-router";
 import { client } from "../../../apollo";
 import test_image from "../../../image/test.png";
 import { Icon } from 'antd';
-import { Modal, Avatar, Button, Skeleton, Col, Tag, Row, Typography } from 'antd';
+import { Modal, Avatar, Button, Skeleton, Col, Tag, Row, Typography,Rate } from 'antd';
 const { Title, Paragraph } = Typography;
 const { confirm } = Modal;
-const count = 3;
-
-const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat&noinfo`;
-
 class BiderDetail extends React.Component {
     state = {
-        initLoading: true,
         loading: false,
         price_visible: false,
         company_visible: false,
-        data: {
-            name: "Garding setup",
-            company_name: "XYZ Pct ltd",
-            data1: "Cleaing",
-            data2: "16 bids",
-            data3: "active",
-            price: "20000 Ksh",
-            detail: " Content testing (when performed at the beginning of a project) can save you the frustration of reaching the end of the project, only to find that people don't understand what you're saying. It can also provide designers with context around what users care about, and how to best structure information",
-            duration: "3 day",
-            loading: false
-        },
-        list: [],
+        data: {},
     };
 
     componentDidMount() {
-        this.getData(res => {
+        console.log("BiderDetail -> componentDidMount -> this.props", this.props)
+        if (this.props.current_data) {
             this.setState({
-                initLoading: false,
-                data: res.results,
-                list: res.results,
-            });
-        });
+                data: this.props.current_data
+            })
+        }
     }
 
-    getData = callback => {
-
-    };
-
-    onLoadMore = () => {
-        this.setState({
-            loading: !this.state.loading,
-        });
-    };
-
     render() {
-        const data = [
-            {
-                name: 'Ant Design Title 1',
-                price: '20000 Ksh',
-                basde: "basde",
-                time: "3.5",
-                year: "1 day"
-
-            },
-            {
-                name: 'Ant Design Title 1',
-                price: '20000 Ksh',
-                basde: "basde",
-                time: "3.5",
-                year: "1 day"
-            },
-            {
-                name: 'Ant Design Title 1',
-                price: '20000 Ksh',
-                basde: "basde",
-                time: "3.5",
-                year: "1 day"
-            },
-
-        ];
-        const { initLoading, loading, list } = this.state;
-
+        const { loading, data, price_visible, company_visible } = this.state;
+        console.log("BiderDetail -> render -> data", data)
         return (
             <div className="p-4">
                 <Row gutter={[12, 24]}>
                     <Col span={24}>
                         <div className="d-flex justify-content-between">
                             <div>
-                                <Avatar className="biding_avatar" size={64} src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                                <Avatar className="biding_avatar" size={64} src={data?.get_user[0]?.img_url} />
                             </div>
                             <div className="w-100 px-1">
                                 <div className="d-flex justify-content-between align-items-center">
                                     <Title level={4} className="d-flex flex-column align-items-baseline">
                                         <div>
-                                            {this.state.data.name}
+                                            {data?.get_user[0]?.first_name || ""}{data?.get_user[0]?.last_name || ""}
                                         </div>
                                         <div className="font-weight-light figure-caption">
                                             {"XYZ pvt"}
                                         </div>
                                     </Title>
-                                    <div>{this.state.data.name}</div>
-                                </div>
+                                    <div>
+                                        <Rate count={1} value={1} className="mr-2" />
+                                        {data.get_user[0]?.rating || "0"}
+                                    </div>                                </div>
                                 <div>
                                     <Paragraph ellipsis={{ rows: 3, expandable: true }}>
                                         Ant Design, a design language for background applications, is refined by Ant UED Team. Ant
@@ -114,8 +64,8 @@ class BiderDetail extends React.Component {
                                         language for background applications, is refined by Ant UED Team.
                                     </Paragraph>
                                 </div>
-                                <div>
-                                    <Button type="primary" onClick={() => { this.setState({ company_visible: !this.state.company_visible }) }}> Company Detail</Button>
+                                <div className={data?.user_type === "company" ? "" : "d-none"}>
+                                    <Button type="primary" onClick={() => { this.setState({ company_visible: !company_visible }) }}> Company Detail</Button>
                                 </div>
                             </div>
                         </div>
@@ -131,11 +81,11 @@ class BiderDetail extends React.Component {
                 </Row>
                 <Row gutter={[12, 24]}>
                     <Col>
-                        <div className="d-flex justify-content-around normal_font_size bold">Duration : {this.state.data.duration}</div>
+                        <div className="d-flex justify-content-around normal_font_size bold">Duration : {data?.timeline}{data?.timeline_type}</div>
                         <Title level={2} className="font-weight-normal text-success d-flex justify-content-around">
                             <div className="align-items-center d-flex flex-column">
                                 <div>
-                                    {this.state.data.price}
+                                    {data?.budget}
                                 </div>
                                 <div className="f_25">
                                     {"Budget"}
@@ -149,18 +99,7 @@ class BiderDetail extends React.Component {
                         <Title level={4}>{"Description about bids"}</Title>
                         <div>
                             <Paragraph ellipsis={{ rows: 3, expandable: true }}>
-                                Ant Design, a design language for background applications, is refined by Ant UED Team. Ant
-                                Design, a design language for background applications, is refined by Ant UED Team. Ant Design,
-                                a design language for background applications, is refined by Ant UED Team. Ant Design, a
-                                design language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                language for background applications, is refined by Ant UED Team.
-                                Ant Design, a design language for background applications, is refined by Ant UED Team. Ant
-                                Design, a design language for background applications, is refined by Ant UED Team. Ant Design,
-                                a design language for background applications, is refined by Ant UED Team. Ant Design, a
-                                design language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                language for background applications, is refined by Ant UED Team.
+                                {data?.description}
                             </Paragraph>
                         </div>
 
@@ -168,7 +107,7 @@ class BiderDetail extends React.Component {
                 </Row>
                 <Row gutter={[12, 24]}>
                     <Col>
-                        <Title level={4} className="font-weight-normal">Experience : 3 Years</Title>
+                        <Title level={4} className="font-weight-normal">Experience : {data?.experience || 0}</Title>
                     </Col>
                 </Row>
                 <Row gutter={[12, 24]}>
@@ -198,15 +137,21 @@ class BiderDetail extends React.Component {
                     </Col>
                     <Col span={12}>
                         <div className="d-flex justify-content-around">
-                            <Button size={'large'} type="primary" onClick={() => { this.setState({ price_visible: !this.state.price_visible }) }}> Adward</Button>
+                            <Button size={'large'} type="primary" onClick={() => { this.setState({ price_visible: !price_visible }) }}> Adward</Button>
                         </div>
                     </Col>
                 </Row>
                 <Modal
                     title="Please fund the Project"
-                    visible={this.state.price_visible}
+                    visible={
+                        price_visible}
                     footer={null}
-                    onCancel={()=>{this.setState({price_visible:!this.state.price_visible})}}
+                    onCancel={() => {
+                        this.setState({
+                            price_visible: !
+                                price_visible
+                        })
+                    }}
                 >
                     <Row gutter={[12, 24]}>
                         <Col span={24}>
@@ -237,11 +182,17 @@ class BiderDetail extends React.Component {
                     </Row>
                 </Modal>
                 <Modal
-                    visible={this.state.company_visible}
+                    visible={
+                        company_visible}
                     footer={null}
                     header={null}
                     className="company_detail_modal"
-                    onCancel={()=>{this.setState({company_visible:!this.state.company_visible})}}
+                    onCancel={() => {
+                        this.setState({
+                            company_visible: !
+                                company_visible
+                        })
+                    }}
                 >
                     <Row gutter={[12, 24]} className="mt-5">
                         <Col span={24}>
@@ -286,8 +237,8 @@ class BiderDetail extends React.Component {
                         <Col span={24}>
                             <div>
                                 <Button type="link" className="option_blue normal_font_size">
-                                    <div className="d-flex align-items-center"> 
-                                        Dowwnload Profile <Icon type="download" className="px-2"/>
+                                    <div className="d-flex align-items-center">
+                                        Dowwnload Profile <Icon type="download" className="px-2" />
                                     </div>
                                 </Button>
                             </div>
@@ -299,4 +250,4 @@ class BiderDetail extends React.Component {
     }
 }
 
-export default (withRouter(BiderDetail));
+export default React.memo(withRouter(BiderDetail));

@@ -55,6 +55,7 @@ export const GET_CONTRACT = gql`
             timeline_type
             terms_condition
             contract_ref
+            biding_count
             get_contract_category{
                 category_name
                 subCategory_name

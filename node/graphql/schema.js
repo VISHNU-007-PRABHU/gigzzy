@@ -337,7 +337,7 @@ const typeDefs = gql`
         category_id:ID
         category_type:Int
         contract_ref:String
-        biding_count:String
+        biding_count:Int
         get_contract_category(contract_id:ID,_id:ID,category_type:Int):[Category]
         get_contract_files(contract_id:ID):[CompanyImage]
         get_contract_all_files(contract_id:ID):[CompanyImage]

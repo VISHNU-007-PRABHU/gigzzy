@@ -31,7 +31,7 @@ class Biding extends React.Component {
             this.setState({
                 loading: false,
                 data: result.data.get_contracts[0],
-                catgeory: result.data.get_contracts[0].get_contract_category[0] || {}
+                catgeory: result.data.get_contracts[0]?.get_contract_category[0] || {}
             });
         })
     };
@@ -51,16 +51,16 @@ class Biding extends React.Component {
                 <Row gutter={[12, 24]}>
                     <Col span={24}>
                         <Suspense fallback={<Skeleton active />}>
-                            <BannerSlider parent_images={data.get_contract_all_files} />
+                            <BannerSlider parent_images={data?.get_contract_all_files} />
                         </Suspense>
                     </Col>
                 </Row>
                 <Row gutter={[12, 24]}>
                     <Col>
-                        <Title level={4}>{data.name}</Title>
+                        <Title level={4}>{data?.name}</Title>
                         <Title level={4} className="font-weight-light m-0 mb-1">{data?.company_name}</Title>
                         <Suspense fallback={<Skeleton active />}>
-                            <ShowCategory parent_catgeory={catgeory} />
+                            <ShowCategory parent_catgeory={catgeory} custom_font={4} custom_class="font-weight-light m-0 text-success"/>
                         </Suspense>
                     </Col>
                 </Row>
@@ -68,12 +68,14 @@ class Biding extends React.Component {
                     <Col>
                         <div className="normal_font_size d-flex justify-content-between py-2">
                             <div className="d-flex align-items-center">
-                                <div>{data?.catgeory}</div>
-                                <div className="px-3">{data?.bid_count || 0}Bids</div>
+                                <Suspense fallback={<Skeleton active />}>
+                                    <ShowCategory parent_catgeory={catgeory} custom_class="font-weight-light m-0" custom_font={4} />
+                                </Suspense>
+                                <div className="px-3">{data?.biding_count || 0}Bids</div>
                                 <Tag color="green">green</Tag>
                             </div>
                             <div>
-                                <div>{data.budget}</div>
+                                <div>{data?.budget}</div>
                             </div>
                         </div>
                     </Col>

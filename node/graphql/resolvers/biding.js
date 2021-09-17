@@ -33,12 +33,18 @@ module.exports.get_biding_pagination = async (root, args) => {
         var total = await Biding_model.count(fetch_query);
         var pageInfo = { totalDocs: total, page: pages }
         var BidingResult = await Biding_model.find(fetch_query).sort({ created_at: -1 }).skip(Number(offset)).limit(Number(limits));
-        console.log("module.exports.get_biding_pagination -> BidingResult", BidingResult)
         return { data: BidingResult, pageInfo };
     } catch (error) {
-        console.log("module.exports.get_biding_pagination -> error", error)
         return { data: [], pageInfo: { totalDocs: 0, page: 1 } };
 
+    }
+}
+
+module.exports.biding_count = async (root, args) => {
+    try{
+       return await Biding_model.count({contract_id:root._id});
+    }catch(error){
+        return 0
     }
 }
 

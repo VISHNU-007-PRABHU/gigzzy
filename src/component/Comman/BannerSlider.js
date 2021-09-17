@@ -45,15 +45,15 @@ const BannerSlider = (props) => {
         }
     }, [props])
     return (
-        <>
-            <Carousel effect="fade" dots={true} {...settings}>
+        <div className="">
+            <Carousel className="h-100" effect="fade" dots={true}>
                 {fileList.map(data => (
                     <>
-                        <img alt='' src={data?.small_image} loading="lazy" className="w-100 br_14 object_fit lazyload" />
+                        <img alt='' src={data?.small_image} loading="lazy" className="h_18_em w-100 br_14 img-fluid lazyload" />
                     </>
                 ))}
             </Carousel>
-        </>
+        </div>
     )
 };
 

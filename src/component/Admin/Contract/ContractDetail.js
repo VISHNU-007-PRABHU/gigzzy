@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { withRouter } from "react-router";
 import { client } from "../../../apollo";
-import { Layout,Form, Card,  Row, Col,  Skeleton,  } from 'antd';
+import { Layout, Form, Card, Row, Col, Skeleton, BackTop } from 'antd';
 import 'antd/dist/antd.css';
 import '../../../scss/template.scss';
 const { Content } = Layout;

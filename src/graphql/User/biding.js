@@ -12,11 +12,14 @@ export const GET_BIDING_PAGINATION = gql`
                 budget
                 ref: biding_ref
                 created_at
+                user_id
+                timeline
+                timeline_type
                 get_user {
+                    img_url
                     first_name
-                    email
                     user_type
-                    full_name:first_name last_name
+                    last_name
                 }
             }
         }
