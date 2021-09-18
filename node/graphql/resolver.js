@@ -304,11 +304,11 @@ const resolvers = {
         get_contract_files:contractResolver.get_contract_files,
         get_contract_category:categoryResolver.available_booking_category,
         get_contract_all_files:contractResolver.get_contract_all_files,
+        biding_count:bidingResolver.biding_count,
     },
     CompanyImage:{
         get_contract_files:contractResolver.get_contract_files,
         get_contract_all_files:contractResolver.get_contract_all_files,
-        biding_count:bidingResolver.biding_count,
     },
     Booking: {
         user: userResolver.user,
