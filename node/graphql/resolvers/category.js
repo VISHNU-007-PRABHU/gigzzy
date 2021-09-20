@@ -236,7 +236,7 @@ exports.GetCategoryCurrency = async () => {
         return [];
     }
 }
-exports.UpdateCategoryCurrency = async () => {
+exports.UpdateCategoryCurrency = async (root,args) => {
     try {
         if (args._id) {
             var update_result = await CategoryCurrency_model.update({ _id: args._id }, args);
