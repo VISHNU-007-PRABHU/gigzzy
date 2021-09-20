@@ -207,8 +207,9 @@ module.exports.addCategory = async (parent, args, { file }) => {
 };
 
 
-exports.GetCategoryCurrency = async () => {
+exports.GetCategoryCurrency = async (root,args) => {
     try {
+        console.log("exports.GetCategoryCurrency -> args", args)
         var limit = args.limit || 10;
         var page = args.page || 1;
         var offset = Number(page - 1) * Number(limit);
@@ -221,14 +222,17 @@ exports.GetCategoryCurrency = async () => {
         if (args.currency_id) {
             query["currency_id"] = args.currency_id
         }
-        if(pagination === true){
+        if (args.category_id) {
+            query["category_id"] = args.category_id
+        }
+        if(args.pagination && args.pagination === true){
             var total = await CategoryCurrency_model.count(query);
             var result = await CategoryCurrency_model.find(query).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
             var pageInfo = { totalDocs: total, page: args.page }
             return { data: result, pageInfo };
         }else{
             var total = await CategoryCurrency_model.count(query);
-            var result = await CategoryCurrency_model.find(query).sort({ created_at: -1 }).sort({ created_at: -1 });
+            var result = await CategoryCurrency_model.find(query).sort({ created_at: -1 });
             var pageInfo = { totalDocs: total, page: args.page }
             return { data: result, pageInfo };
         }
@@ -240,19 +244,31 @@ exports.UpdateCategoryCurrency = async (root,args) => {
     try {
         if (args._id) {
             var update_result = await CategoryCurrency_model.update({ _id: args._id }, args.data);
-            var result = await CategoryCurrency_model.findOne(query).lean();
+            var result = await CategoryCurrency_model.findOne({ _id: args._id }).lean();
             result["msg"] = "update process success"
             result['status'] = 'success'
             return result
         } else {
             const add_currency_catgeory = new CategoryCurrency_model(args.data);
             const save = await add_currency_catgeory.save();
-            result["msg"] = "update process success"
-            result['status'] = 'success'
-            return result
+            save["msg"] = "update process success"
+            save['status'] = 'success'
+            return save
         }
     } catch (error) {
+        console.log("exports.UpdateCategoryCurrency -> error", error)
         return { "msg": "update process failed", status: 'failed' };
+    }
+}
+exports.DeleteCategoryCurrency = async (root,args) => {
+    try {
+        var result ={}
+        var update_result = await CategoryCurrency_model.update({ _id: args._id },{is_delete:true});
+        result["msg"] = "Delete process success"
+        result['status'] = 'success'
+        return result
+    } catch (error) {
+        return { "msg": "Delete process failed", status: 'failed' };
     }
 }
 //  add sub category

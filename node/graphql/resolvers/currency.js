@@ -52,6 +52,22 @@ module.exports.get_currency = async (root, args) => {
     }
 }
 
+
+module.exports.get_parent_currency = async (root, args) => {
+    try {
+        let match = { is_delete: false }
+        if (root['currency_id']) {
+            match['_id'] = ObjectId(root['currency_id'])
+        }
+        
+        console.log("module.exports.get_parent_currency -> match", match)
+        const currency = await Currency_model.findOne(match).lean()
+        return currency
+    } catch (error) {
+        return { "msg": "Error in curreny fetch", status: 'failed' };
+    }
+}
+
 module.exports.update_currency = async (root, args) => {
     try {
         if (args['_id']) {

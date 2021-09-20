@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { withRouter } from "react-router-dom";
 import { Layout, Icon, Form, Input, Button, message, Typography, Row, Col, Select, Upload, Radio } from 'antd';
 import { ADD_SUBCATEGORY, CATEGORY_NAME, FIND_SUBCATEGORY, UPDATE_SUBCATEGORY } from '../../../graphql/Admin/sub_category';
@@ -12,7 +12,7 @@ const { Content } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
 
-
+const MultiCurrency = React.lazy(() => import('./MultiCurrency'));
 class Add_Subcategory extends React.Component {
     constructor(props) {
         super(props);
@@ -55,9 +55,9 @@ class Add_Subcategory extends React.Component {
             variables: { is_parent: true },
             fetchPolicy: 'no-cache',
         }).then(result => {
-            this.setState({ 
-                category: result.data.category, 
-                certificate: result.data.category[0].Certificate 
+            this.setState({
+                category: result.data.category,
+                certificate: result.data.category[0].Certificate
             });
         });
     }
@@ -73,7 +73,7 @@ class Add_Subcategory extends React.Component {
                 update_data: result.data.sub_category[0],
                 certificate: result.data.sub_category[0].Certificate,
                 imageUrl: result.data.sub_category[0].img_url,
-                price_type:result.data.sub_category[0].price_type || 'job'
+                price_type: result.data.sub_category[0].price_type || 'job'
             });
         });
     }
@@ -127,7 +127,7 @@ class Add_Subcategory extends React.Component {
                     mutation: ADD_SUBCATEGORY,
                     variables: {
                         subCategory_name: values.subCategory_name, base_price: values.base_price, hour_limit: values.hour_limit, hour_price: values.hour_price, service_fee: values.service_fee, certificates: values.certificates,
-                        category_id: values.category_name, description: values.description, file: this.state.file,price_type:this.state.price_type,day_price: values.day_price,day_limit: values.day_limi
+                        category_id: values.category_name, description: values.description, file: this.state.file, price_type: this.state.price_type, day_price: values.day_price, day_limit: values.day_limi
                     },
                 }).then((result, loading, error) => {
                     Alert_msg(result.data.addsubCategory.info);
@@ -147,7 +147,7 @@ class Add_Subcategory extends React.Component {
                     mutation: UPDATE_SUBCATEGORY,
                     variables: {
                         subCategory_name: values.subCategory_name, base_price: values.base_price, hour_limit: values.hour_limit, hour_price: values.hour_price, service_fee: values.service_fee, certificates: values.certificates,
-                        category_id: values.category_name, description: values.description, file: this.state.file, _id: this.props.match.params.id,price_type:this.state.price_type,day_price: values.day_price,day_limit: values.day_limit, 
+                        category_id: values.category_name, description: values.description, file: this.state.file, _id: this.props.match.params.id, price_type: this.state.price_type, day_price: values.day_price, day_limit: values.day_limit,
                     },
                 }).then((result, loading, error) => {
                     Alert_msg(result.data.updatesubCategory.info);
@@ -188,6 +188,7 @@ class Add_Subcategory extends React.Component {
                         <Row>
                             <Form>
                                 <Col md={18} sm={24}>
+
                                     <Row gutter={12}>
                                         <Col span={12}>
                                             <Form.Item label="Category Name">
@@ -224,66 +225,6 @@ class Add_Subcategory extends React.Component {
                                         </Col>
                                     </Row>
                                     <Row>
-                                        <Radio.Group name="price_type" onChange={this.onPriceTypeChange} value={this.state.price_type}>
-                                            <Radio value={"hour"}>Per hour</Radio>
-                                            <Radio value={"day"}>Per day</Radio>
-                                            <Radio value={"job"}>Per job</Radio>
-                                        </Radio.Group>
-                                    </Row>
-                                    <Row className="py-3" gutter={12}>
-                                        <Row gutter={12} className={this.state.price_type === "hour" ? "d-flex" : "d-none"}>
-                                            <Col className="" lg={12}>
-                                                <Form.Item label="Limit (Per hour)">
-                                                    {form.getFieldDecorator("hour_limit", {
-                                                        initialValue: this.state.update_data.hour_limit,
-                                                        rules: [{ required: false, message: 'Hour Limit is required' }]
-                                                    })(<Input placeholder="Limit (Per hour)" />)}
-                                                </Form.Item>
-                                            </Col>
-                                            <Col className="" lg={12}>
-                                                <Form.Item label="Price (Per hour price)">
-                                                    {form.getFieldDecorator("hour_price", {
-                                                        initialValue: this.state.update_data.hour_price,
-                                                        rules: [{ required: false }]
-                                                    })(<Input placeholder="Price (Per hour price)" />)}
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
-
-                                        <Row gutter={12} className={this.state.price_type === "day" ? "d-flex" : "d-none"}>
-                                            <Col className="" lg={12}>
-                                                <Form.Item label="Limit (Per day)">
-                                                    {form.getFieldDecorator("day_limit", {
-                                                        initialValue: this.state.update_data.day_limit,
-                                                        rules: [{ required: false, message: 'Day Limit is required' }]
-                                                    })(<Input placeholder="Limit (Per day)" />)}
-                                                </Form.Item>
-                                            </Col>
-                                            <Col className="" lg={12}>
-                                                <Form.Item label="Price (Per day price)">
-                                                    {form.getFieldDecorator("day_price", {
-                                                        initialValue: this.state.update_data.day_price,
-                                                        rules: [{ required: false }]
-                                                    })(<Input placeholder="Price (Per day price)" />)}
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
-                                        <Col className="" lg={12}>
-                                            <Form.Item label="Basic Price">
-                                                {form.getFieldDecorator("base_price", {
-                                                    initialValue: this.state.update_data.base_price,
-                                                    rules: [{ required: true }]
-                                                })(<Input placeholder="Basic Price" />)}
-                                            </Form.Item>
-                                        </Col>
-                                        <Col className="" lg={12}>
-                                            <Form.Item label="Service Fee">
-                                                {form.getFieldDecorator("service_fee", {
-                                                    initialValue: this.state.update_data.service_fee,
-                                                    rules: [{ required: true, message: 'Service Fee is required' }]
-                                                })(<Input placeholder="service Fee" addonAfter="%" />)}
-                                            </Form.Item>
-                                        </Col>
                                         <Col span={24}>
                                             <Form.Item label="Certificates">
                                                 {form.getFieldDecorator("certificates", {
@@ -328,13 +269,20 @@ class Add_Subcategory extends React.Component {
                                                 beforeUpload={this.beforeUpload}
                                                 onChange={this.handleChange}
                                             >
-                                                {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+                                                {imageUrl ? <img src={imageUrl}  alt="avatar" style={{ width: '100%' }} /> : uploadButton}
                                             </Upload>
 
                                         )}
                                     </Form.Item>
                                 </Col>
                             </Form>
+                        </Row>
+                        <Row className="jumbotron p-1">
+                            <Col>
+                                <Suspense fallback={<div>.......</div>}>
+                                    <MultiCurrency id={this.props.match.params.id} />
+                                </Suspense>
+                            </Col>
                         </Row>
                     </Content>
                 </Layout>

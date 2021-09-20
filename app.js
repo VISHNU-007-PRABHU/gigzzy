@@ -132,7 +132,7 @@ class currencyDirective extends SchemaDirectiveVisitor {
       info,
       ) {
       const date = await resolve.call(this, source, otherArgs, context, info);
-      console.log("currencyDirective -> visitFieldDefinition -> otherArgs", otherArgs.code)
+      // console.log("currencyDirective -> visitFieldDefinition -> otherArgs", otherArgs.code)
       let code =  otherArgs.code
       let inputdata={
         convert_code:otherArgs.code||defaultFormat,
@@ -140,7 +140,7 @@ class currencyDirective extends SchemaDirectiveVisitor {
         currency_code:"INR"
       }
       let final_value = await CommonFunction.currency_calculation(inputdata)
-      console.log("currencyDirective -> visitFieldDefinition -> final_value", final_value)
+      // console.log("currencyDirective -> visitFieldDefinition -> final_value", final_value)
       return final_value
     };
 

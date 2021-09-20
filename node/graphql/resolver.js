@@ -281,6 +281,7 @@ const resolvers = {
     subCategory: {
         category: categoryResolver.subcategory_category,
         Certificate: certificateResolver.certificate,  //display certificate  based on category
+        get_parent_currency:currencyResolver.get_parent_currency,
     },
 
     User: {
@@ -342,6 +343,7 @@ const resolvers = {
         update_biding:bidingResolver.update_biding,
         // company detiail
         UpdateCategoryCurrency:categoryResolver.UpdateCategoryCurrency,
+        DeleteCategoryCurrency:categoryResolver.DeleteCategoryCurrency,
         update_company_detail: userResolver.update_company_detail,
         CompanyFileUpload: userResolver.CompanyFileUpload,
         deleteCompany: userResolver.deleteCompany,
