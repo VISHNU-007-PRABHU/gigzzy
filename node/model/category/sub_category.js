@@ -56,6 +56,15 @@ sub_categorySchema.virtual('uid').get(function () {
   return this._id;
 });
 
+
+sub_categorySchema.virtual('currency_convert', {
+  ref: 'CategoryCurrency',
+  localField: '_id',
+  foreignField: 'category_id',
+  justOne: true
+});
+  
+
 sub_categorySchema.pre('save', function (next) {
   // get the current date
   var currentDate = moment();

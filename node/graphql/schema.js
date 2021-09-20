@@ -97,7 +97,7 @@ const typeDefs = gql`
         get_contracts_pagination(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
         get_contract_all_files(contract_id:ID):[CompanyImage]
         get_currencys(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,pagination:Boolean,page:Int,limit:Int):CurrencyConnection
-        get_currency(_id:ID):Currency
+        get_currency(_id:ID,country_code:String,location_code:String):Currency
         get_biding_pagination(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int,contract_id:ID):BidingConnection
         GetCategoryCurrency(pagination:Boolean,data:JSON,_id:ID,category_id:ID,country_code:String,country_id:ID):SubCategoryConnection
     }
@@ -203,8 +203,8 @@ const typeDefs = gql`
         msg:String
         status:String
         total:Float 
-        earning:Float  @currency
-        revenue:Float  @currency
+        earning(code: String):Float  @currency
+        revenue(code: String):Float  @currency
         user:Int
         provider:Int
         _id:Int
@@ -506,7 +506,7 @@ const typeDefs = gql`
         provider_id:ID
         booking_id:ID
         amount:String
-        total_amount:String @currency
+        total_amount(code: String):String @currency
         status:String
         info:JSON
         totalDocs: Int
@@ -599,6 +599,7 @@ const typeDefs = gql`
         price(code: String): String @currency
         currency_code:String
         location_code:String
+        get_currency(location_code:String,country_code:String,_id:ID):Currency
     }
     
     type Account{
@@ -619,10 +620,10 @@ const typeDefs = gql`
         Certificate:[Certificate]
         certificates:[ID]
         subCategory_name:String  @upper
-        base_price:String  @currency
-        hour_price:String  @currency
+        base_price(code: String):String  @currency
+        hour_price(code: String):String  @currency
         hour_limit:String
-        day_price:String  @currency
+        day_price(code: String):String  @currency
         day_limit:String
         price_type:String
         service_fee:String
@@ -668,10 +669,10 @@ const typeDefs = gql`
         categoryid:JSON
         certificates:[ID]
         subCategory_name:String  @upper
-        base_price:String  @currency
-        hour_price:String  @currency
+        base_price(code: String): String @currency
+        hour_price(code: String):String  @currency
         hour_limit:String
-        day_price:String  @currency
+        day_price(code: String):String  @currency
         day_limit:String
         price_type:String
         img_url:String
@@ -700,6 +701,8 @@ const typeDefs = gql`
         currency_code:String, 
         currency_id:ID
         get_parent_currency:Currency
+        GetCategoryCurrency(root:Boolean):SubCategoryConnection
+        ParentCategoryCurrency(root:Boolean,location_code:String,currency_id:ID,country_code:String,_id:ID):subCategory
     }
     
     type Status{
@@ -731,9 +734,9 @@ const typeDefs = gql`
         booked:String
         status:String
         hours:String
-        base_price:String @currency
-        hour_price:String @currency
-        extra_price:String @currency
+        base_price(code: String):String @currency
+        hour_price(code: String):String @currency
+        extra_price(code: String):String @currency
         created_date:String
         bookingDate:String
         job_start_time:String @date(format: "DD/MM/YYYY hh:mm a")
@@ -757,8 +760,8 @@ const typeDefs = gql`
         provider_msg_is_read:Int
         user_msg_is_read:Int
         created_at:String @date(format: "DD/MM/YYYY hh:mm a")
-        amount:String  @currency
-        extra_fare:String  @currency
+        amount(code: String):String  @currency
+        extra_fare(code: String):String  @currency
         start_job_image:[String]
         accept_date:String @date(format: "DD/MM/YYYY hh:mm a")
         end_date:Date
@@ -776,21 +779,21 @@ const typeDefs = gql`
         jobEnd_time:Date
         location:JSON
         extra_fare_reason:String
-        total:String @currency
+        total(code: String):String @currency
         booking_alert:Int
         user_rating:Int
         provider_rating:Int
         provider_comments:String
         user_comments:String
-        provider_fee:String  @currency
-        admin_fee:Int  @currency
+        provider_fee(code: String):String  @currency
+        admin_fee(code: String):Int  @currency
         payment_status:Int
-        final_payment:String  @currency
-        extra_hour_price:String  @currency
+        final_payment(code: String):String  @currency
+        extra_hour_price(code: String):String  @currency
         category_type:String
         description: String
         availability:[JSON] 
-        total_amount:String  @currency
+        total_amount(code: String):String  @currency
         find_kilometre(lat:Float,lng:Float):Detail
         category(_id:ID,category_type:Int):[Category]
         booking_category(_id:ID,category_type:Int):[Category]
@@ -889,7 +892,7 @@ const typeDefs = gql`
         provider_document_verified(_id:ID,proof_status:String):Detail
         online_status(_id:ID,online_status:Int):Detail
         # booking process
-        add_booking( user_id:ID,provider_id:ID,category_id:ID,lat:Float,lng:Float,weekday:JSON,hours:String,description:String,booking_status:Int,booking_type:Int,data:[JSON],file:[Upload],category_type:Int,booking_date:String,booking_time:String,booking_hour:String):[Booking]
+        add_booking( user_id:ID,location_code:String,provider_id:ID,category_id:ID,lat:Float,lng:Float,weekday:JSON,hours:String,description:String,booking_status:Int,booking_type:Int,data:[JSON],file:[Upload],category_type:Int,booking_date:String,booking_time:String,booking_hour:String):[Booking]
         manage_booking(role:Int,booking_id:ID,user_id:ID,provider_id:ID,category_id:String,lat:Float,lng:Float,weekday:JSON,hours:String,description:String,booking_status:Int,category_type:Int,stripe_token:String,payment_type:String,phone_number:String,extra_fare:String,extra_fare_reason:String,option:Int,extra_fare_id:ID):[Booking]
         update_booking(provider_id:ID,booking_id:ID,file:[Upload],option:Int):Booking
         update_booking_details(provider_id:ID,booking_id:ID,file:[Upload],option:Int,user_comments_status:Int):Booking

@@ -28,18 +28,15 @@ import Add_User from './component/Admin/User/Add_User';
 import Static from './component/Admin/Static/Static';
 import Add_Static from './component/Admin/Static/Add_static';
 import User_Login from './component/User/Login/User_Login';
-import Home_Page from './component/User/HomePage/Home_Page';
 import Profile_Page from './component/User/Profile/Profile';
 import Bookings_Page from './component/User/Book/Bookings';
 import NotFound from './component/Comman/NotFound';
 import NotAccess from './component/Comman/NotAccess';
-import Description_Page from './component/User/Book/Description';
 import Payouts from './component/Admin/Payouts/Payouts';
 import Review from './component/Admin/Review/Review';
 import Settings from './component/Admin/Setting/Setting';
 import Email_Login from "./component/User/Login/Email_Login";
 import Request from "./component/Admin/Request/Request";
-import Booking_Details from "./component/Admin/Booking/Booking_Details";
 import Invoice from './component/Admin/Booking/invoice';
 import provider_detail from './component/User/Provider/Provider_Details';
 import provider_earnings from './component/User/Provider/Provider_Earns';
@@ -61,6 +58,12 @@ import Currency from './component/Admin/Currency/Currency'
 import AddCurrency from './component/Admin/Currency/AddCurrency';
 import HowLearnMore from './component/User/About/HowLearnMore';
 import ContractUserDetail from './component/User/Book/contract/view/ContractUserDetail';
+
+const Home_Page = React.lazy(() => import('./component/User/HomePage/Home_Page'));
+const Description_Page = React.lazy(() => import('./component/User/Book/Description'));
+const Booking_Details = React.lazy(() => import('./component/Admin/Booking/Booking_Details'));
+
+
 function PrivateRoute({ permission, component: Component, ...rest }) {
   console.log("PrivateRoute -> permission", permission)
   let permission_condition = true

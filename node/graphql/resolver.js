@@ -33,6 +33,7 @@ var Category_model = model.category;
 var message_model = model.message;
 var Payout_model = model.payout;
 var Extra_fee_model = model.Extra_fee;
+var CategoryCurrency_model = model.CategoryCurrency;
 var providerSubcategory_model = model.providerSubcategory_model;
 
 const MESSAGE_CREATED = 'MESSAGE_CREATED';
@@ -282,6 +283,8 @@ const resolvers = {
         category: categoryResolver.subcategory_category,
         Certificate: certificateResolver.certificate,  //display certificate  based on category
         get_parent_currency:currencyResolver.get_parent_currency,
+        GetCategoryCurrency:categoryResolver.GetCategoryCurrency,
+        ParentCategoryCurrency:categoryResolver.ParentCategoryCurrency,
     },
 
     User: {
@@ -294,6 +297,7 @@ const resolvers = {
         category: categoryResolver.category,
         provider_rating: userResolver.provider_rating,
         provider_rate: userResolver.provider_rate,
+        get_currency:currencyResolver.get_currency,
 
     },
     Company: {
@@ -675,6 +679,7 @@ const resolvers = {
             } else if (args.category_type == 2) {
                 var category = await subCategory_model.findOne({ _id: args.category_id });
             }
+            var categoryCurrency = await CategoryCurrency_model.findOne({category_id:args.category_id ,currency_id:args.currency_id }).lean()
 
             if (args.booking_type == 1) {
                 args['booking_date'] = moment.utc().format();
@@ -686,14 +691,16 @@ const resolvers = {
                 args['booking_time'] = a.utc().format("HH:mm:ss");
             }
             args['available_provider'] = available_provider;
+            arga['currency_id'] = args.currency_id;
+            arga['current_currency'] = categoryCurrency;
             args['location'] = { coordinates: [args.lng, args.lat] }
-            args['service_fee'] = String(parseFloat(category.service_fee).toFixed(2));
-            args['base_price'] = String(parseFloat(category.base_price).toFixed(2));
-            args['hour_price'] = String(parseFloat(category.hour_price).toFixed(2));
-            args['hour_limit'] = category.hour_limit;
-            args['day_price'] = String(parseFloat(category.day_price).toFixed(2));
-            args['day_limit'] = category.day_limit;
-            args['price_type'] = category.price_type;
+            args['service_fee'] = String(parseFloat(categoryCurrency.service_fee).toFixed(2));
+            args['base_price'] = String(parseFloat(categoryCurrency.base_price).toFixed(2));
+            args['hour_price'] = String(parseFloat(categoryCurrency.hour_price).toFixed(2));
+            args['hour_limit'] = categoryCurrency.hour_limit;
+            args['day_price'] = String(parseFloat(categoryCurrency.day_price).toFixed(2));
+            args['day_limit'] = categoryCurrency.day_limit;
+            args['price_type'] = categoryCurrency.price_type;
 
             args['booking_ref'] = String(Math.floor(1000 + Math.random() * 9000));
             args['ctob_shotcode'] = process.env.MPESA_SHORT_CODE;

@@ -2,6 +2,7 @@ const model = require('../../model_data');
 const _ = require('lodash');
 const moment = require('moment');
 var Jimp = require('jimp');
+var ObjectId = require('mongodb').ObjectID;
 
 var Category_model = model.category;
 var subCategory_model = model.sub_category;
@@ -134,12 +135,10 @@ module.exports.get_subcategory = async (parent, args, context, info) => {
     data.delete = 0;
     var total = await subCategory_model.count(data);
     var result = await subCategory_model.find(data).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
-    // console.log(result);
     var pageInfo = { totalDocs: total, page: args.page }
     return { data: result, pageInfo };
 }
 
-//add category { 'category_name','description','file'}
 
 module.exports.addCategory = async (parent, args, { file }) => {
     //console.log("add category");
@@ -207,9 +206,8 @@ module.exports.addCategory = async (parent, args, { file }) => {
 };
 
 
-exports.GetCategoryCurrency = async (root,args) => {
+exports.GetCategoryCurrency = async (root, args) => {
     try {
-        console.log("exports.GetCategoryCurrency -> args", args)
         var limit = args.limit || 10;
         var page = args.page || 1;
         var offset = Number(page - 1) * Number(limit);
@@ -225,12 +223,15 @@ exports.GetCategoryCurrency = async (root,args) => {
         if (args.category_id) {
             query["category_id"] = args.category_id
         }
-        if(args.pagination && args.pagination === true){
+        if (args.root) {
+            query["category_id"] = ObjectId(root._id)
+        }
+        if (args.pagination && args.pagination === true) {
             var total = await CategoryCurrency_model.count(query);
             var result = await CategoryCurrency_model.find(query).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
             var pageInfo = { totalDocs: total, page: args.page }
             return { data: result, pageInfo };
-        }else{
+        } else {
             var total = await CategoryCurrency_model.count(query);
             var result = await CategoryCurrency_model.find(query).sort({ created_at: -1 });
             var pageInfo = { totalDocs: total, page: args.page }
@@ -240,7 +241,34 @@ exports.GetCategoryCurrency = async (root,args) => {
         return [];
     }
 }
-exports.UpdateCategoryCurrency = async (root,args) => {
+
+
+exports.ParentCategoryCurrency = async (root, args) => {
+    try {
+        let query = {is_delete: false}
+        if(args.root){
+            query["category_id"] = ObjectId(root._id)
+        }else{
+            query["category_id"] = ObjectId(args._id)
+        }
+        if(args.currency_id){
+            query["currency_id"] = args.currency_id
+        }
+        console.log("exports.ParentCategoryCurrency -> query", query)
+        let data = await CategoryCurrency_model.findOne(query).lean();
+        console.log("exports.ParentCategoryCurrency -> data", data)
+        if(data){
+            return data
+        }else{
+            return {}
+        }
+
+    } catch (error) {
+        console.log("exports.ParentCategoryCurrency -> error", error)
+        return {};
+    }
+}
+exports.UpdateCategoryCurrency = async (root, args) => {
     try {
         if (args._id) {
             var update_result = await CategoryCurrency_model.update({ _id: args._id }, args.data);
@@ -260,10 +288,10 @@ exports.UpdateCategoryCurrency = async (root,args) => {
         return { "msg": "update process failed", status: 'failed' };
     }
 }
-exports.DeleteCategoryCurrency = async (root,args) => {
+exports.DeleteCategoryCurrency = async (root, args) => {
     try {
-        var result ={}
-        var update_result = await CategoryCurrency_model.update({ _id: args._id },{is_delete:true});
+        var result = {}
+        var update_result = await CategoryCurrency_model.update({ _id: args._id }, { is_delete: true });
         result["msg"] = "Delete process success"
         result['status'] = 'success'
         return result

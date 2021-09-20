@@ -44,7 +44,12 @@ module.exports.get_currency = async (root, args) => {
         if (args['_id']) {
             match['_id'] = ObjectId(args['_id'])
         }
-
+        if (args['country_code']) {
+            match['country_code'] = ObjectId(args['country_code'])
+        }
+        if (args['location_code']) {
+            match['location_code'] = ObjectId(args['location_code'])
+        }
         const currency = await Currency_model.findOne(match).lean()
         return currency
     } catch (error) {
