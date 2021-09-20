@@ -239,13 +239,13 @@ exports.GetCategoryCurrency = async () => {
 exports.UpdateCategoryCurrency = async (root,args) => {
     try {
         if (args._id) {
-            var update_result = await CategoryCurrency_model.update({ _id: args._id }, args);
+            var update_result = await CategoryCurrency_model.update({ _id: args._id }, args.data);
             var result = await CategoryCurrency_model.findOne(query).lean();
             result["msg"] = "update process success"
             result['status'] = 'success'
             return result
         } else {
-            const add_currency_catgeory = new CategoryCurrency_model(args);
+            const add_currency_catgeory = new CategoryCurrency_model(args.data);
             const save = await add_currency_catgeory.save();
             result["msg"] = "update process success"
             result['status'] = 'success'
