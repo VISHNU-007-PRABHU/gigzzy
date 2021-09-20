@@ -341,6 +341,7 @@ const resolvers = {
         DeleteContractJobFile: contractResolver.DeleteContractJobFile,
         update_biding:bidingResolver.update_biding,
         // company detiail
+        UpdateCategoryCurrency:categoryResolver.UpdateCategoryCurrency,
         update_company_detail: userResolver.update_company_detail,
         CompanyFileUpload: userResolver.CompanyFileUpload,
         deleteCompany: userResolver.deleteCompany,
