@@ -33,10 +33,10 @@ function How() {
             </Row>
             <Row gutter={[{ xs: 8, sm: 16, md: 24, lg: 32 }, 20]}>
                 {subcontent.map(itemdata => <>
-                    <Col className="gutter-row" span={6}>
+                    <Col className="gutter-row" sm={24} md={6}>
                         <div className="d-flex flex-column align-items-start">
-                            <h3 className="bold"><Icon type={itemdata.icon} /> </h3>
-                            <h3 className="">{itemdata.title}</h3>
+                            <h3 className="bold text-center w-100"><Icon type={itemdata.icon} /> </h3>
+                            <h3 className="text-center w-100">{itemdata.title}</h3>
                             {/* <div className="">{itemdata.data}</div> */}
                         </div>
                     </Col>
