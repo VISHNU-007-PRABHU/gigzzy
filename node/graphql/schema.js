@@ -99,7 +99,7 @@ const typeDefs = gql`
         get_currencys(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,pagination:Boolean,page:Int,limit:Int):CurrencyConnection
         get_currency(_id:ID):Currency
         get_biding_pagination(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int,contract_id:ID):BidingConnection
-        GetCategoryCurrency(pagination:Boolean,data:JSON,_id:ID,country_id:Id,country_code:String,country_id:ID):subCategory
+        GetCategoryCurrency(pagination:Boolean,data:JSON,_id:ID,country_id:ID,country_code:String,country_id:ID):subCategory
     }
 
     # sub category pagination data  
