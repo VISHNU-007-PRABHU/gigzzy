@@ -6,11 +6,13 @@ var Jimp = require('jimp');
 var Category_model = model.category;
 var subCategory_model = model.sub_category;
 var Detail_model = model.detail;
+var CategoryCurrency_model = model.CategoryCurrency;
 var providerSubcategory_model = model.providerSubcategory_model;
 
 const { createWriteStream, existsSync, mkdirSync, fs } = require("fs");
 const path = require("path");
 const express = require("express");
+const { paginate } = require('../../model/userDetail/user');
 const files = [];
 
 //  Find all category
@@ -18,12 +20,12 @@ module.exports.category = async (parent, args, context, info) => {
     args.delete = 0;
     args.is_block = false;
     var result = await Category_model.find(args);
-    console.log(_.size(result),"ops");
-    _.map(result,data=>{
+    console.log(_.size(result), "ops");
+    _.map(result, data => {
         console.log(_.size(result.child_category))
-        if(_.size(result.child_category))return data
+        if (_.size(result.child_category)) return data
     })
-    console.log(_.size(result),"ops");
+    console.log(_.size(result), "ops");
     return result;
 };
 
@@ -168,22 +170,22 @@ module.exports.addCategory = async (parent, args, { file }) => {
         delete args.file
     }
 
-    if (_.has(args,"base_price")) {
+    if (_.has(args, "base_price")) {
         var base_price = args.base_price.replace("KSh", "");
         if (!Number(base_price)) {
             base_price = 0
         }
         args.base_price = String(parseFloat(Number(base_price)).toFixed(2))
     }
-    
-    if (_.has(args,"hour_price")) {
+
+    if (_.has(args, "hour_price")) {
         var hour_price = args.hour_price.replace("KSh", "");
         if (!Number(hour_price)) {
             hour_price = 0
         }
         args.hour_price = String(parseFloat(Number(hour_price)).toFixed(2))
     }
-    if (_.has(args,"day_price")) {
+    if (_.has(args, "day_price")) {
         var day_price = args.day_price.replace("KSh", "");
         if (!Number(day_price)) {
             day_price = 0
@@ -204,6 +206,52 @@ module.exports.addCategory = async (parent, args, { file }) => {
 
 };
 
+
+exports.GetCategoryCurrency = async () => {
+    try {
+        var limit = args.limit || 10;
+        var page = args.page || 1;
+        var offset = Number(page - 1) * Number(limit);
+        var query = {
+            is_delete: false
+        };
+        if (args._id) {
+            query["_id"] = args._id
+        }
+        if (args.currency_id) {
+            query["currency_id"] = args.currency_id
+        }
+        if(pagination === true){
+            var total = await CategoryCurrency_model.count(query);
+            var result = await CategoryCurrency_model.find(query).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
+            var pageInfo = { totalDocs: total, page: args.page }
+            return { data: result, pageInfo };
+        }else{
+            var total = await CategoryCurrency_model.count(query);
+            var result = await CategoryCurrency_model.find(query).sort({ created_at: -1 }).sort({ created_at: -1 });
+            var pageInfo = { totalDocs: total, page: args.page }
+            return { data: result, pageInfo };
+        }
+    } catch (error) {
+        return [];
+    }
+}
+exports.UpdateCategoryCurrency = async () => {
+    try {
+        if (args._id) {
+            var update_result = await CategoryCurrency_model.update({ _id: args._id }, args);
+            var result = await CategoryCurrency_model.findOne(query).lean();
+            result["msg"] = "This Sub Category name was already selected"
+            result['status'] = 'failed'
+            return result
+        } else {
+            const add_currency_catgeory = new CategoryCurrency_model(args);
+            const save = await add_currency_catgeory.save();
+        }
+    } catch (error) {
+        return { "msg": "update process failed", status: 'failed' };
+    }
+}
 //  add sub category
 module.exports.addsubCategory = async (parent, args, { file }) => {
     // console.log("add sub category");
@@ -233,22 +281,22 @@ module.exports.addsubCategory = async (parent, args, { file }) => {
             });
         delete args.file
     }
-    if (_.has(args,"base_price")) {
+    if (_.has(args, "base_price")) {
         var base_price = args.base_price.replace("KSh", "");
         if (!Number(base_price)) {
             base_price = 0
         }
         args.base_price = String(parseFloat(Number(base_price)).toFixed(2))
     }
-    
-    if (_.has(args,"hour_price")) {
+
+    if (_.has(args, "hour_price")) {
         var hour_price = args.hour_price.replace("KSh", "");
         if (!Number(hour_price)) {
             hour_price = 0
         }
         args.hour_price = String(parseFloat(Number(hour_price)).toFixed(2))
     }
-    if (_.has(args,"day_price")) {
+    if (_.has(args, "day_price")) {
         var day_price = args.day_price.replace("KSh", "");
         if (!Number(day_price)) {
             day_price = 0
@@ -309,22 +357,22 @@ module.exports.updateCategory = async (parent, args, { file }) => {
             });
         }
     }
-    if (_.has(args,"base_price")) {
+    if (_.has(args, "base_price")) {
         var base_price = args.base_price.replace("KSh", "");
         if (!Number(base_price)) {
             base_price = 0
         }
         args.base_price = String(parseFloat(Number(base_price)).toFixed(2))
     }
-    
-    if (_.has(args,"hour_price")) {
+
+    if (_.has(args, "hour_price")) {
         var hour_price = args.hour_price.replace("KSh", "");
         if (!Number(hour_price)) {
             hour_price = 0
         }
         args.hour_price = String(parseFloat(Number(hour_price)).toFixed(2))
     }
-    if (_.has(args,"day_price")) {
+    if (_.has(args, "day_price")) {
         var day_price = args.day_price.replace("KSh", "");
         if (!Number(day_price)) {
             day_price = 0
@@ -387,22 +435,22 @@ module.exports.updatesubCategory = async (parent, args, { file }) => {
                 });
             }
         }
-        if (_.has(args,"base_price")) {
+        if (_.has(args, "base_price")) {
             var base_price = args.base_price.replace("KSh", "");
             if (!Number(base_price)) {
                 base_price = 0
             }
             args.base_price = String(parseFloat(Number(base_price)).toFixed(2))
         }
-        
-        if (_.has(args,"hour_price")) {
+
+        if (_.has(args, "hour_price")) {
             var hour_price = args.hour_price.replace("KSh", "");
             if (!Number(hour_price)) {
                 hour_price = 0
             }
             args.hour_price = String(parseFloat(Number(hour_price)).toFixed(2))
         }
-        if (_.has(args,"day_price")) {
+        if (_.has(args, "day_price")) {
             var day_price = args.day_price.replace("KSh", "");
             if (!Number(day_price)) {
                 day_price = 0

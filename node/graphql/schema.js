@@ -99,6 +99,7 @@ const typeDefs = gql`
         get_currencys(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,pagination:Boolean,page:Int,limit:Int):CurrencyConnection
         get_currency(_id:ID):Currency
         get_biding_pagination(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int,contract_id:ID):BidingConnection
+        GetCategoryCurrency(pagination:Boolean,data:JSON,_id:ID,country_id:Id,country_code:String,country_id:ID):subCategory
     }
 
     # sub category pagination data  
@@ -315,9 +316,9 @@ const typeDefs = gql`
         location:String 
         default_currency:String 
         status:String 
-        msg:String
-        
+        msg:String   
     }
+
     type ContractJob{
         _id:ID
         msg:String
@@ -651,6 +652,7 @@ const typeDefs = gql`
         prevPage: String,
         nextPage: String,
         currency_code:String,  
+        currency_id:ID
     }
     type subCategory{
         id:ID
@@ -696,6 +698,7 @@ const typeDefs = gql`
         prevPage: String,
         nextPage: String,
         currency_code:String, 
+        currency_id:ID
     }
     
     type Status{
@@ -1002,6 +1005,8 @@ const typeDefs = gql`
             company_id:ID
             biding_data:[JSON]
         ):Biding
+
+        UpdateCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
     }
 `;
 module.exports.typeDefs = typeDefs;

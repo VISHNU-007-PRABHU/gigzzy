@@ -195,6 +195,7 @@ const resolvers = {
         get_currencys:currencyResolver.get_currencys,
         get_currency:currencyResolver.get_currency,
         get_biding_pagination:bidingResolver.get_biding_pagination,
+        GetCategoryCurrency:categoryResolver.GetCategoryCurrency,
         get_my_appointments: async (parent, args, context, info) => {
             try {
 
