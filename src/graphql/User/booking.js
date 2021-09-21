@@ -8,7 +8,7 @@ subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
       description
       booking_ref
       booking_date
-      base_price
+      base_price(code:"symbol")
       extra_price
       msg_date
       msg_time
@@ -33,7 +33,7 @@ $booking_status: Int
     _id
     status
     description
-    base_price
+    base_price(code:"symbol")
     booking_date
     jobStart_time
     jobEnd_time
@@ -93,10 +93,11 @@ subscription TESTS($online:String){
 
 
 export const ADD_BOOKING = gql`
- mutation ADDBOOKING($user_id:ID,$booking_time:String,$booking_hour:String,$booking_type:Int,$category_id:ID,$category_type:Int,$lat:Float,$lng:Float,$hours:String,$description:String,$booking_status:Int,$booking_date:String,$file:[Upload]) {
+ mutation ADDBOOKING($user_id:ID,$location_code:String,$booking_time:String,$booking_hour:String,$booking_type:Int,$category_id:ID,$category_type:Int,$lat:Float,$lng:Float,$hours:String,$description:String,$booking_status:Int,$booking_date:String,$file:[Upload]) {
     add_booking(
       user_id: $user_id,
       category_id: $category_id
+      location_code:$location_code
       category_type: $category_type
       lat: $lat
       lng: $lng
@@ -130,6 +131,9 @@ export const ADD_BOOKING = gql`
         hour_limit
         description
         img_url
+        ParentCategoryCurrency(root: true,location_code:$location_code) {
+          base_price(code:$location_code)
+        }
       }
       hours
     }
@@ -169,7 +173,7 @@ query My_appointments($_id : ID,$role : Int,$booking_status : Int,$limit:Int,$pa
             _id
           booking_status
           booking_date
-          base_price
+          base_price(code:"symbol")
           booking_ref
           booking_type
           booking_date
@@ -211,17 +215,17 @@ query GETPARTICULARBOOKING($_id : ID) {
         start_job_image_url
         end_job_image_url
         booking_ref
-        base_price
-        extra_price
-        extra_hour_price
-        total
-        final_payment
+        base_price(code:"symbol")
+        extra_price(code:"symbol")
+        extra_hour_price(code:"symbol")
+        total(code:"symbol")
+        final_payment(code:"symbol")
+        admin_fee(code:"symbol")
         charge_id
         MpesaReceiptNumber
         mpeas_payment_callback
         ctob_shotcode
         ctob_billRef
-        admin_fee
         service_fee
         lat
         lng
@@ -311,7 +315,7 @@ mutation ADDMSG($booking_id : ID,$user_id:ID,$data:String){
   }
 }`
 
-export const UPDATE_MANUAL_PAYMENT =  gql`
+export const UPDATE_MANUAL_PAYMENT = gql`
 mutation UPDATE_MANUAL_PAYMENT($booking_id : ID,$role:Int,){ 
   update_manual_payment(role:$role,booking_id: $booking_id) {
     msg

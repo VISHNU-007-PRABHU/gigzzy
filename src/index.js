@@ -1,6 +1,6 @@
 import 'react-app-polyfill/ie11';
 import 'react-app-polyfill/stable';
-import React from 'react';
+import React,{Suspense} from 'react';
 import ReactDOM from 'react-dom';
 import { Switch, Redirect, Route, BrowserRouter, useHistory } from 'react-router-dom';
 import './index.css';
@@ -9,6 +9,8 @@ import * as serviceWorker from './serviceWorker';
 import { client } from "./apollo";
 import { ApolloProvider } from "react-apollo";
 import { ApolloProvider as ApolloProviderHooks } from "@apollo/react-hooks";
+
+
 import { LoginPage } from './component/Admin/Layout/LoginPage';
 import Dashboard from './component/Admin/Dashboard/Dashboard';
 import Category from './component/Admin/Category/Category';
@@ -48,20 +50,25 @@ import { Alert_msg } from './component/Comman/alert_msg';
 import StaticPage from './component/Comman/static_page';
 import HowLearnMore from './component/User/About/HowLearnMore';
 
+const Currency = React.lazy(() => import('./component/Admin/Currency/Currency'));
+const AddCurrency = React.lazy(() => import('./component/Admin/Currency/AddCurrency'));
+
 function PrivateRoute({ component: Component, ...rest }) {
   return (
     <Route
       {...rest}
       render={props =>
         localStorage.getItem('adminLogin') === "success" ? (
-          <Component {...props} />
+          <Suspense fallback={"..."}>
+            <Component {...props} />
+          </Suspense>
         ) : (
-            <Redirect
-              to={{
-                pathname: "/admin",
-              }}
-            />
-          )
+          <Redirect
+            to={{
+              pathname: "/admin",
+            }}
+          />
+        )
       }
     />
   );
@@ -77,7 +84,7 @@ const isDemo = async () => {
       if (result.data.check_demo_app.status === 'success') {
         localStorage.setItem('userLogin', '');
         localStorage.removeItem('user');
-        Alert_msg({msg:"Your demo account is ended",status:"failed"});
+        Alert_msg({ msg: "Your demo account is ended", status: "failed" });
       }
     });
   }
@@ -90,7 +97,7 @@ const isDemo = async () => {
       if (result.data.check_demo_app.status === 'success') {
         localStorage.setItem('providerLogin', '');
         localStorage.removeItem('provider');
-        Alert_msg({msg:"Your demo account is ended",status:"failed"});
+        Alert_msg({ msg: "Your demo account is ended", status: "failed" });
       }
     });
   }
@@ -105,12 +112,12 @@ function UserRoute({ component: Component, ...rest }) {
         localStorage.getItem('userLogin') === 'success' ? (
           <Component {...props} />
         ) : (
-            <Redirect
-              to={{
-                pathname: "/login",
-              }}
-            />
-          )
+          <Redirect
+            to={{
+              pathname: "/login",
+            }}
+          />
+        )
       }
     />
   );
@@ -123,12 +130,12 @@ function ProviderRoute({ component: Component, ...rest }) {
         localStorage.getItem('providerLogin') === 'success' ? (
           <Component {...props} />
         ) : (
-            <Redirect
-              to={{
-                pathname: "/provider_login",
-              }}
-            />
-          )
+          <Redirect
+            to={{
+              pathname: "/provider_login",
+            }}
+          />
+        )
       }
     />
   );
@@ -164,12 +171,15 @@ ReactDOM.render(
           <PrivateRoute path="/admin-static/add/:id" component={Add_Static} exact />
           <PrivateRoute path="/admin-static" component={Static} exact />
           <PrivateRoute path="/admin-settings" component={Settings} exact />
+          <PrivateRoute path="/admin-currency/add/:id" component={AddCurrency} />
+          <PrivateRoute path="/admin-currency/add" component={AddCurrency} />
+          <PrivateRoute permission="view_currency" path="/admin-currency" component={Currency} />
           <Route exact path="/" component={Home_Page} />
           <Route exact path="/login" component={User_Login} />
           <Route exact path="/Confrim_password/:id" component={ConfrimPassword} />
           <Route exact path="/signup" component={Email_Login} />
-          <Route exact path="/static_page/:id" component={StaticPage}/>
-          <Route exact path="/howlearnmore" component={HowLearnMore}/>
+          <Route exact path="/static_page/:id" component={StaticPage} />
+          <Route exact path="/howlearnmore" component={HowLearnMore} />
 
           <UserRoute exact path="/profile" component={Profile_Page} />
           <UserRoute exact path="/description/:id" component={Description_Page} />

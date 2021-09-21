@@ -14,5 +14,7 @@ module.exports = {
     Extra_fee:require('./model/booking/extra'),
     payout_setting:require('./model/Admin/payout_setting'),
     site_setting:require('./model/Admin/site'),
-    address:require('./model/userDetail/address')
+    address:require('./model/userDetail/address'),
+     currency: require('./model/Admin/currency'),
+    CategoryCurrency:require('./model/category/CategoryCurrency')
 }

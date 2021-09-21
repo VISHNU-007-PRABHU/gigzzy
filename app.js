@@ -20,6 +20,7 @@ const fs = require('fs');
 const cwd = process.cwd();
 const dotenv = require('dotenv');
 const expressStaticGzip = require('express-static-gzip');
+const CommonFunction = require('./node/graphql/CommonFunction')
 // const i18n = require("i18n");
 dotenv.config();
 // i18n.configure({
@@ -102,28 +103,40 @@ class currencyDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
     const { defaultFormat } = this.args;
-
+    
     field.args.push({
       name: 'format',
       type: GraphQLString
     });
-
+    
     field.resolve = async function (
       source,
       { format, ...otherArgs },
       context,
       info,
-    ) {
+      ) {
       const date = await resolve.call(this, source, otherArgs, context, info);
-      // If a format argument was not provided, default to the optional
-      // defaultFormat argument taken by the @date directive:
-      // console.log(`${getSymbolFromCurrency(format || defaultFormat)}${date}`);
-      return `${getSymbolFromCurrency(format || defaultFormat)}${date}`;
+      let code =  otherArgs.code
+      if(code === "symbol"){
+        let const_symbol = source.symbol || "$"
+        return `${const_symbol} ${date}`
+      }else{
+        let inputdata={
+          convert_code:otherArgs.code||defaultFormat,
+          amount: date,
+          currency_code:"INR"
+        }
+        let final_value = await CommonFunction.currency_calculation(inputdata)
+        // console.log("currencyDirective -> visitFieldDefinition -> final_value", final_value)
+        return final_value
+      }
     };
 
     field.type = GraphQLString;
   }
 }
+
+
 const server = new ApolloServer({
   cors: {
     origin: '*',			// <- allow request from all domains
@@ -274,7 +287,7 @@ app.use(cors({ origin: 'http://localhost:3000' }));
 
 
 
-mongoose.connect('mongodb://localhost/gigzzy').then(() => {
+mongoose.connect(process.env.DB_LINK).then(() => {
 }).catch((err) => {
   // console.log("Not Connected to Database ERROR! ", err);
 });

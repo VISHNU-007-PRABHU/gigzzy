@@ -22,6 +22,7 @@ class User_Login extends React.Component {
             otp_login: 1,
             email_login: 0,
             country_code: '',
+            location_code:"",
             login: 1,
             m_no:'',
         };
@@ -32,11 +33,12 @@ class User_Login extends React.Component {
             if (!err) {
                 await client.query({
                     query: ADD_USER,
-                    variables: { option: "otp", phone_no: this.state.m_no, role: 1, country_code: this.state.country_code },
+                    variables: { option: "otp", phone_no: this.state.m_no, role: 1,location_code:this.state.location_code, country_code: this.state.country_code },
                     fetchPolicy: 'no-cache',
                 }).then(result => {
                     console.log(result.data.addUser.status);
                     localStorage.setItem('user', JSON.stringify(result.data.addUser));
+                    localStorage.setItem('currency', JSON.stringify(result.data.addUser.get_currency));
                     Alert_msg({ msg: result.data.addUser.otp, status: "success" });
                     this.setState({ login: 0 });
                 });
@@ -50,11 +52,12 @@ class User_Login extends React.Component {
         console.log(data);
         await client.query({
             query: ADD_USER,
-            variables: { option: "otp", phone_no: data.phone_no, role: 1, country_code: data.phone_no },
+            variables: { option: "otp", phone_no: data.phone_no, role: 1, country_code: data.phone_no,location_code:this.state.location_code },
             fetchPolicy: 'no-cache',
         }).then(result => {
             console.log(result.data.addUser.status);
             localStorage.setItem('user', JSON.stringify(result.data.addUser));
+            localStorage.setItem('currency', JSON.stringify(result.data.addUser.get_currency));
             Alert_msg({ msg: result.data.addUser.otp, status: "success" });
             this.setState({ login: 0 });
         });
@@ -174,7 +177,8 @@ class User_Login extends React.Component {
                                             onChange={(value, data, event) => {
                                                 this.setState({
                                                     m_no:value.replace(/[^0-9]+/g, '').slice(data.dialCode.length),
-                                                    country_code: data.dialCode 
+                                                    country_code: data.dialCode,
+                                                    location_code: data.countryCode
                                                     });
                                             }} />
 

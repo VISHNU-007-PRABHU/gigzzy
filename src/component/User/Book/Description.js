@@ -177,6 +177,7 @@ class Description extends React.Component {
             description_loading: 0,
             short_description: [],
             str: '#@image@#',
+            location_code:"",
             description: "I need a handyman for #@half a day ( up to 4 hours ),a full day ( up to 8 hours )@# to #@assemble furniture,fix things,do odd jobs@# #@description@# here are some photos #@image@# at #@location@#"
         }
     }
@@ -319,7 +320,7 @@ class Description extends React.Component {
     };
 
     handleSelect = address => {
-        console.log(address);
+        console.log(address,"asde");
         this.setState({ address, location: address });
         geocodeByAddress(address)
             .then(results => getLatLng(results[0]))
@@ -379,6 +380,7 @@ class Description extends React.Component {
                 variables: {
                     booking_status: 12,
                     booking_type: 1,
+                    location_code: this.state.location_code,
                     lat: parseFloat(this.state.center[0]),
                     lng: parseFloat(this.state.center[1]),
                     description: description,
@@ -388,12 +390,14 @@ class Description extends React.Component {
                     file: file_data
                 },
             }).then((result, loading, error) => {
-                this.setState({ loading: 0 });
-                console.log(result);
-                // Alert_msg(result.data.add_booking);
-                if (result.data.add_booking[0].id !== undefined && result.data.add_booking[0].id !== null) {
+                this.setState({ loading: false });
+                console.log("book_now -> result.data.add_booking", result.data.add_booking)
+                if (result.data.add_booking && result.data.add_booking[0]?.id) {
                     this.setState({ description, book_requesting_modal: 1, add_booking: result.data.add_booking, deadline: moment().add(2, 'minutes') });
                     this.DontReadTheComments(result.data.add_booking[0].id);
+                }else{
+                    Alert_msg({msg:"Category currently not available",status:"failed"});
+                    this.setState({ book_requesting_modal: 0});
                 }
             });
 
@@ -423,6 +427,7 @@ class Description extends React.Component {
                 variables: {
                     booking_status: 12,
                     booking_type: 2,
+                    location_code: this.state.location_code,
                     lat: parseFloat(this.state.center[0]),
                     lng: parseFloat(this.state.center[1]),
                     description: description,
@@ -435,11 +440,12 @@ class Description extends React.Component {
                 },
             }).then(result => {
                 this.setState({ loading: 0 });
-                // console.log(result); 
-                // Alert_msg(result.data.add_booking);
-                if (result.data.add_booking[0].id !== undefined && result.data.add_booking[0].id !== null) {
+                if ( result.data.add_booking && result.data.add_booking[0].id) {
                     this.setState({ book_later_modal: 0, book_requesting_modal: 1, add_booking: result.data.add_booking, deadline: moment().add(2, 'minutes') });
                     this.DontReadTheComments(result.data.add_booking[0].id);
+                }else{
+                    Alert_msg({msg:"Category currently not available",status:"failed"});
+                    this.setState({ book_later_modal: 0});
                 }
             });
 
@@ -463,8 +469,7 @@ class Description extends React.Component {
     }
 
     on_location_change = (item) => {
-        // console.log(item);
-        this.setState({ location: item.address, center: [item.lat, item.lng], location_modal: 0 });
+        this.setState({location_code:item.location_code, location: item.address, center: [item.lat, item.lng], location_modal: 0 });
     }
 
 
@@ -563,7 +568,7 @@ class Description extends React.Component {
                                                 <div className="loaderBar"></div>
                                             </div>
                                             <div className="price_section text-center">
-                                                <p className="price">{this.state.add_booking[0] ? this.state.add_booking[0].category[0] ? this.state.add_booking[0].category[0].base_price : 'price is not fixed' : "error"}</p>
+                                                <p className="price">{this.state.add_booking[0] ? this.state.add_booking[0].category[0] ? this.state.add_booking[0].category[0]?.ParentCategoryCurrency?.base_price : 'price is not fixed' : "error"}</p>
                                                 <label className="normal_font_size">Base Price</label>
                                             </div>
                                             <div style={{ height: '200px', width: '100%' }}>
@@ -595,7 +600,7 @@ class Description extends React.Component {
                                             </div>
                                             <div className="price_section text-center">
                                                 <p className="price">
-                                                    {this.state.add_booking[0] ? this.state.add_booking[0].category[0] ? this.state.add_booking[0].category[0].base_price : 'price is not fixed' : "error"}
+                                                    {this.state.add_booking[0] ? this.state.add_booking[0].category[0] ? this.state.add_booking[0].category[0]?.ParentCategoryCurrency?.base_price : 'price is not fixed' : "error"}
                                                 </p>
                                                 <label className="normal_font_size">Base Price</label>
                                             </div>
@@ -629,7 +634,7 @@ class Description extends React.Component {
                                                         this.state.booking_category[0].category_type === 1 ?
                                                             this.state.booking_category[0].category_name : this.state.booking_category[0].subCategory_name : ""}</label>
                                                 </div>
-                                                <p class="ml-auto price">{this.state.accept_data ? this.state.accept_data.base_price : ''}</p>
+                                                <p class="ml-auto price">{this.state.accept_data ? this.state.accept_data.code : ''}</p>
                                             </div>
                                             <div className="price_section px-3 d-flex pt-4 btc">
                                                 <p className="m-0 normal_font_size ">Booking Ref</p>
@@ -658,7 +663,7 @@ class Description extends React.Component {
                                                 <img alt="" src={this.state.accept_provider[0] ? this.state.accept_provider[0].img_url : ''} />
                                                 <p className="normal_font_size mt-3 bold">{this.state.accept_provider[0] ? this.state.accept_provider[0].name : ''}</p>
                                                 <Rate allowHalf disabled value={this.state.accept_provider[0] ? Number(this.state.accept_provider[0].provider_rate[0].rating) : 0} />
-                                            </div>
+                                            </div>{}
                                             <div className="price_section px-3 d-flex justify-content-center">
                                                 <Payment data={this.state.accept_data} />
                                             </div>

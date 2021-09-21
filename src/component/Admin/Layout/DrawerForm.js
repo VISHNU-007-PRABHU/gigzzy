@@ -95,6 +95,11 @@ class DrawerForm extends React.Component {
               <span>Static Pages</span>
               <Link to="/admin-static" />
             </Menu.Item>
+            <Menu.Item key="/admin-currency" >
+              <Icon type="dollar" />
+              <span>Currency</span>
+              <Link to="/admin-currency" />
+            </Menu.Item>
             {/* <Menu.Item key="/admin-settings">
               <Icon type="setting" />
               <span>Settings</span>

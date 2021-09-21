@@ -18,7 +18,17 @@ class _CardForm extends Component {
         phone_number: '',
         country_code: '',
         m_no: '',
+        available_payment:['KE'],
+        is_show:false
     };
+
+    componentDidMount=()=>{
+        let cc_code =  JSON.parse(localStorage.getItem('currency')).location;
+        if(cc_code && this.state.available_payment.includes(cc_code)){
+           this.setState({is_show:true})
+        }
+
+    }
 
     handleChange = ({ error }) => {
         if (error) {
@@ -72,23 +82,20 @@ class _CardForm extends Component {
         });
         this.setState({ loading: false });
     }
-    //     });
-    // } else {
-    //     Alert_msg({ msg: "Stripe is not working now ...", status: "failed" });
-    // }
-
+ 
     render() {
-        const { ctob_billRef, ctob_shotcode, mpeas_payment_callback, base_price, extra_price } = this.props.data
+        const { is_show,ctob_billRef, ctob_shotcode, mpeas_payment_callback, base_price, extra_price } = this.props.data
         return (
+
             <div className="CardDemo w-100">
                 <label className="w-100">
-                    Payment Instructions
+                   {is_show? "Payment Instructions" : "Your not currently paid for this category"} 
                 </label>
                 <Collapse
                     bordered={false}
                     defaultActiveKey={['1']}
                     expandIcon={({ isActive }) => <Icon type="caret-right" rotate={isActive ? 90 : 0} />}
-                    className="site-collapse-custom-collapse"
+                    className={is_show?"site-collapse-custom-collapse":"d-none"}
                 >
                     <Panel header=" Mpesa phone number" key="1" className="site-collapse-custom-panel">
                         <Spin spinning={this.state.loading} className="d-flex justify-content-center mt-4" size="large" >

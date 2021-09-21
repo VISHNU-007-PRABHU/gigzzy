@@ -34,7 +34,7 @@ export const SEND_FORGET_EMAIL = gql`
             }
     }`
 
-    export const CHECK_DEMO = gql`
+export const CHECK_DEMO = gql`
     query CHECKDEMO($_id:ID){
         check_demo_app(_id:$_id){
                 msg
@@ -43,7 +43,7 @@ export const SEND_FORGET_EMAIL = gql`
     }`
 
 export const EMAIL_LOGIN = gql`
-query EMAILLOGIN($role: Int,$email: String,$password: String){
+query EMAILLOGIN($role: Int,$email: String,$password: String,$location_code:String){
     sign_up( role: $role
             email: $email
             password: $password
@@ -66,6 +66,15 @@ query EMAILLOGIN($role: Int,$email: String,$password: String){
             rating
             profile
             status
+            get_currency(location_code:$location_code) {
+                _id
+                country_code
+                code
+                symbol
+                location
+                msg
+                status
+            }
         }
 }`
 
@@ -103,7 +112,7 @@ export const RESET_PwD = gql`
 `
 
 export const ADD_USER = gql`
-    mutation ADDUSER($_id:ID,$option:String,$phone_no:String,$role:Int,$country_code:String,$email:String,$password:String,$name:String,$lng:Float,$lat:Float,$provider_subCategoryID:[ID]){
+    mutation ADDUSER($_id:ID,$option:String,$location_code:String,$phone_no:String,$role:Int,$country_code:String,$email:String,$password:String,$name:String,$lng:Float,$lat:Float,$provider_subCategoryID:[ID]){
         addUser(_id:$_id,option:$option,phone_no:$phone_no,role:$role,country_code:$country_code,email:$email,password:$password,name:$name,lng:$lng,lat:$lat,provider_subCategoryID:$provider_subCategoryID){
             msg
             otp
@@ -124,6 +133,15 @@ export const ADD_USER = gql`
             lng
             rating
             profile
+            get_currency(location_code:$location_code) {
+                _id
+                country_code
+                code
+                symbol
+                location
+                msg
+                status
+            }
         }
     }
 `

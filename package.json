@@ -24,6 +24,7 @@
         "@sendgrid/mail": "^7.4.5",
         "africastalking": "^0.5.4",
         "antd": "^3.20.6",
+        "apollo": "^2.33.6",
         "apollo-boost": "^0.4.3",
         "apollo-client-preset": "^1.0.8",
         "apollo-link-batch-http": "^1.2.12",

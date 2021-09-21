@@ -442,11 +442,11 @@ class Bookings extends React.Component {
                                 <div className="bookings_detail position-relative bb-detail">
                                     <Row>
                                         <div className="profile floatup ml-3 mr-3">
-                                            <img alt='' src={this.state.particular_booking[0].booking_provider[0].img_url} />
+                                            <img alt='' src={this.state.particular_booking[0].booking_provider[0]?.img_url} />
                                         </div>
                                         <Col lg={{ span: 18, offset: 6 }} className="booking_profile">
-                                            <p className="m-0 bold">{this.state.particular_booking[0].booking_provider[0].name}</p>
-                                            <p className="m-0 pb-3">{this.state.particular_booking[0].booking_date}</p>
+                                            <p className="m-0 bold">{this.state.particular_booking[0]?.booking_provider[0]?.name}</p>
+                                            <p className="m-0 pb-3">{this.state.particular_booking[0]?.booking_date}</p>
                                             <span className="status position-absolute">
                                                 {this.state.mange_state === 10 ? 'Pending'
                                                     : this.state.mange_state === 4 ? 'On Going'
