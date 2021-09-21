@@ -12,11 +12,11 @@ const subcontent = [{
     data: ""
 }, {
     icon: "thunderbolt",
-    title: "2.Post an job or project",
+    title: "2.Post a job or project",
     data: "From routine maintenance and repairs to dream  home renovations , we can help with any project - big or small"
 }, {
     icon: "heart",
-    title: "3.Accept qoutes from service provider(s)",
+    title: "3.Accept quotes from service provider(s)",
     data: "From routine maintenance and repairs to dream  home renovations , we can help with any project - big or small"
 }, {
     icon: "bulb",
