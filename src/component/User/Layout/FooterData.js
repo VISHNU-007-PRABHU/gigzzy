@@ -38,6 +38,8 @@ export const FooterData = [
         }, {
             title: "Android app for customers",
             link: "https://play.google.com/store/apps/details?id=com.gigzzy.pro"
+        },{
+            title:"SHAREBUTTON"
         }
         ]
     },

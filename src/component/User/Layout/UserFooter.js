@@ -1,7 +1,8 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Link } from "react-router-dom";
-import { Layout, Row, Col, Icon } from "antd";
+import { Layout, Row, Col, Skeleton } from "antd";
 import { FooterData } from "./FooterData";
+const ShareButton = React.lazy(() => import('../../Comman/ShareButton'));
 
 const { Footer } = Layout;
 
@@ -21,11 +22,23 @@ const UserFooter = () => {
                       <li>
                         <h6 style={{ color: "green" }}>{parentdata.title}</h6>
                       </li>
-                      {parentdata.data.map(innerdata => <>
-                        <li>
-                          <Link to={innerdata.link} target="_blank" className="mr-1">{innerdata.title}</Link>
-                        </li>
-                      </>)}
+                      {parentdata.data.map(innerdata => {
+                        if (innerdata.title === "SHAREBUTTON") {
+                          return (
+                            <>
+                              <Suspense fallback={<Skeleton active />}>
+                                <ShareButton />
+                              </Suspense>
+                            </>
+                          )
+                        } else {
+                          return (<>
+                            <li>
+                              <Link to={innerdata.link} target="_blank" className="mr-1">{innerdata.title}</Link>
+                            </li>
+                          </>)
+                        }
+                      })}
                     </ul>
                   </div>
                 </Col>
