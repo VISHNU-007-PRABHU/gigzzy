@@ -816,6 +816,7 @@ const typeDefs = gql`
         msg:String
         location_code:String
         currency_code:String
+        symbol:String
     }
 
     type File {

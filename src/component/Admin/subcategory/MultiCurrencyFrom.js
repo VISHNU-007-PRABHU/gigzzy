@@ -23,7 +23,7 @@ const MultiCurrencyFrom = (props) => {
 
     const getCurrencyResponse=async()=>{
         let ids=[]
-        props.currency_data.forEach(element => {
+        props?.currency_data && props.currency_data.forEach(element => {
             ids.push(element.currency_id)
         });
         let inputdata={}

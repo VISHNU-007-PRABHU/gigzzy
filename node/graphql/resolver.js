@@ -232,7 +232,7 @@ const resolvers = {
                     }
                 }
                 const result = await Booking_model.find(data).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
-                // console.log("result", result)
+                console.log("result", result.length)
                 var total = await Booking_model.count(data);
                 var pageInfo = { totalDocs: total, page: args.page }
                 return { data: result, pageInfo };

@@ -98,8 +98,7 @@ class c2bDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
     field.resolve = async function (source, { format, ...otherArgs }, context, info,) {
-      let location_code = source.currency_detail.location_code || ""
-      if (location_code == "KE") {
+      if (source && source.currency_detail && source.currency_detail.location == "IN") {
         return true;
       } else {
         return false
@@ -126,21 +125,21 @@ class currencyDirective extends SchemaDirectiveVisitor {
       info,
     ) {
       const date = await resolve.call(this, source, otherArgs, context, info);
-      console.log("currencyDirective -> visitFieldDefinition -> source", source)
       let code = otherArgs.code
       if (code === "symbol") {
         let const_symbol = source.symbol || "$"
-        console.log("currencyDirective -> visitFieldDefinition -> const_symbol", const_symbol)
-       
         if(source.currency_id){
-          console.log("currencyDirective -> visitFieldDefinition -> source.currency_id", source.currency_id)
           var currency = await Currency_model.findOne({_id:ObjectId(source.currency_id)}).lean()
           if(currency && _.size(currency)){
             const_symbol = currency['symbol']
           }
         }
-        let symbol_data = `${const_symbol} ${date}`
-        console.log("currencyDirective -> visitFieldDefinition -> symbol_data", symbol_data)
+        let symbol_data = `${date}`
+
+        if( date && date > 0 ){
+          symbol_data = `${const_symbol} ${date}`
+        }
+        
         return symbol_data
       } else {
         let inputdata = {

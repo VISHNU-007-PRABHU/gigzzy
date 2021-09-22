@@ -34,12 +34,13 @@ subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
       description
       booking_ref
       booking_date
-      base_price
-      extra_price
+      base_price(code:"symbol")
+      extra_price(code:"symbol")
       payment_type
       mpeas_payment_callback
       ctob_shotcode
       ctob_billRef
+      ctob
       booking_category {
         category_name
         category_type

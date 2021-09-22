@@ -2,8 +2,10 @@ import 'react-app-polyfill/ie11';
 import 'react-app-polyfill/stable';
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
+import { Layout, Skeleton } from 'antd';
 import { Switch, Redirect, Route, BrowserRouter, useHistory } from 'react-router-dom';
 import './index.css';
+import 'antd/dist/antd.css';
 import './scss/template.scss';
 import './scss/user.scss';
 import './scss/bootstrap.min.css';
@@ -11,6 +13,7 @@ import * as serviceWorker from './serviceWorker';
 import { client } from "./apollo";
 import { ApolloProvider } from "react-apollo";
 import { ApolloProvider as ApolloProviderHooks } from "@apollo/react-hooks";
+const { Content } = Layout;
 
 
 const Category = React.lazy(() => import('./component/Admin/Category/Category'));
@@ -29,6 +32,7 @@ const Add_Static = React.lazy(() => import('./component/Admin/Static/Add_static'
 
 const User_Login = React.lazy(() => import('./component/User/Login/User_Login'));
 const Home_Page = React.lazy(() => import('./component/User/HomePage/Home_Page'));
+const HomePage = React.lazy(() => import('./component/User/HomePage/HomePage'));
 const Profile_Page = React.lazy(() => import('./component/User/Profile/Profile'));
 const Bookings_Page = React.lazy(() => import('./component/User/Book/Bookings'));
 const NotFound = React.lazy(() => import('./component/Comman/NotFound'));
@@ -46,12 +50,11 @@ const Booking_Detail = React.lazy(() => import('./component/User/Provider/Bookin
 const Provider_Email_Login = React.lazy(() => import('./component/User/Login/Provider_Email_Login'));
 const Provider_Login = React.lazy(() => import('./component/User/Login/Provider_Login'));
 const { ConfrimPassword } = React.lazy(() => import('./component/User/Login/ConfrimPassword'));
-const { CHECK_DEMO } = React.lazy(() => import('./graphql/User/login'));
-const { Alert_msg } = React.lazy(() => import('./component/Comman/alert_msg'));
 const StaticPage = React.lazy(() => import('./component/Comman/static_page'));
 const FAQ = React.lazy(() => import('./component/User/About/Faq'));
 const HowLearnMore = React.lazy(() => import('./component/User/About/HowLearnMore'));
-
+const UserHeader = React.lazy(() => import('./component/User/Layout/UserHeader'));
+const UserFooter = React.lazy(() => import('./component/User/Layout/UserFooter'));
 const Currency = React.lazy(() => import('./component/Admin/Currency/Currency'));
 const AddCurrency = React.lazy(() => import('./component/Admin/Currency/AddCurrency'));
 const LoginPage = React.lazy(() => import('./component/Admin/Layout/LoginPage'));
@@ -76,43 +79,25 @@ function PrivateRoute({ component: Component, ...rest }) {
   );
 }
 
-const isDemo = async () => {
-  if (localStorage.getItem('userLogin') === 'success' && JSON.parse(localStorage.getItem('user')).demo === true) {
-    await client.query({
-      query: CHECK_DEMO,
-      variables: { _id: JSON.parse(localStorage.getItem('user'))._id, },
-      fetchPolicy: 'no-cache',
-    }).then(result => {
-      if (result.data.check_demo_app.status === 'success') {
-        localStorage.setItem('userLogin', '');
-        localStorage.removeItem('user');
-        Alert_msg({ msg: "Your demo account is ended", status: "failed" });
-      }
-    });
-  }
-  if (localStorage.getItem('providerLogin') === 'success' && JSON.parse(localStorage.getItem('provider')).demo === true) {
-    await client.query({
-      query: CHECK_DEMO,
-      variables: { _id: JSON.parse(localStorage.getItem('provider'))._id, },
-      fetchPolicy: 'no-cache',
-    }).then(result => {
-      if (result.data.check_demo_app.status === 'success') {
-        localStorage.setItem('providerLogin', '');
-        localStorage.removeItem('provider');
-        Alert_msg({ msg: "Your demo account is ended", status: "failed" });
-      }
-    });
-  }
-}
-
 function UserRoute({ component: Component, ...rest }) {
-  isDemo();
   return (
     <Route
       {...rest}
       render={props =>
         localStorage.getItem('userLogin') === 'success' ? (
-          <Component {...props} />
+          <>
+            <Layout className="white">
+              <Suspense fallback={<p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>}>
+                <UserHeader />
+              </Suspense>
+              <Content className="px-1">
+                <Component {...props} />
+              </Content>
+              <Suspense fallback={<Skeleton active />}>
+                <UserFooter />
+              </Suspense>
+            </Layout>
+          </>
         ) : (
           <Redirect
             to={{
@@ -142,6 +127,31 @@ function ProviderRoute({ component: Component, ...rest }) {
     />
   );
 }
+
+function UnAuthRoute({ component: Component, ...rest }) {
+  return (
+    <Route
+      {...rest}
+      render={props => (
+        <>
+          <Layout className="white">
+            <Suspense fallback={<p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>}>
+              <UserHeader />
+            </Suspense>
+            <Content className="px-1">
+              <Component {...props} />
+            </Content>
+            <Suspense fallback={<Skeleton active />}>
+              <UserFooter />
+            </Suspense>
+          </Layout>
+        </>
+      )
+      }
+    />
+  );
+}
+
 ReactDOM.render(
   <BrowserRouter>
     <ApolloProvider client={client}>
@@ -175,17 +185,18 @@ ReactDOM.render(
             <PrivateRoute path="/admin-currency/add/:id" component={AddCurrency} />
             <PrivateRoute path="/admin-currency/add" component={AddCurrency} />
             <PrivateRoute permission="view_currency" path="/admin-currency" component={Currency} />
-            <Route path="/admin-booking-invoice/:id" component={Invoice} exact />
-            <Route exact path="/admin" component={LoginPage} />
-            <Route exact path="/" component={Home_Page} />
-            <Route exact path="/login" component={User_Login} />
-            <Route exact path="/Confrim_password/:id" component={ConfrimPassword} />
-            <Route exact path="/signup" component={Email_Login} />
-            <Route exact path="/static_page/:id" component={StaticPage} />
-            <Route exact path="/howlearnmore" component={HowLearnMore} />
-            <Route exact path="/faq" component={FAQ} />
-            <Route exact path="/provider_login" component={Provider_Login} />
-            <Route exact path="/provider_signup" component={Provider_Email_Login} />
+            <UnAuthRoute path="/admin-booking-invoice/:id" component={Invoice} exact />
+            <UnAuthRoute exact path="/admin" component={LoginPage} />
+            <UnAuthRoute exact path="/" component={Home_Page} />
+            <UnAuthRoute exact path="/new" component={HomePage} />
+            <UnAuthRoute exact path="/login" component={User_Login} />
+            <UnAuthRoute exact path="/Confrim_password/:id" component={ConfrimPassword} />
+            <UnAuthRoute exact path="/signup" component={Email_Login} />
+            <UnAuthRoute exact path="/static_page/:id" component={StaticPage} />
+            <UnAuthRoute exact path="/howlearnmore" component={HowLearnMore} />
+            <UnAuthRoute exact path="/faq" component={FAQ} />
+            <UnAuthRoute exact path="/provider_login" component={Provider_Login} />
+            <UnAuthRoute exact path="/provider_signup" component={Provider_Email_Login} />
 
             <UserRoute exact path="/profile" component={Profile_Page} />
             <UserRoute exact path="/description/:id" component={Description_Page} />
