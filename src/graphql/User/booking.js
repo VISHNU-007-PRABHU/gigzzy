@@ -9,6 +9,7 @@ subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
       booking_ref
       booking_date
       base_price(code:"symbol")
+      ctob
       extra_price
       msg_date
       msg_time
@@ -34,6 +35,7 @@ $booking_status: Int
     status
     description
     base_price(code:"symbol")
+    ctob
     booking_date
     jobStart_time
     jobEnd_time
@@ -132,7 +134,7 @@ export const ADD_BOOKING = gql`
         description
         img_url
         ParentCategoryCurrency(root: true,location_code:$location_code) {
-          base_price(code:$location_code)
+          base_price(code:"symbol")
         }
       }
       hours
@@ -174,6 +176,7 @@ query My_appointments($_id : ID,$role : Int,$booking_status : Int,$limit:Int,$pa
           booking_status
           booking_date
           base_price(code:"symbol")
+          ctob
           booking_ref
           booking_type
           booking_date
@@ -224,6 +227,7 @@ query GETPARTICULARBOOKING($_id : ID) {
         charge_id
         MpesaReceiptNumber
         mpeas_payment_callback
+        ctob
         ctob_shotcode
         ctob_billRef
         service_fee

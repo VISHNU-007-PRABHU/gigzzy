@@ -663,7 +663,7 @@ const resolvers = {
             }
             args['available_provider'] = available_provider;
             args['currency_id'] = CurrencyDetail._id;
-            args['symbol'] = CurrencyDetail.symbol || ""
+            args['symbol'] = CurrencyDetail.symbol || "";
             args['current_currency'] = categoryCurrency;
             args['currency_detail'] = CurrencyDetail;
             args['location'] = { coordinates: [args.lng, args.lat] }

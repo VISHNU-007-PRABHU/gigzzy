@@ -6,7 +6,8 @@ export const ADMIN_LOGIN = gql`
                   info
                   email
                   password
-                  username
+                  # username
+                  name
             }
       }
 `;

@@ -1,6 +1,5 @@
 import React from "react";
 import 'antd/dist/antd.css';
-import 'antd/dist/antd.css';
 import '../../../scss/template.scss';
 import  AdminSider from '../Layout/AdminSider';
 import  AdminHeader  from '../Layout/AdminHeader';

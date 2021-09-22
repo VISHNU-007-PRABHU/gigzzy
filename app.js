@@ -1,12 +1,12 @@
 const express = require('express')
 const app = require('express')()
-// const CronJob = require('cron').CronJob;
 const util = require('util');
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const path = require('path');
 const http = require('http');
 const https = require('https');
+var ObjectId = require('mongodb').ObjectID;
 const { ApolloServer, gql, SchemaDirectiveVisitor } = require('apollo-server-express');
 const { defaultFieldResolver, GraphQLString } = require('graphql');
 const { typeDefs } = require('./node/graphql/schema');
@@ -17,11 +17,15 @@ app.use(bodyParser.urlencoded({ limit: "100mb", extended: true, parameterLimit: 
 app.use(express.json());
 const getSymbolFromCurrency = require('currency-symbol-map')
 const fs = require('fs');
+const _ = require('lodash');
 const cwd = process.cwd();
 const dotenv = require('dotenv');
 const expressStaticGzip = require('express-static-gzip');
 const CommonFunction = require('./node/graphql/CommonFunction')
 // const i18n = require("i18n");
+const model = require('./node/model_data');
+var Currency_model = model.currency;
+
 dotenv.config();
 // i18n.configure({
 //   locales: ['en', 'es'],
@@ -93,9 +97,15 @@ class UpperCaseDirective extends SchemaDirectiveVisitor {
 class c2bDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
-    field.resolve = async function (...args) {
-      return true;
+    field.resolve = async function (source, { format, ...otherArgs }, context, info,) {
+      let location_code = source.currency_detail.location_code || ""
+      if (location_code == "KE") {
+        return true;
+      } else {
+        return false
+      }
     };
+
   }
 }
 
@@ -103,28 +113,40 @@ class currencyDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
     const { defaultFormat } = this.args;
-    
+
     field.args.push({
       name: 'format',
       type: GraphQLString
     });
-    
+
     field.resolve = async function (
       source,
       { format, ...otherArgs },
       context,
       info,
-      ) {
+    ) {
       const date = await resolve.call(this, source, otherArgs, context, info);
-      let code =  otherArgs.code
-      if(code === "symbol"){
+      console.log("currencyDirective -> visitFieldDefinition -> source", source)
+      let code = otherArgs.code
+      if (code === "symbol") {
         let const_symbol = source.symbol || "$"
-        return `${const_symbol} ${date}`
-      }else{
-        let inputdata={
-          convert_code:otherArgs.code||defaultFormat,
+        console.log("currencyDirective -> visitFieldDefinition -> const_symbol", const_symbol)
+       
+        if(source.currency_id){
+          console.log("currencyDirective -> visitFieldDefinition -> source.currency_id", source.currency_id)
+          var currency = await Currency_model.findOne({_id:ObjectId(source.currency_id)}).lean()
+          if(currency && _.size(currency)){
+            const_symbol = currency['symbol']
+          }
+        }
+        let symbol_data = `${const_symbol} ${date}`
+        console.log("currencyDirective -> visitFieldDefinition -> symbol_data", symbol_data)
+        return symbol_data
+      } else {
+        let inputdata = {
+          convert_code: otherArgs.code || defaultFormat,
           amount: date,
-          currency_code:"INR"
+          currency_code: "INR"
         }
         let final_value = await CommonFunction.currency_calculation(inputdata)
         // console.log("currencyDirective -> visitFieldDefinition -> final_value", final_value)
@@ -224,7 +246,6 @@ app.post('/refund_confirmation', async (req, res, next) => {
   } catch (error) {
     console.log("confirmation error", error)
     return res.send(error)
-    return res.send({ status: true, message: "we reviced confirmation but error in code" })
   }
 })
 
@@ -238,7 +259,7 @@ app.post('/c2b_validation', async (req, res, next) => {
       "ResultDesc": "Accepted"
     })
   } catch (error) {
-    console.log("ops, not valid data",error)
+    console.log("ops, not valid data", error)
     return res.send({
       "ResultCode": 1,
       "ResultDesc": "Rejected"
