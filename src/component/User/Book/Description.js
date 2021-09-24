@@ -382,6 +382,7 @@ class Description extends React.Component {
                     booking_status: 12,
                     booking_type: 1,
                     location_code: this.state.location_code,
+                    local_location_code:JSON.parse(localStorage.getItem('currency')).location || 'KE',
                     lat: parseFloat(this.state.center[0]),
                     lng: parseFloat(this.state.center[1]),
                     description: description,
@@ -429,6 +430,7 @@ class Description extends React.Component {
                     booking_status: 12,
                     booking_type: 2,
                     location_code: this.state.location_code,
+                    local_location_code:JSON.parse(localStorage.getItem('currency')).location || 'KE',
                     lat: parseFloat(this.state.center[0]),
                     lng: parseFloat(this.state.center[1]),
                     description: description,
@@ -489,10 +491,6 @@ class Description extends React.Component {
                 state: this.state,
                 location_change: this.on_location_change,
             }}>
-                <Layout className="white">
-                    <Suspense fallback={<Skeleton active />}>
-                        <UserHeader />
-                    </Suspense>
 
                     <h2 className="bold mb-5 text-center">What do you need?</h2>
 
@@ -695,7 +693,6 @@ class Description extends React.Component {
                             </Col>
                         </Row>
                     </Content>
-                </Layout >
             </LocationContext.Provider>
         );
     }

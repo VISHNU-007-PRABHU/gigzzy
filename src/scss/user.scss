@@ -2,10 +2,54 @@
 body {
     font-family: "BalooTamma2", cursive !important;
 }
+$primaryBlueColor: #170b59;
+$primarycolor: #34a108;
+
 .primary_color {
-    color: #07cb79 !important;
+    color: $primarycolor !important;
+}
+.primary_blue_color {
+    color: $primaryBlueColor !important;
+}
+.primary_bg_blue_color {
+    background-color: $primaryBlueColor !important;
+}
+.bg_light_pink {
+    background-color: #fef5fe !important;
+}
+.choose_page_img {
+    border: 1px solid $primarycolor;
+    border-radius: 55px;
+    box-shadow: 0px 0px 4px 0px #697169;
+    width: 36%;
+    padding: 20px;
 }
 
+.service_autocomplete{}
+.slider_sm_padding .slick-list {
+    margin: 0px 130px;
+}
+.green_border {
+    border: 2px solid $primarycolor !important;
+}
+.how_icon_img {
+    position: absolute;
+    top: -18px;
+    left: -8px;
+    background: #fef5fe;
+    border-radius: 30px;
+}
+.banner_imgae {
+    height: 200px !important;
+    width: 160px;
+}
+
+.c2Link {
+    height: 170px !important;
+    width: 240px;
+    position: absolute;
+    right: 200px;
+}
 @media (max-width: 1023px) and(orientation: landscape) {
     .froms {
         height: auto !important;
@@ -236,8 +280,6 @@ span.ant-form-item-children.d-block {
         margin: 13px 0px;
         overflow: hidden;
     }
-    
-    
 }
 
 @media only screen and (min-width: 900px) {
@@ -298,6 +340,6 @@ span.ant-form-item-children.d-block {
     }
 }
 
-.multi_currency_panel .ant-collapse-extra{
+.multi_currency_panel .ant-collapse-extra {
     margin-top: -20px;
 }

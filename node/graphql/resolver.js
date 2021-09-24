@@ -651,7 +651,8 @@ const resolvers = {
                 console.log("sscaCurrencyDetail")
                 return []
             }
-
+            var default_currency = await Currency_model.findOne({default_currency:1,is_delete:false}).lean()
+            var local_currency = await Currency_model.findOne({location:args.local_location_code,is_delete:false}).lean()
             if (args.booking_type == 1) {
                 args['booking_date'] = moment.utc().format();
             } else if (args.booking_type == 2) {
@@ -666,6 +667,8 @@ const resolvers = {
             args['symbol'] = CurrencyDetail.symbol || "";
             args['current_currency'] = categoryCurrency;
             args['currency_detail'] = CurrencyDetail;
+            args['default_currency_rate'] = default_currency.rate;
+            args['currenct_local_rate'] =  local_currency.rate;
             args['location'] = { coordinates: [args.lng, args.lat] }
             args['service_fee'] = String(parseFloat(categoryCurrency.service_fee).toFixed(2));
             args['base_price'] = String(parseFloat(categoryCurrency.base_price).toFixed(2));

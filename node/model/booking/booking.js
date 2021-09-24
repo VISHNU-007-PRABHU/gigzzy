@@ -37,6 +37,8 @@ var bookingSchema = new Schema({
   data: [{}],
   current_currency:{},
   currency_id:String,
+  default_currency_rate:String,
+  currenct_local_rate:String,
   base_price: { type: String, default: "0.00" },
   hour_price: { type: String, default: "0.00" },
   extra_price: { type: String, default: "0.00" },

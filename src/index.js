@@ -2,6 +2,7 @@ import 'react-app-polyfill/ie11';
 import 'react-app-polyfill/stable';
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
+import { useLocation } from "react-router";
 import { Layout, Skeleton } from 'antd';
 import { Switch, Redirect, Route, BrowserRouter, useHistory } from 'react-router-dom';
 import './index.css';
@@ -60,6 +61,7 @@ const AddCurrency = React.lazy(() => import('./component/Admin/Currency/AddCurre
 const LoginPage = React.lazy(() => import('./component/Admin/Layout/LoginPage'));
 const Dashboard = React.lazy(() => import('./component/Admin/Dashboard/Dashboard'));
 
+
 function PrivateRoute({ component: Component, ...rest }) {
   return (
     <Route
@@ -80,6 +82,12 @@ function PrivateRoute({ component: Component, ...rest }) {
 }
 
 function UserRoute({ component: Component, ...rest }) {
+
+  const location = useLocation();
+  let url_path = location.pathname.split('/')[1] || ""
+  let non_footer = ['description']
+  let footer_boolean = non_footer.includes(url_path)
+  console.log("url_path", footer_boolean)
   return (
     <Route
       {...rest}
@@ -93,9 +101,11 @@ function UserRoute({ component: Component, ...rest }) {
               <Content className="px-1">
                 <Component {...props} />
               </Content>
-              <Suspense fallback={<Skeleton active />}>
-                <UserFooter />
-              </Suspense>
+              {!footer_boolean &&
+                <Suspense fallback={<Skeleton active />}>
+                  <UserFooter />
+                </Suspense>
+              }
             </Layout>
           </>
         ) : (
@@ -157,7 +167,7 @@ ReactDOM.render(
     <ApolloProvider client={client}>
       <ApolloProviderHooks client={client}>
         <Switch>
-          <Suspense fallback={""}>
+          <Suspense fallback={<Skeleton active />}>
             <PrivateRoute path="/admin-dashboard" component={Dashboard} />
             <PrivateRoute path="/admin-category/add" component={Add_Category} exact />
             <PrivateRoute path="/admin-category/add/:id" component={Add_Category} exact />
@@ -187,8 +197,8 @@ ReactDOM.render(
             <PrivateRoute permission="view_currency" path="/admin-currency" component={Currency} />
             <UnAuthRoute path="/admin-booking-invoice/:id" component={Invoice} exact />
             <UnAuthRoute exact path="/admin" component={LoginPage} />
-            <UnAuthRoute exact path="/" component={Home_Page} />
-            <UnAuthRoute exact path="/new" component={HomePage} />
+            <UnAuthRoute exact path="/old" component={Home_Page} />
+            <UnAuthRoute exact path="/" component={HomePage} />
             <UnAuthRoute exact path="/login" component={User_Login} />
             <UnAuthRoute exact path="/Confrim_password/:id" component={ConfrimPassword} />
             <UnAuthRoute exact path="/signup" component={Email_Login} />

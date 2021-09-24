@@ -95,11 +95,12 @@ subscription TESTS($online:String){
 
 
 export const ADD_BOOKING = gql`
- mutation ADDBOOKING($user_id:ID,$location_code:String,$booking_time:String,$booking_hour:String,$booking_type:Int,$category_id:ID,$category_type:Int,$lat:Float,$lng:Float,$hours:String,$description:String,$booking_status:Int,$booking_date:String,$file:[Upload]) {
+ mutation ADDBOOKING($user_id:ID,$local_location_code:String,$location_code:String,$booking_time:String,$booking_hour:String,$booking_type:Int,$category_id:ID,$category_type:Int,$lat:Float,$lng:Float,$hours:String,$description:String,$booking_status:Int,$booking_date:String,$file:[Upload]) {
     add_booking(
       user_id: $user_id,
       category_id: $category_id
       location_code:$location_code
+      local_location_code:$local_location_code
       category_type: $category_type
       lat: $lat
       lng: $lng
