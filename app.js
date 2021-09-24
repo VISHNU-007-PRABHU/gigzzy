@@ -128,18 +128,13 @@ class currencyDirective extends SchemaDirectiveVisitor {
       let code = otherArgs.code
       if (code === "symbol") {
         let const_symbol = source.symbol || "$"
-        if(source.currency_id){
-          var currency = await Currency_model.findOne({_id:ObjectId(source.currency_id)}).lean()
-          if(currency && _.size(currency)){
+        if (source.currency_id) {
+          var currency = await Currency_model.findOne({ _id: ObjectId(source.currency_id) }).lean()
+          if (currency && _.size(currency)) {
             const_symbol = currency['symbol']
           }
         }
-        let symbol_data = `${date}`
-
-        if( date && date > 0 ){
-          symbol_data = `${const_symbol} ${date}`
-        }
-        
+        let symbol_data = `${const_symbol} ${date}`
         return symbol_data
       } else {
         let inputdata = {
