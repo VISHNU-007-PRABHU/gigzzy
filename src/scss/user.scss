@@ -21,16 +21,15 @@ $primarycolor: #34a108;
     border: 1px solid $primarycolor;
     border-radius: 55px;
     box-shadow: 0px 0px 4px 0px #697169;
-    width: 36%;
+    width: 40%;
     padding: 20px;
 }
 
-.service_autocomplete{}
-.slider_sm_padding .slick-list {
-    margin: 0px 130px;
-}
 .green_border {
     border: 2px solid $primarycolor !important;
+}
+.blue_border {
+    border: 2px solid $primaryBlueColor !important;
 }
 .how_icon_img {
     position: absolute;
@@ -215,7 +214,7 @@ $primarycolor: #34a108;
 }
 
 .certain-category-search.ant-select-focused .certain-category-icon {
-    color: #07cb79;
+    color: $primaryBlueColor;
 }
 
 .avatar_shadow {
@@ -283,6 +282,9 @@ span.ant-form-item-children.d-block {
 }
 
 @media only screen and (min-width: 900px) {
+    .slider_sm_padding .slick-list {
+        margin: 0px 130px;
+    }
     .otp_align {
         margin-left: 85px;
     }

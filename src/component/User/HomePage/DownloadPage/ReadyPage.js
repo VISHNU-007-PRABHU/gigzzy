@@ -4,7 +4,7 @@ import img1 from '../../../../image/home/ht1.png';
 import img2 from '../../../../image/home/ht2.png';
 const TrendingHeader = React.lazy(() => import('../Trending/TrandingHeader'));
 
-const style={
+const style = {
     padding: "0px",
     position: "absolute",
     top: "75px",
@@ -32,18 +32,18 @@ let data = [
 ]
 const ReadyPage = () => {
     return (
-        <>
-            <Row className="align-items-center d-flex">
+        <div className="my-4">
+            <Row className="align-items-center">
                 <Col lg={24}>
                     <Suspense fallback={<Skeleton active />}>
                         <TrendingHeader header_data={header_data} />
                     </Suspense>
                 </Col>
             </Row>
-            <Row gutter={[32, 32]}>
+            <Row className="">
                 {data.map(inner_data => (
                     <>
-                        <Col span={12} className="px-1 ">
+                        <Col sm={24} md={12} className="px-1 ">
                             <div className="text-center">
                                 <Card
                                     cover={
@@ -61,7 +61,7 @@ const ReadyPage = () => {
                     </>
                 ))}
             </Row>
-        </>
+        </div>
     )
 }
 export default ReadyPage;

@@ -95,17 +95,17 @@ function UserRoute({ component: Component, ...rest }) {
         localStorage.getItem('userLogin') === 'success' ? (
           <>
             <Layout className="white">
-              <Suspense fallback={<p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>}>
-                <UserHeader />
-              </Suspense>
-              <Content className="px-1">
-                <Component {...props} />
-              </Content>
-              {!footer_boolean &&
-                <Suspense fallback={<Skeleton active />}>
-                  <UserFooter />
+              <Content className="container px-md-5">
+                <Suspense fallback={<p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>}>
+                  <UserHeader />
                 </Suspense>
-              }
+                <Component {...props} />
+                {!footer_boolean &&
+                  <Suspense fallback={<Skeleton active />}>
+                    <UserFooter />
+                  </Suspense>
+                }
+              </Content>
             </Layout>
           </>
         ) : (
@@ -145,15 +145,15 @@ function UnAuthRoute({ component: Component, ...rest }) {
       render={props => (
         <>
           <Layout className="white">
-            <Suspense fallback={<p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>}>
-              <UserHeader />
-            </Suspense>
-            <Content className="px-1">
+            <Content className="container px-md-5">
+              <Suspense fallback={<p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>}>
+                <UserHeader />
+              </Suspense>
               <Component {...props} />
+              <Suspense fallback={<Skeleton active />}>
+                <UserFooter />
+              </Suspense>
             </Content>
-            <Suspense fallback={<Skeleton active />}>
-              <UserFooter />
-            </Suspense>
           </Layout>
         </>
       )
@@ -167,7 +167,13 @@ ReactDOM.render(
     <ApolloProvider client={client}>
       <ApolloProviderHooks client={client}>
         <Switch>
-          <Suspense fallback={<Skeleton active />}>
+          <Suspense fallback={<>
+            <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>
+            <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "100px" }}></p>
+            <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "100px" }}></p>
+            <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "100px" }}></p>
+            <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "100px" }}></p>
+          </>}>
             <PrivateRoute path="/admin-dashboard" component={Dashboard} />
             <PrivateRoute path="/admin-category/add" component={Add_Category} exact />
             <PrivateRoute path="/admin-category/add/:id" component={Add_Category} exact />

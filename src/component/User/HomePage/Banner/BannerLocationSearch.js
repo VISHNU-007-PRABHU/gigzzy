@@ -48,13 +48,13 @@ const BannerLocationSearch = () => {
 
     return (
         <>
-            <Row gutter={[24, 32]} className='d-flex align-items-center'>
-                <Col sm={24} md={8} >
+            <Row className='d-flex flex-column flex-md-row align-items-md-center'>
+                <Col sm={24} md={8} className='pr-0 pr-md-2'>
                     <Button icon="environment" className="px-1 jiffy_btn h-50x normal_font_size w-100" onClick={() => setLocationModal(true)}>
                         {home_page_city}
                     </Button>
                 </Col>
-                <Col sm={24} md={16}>
+                <Col sm={24} md={16} className='py-3'>
                     <AutoComplete
                         size={"large"}
                         className="w-100 h-50x service_autocomplete certain-category-search"
@@ -97,13 +97,13 @@ const BannerLocationSearch = () => {
                     </AutoComplete> */}
                 </Col>
             </Row>
-            <Row gutter={[24, 32]}>
-                <Col sm={24} md={14} className="px-0">
+            <Row>
+                <Col sm={24} md={14} className="pr-0">
                     <Button block size="large" className="py-4 align-items-center d-flex justify-content-center bold br_10 border-0 primary_bg_blue_color white-text" onClick={() => { on_book() }}>
                         Book Now
                     </Button>
                 </Col>
-                <Col sm={24} md={10} className="px-0">
+                <Col sm={24} md={10} className="d-none d-md-flex px-0">
                     <img alt='gigzzy link tag' src={link_img} loading="lazy" class="ml-3 position-absolute lazyload img-fluid" />
                 </Col>
             </Row>

@@ -30,18 +30,18 @@ let data = [
 ]
 const ChoosePage = () => {
     return (
-        <>
-            <Row className="align-items-center d-flex">
+        <div className="my-4 ">
+            <Row className="align-items-center d-flex flex-cloumn flex-md-row">
                 <Col lg={24}>
                     <Suspense fallback={<Skeleton active />}>
                         <TrendingHeader header_data={header_data} />
                     </Suspense>
                 </Col>
             </Row>
-            <Row gutter={[32, 32]}>
+            <Row>
                 {data.map(inner_data => (
                     <>
-                        <Col span={8} className="px-1 ">
+                        <Col sm={24} md={8} className="px-1 ">
                             <div className="text-center">
                                 <Card className="green_border">
                                     <div className="d-flex justify-content-center">
@@ -57,7 +57,7 @@ const ChoosePage = () => {
                     </>
                 ))}
             </Row>
-        </>
+        </div>
     )
 }
 export default ChoosePage;

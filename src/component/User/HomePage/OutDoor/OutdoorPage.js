@@ -11,8 +11,8 @@ const OutdoorCategory = React.lazy(() => import('./OutdoorCategory'));
 
 const OutdoorPage = () => {
     return (
-        <>
-            <Row gutter={[32,32]}>
+        <div className="my-4">
+            <Row>
                 <Col md={24}>
                     <Suspense fallback={<Skeleton active />}>
                         <TrendingHeader header_data={header_data} />
@@ -26,7 +26,7 @@ const OutdoorPage = () => {
                     </Suspense>
                 </Col>
             </Row>
-        </>
+        </div>
     )
 }
 export default OutdoorPage;

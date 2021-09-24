@@ -50,7 +50,10 @@ module.exports.get_payout = async (root, args) => {
         provider_fee: 1,
         created_at: 1,
         bookingDate: 1,
-        booking_date: 1
+        booking_date: 1,
+        symbol:1,
+        currency_id:1,
+        base_price:1
     };
     var wmatch = {
         provider_fee: { $ne: 'NaN' },

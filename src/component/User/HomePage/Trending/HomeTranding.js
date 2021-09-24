@@ -7,27 +7,29 @@ const TrendingHeader = React.lazy(() => import('./TrandingHeader'));
 const HomeTranding = () => {
     return (
         <>
-            <Row gutter={[32,32]}>
-                <Col md={24}>
-                    <Suspense fallback={<Skeleton active />}>
-                        <TrendingHeader />
-                    </Suspense>
-                </Col>
-            </Row>
-            <Row>
-                <Col md={24}>
-                    <Suspense fallback={<Skeleton active />}>
-                        <TrendingCategory />
-                    </Suspense>
-                </Col>
-            </Row>
-            <Row>
-                <Col md={24}>
-                    <Suspense fallback={<Skeleton active />}>
-                        <AllServices />
-                    </Suspense>
-                </Col>
-            </Row>
+            <div className="my-0 my-md-4">
+                <Row>
+                    <Col md={24}>
+                        <Suspense fallback={<Skeleton active />}>
+                            <TrendingHeader />
+                        </Suspense>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col md={24}>
+                        <Suspense fallback={<Skeleton active />}>
+                            <TrendingCategory />
+                        </Suspense>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col md={24}>
+                        <Suspense fallback={<Skeleton active />}>
+                            <AllServices />
+                        </Suspense>
+                    </Col>
+                </Row>
+            </div>
         </>
     )
 }

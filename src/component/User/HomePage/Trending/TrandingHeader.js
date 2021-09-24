@@ -12,7 +12,7 @@ let StaticData = {
 const TrendingHeader = (props) => {
 
     const [LocalData,set_LocalData]=useState(StaticData)
-    const [LocalClass,set_LocalClass]=useState("justify-content-center d-flex flex-column align-items-center")
+    const [LocalClass,set_LocalClass]=useState("text-center justify-content-center d-flex flex-column align-items-center")
     useEffect(() => {
         if(props.header_data){
             set_LocalData(props.header_data)
@@ -23,7 +23,7 @@ const TrendingHeader = (props) => {
     }, [props])
     return (
         <>
-            <Row gutter={[32,48]}>
+            <Row className="p-4">
                 <Col md={24}>
                     <div className={LocalClass}>
                         <Paragraph className="h2 mb-2 font-weight-bold line_h_1_3">

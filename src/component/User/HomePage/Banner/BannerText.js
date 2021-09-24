@@ -15,10 +15,10 @@ const BannerText = () => {
             <Row>
                 <Col md={24} className="">
                     <Paragraph className="h3 mb-2 font-weight-bold">
-                        <Text className="primary_color pr-2 line_h_1_3">
+                        <Text className="primary_color d-flex">
                             {LocalData.title1}
                         </Text>
-                        <Text className="primary_blue_color">
+                        <Text className="primary_blue_color d-flex">
                             {LocalData.title2}
                         </Text>
                     </Paragraph>

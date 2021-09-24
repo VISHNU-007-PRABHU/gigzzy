@@ -29,16 +29,16 @@ const subcontent = [{
 function How() {
     return (
         <div className="my-5">
-            <Row gutter={[32, 32]}>
+            <Row className="bg_light_pink">
                 <Col md={24}>
                     <Suspense fallback={<Skeleton active />}>
                         <TrendingHeader header_data={header_data} />
                     </Suspense>
                 </Col>
             </Row>
-            <Row gutter={[{ xs: 8, sm: 16, md: 24, lg: 32 }, 20]}>
+            <Row  className="bg_light_pink">
                 {subcontent.map(itemdata => <>
-                    <Col className="gutter-row" sm={24} md={6}>
+                    <Col className="gutter-row p-3" sm={24} md={6}>
                         <Card hoverable bordered={false}>
                             <div className="align-items-start d-flex flex-column mt-4">
                                 <div className="how_icon_img">

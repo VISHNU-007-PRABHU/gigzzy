@@ -154,9 +154,9 @@ const UserHeader = () => {
 
   return (
     <div>
-      <Header className="white user_header px-0">
+      <Header className="white user_header px-2">
         <Row>
-          <Col lg={{ span: 20, offset: 2 }} className="px-1">
+          <Col>
             <img
               src={main}
               height="75"
