@@ -12,6 +12,7 @@ dotenv.config();
 exports.currency_calculation = async (args) => {
     try {
         let { currency_code, convert_code, amount } = args;
+        console.log("exports.currency_calculation -> args", args)
         let default_currency = await Currency_model.findOne({ default_currency: "1" }).lean()
         let currency_data = await Currency_model.findOne({ code: currency_code }).lean()
         // amount =500 / rate =73.66 (currency_code inr) = 6.57 doller
