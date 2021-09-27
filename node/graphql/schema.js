@@ -70,7 +70,7 @@ const typeDefs = gql`
         get_static(limit: Int,page:Int):StaticConnection
         get_review(limit: Int,page:Int,user_comments_status:Int,option:String,data:JSON):BookingConnection
         get_booking(limit: Int,page:Int,booking_status:[Int],location_code:String,payment_status:[Int],provider_id:ID,user_id:ID,category_id:ID,booking_date:JSON,booking_ref:JSON):BookingConnection 
-        get_booking_details(limit: Int,page:Int,status:Int,_id:ID):BookingConnection 
+        get_booking_details(limit: Int,page:Int,status:Int,_id:ID,location_code:String):BookingConnection 
         get_payout(limit: Int,page:Int,provider_id:ID,booking_id:ID,booking_status:Int,option:Int,location_code:String):BookingConnection
         get_all_payout(limit: Int,page:Int,provider_id:ID,booking_id:ID,booking_status:Int,option:Int):BookingConnection
         get_booking_chart(option:Int):[Dashboard]
