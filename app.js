@@ -25,6 +25,7 @@ const CommonFunction = require('./node/graphql/CommonFunction')
 // const i18n = require("i18n");
 const model = require('./node/model_data');
 var Currency_model = model.currency;
+var Booking_model = model.booking;
 
 dotenv.config();
 // i18n.configure({
@@ -98,7 +99,7 @@ class c2bDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
     field.resolve = async function (source, { format, ...otherArgs }, context, info,) {
-      if (source && source.currency_detail && source.currency_detail.location == "IN") {
+      if (source && source.currency_detail && source.currency_detail.location == "KE") {
         return true;
       } else {
         return false
@@ -145,6 +146,15 @@ class currencyDirective extends SchemaDirectiveVisitor {
           var currency = await Currency_model.findOne({ _id: ObjectId(source.currency_id) }).lean()
           if (currency && _.size(currency)) {
             currency_code = currency['code']
+          }
+        }
+        if (source.booking_id) {
+          var bookingdata = await Booking_model.findOne({ _id: ObjectId(source.booking_id) }).lean()
+          if (bookingdata && _.size(bookingdata)) {
+            var currency = await Currency_model.findOne({ _id: ObjectId(bookingdata.currency_id) }).lean()
+            if (currency && _.size(currency)) {
+              currency_code = currency['code']
+            }
           }
         }
         let inputdata = {
