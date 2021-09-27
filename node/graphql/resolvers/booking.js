@@ -181,9 +181,10 @@ module.exports.find_payout_booking = async (parent, args) => {
 
 // get booking
 module.exports.booking = async (parent, args, context, info) => {
+    if(args.location_code){
+        delete args.location_code
+    }
     const result = await Booking_model.find(args);
-    //console.log(result);
-    //console.log(result.length);
     return result;
 };
 
