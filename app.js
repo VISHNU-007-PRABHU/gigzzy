@@ -141,6 +141,12 @@ class currencyDirective extends SchemaDirectiveVisitor {
         if (source.currency_detail && source.currency_detail.code) {
           currency_code = source.currency_detail.code
         }
+        if (source.currency_id) {
+          var currency = await Currency_model.findOne({ _id: ObjectId(source.currency_id) }).lean()
+          if (currency && _.size(currency)) {
+            currency_code = currency['code']
+          }
+        }
         let inputdata = {
           convert_code: otherArgs.code || defaultFormat,
           amount: date,
