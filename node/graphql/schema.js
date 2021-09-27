@@ -16,11 +16,11 @@ const typeDefs = gql`
 
     type Subscription {
         messageSent(limit: Int,page:Int,user_id:ID,provider_id:ID,booking_id:ID):Chat
-        get_my_appointments(_id:ID,role:Int,booking_status:Int,limit:Int,page:Int):[Booking]
+        get_my_appointments(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[Booking]
         acceptedMessage(id:ID,online:Int): Booking   
-        send_jobs_provider(_id:ID,online:Int): Booking
-        send_accept_msg(_id:ID,booking_id:ID,online:Int): Booking
-        booking_details(booking_id:ID,online:Int): Booking
+        send_jobs_provider(_id:ID,online:Int,location_code:String): Booking
+        send_accept_msg(_id:ID,booking_id:ID,online:Int,location_code:String): Booking
+        booking_details(booking_id:ID,online:Int,location_code:String): Booking
         test(online:String):User
         proof_status(_id:ID,role:Int,):Detail
         demo_account(_id:ID):Detail
@@ -48,15 +48,15 @@ const typeDefs = gql`
         files: [String]
         resend_otp(_id:ID):Detail
         test:Category
-        get_my_appointments(_id:ID,role:Int,booking_status:Int,limit:Int,page:Int):BookingConnection
-        booking(_id:ID):[Booking]
+        get_my_appointments(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):BookingConnection
+        booking(_id:ID,location_code:String):[Booking]
         get_now_job(_id:ID,role:Int,booking_status:Int):[Booking]
         get_message(booking_id:ID,user_id:ID,provider_id:ID):[Chat]
         search_category(_id:ID,data:JSON):[Category] 
         search_category_mobile(data:String):[Category]
         get_trending(_id:ID):[Category]
         get_is_future(_id:ID):[Category]
-        get_extra_fare(booking_id:ID,option:Int):[Booking]
+        get_extra_fare(booking_id:ID,option:Int,location_code:String):[Booking]
         get_payout_detail(data:JSON):[Booking]
         site_setting_detail(_id:ID):Site
         payout_setting_detail(_id:ID):Payout
@@ -69,7 +69,7 @@ const typeDefs = gql`
         get_certificate(limit: Int,page:Int):CertificateConnection
         get_static(limit: Int,page:Int):StaticConnection
         get_review(limit: Int,page:Int,user_comments_status:Int,option:String,data:JSON):BookingConnection
-        get_booking(limit: Int,page:Int,booking_status:[Int],payment_status:[Int],provider_id:ID,user_id:ID,category_id:ID,booking_date:JSON,booking_ref:JSON):BookingConnection 
+        get_booking(limit: Int,page:Int,booking_status:[Int],location_code:String,payment_status:[Int],provider_id:ID,user_id:ID,category_id:ID,booking_date:JSON,booking_ref:JSON):BookingConnection 
         get_booking_details(limit: Int,page:Int,status:Int,_id:ID):BookingConnection 
         get_payout(limit: Int,page:Int,provider_id:ID,booking_id:ID,booking_status:Int,option:Int,location_code:String):BookingConnection
         get_all_payout(limit: Int,page:Int,provider_id:ID,booking_id:ID,booking_status:Int,option:Int):BookingConnection
@@ -806,7 +806,7 @@ const typeDefs = gql`
         booking_provider(_id:ID):[Detail]
         provider(_id:ID):[Detail]
         find_payout_provider:[Detail]
-        get_my_appointments(_id:ID,booking_status:Int):[Booking]
+        get_my_appointments(_id:ID,booking_status:Int,location_code:String):[Booking]
         send_job_category(_id:ID,type:Int):[Category]
         get_booking_on_status(_id:ID,booking_status:Int):[Booking]
         find_payout_booking:[Booking]
