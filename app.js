@@ -136,14 +136,17 @@ class currencyDirective extends SchemaDirectiveVisitor {
         }
         let symbol_data = `${const_symbol} ${date}`
         return symbol_data
-      } else {
+      } else if (code) {
+        let currency_code = ""
+        if (source.currency_detail && source.currency_detail.code) {
+          currency_code = source.currency_detail.code
+        }
         let inputdata = {
           convert_code: otherArgs.code || defaultFormat,
           amount: date,
-          currency_code: "INR"
+          currency_code: currency_code
         }
         let final_value = await CommonFunction.currency_calculation(inputdata)
-        // console.log("currencyDirective -> visitFieldDefinition -> final_value", final_value)
         return final_value
       }
     };
