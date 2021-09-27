@@ -95,7 +95,7 @@ function UserRoute({ component: Component, ...rest }) {
         localStorage.getItem('userLogin') === 'success' ? (
           <>
             <Layout className="white">
-              <Content className="container px-md-5">
+              <Content className="px-md-5">
                 <Suspense fallback={<p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>}>
                   <UserHeader />
                 </Suspense>
@@ -145,7 +145,7 @@ function UnAuthRoute({ component: Component, ...rest }) {
       render={props => (
         <>
           <Layout className="white">
-            <Content className="container px-md-5">
+            <Content className="px-md-5">
               <Suspense fallback={<p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>}>
                 <UserHeader />
               </Suspense>
@@ -168,19 +168,19 @@ ReactDOM.render(
       <ApolloProviderHooks client={client}>
         <Switch>
           <Suspense fallback={<>
-            <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>
+            {/* <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>
             <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "100px" }}></p>
             <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "100px" }}></p>
             <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "100px" }}></p>
-            <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "100px" }}></p>
+            <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "100px" }}></p> */}
           </>}>
             <PrivateRoute path="/admin-dashboard" component={Dashboard} />
             <PrivateRoute path="/admin-category/add" component={Add_Category} exact />
             <PrivateRoute path="/admin-category/add/:id" component={Add_Category} exact />
             <PrivateRoute path="/admin-category" component={Category} />
-            <PrivateRoute path="/admin-subcategory" component={Subcategory} />
             <PrivateRoute path="/admin-add-subcategory/:id" component={Add_Subcategory} />
             <PrivateRoute path="/admin-add-subcategory" component={Add_Subcategory} />
+            <PrivateRoute path="/admin-subcategory" component={Subcategory} />
             <PrivateRoute path="/admin-booking" component={Booking} />
             <PrivateRoute path="/admin-booking-detail" component={Booking_Details} />
             <PrivateRoute path="/admin-request" component={Request} />

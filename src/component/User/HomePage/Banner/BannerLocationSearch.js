@@ -1,12 +1,21 @@
-import React, { useState } from "react";
-import { Icon, Input, AutoComplete, Button, Row, Col } from 'antd';
+import React, { useState, Suspense,useContext } from "react";
+import { Icon, Input, AutoComplete, Button, Row, Col, Modal, Skeleton } from 'antd';
 import link_img from '../../../../image/home/c1.png'
+import { useQuery } from '@apollo/react-hooks';
+import { SEARCH_CATEGORY } from '../../../../graphql/User/home_page'
+import {HomeContext} from '../../../context/Location'
+
+const PlaceComplete = React.lazy(() => import('../../../Comman/PlaceComplete'));
 const BannerLocationSearch = () => {
     const [home_page_city, set_home_page_city] = useState('kenya')
     const [LocationModal, setLocationModal] = useState(false)
+    const home_context = useContext(HomeContext);
+
     const [category_values, set_category_values] = useState("")
+    const [address, set_address] = useState("")
     const [center, set_center] = useState([9.9252, 78.1198])
     const [auto_complete_data, set_auto_complete_data] = useState([])
+    const search_category = useQuery(SEARCH_CATEGORY)
 
     const on_book = async () => {
 
@@ -30,27 +39,30 @@ const BannerLocationSearch = () => {
         // }
     }
 
-
     const category_search = async value => {
         set_category_values(value);
         if (value === undefined) {
             value = "a"
         }
         if (value.length >= 0) {
-            // const { data } = await client.query({
-            //     query: SEARCH_CATEGORY,
-            //     variables: { data: { value: value } },
-            // });
-            // set_auto_complete_data(data ? data.search_category : [])
+            const result = await search_category.refetch({ data: { value: value } })
+            if(result?.data && result?.data.search_category){
+                set_auto_complete_data(result?.data.search_category)
+            }
         }
     };
 
+    const PlaceCompleteFunction = async (data) => {
+        set_home_page_city(data?.home_page_city)
+        set_center(data?.center)
+        home_context.set_home_page_location(data)
+    }
 
     return (
         <>
             <Row className='d-flex flex-column flex-md-row align-items-md-center'>
                 <Col sm={24} md={8} className='pr-0 pr-md-2'>
-                    <Button icon="environment" className="px-1 jiffy_btn h-50x normal_font_size w-100" onClick={() => setLocationModal(true)}>
+                    <Button icon="environment" className="overflow-hidden px-1 jiffy_btn h-50x normal_font_size w-100" onClick={() => setLocationModal(true)}>
                         {home_page_city}
                     </Button>
                 </Col>
@@ -76,25 +88,6 @@ const BannerLocationSearch = () => {
                         <Input size={"large"} prefix={<Icon type="search" className="certain-category-icon" />} />
 
                     </AutoComplete>
-                    {/* <AutoComplete
-                        className="w-100 border py-2 br_10"
-                        // dropdownClassName="certain-category-search-dropdown"
-                        onSelect={(value) => { set_category_values(value) }}
-                        // onSearch={this.category_search}
-                        // onFocus={this.category_search}
-                        placeholder="Search for Services"
-                        value={category_values}
-                        dataSource={auto_complete_data.map((data, index) => {
-                            return (
-                                <AutoComplete.Option key={`${data._id}_${data.category_type}_${data.is_parent}`}>
-                                    {data.category_type === 1 ? data.category_name : data.subCategory_name}
-                                </AutoComplete.Option>
-                            );
-                        })}
-                    >
-                        <Input size={'large'} />
-
-                    </AutoComplete> */}
                 </Col>
             </Row>
             <Row>
@@ -107,6 +100,19 @@ const BannerLocationSearch = () => {
                     <img alt='gigzzy link tag' src={link_img} loading="lazy" class="ml-3 position-absolute lazyload img-fluid" />
                 </Col>
             </Row>
+            <Modal
+                title="Choose Your Location"
+                style={{ borderRadius: "2em" }}
+                className="home_modal new_modal"
+                centered style={{ top: 20 }}
+                visible={LocationModal}
+                onOk={() => setLocationModal(false)}
+                onCancel={() => setLocationModal(false)}
+            >
+                <Suspense fallback={<Skeleton active />}>
+                    <PlaceComplete PlaceCompleteFunction={PlaceCompleteFunction} />
+                </Suspense>
+            </Modal>
         </>
     )
 }
