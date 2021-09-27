@@ -587,6 +587,8 @@ const resolvers = {
         update_manual_payment: bookingResolver.update_manual_payment,
         //add new booking
         add_booking: async (parent, args, context, info) => {
+            console.log("args.location", args.location_code)
+            console.log("args loval location", args.local_location_code)
             var img = [];
             if (args.file != '' && args.file != undefined) {
                 for (let i = 0; i < args.file.length; i++) {

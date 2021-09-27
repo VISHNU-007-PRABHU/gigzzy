@@ -55,7 +55,7 @@ const typeDefs = gql`
         search_category(_id:ID,data:JSON):[Category] 
         search_category_mobile(data:String):[Category]
         get_trending(_id:ID):[Category]
-        get_is_future(_id:ID):[Category]
+        get_is_future(_id:ID,limit:Int):[Category]
         get_extra_fare(booking_id:ID,option:Int,location_code:String):[Booking]
         get_payout_detail(data:JSON):[Booking]
         site_setting_detail(_id:ID):Site
