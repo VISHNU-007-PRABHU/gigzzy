@@ -3,7 +3,7 @@ import { Typography, Row, Col } from 'antd';
 const { Paragraph, Text } = Typography;
 
 let StaticData = {
-    title1: "Tranding",
+    title1: "Trending",
     title2: "Services",
     title3: "Service provider Sign-up for free, no more lead chatgesfor jobs that you don't get",
     title4: "Get instant access to reliable and affordable Gigzzy service providers."

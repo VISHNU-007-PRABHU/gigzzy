@@ -1,0 +1,2 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[115],{1514:function(e,n,a){"use strict";a.r(n),a.d(n,"default",function(){return s});var t=a(0),c=a.n(t),o=a(1143),i=a.n(o),r=a(83);function s(){return c.a.createElement(c.a.Fragment,null,c.a.createElement(r.a,{image:i.a,imageStyle:{height:200,objectFit:" scale-down"},description:c.a.createElement("span",{className:"bold"},"You have no bookings (Search Service)")}))}}}]);
+//# sourceMappingURL=115.5efb4641.chunk.js.map

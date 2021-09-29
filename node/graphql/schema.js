@@ -7,8 +7,9 @@ const typeDefs = gql`
     scalar Cursor
 
     directive @ref on FIELD_DEFINITION
-    directive @payment(defaultFormat: String = "false") on FIELD_DEFINITION
-    directive @currency(defaultFormat: String = "KES") on FIELD_DEFINITION
+    directive @paymentOption(defaultFormat: String = "false") on FIELD_DEFINITION
+    directive @currency(defaultFormat: String = "KE") on FIELD_DEFINITION
+    directive @payment(defaultFormat: String = "KE") on FIELD_DEFINITION
     directive @upper on FIELD_DEFINITION
     directive @date(format: String) on FIELD_DEFINITION
     directive @imgSize(format: String) on FIELD_DEFINITION
@@ -778,6 +779,7 @@ const typeDefs = gql`
         payment_message:String
         MpesaReceiptNumber:String
         payment_type:String
+        payment_option(code:String):String @paymentOption
         job_status:Int
         jobStart_time:Date
         jobEnd_time:Date

@@ -14,7 +14,7 @@ const settings = {
     infinite: true,
     arrows: false,
     speed: 500,
-    slidesToShow: 3,
+    slidesToShow: 6,
     slidesToScroll: 3,
     lazyLoad: true,
     cssEase: "linear",

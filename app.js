@@ -109,6 +109,25 @@ class c2bDirective extends SchemaDirectiveVisitor {
   }
 }
 
+
+class paymentDirective extends SchemaDirectiveVisitor {
+  visitFieldDefinition(field) {
+    const { resolve = defaultFieldResolver } = field;
+    const { defaultFormat } = this.args;
+    field.args.push({ name: 'format', type: GraphQLString});
+    field.resolve = async function (source,{ format, ...otherArgs },context, info, ) {
+      const date = await resolve.call(this, source, otherArgs, context, info);
+      let code = otherArgs.code
+      if (code === "KE") {
+        return "mpesa"
+      }else{
+        return "stripe"
+      }
+    };
+
+    field.type = GraphQLString;
+  }
+}
 class currencyDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
@@ -181,6 +200,7 @@ const server = new ApolloServer({
   resolvers: [resolvers],
   schemaDirectives: {
     currency: currencyDirective,
+    paymentOption:paymentDirective,
     ref: refDirective,
     date: DateFormatDirective,
     upper: UpperCaseDirective,
