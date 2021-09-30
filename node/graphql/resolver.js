@@ -5,6 +5,7 @@ const moment = require("moment");
 const path = require("path");
 var CronJob = require('cron').CronJob;
 const pubsub = new PubSub();
+global.pubsub = pubsub;
 const { createWriteStream } = require("fs");
 var userResolver = require('./resolvers/user');
 var categoryResolver = require('./resolvers/category');
@@ -850,10 +851,12 @@ const resolvers = {
 
                 } else if (args.booking_status == 16) {
                     var end_data = {};
+                    let s_extra_fare = 0
+                    console.log("args.extra_fare", args.extra_fare)
                     if (args.extra_fare) {
-                        var s_extra_fare = args.extra_fare.replace("KSh", "");
-                        if (!Number(s_extra_fare)) {
-                            s_extra_fare = 0
+                        if (args.extra_fare && Number(args.extra_fare)) {
+                            s_extra_fare = args.extra_fare
+                            console.log("s_extra_fare", s_extra_fare)
                         }
                     }
                     args.extra_fare = String(parseFloat(Number(s_extra_fare)).toFixed(2))
@@ -1101,9 +1104,7 @@ const resolvers = {
                     } else {
                         return [{ msg: "Booking Cancel Failed", status: 'failed' }];
                     }
-                } else if (args.booking_status == 10) {
-                    // && booking_detail.booking_status == 9
-
+                } else if (args.booking_status == 10 && booking_detail.booking_status == 9) {
                     let base_amount = booking_detail.base_price;
                     let service_fee = booking_detail.service_fee;
                     let admin_fee = (service_fee / 100) * base_amount;              // store admin fee  ....
@@ -1114,11 +1115,9 @@ const resolvers = {
                     args['total'] = amount;
                     args['amount'] = amount;
 
-                    let payment_data = await payment_choose.choose_payment(args,booking_detail)
+                    let payment_data = await payment_choose.choose_payment(args, booking_detail)
                     console.log("payment_data", payment_data)
                     if (payment_data.status) {
-                        let update_booking_data = payment_data.data
-                        var update_booking = await Booking_model.update({ _id: args.booking_id }, update_booking_data, { new: true });
                         var findBooking = await Booking_model.findOne({ _id: args.booking_id }).lean();
                         findBooking['user_parent'] = true;
                         findBooking['msg'] = "user accept the job ";
@@ -1200,56 +1199,19 @@ const resolvers = {
 
                 } else if (args.booking_status == 14) {
                     var final_job = await Booking_model.findOne({ _id: args.booking_id });
-                    // console.log(final_job);
-                    // console.log(Number(final_job.final_payment));
-                    // console.log(parseFloat(Number(final_job.final_payment) * 100).toFixed(0));
                     if (final_job.payment_status == 4) {
-                        var res = []
                         let admin_fee = (final_job.service_fee / 100) * final_job.final_payment;              // store admin fee  ....
                         let provider_fee = Number(final_job.provider_fee) - Number(admin_fee);     //store provider fee ...
                         args['admin_fee'] = Number(final_job.admin_fee) + Number(admin_fee);
                         args['provider_fee'] = provider_fee;
-
+                        args['amount'] = Number(final_job.final_payment);
                         try {
-                            let final_amount = Number(final_job.final_payment)
-
-                            if (args['payment_type'] && args['payment_type'] === "c2b") {
-                                var update_booking = await Booking_model.update({ _id: args.booking_id }, {
-                                    end_date: moment.utc().format(),
-                                    admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
-                                    provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
-                                    phone_number: args.phone_number,
-                                    payment_type: "c2b",
-                                    mpeas_payment_callback: true,
-                                    // job_status: 10,
-                                    // payment_status: 1,
-                                }, { new: true });
-                                var findBooking = await Booking_model.find({ _id: args.booking_id });
+                            let payment_data = await payment_choose.choose_payment(args, booking_detail)
+                            console.log("payment_data", payment_data)
+                            if (payment_data.status) {
                                 return [{ job_status: 14, msg: "job is completed successfully", status: 'success' }];
                             } else {
-                                var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(final_amount), booking_detail.booking_ref)
-
-                                if (charge.status == true && charge.data.ResponseCode === '0') {
-                                    // update charge amount
-                                    var update_booking = await Booking_model.update({ _id: args.booking_id }, {
-                                        end_date: moment.utc().format(),
-                                        admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
-                                        provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
-                                        phone_number: args.phone_number,
-                                        payment_type: "lipesa",
-                                        mpeas_payment_callback: true,
-                                        // job_status: 10,
-                                        // payment_status: 1,
-                                        MerchantRequestID: charge.data.MerchantRequestID || 0,
-                                        CheckoutRequestID: charge.data.CheckoutRequestID || 0
-                                    }, { new: true });
-                                    var findBooking = await Booking_model.find({ _id: args.booking_id });
-                                    return [{ job_status: 14, msg: "job is completed successfully", status: 'success' }];
-
-                                } else {
-                                    return [{ job_status: 14, msg: "job is completed failed", status: 'failed' }];
-
-                                }
+                                return [{ msg: "Booking Payment failed", status: 'failed' }]
                             }
 
                         } catch (err) {
@@ -1257,10 +1219,6 @@ const resolvers = {
                         }
 
 
-                        // }).catch(err => {
-                        //     // console.log("Error:", err);
-                        // });
-                        return res;
                     } else {
                         await Booking_model.update({ _id: args.booking_id }, { payment_status: 5, booking_status: 14, job_status: 14 }, { new: true });
                         await Payout_model.update({ booking_id: args.booking_id }, { booking_status: 14 }, { new: true });

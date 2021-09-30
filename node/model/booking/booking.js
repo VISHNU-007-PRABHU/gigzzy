@@ -89,6 +89,7 @@ var bookingSchema = new Schema({
   payment_message:{type:String,default:""},
   mpeas_payment_callback:{ type: Boolean, default: false },
   manual_payment_status:{ type: Boolean, default: false },
+  extra_payment_callback:{ type: Boolean, default: false },
   payment_type:{ type: String, default: "" },
   ctob_shotcode:{ type: String, default: "" },
   ctob_billRef:{ type: String, default: "" },
