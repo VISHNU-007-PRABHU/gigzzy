@@ -19,6 +19,7 @@ var settingResolver = require('./resolvers/setting');
 const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
+const payment_choose = require('./payment/choose')
 dotenv.config();
 
 var Detail_model = model.detail;
@@ -202,9 +203,9 @@ const resolvers = {
         site_setting_detail: settingResolver.site_setting_detail,
         payout_setting_detail: settingResolver.payout_setting_detail,
         user_address: userResolver.user_address,
-        get_currencys:currencyResolver.get_currencys,
-        get_currency:currencyResolver.get_currency,
-        GetCategoryCurrency:categoryResolver.GetCategoryCurrency,
+        get_currencys: currencyResolver.get_currencys,
+        get_currency: currencyResolver.get_currency,
+        GetCategoryCurrency: categoryResolver.GetCategoryCurrency,
         get_my_appointments: async (parent, args, context, info) => {
             try {
 
@@ -272,14 +273,14 @@ const resolvers = {
         sub_category: categoryResolver.subcategory,
         child_category: categoryResolver.child_category, //display child categor based on parent _id 
         Certificate: certificateResolver.certificate,   //display certificate  based on category
-        ParentCategoryCurrency:categoryResolver.ParentCategoryCurrency,
+        ParentCategoryCurrency: categoryResolver.ParentCategoryCurrency,
     },
     subCategory: {
         category: categoryResolver.subcategory_category,
         Certificate: certificateResolver.certificate,  //display certificate  based on category
-        get_parent_currency:currencyResolver.get_parent_currency,
-        GetCategoryCurrency:categoryResolver.GetCategoryCurrency,
-        ParentCategoryCurrency:categoryResolver.ParentCategoryCurrency,
+        get_parent_currency: currencyResolver.get_parent_currency,
+        GetCategoryCurrency: categoryResolver.GetCategoryCurrency,
+        ParentCategoryCurrency: categoryResolver.ParentCategoryCurrency,
     },
 
     User: {
@@ -292,7 +293,7 @@ const resolvers = {
         category: categoryResolver.category,
         provider_rating: userResolver.provider_rating,
         provider_rate: userResolver.provider_rate,
-        get_currency:currencyResolver.get_currency,
+        get_currency: currencyResolver.get_currency,
 
     },
 
@@ -318,10 +319,10 @@ const resolvers = {
 
     Mutation: {
         adminLogin: adminResolver.adminlogin,
-        update_currency:currencyResolver.update_currency,
-        delete_currency:currencyResolver.delete_currency,
-        UpdateCategoryCurrency:categoryResolver.UpdateCategoryCurrency,
-        DeleteCategoryCurrency:categoryResolver.DeleteCategoryCurrency,
+        update_currency: currencyResolver.update_currency,
+        delete_currency: currencyResolver.delete_currency,
+        UpdateCategoryCurrency: categoryResolver.UpdateCategoryCurrency,
+        DeleteCategoryCurrency: categoryResolver.DeleteCategoryCurrency,
         addUser: async (_, args) => {
             const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
             // console.log(user);
@@ -429,7 +430,7 @@ const resolvers = {
                 args.otp = otp;
                 args.last_otp_verification = moment.utc().format();
                 args.Upload_percentage = 25;
-                
+
                 const add_user = new Detail_model(args);
                 await add_user.save();
                 var data = await Detail_model.findOne({ role: args.role, phone_no: args.phone_no, delete: 0 });
@@ -643,18 +644,18 @@ const resolvers = {
             } else if (args.category_type == 2) {
                 var category = await subCategory_model.findOne({ _id: args.category_id });
             }
-            var CurrencyDetail = await Currency_model.findOne({location:args.location_code }).lean()
-            console.log("CurrencyDetail",CurrencyDetail._id)
-            if(!_.size(CurrencyDetail)){
+            var CurrencyDetail = await Currency_model.findOne({ location: args.location_code }).lean()
+            console.log("CurrencyDetail", CurrencyDetail._id)
+            if (!_.size(CurrencyDetail)) {
                 return []
             }
-            var categoryCurrency = await CategoryCurrency_model.findOne({category_id:args.category_id ,currency_id:CurrencyDetail._id }).lean()
-            if(!_.size(categoryCurrency)){
+            var categoryCurrency = await CategoryCurrency_model.findOne({ category_id: args.category_id, currency_id: CurrencyDetail._id }).lean()
+            if (!_.size(categoryCurrency)) {
                 console.log("sscaCurrencyDetail")
                 return []
             }
-            var default_currency = await Currency_model.findOne({default_currency:1,is_delete:false}).lean()
-            var local_currency = await Currency_model.findOne({location:args.local_location_code,is_delete:false}).lean()
+            var default_currency = await Currency_model.findOne({ default_currency: 1, is_delete: false }).lean()
+            var local_currency = await Currency_model.findOne({ location: args.local_location_code, is_delete: false }).lean()
             if (args.booking_type == 1) {
                 args['booking_date'] = moment.utc().format();
             } else if (args.booking_type == 2) {
@@ -670,7 +671,7 @@ const resolvers = {
             args['current_currency'] = categoryCurrency;
             args['currency_detail'] = CurrencyDetail;
             args['default_currency_rate'] = default_currency.rate;
-            args['currenct_local_rate'] =  local_currency.rate;
+            args['currenct_local_rate'] = local_currency.rate;
             args['location'] = { coordinates: [args.lng, args.lat] }
             args['service_fee'] = String(parseFloat(categoryCurrency.service_fee).toFixed(2));
             args['base_price'] = String(parseFloat(categoryCurrency.base_price).toFixed(2));
@@ -926,7 +927,7 @@ const resolvers = {
                         }
                     }
                     if (args.option == 3) {
-                        
+
                         var find_extra = await Extra_fee_model.find({ booking_id: args.booking_id });
                         var find_extra_data = await Extra_fee_model.findOne({ _id: args.extra_fare_id }).lean();
                         if (find_extra.length == 0) {
@@ -1100,11 +1101,9 @@ const resolvers = {
                     } else {
                         return [{ msg: "Booking Cancel Failed", status: 'failed' }];
                     }
-                } else if (args.booking_status == 10 && booking_detail.booking_status == 9) {
-                    var data = {};
-                    // console.log("========================");
-                    // console.log("TRNSCATIONS START");
-                    // console.log(args);
+                } else if (args.booking_status == 10) {
+                    // && booking_detail.booking_status == 9
+
                     let base_amount = booking_detail.base_price;
                     let service_fee = booking_detail.service_fee;
                     let admin_fee = (service_fee / 100) * base_amount;              // store admin fee  ....
@@ -1113,68 +1112,23 @@ const resolvers = {
                     args['admin_fee'] = admin_fee;
                     args['provider_fee'] = provider_fee
                     args['total'] = amount;
-                    // console.log("osp")
-                    try {
-                        if (args['payment_type'] && args['payment_type'] === "c2b") {
-                            var update_booking_c2b = await Booking_model.update({ _id: args.booking_id }, {
-                                accept_date: moment.utc().format(),
-                                admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
-                                provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
-                                total: String(parseFloat(args.total).toFixed(2)),
-                                booking_status: 50, // 50 means waiting booking
-                                phone_number: args.phone_number || "",
-                                payment_type: "c2b",
-                            }, { new: true });
-                            var findBooking = await Booking_model.find({ _id: args.booking_id });
-                            data = {
-                                user_parent: true,
-                                ...findBooking,
-                                msg: "user accept the job ",
-                                status: 'success',
-                                msg_status: 'to_provider'
-                            }
-                            // console.log("data", data)
-                            return [data]
-                        } else {
+                    args['amount'] = amount;
 
-                            var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(amount),booking_detail.booking_ref)
-                            // console.log("charge", charge)
-                            if (charge.status == true && charge.data.ResponseCode === '0') {
-                                // update charge amount
-                                // console.log(charge.data.MerchantRequestID, args.booking_id)
-                                var update_booking = await Booking_model.update({ _id: args.booking_id }, {
-                                    accept_date: moment.utc().format(),
-                                    admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
-                                    provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
-                                    total: String(parseFloat(args.total).toFixed(2)),
-                                    booking_status: 50, // 50 means waiting booking
-                                    phone_number: args.phone_number,
-                                    payment_type: "lipesa",
-                                    // job_status: 10,
-                                    // payment_status: 1,
-                                    MerchantRequestID: charge.data.MerchantRequestID || 0,
-                                    CheckoutRequestID: charge.data.CheckoutRequestID || 0
-                                }, { new: true });
-                                var findBooking = await Booking_model.find({ _id: args.booking_id });
-                                data = {
-                                    user_parent: true,
-                                    ...findBooking,
-                                    msg: "user accept the job ",
-                                    status: 'success',
-                                    msg_status: 'to_provider'
-                                }
-                                // console.log("data", data)
-                                return [data]
-                            } else {
-                                return [{ msg: "Payment charge failed", status: 'failed' }]
-                            }
-                        }
-
-                    } catch (err) {
-                        // console.log("err", err)
+                    let payment_data = await payment_choose.choose_payment(args,booking_detail)
+                    console.log("payment_data", payment_data)
+                    if (payment_data.status) {
+                        let update_booking_data = payment_data.data
+                        var update_booking = await Booking_model.update({ _id: args.booking_id }, update_booking_data, { new: true });
+                        var findBooking = await Booking_model.findOne({ _id: args.booking_id }).lean();
+                        findBooking['user_parent'] = true;
+                        findBooking['msg'] = "user accept the job ";
+                        findBooking['status'] = 'success';
+                        findBooking['msg_status'] = 'to_provider';
+                        // console.log("data", data)
+                        return [findBooking]
+                    } else {
                         return [{ msg: "Booking Payment failed", status: 'failed' }]
                     }
-
 
 
                 } else if (args.booking_status == 11 && booking_detail.booking_status == 9) {
@@ -1273,7 +1227,7 @@ const resolvers = {
                                 var findBooking = await Booking_model.find({ _id: args.booking_id });
                                 return [{ job_status: 14, msg: "job is completed successfully", status: 'success' }];
                             } else {
-                                var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(final_amount),booking_detail.booking_ref)
+                                var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(final_amount), booking_detail.booking_ref)
 
                                 if (charge.status == true && charge.data.ResponseCode === '0') {
                                     // update charge amount

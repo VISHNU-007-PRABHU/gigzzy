@@ -92,6 +92,7 @@ var bookingSchema = new Schema({
   payment_type:{ type: String, default: "" },
   ctob_shotcode:{ type: String, default: "" },
   ctob_billRef:{ type: String, default: "" },
+  payment_history:{},
   currency_detail:{},
   symbol:String
 }, schemaOptions);
