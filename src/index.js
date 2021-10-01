@@ -138,7 +138,7 @@ function ProviderRoute({ component: Component, ...rest }) {
   );
 }
 
-function UnAuthRoute({ component: Component, ...rest }) {
+function UnAuthRoute({ component: Component, isHeader,isFooter, ...rest }) {
   return (
     <Route
       {...rest}
@@ -146,13 +146,18 @@ function UnAuthRoute({ component: Component, ...rest }) {
         <>
           <Layout className="white">
             <Content className="px-md-5">
-              <Suspense fallback={<p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>}>
-                <UserHeader />
-              </Suspense>
+              {isHeader &&
+                <Suspense fallback={<p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>}>
+                  <UserHeader />
+                </Suspense>
+              }
               <Component {...props} />
-              <Suspense fallback={<Skeleton active />}>
-                <UserFooter />
-              </Suspense>
+              {isFooter &&
+                <Suspense fallback={<Skeleton active />}>
+                  <UserFooter />
+                </Suspense>
+              }
+
             </Content>
           </Layout>
         </>
@@ -175,17 +180,17 @@ ReactDOM.render(
             <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "100px" }}></p> */}
           </>}>
             <PrivateRoute path="/admin-dashboard" component={Dashboard} />
-            <PrivateRoute path="/admin-category/add" component={Add_Category} exact />
-            <PrivateRoute path="/admin-category/add/:id" component={Add_Category} exact />
-            <PrivateRoute path="/admin-category" component={Category} />
-            <PrivateRoute path="/admin-add-subcategory/:id" component={Add_Subcategory} />
-            <PrivateRoute path="/admin-add-subcategory" component={Add_Subcategory} />
-            <PrivateRoute path="/admin-subcategory" component={Subcategory} />
-            <PrivateRoute path="/admin-booking" component={Booking} />
-            <PrivateRoute path="/admin-booking-detail" component={Booking_Details} />
-            <PrivateRoute path="/admin-request" component={Request} />
-            <PrivateRoute path="/admin-payouts" component={Payouts} />
-            <PrivateRoute path="/admin-provider/add" component={Add_Provider} exact />
+            <PrivateRoute exact path="/admin-category/add" component={Add_Category}  />
+            <PrivateRoute exact path="/admin-category/add/:id" component={Add_Category}  />
+            <PrivateRoute exact path="/admin-category" component={Category} />
+            <PrivateRoute exact path="/admin-add-subcategory/:id" component={Add_Subcategory} />
+            <PrivateRoute exact path="/admin-add-subcategory" component={Add_Subcategory} />
+            <PrivateRoute exact path="/admin-subcategory" component={Subcategory} />
+            <PrivateRoute exact path="/admin-booking" component={Booking} />
+            <PrivateRoute exact path="/admin-booking-detail" component={Booking_Details} />
+            <PrivateRoute exact path="/admin-request" component={Request} />
+            <PrivateRoute exact path="/admin-payouts" component={Payouts} />
+            <PrivateRoute exact path="/admin-provider/add" component={Add_Provider}  />
             <PrivateRoute path="/admin-provider/add/:id" component={Add_Provider} exact />
             <PrivateRoute path="/admin-provider/view/:id" component={Provider_Verified} exact />
             <PrivateRoute path="/admin-provider" component={Provider} exact />
@@ -198,19 +203,23 @@ ReactDOM.render(
             <PrivateRoute path="/admin-static/add/:id" component={Add_Static} exact />
             <PrivateRoute path="/admin-static" component={Static} exact />
             <PrivateRoute path="/admin-settings" component={Settings} exact />
-            <PrivateRoute path="/admin-currency/add/:id" component={AddCurrency} />
-            <PrivateRoute path="/admin-currency/add" component={AddCurrency} />
-            <PrivateRoute permission="view_currency" path="/admin-currency" component={Currency} />
+            <PrivateRoute path="/admin-currency/add/:id" component={AddCurrency} exact/>
+            <PrivateRoute path="/admin-currency/add" component={AddCurrency} exact/>
+            <PrivateRoute permission="view_currency" path="/admin-currency" component={Currency} exact/>
+            <ProviderRoute exact path="/provider_detail" component={provider_detail} />
+            <ProviderRoute exact path="/provider_earnings" component={provider_earnings} />
+            <ProviderRoute exact path="/provider-booking-detail" component={Booking_Detail} />
+
             <UnAuthRoute path="/admin-booking-invoice/:id" component={Invoice} exact />
             <UnAuthRoute exact path="/admin" component={LoginPage} />
-            <UnAuthRoute exact path="/old" component={Home_Page} />
-            <UnAuthRoute exact path="/" component={HomePage} />
+            <UnAuthRoute isHeader={true} isFooter={true} exact path="/old" component={Home_Page} />
+            <UnAuthRoute isHeader={true} isFooter={true} exact path="/" component={HomePage} />
             <UnAuthRoute exact path="/login" component={User_Login} />
             <UnAuthRoute exact path="/Confrim_password/:id" component={ConfrimPassword} />
             <UnAuthRoute exact path="/signup" component={Email_Login} />
             <UnAuthRoute exact path="/static_page/:id" component={StaticPage} />
-            <UnAuthRoute exact path="/howlearnmore" component={HowLearnMore} />
-            <UnAuthRoute exact path="/faq" component={FAQ} />
+            <UnAuthRoute isHeader={true} isFooter={true} exact path="/howlearnmore" component={HowLearnMore} />
+            <UnAuthRoute isHeader={true} isFooter={true} exact path="/faq" component={FAQ} />
             <UnAuthRoute exact path="/provider_login" component={Provider_Login} />
             <UnAuthRoute exact path="/provider_signup" component={Provider_Email_Login} />
 
@@ -218,9 +227,6 @@ ReactDOM.render(
             <UserRoute exact path="/description/:id" component={Description_Page} />
             <UserRoute exact path="/bookings" component={Bookings_Page} />
 
-            <ProviderRoute exact path="/provider_detail" component={provider_detail} />
-            <ProviderRoute exact path="/provider_earnings" component={provider_earnings} />
-            <ProviderRoute exact path="/provider-booking-detail" component={Booking_Detail} />
           </Suspense>
           <Route component={NotFound} />
         </Switch>

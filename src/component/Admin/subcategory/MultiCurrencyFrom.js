@@ -18,6 +18,9 @@ const MultiCurrencyFrom = (props) => {
         getCurrencyResponse();
         if(props.data){
             set_update_data(props.data)
+            if(props.data.price_type){
+                set_price_type(props.data.price_type)
+            }
         }
     }, [])
 

@@ -21,12 +21,9 @@ const mapOptions = {
     fullscreenControl: false,
 };
 
-
-const UserHeader = React.lazy(() => import('../Layout/UserHeader'));
-const UserFooter = React.lazy(() => import('../Layout/UserFooter'));
 const PointLocation = React.lazy(() => import("./PointLocation"))
 const Appointments = React.lazy(() => import("./Appointments"))
-
+const StripePayout = React.lazy(() => import("./payment/stripe_payment"))
 const SEND_ACCEPT_MSG = gql`
 subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
     send_accept_msg (_id:$_id,booking_id:$booking_id){
@@ -537,6 +534,11 @@ class Bookings extends React.Component {
                                     <label class="ml-auto bold">{this.state.particular_booking[0].final_payment}</label>
                                 </div>
                             </div>
+                            {/* <div>
+                                <Suspense fallback={<Skeleton />}>
+                                    <StripePayout />
+                                </Suspense>
+                            </div> */}
                             <div className={this.state.accept_pay_modal ? "price_section px-3 d-flex" : "d-none"}>
                                 <CompletePayment handleResult={this.handleResult} data={this.state.particular_booking[0] ? this.state.particular_booking[0] : ""} />
                             </div>

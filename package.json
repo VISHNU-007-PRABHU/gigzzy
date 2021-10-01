@@ -22,6 +22,8 @@
         "@apollo/react-hooks": "0.1.0-beta.11",
         "@saeris/graphql-directives": "^0.2.3",
         "@sendgrid/mail": "^7.4.5",
+        "@stripe/react-stripe-js": "^1.5.0",
+        "@stripe/stripe-js": "^1.18.0",
         "africastalking": "^0.5.4",
         "antd": "^3.20.6",
         "apollo": "^2.33.6",
