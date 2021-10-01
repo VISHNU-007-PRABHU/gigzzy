@@ -24,7 +24,7 @@ exports.mpesa_payment = async (args, booking_detail) => {
                 }
             }
         } catch (err) {
-            // console.log("err", err)
+            console.log("err mpesa", err)
             return reject({ msg: "Mpesa Payment failed", status: false })
         }
     })
