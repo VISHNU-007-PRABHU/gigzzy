@@ -47,11 +47,11 @@ const settings = {
 
 const ProfessionalCategory = () => {
     return (
-        <Row gutter={[24, 24]} className="owl-stage-outer">
+        <Row className="owl-stage-outer">
             <div className="featured_category container">
                 <Slider className="owl-theme cursor_point " {...settings}>
                     {category_data.map((data, i) =>
-                        <Col span={8}>
+                        <Col span={8} className="p-0">
                             <Card
                                 hoverable
                                 bodyStyle={{ padding: '0' }}

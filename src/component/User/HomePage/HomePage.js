@@ -56,7 +56,6 @@ const HomePage = () => {
                 </Suspense>
                 <Suspense fallback={<p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>}>
                     <HomeTranding />
-
                 </Suspense>
                 <Suspense fallback={<p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>}>
                     <OutdoorPage />

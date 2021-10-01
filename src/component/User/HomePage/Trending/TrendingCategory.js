@@ -24,14 +24,13 @@ const TrendingCategory = (props) => {
     return (
         <>
             {category_data && category_data.map(Maindata => {
-                console.log("TrendingCategory -> Maindata", data)
                 return (
                     <>
-                        <Row gutter={[24, 24]} className="owl-stage-outer">
+                        <Row  className="owl-stage-outer">
                             {Maindata && Maindata.map(data => {
                                 return (
                                     <Col sm={12} md={6}>
-                                        <div>
+                                        <div className="p-2">
                                             <img alt='gigzzy home banner'
                                                 src={data?.small_img_url}
                                                 loading="lazy" class="h-75 br_10 lazyload img-fluid w-100" />

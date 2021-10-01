@@ -22,7 +22,7 @@ exports.choose_payment = async (args, booking_detail) => {
                     }
                 case 'mpesa':
                     let mpesa_charge = await mpesaModule.mpesa_payment(args, booking_detail)
-                    if (mpesa_charge.charge.status == "succeeded" && mpesa_charge.charge.paid == true) {
+                    if (mpesa_charge.charge.status == true) {
                         await payoutNotificationModule.update_booking_after_payment(args, mpesa_charge.charge)
                         return resolve({ msg: "mpesa payment success", status: true, data: booking_detail })
                     } else {

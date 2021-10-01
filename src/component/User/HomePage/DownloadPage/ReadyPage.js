@@ -7,7 +7,7 @@ const TrendingHeader = React.lazy(() => import('../Trending/TrandingHeader'));
 const style = {
     padding: "0px",
     position: "absolute",
-    top: "75px",
+    top: "50px",
     color: "white",
     width: "100%",
 }
@@ -43,19 +43,13 @@ const ReadyPage = () => {
             <Row className="">
                 {data.map(inner_data => (
                     <>
-                        <Col sm={24} md={12} className="px-1 ">
-                            <div className="text-center">
-                                <Card
-                                    cover={
-                                        <img alt='' loading="lazy" className="img-fluid lazyload" src={inner_data.link} />
-                                    }
-                                    bodyStyle={style}
-                                >
-                                    <div>
-                                        <div className="normal_font_size my-3 bold">{inner_data.title}</div>
-                                        <div>{inner_data.data}</div>
-                                    </div>
-                                </Card>
+                        <Col sm={24} md={12}>
+                            <div className="my-2 p-md-2 text-center">
+                                <img alt='' loading="lazy" className="img-fluid lazyload" src={inner_data.link} />
+                                <div style={style}>
+                                    <div className="normal_font_size my-3 bold">{inner_data.title}</div>
+                                    <div>{inner_data.data}</div>
+                                </div>
                             </div>
                         </Col>
                     </>

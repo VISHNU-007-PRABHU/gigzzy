@@ -36,14 +36,14 @@ const DownloadPage = () => {
                     <Suspense fallback={<Skeleton active />}>
                         <TrendingHeader header_class={isMobile ? mobile_header_class:header_class} header_data={header_data} />
                     </Suspense>
-                    <div className="download_section position-relative pt-5">
+                    <div className="download_section position-relative p-0 p-md-4">
                         <div className="d-flex mb-5 justify-content-center justify-content-md-start">
                             <Input className="w-50" placeholder="Enter your email" size={"large"} onChange={(e) => { setEmail(e.target.value) }} />
                             <Button size={"large"} className="ml-4 primary_bg_blue_color border d-flex text-white align-items-center" onClick={() => { sendLink() }}>
                                 Send Link
                             </Button>
                         </div>
-                        <div className="d-flex justify-content-between justify-content-md-start">
+                        <div className="d-flex justify-content-around justify-content-md-start">
                             <a rel="noopener noreferrer" href="https://play.google.com/store/apps/details?id=com.gigzzy.user" target="_blank">
                                 <img alt='' loading="lazy" className="lazyload mr-3" src={play_store_img} />
                             </a>

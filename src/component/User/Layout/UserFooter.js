@@ -14,12 +14,12 @@ class UserFooter extends React.Component {
     return (
       <div>
         <Footer className="bg-white pb-0 p-0 mt-5">
-          <Row gutter={[16, 16]} className="my-3">
+          <Row className="my-3">
             {FooterData.map(parentdata => {
               return (
                 <>
                   <Col className="gutter-row justify-content-md-around d-flex" sm={24} md={6}>
-                    <div>
+                    <div className="p-4">
                       <ul>
                         <div className='h5 bold primary_color'>{parentdata.title}</div>
                         {parentdata.data.map(innerdata => {
