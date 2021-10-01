@@ -10,31 +10,31 @@ exports.choose_payment = async (args, booking_detail) => {
         try {
             switch (args.payment_option) {
                 case 'stripe':
-                    let { msg, status, charge } = await stripeModule.stripe_payment(args, booking_detail)
-                    if (charge.status == "succeeded" && charge.paid == true) {
-                        await payoutNotificationModule.update_booking_after_payment(args, charge)
+                    let stripe_charge = await stripeModule.stripe_payment(args, booking_detail)
+                    if (stripe_charge.charge.status == "succeeded" && stripe_charge.charge.paid == true) {
+                        await payoutNotificationModule.update_booking_after_payment(args, stripe_charge.charge)
                         await payoutNotificationModule.update_provider_payout(booking_detail)
                         await payoutNotificationModule.accept_payout_notification(booking_detail)
-                        return resolve({ msg: "payment success", status: true, data: booking_detail })
+                        return resolve({ msg: "stripe payment success", status: true, data: booking_detail })
                     } else {
                         await payoutNotificationModule.error_payout_notification(booking_detail);
-                        return reject({ msg: "payment failed", status: false, data: {} })
+                        return reject({ msg: "stripe payment failed", status: false, data: {} })
                     }
                 case 'mpesa':
-                    let { msg, status, charge } = await mpesaModule.mpesa_payment(args, booking_detail)
-                    if (charge.status == "succeeded" && charge.paid == true) {
-                        await payoutNotificationModule.update_booking_after_payment(args, charge)
-                        return resolve({ msg: "payment success", status: true, data: booking_detail })
+                    let mpesa_charge = await mpesaModule.mpesa_payment(args, booking_detail)
+                    if (mpesa_charge.charge.status == "succeeded" && mpesa_charge.charge.paid == true) {
+                        await payoutNotificationModule.update_booking_after_payment(args, mpesa_charge.charge)
+                        return resolve({ msg: "mpesa payment success", status: true, data: booking_detail })
                     } else {
                         await payoutNotificationModule.error_payout_notification(booking_detail);
-                        return reject({ msg: "payment failed", status: false, data: {} })
+                        return reject({ msg: "mpesa payment failed", status: false, data: {} })
                     }
                 default:
                     return reject({ msg: "payment failed", status: false, data: {} })
             }
         } catch (error) {
             console.log("exports.choose_payment -> error", error)
-            return reject({ msg: "", status: false })
+            return reject({ msg: "payment failed", status: false })
         }
     })
 }

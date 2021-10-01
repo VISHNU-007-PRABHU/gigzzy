@@ -2,8 +2,6 @@ const model = require('../../model_data');
 const _ = require('lodash');
 const moment = require("moment");
 const dotenv = require('dotenv');
-const payoutNotificationModule = require('./payout_notification');
-const { update_booking_details } = require('../resolvers/booking');
 var stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 dotenv.config();
 
@@ -16,14 +14,22 @@ var Payout_model = model.payout;
 var Extra_fee_model = model.Extra_fee;
 var providerSubcategory_model = model.providerSubcategory_model;
 
+const stripe_country_code =[{
+    code:"IN",
+    stripe_code:"INR"
+},{
+    code:"US",
+    stripe_code:"usd"
+}]
+
 exports.stripe_payment = async (args, booking_detail) => {
     return new Promise(async function (resolve, reject) {
         try {
             let amount = args.amount;
-            let payment_country_code = "INR"
+            let payment_country_code = _.find(stripe_country_code,["code",_.upperCase(args.location_code)])['stripe_code'] 
             let change_data = {
                 "amount": Number(amount) * 100,
-                "currency": payment_country_code,
+                "currency": payment_country_code || 'usd',
                 "source": args.stripe_token
             }
             var charge = await stripe.charges.create(change_data);
