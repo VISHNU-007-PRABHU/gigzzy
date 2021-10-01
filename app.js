@@ -183,6 +183,8 @@ class currencyDirective extends SchemaDirectiveVisitor {
         }
         let final_value = await CommonFunction.currency_calculation(inputdata)
         return final_value
+      }else{
+        return date
       }
     };
 
