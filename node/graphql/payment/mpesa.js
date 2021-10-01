@@ -5,7 +5,6 @@ const safaricom = require('../safaricom');
 const dotenv = require('dotenv');
 dotenv.config();
 
-
 exports.mpesa_payment = async (args, booking_detail) => {
     return new Promise(async function (resolve, reject) {
         try {

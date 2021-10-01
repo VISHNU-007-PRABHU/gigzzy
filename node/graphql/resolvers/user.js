@@ -620,9 +620,7 @@ module.exports.checkOtp = async (_, args) => {
             result = { ...result._doc, ...message };
         } else {
             let message = {}
-            if (check_user[0].role == 2 && check_user[0].Upload_percentage == 50 && (check_user[0].email_otp_verification == 0)) {
-                message = { pending_status: 2, msg: "Email not verified", status: "success" };
-            } else if (check_user[0].provider_subCategoryID.length == 0 && check_user[0].role == 2 && check_user[0].Upload_percentage == 50) {
+            if (check_user[0].provider_subCategoryID.length == 0 && check_user[0].role == 2 && check_user[0].Upload_percentage == 50) {
                 message = { pending_status: 5, msg: " category not upload", status: "success" };
             } else if (check_user[0].role == 2 && check_user[0].Upload_percentage == 50 && (check_user[0].personal_document == undefined || check_user[0].personal_document == '')) {
                 message = { pending_status: 6, msg: "personal_document not upload", status: "success" };
@@ -707,12 +705,12 @@ module.exports.kilometer = async (parent, args, context, info) => {
             result = await Booking_model.findOne({ _id: parent._id });
 
             if (!_.size(result) || !result.location.coordinates[1] || !result.location.coordinates[0] || !args.lat || !args.lng) {
-                console.log("module.exports.kilometer -> error","size zero")
+                console.log("module.exports.kilometer -> error", "size zero")
                 return { kilometre: 0 };
             }
 
             if (args.lat == result.location.coordinates[1] && args.lng == result.location.coordinates[0]) {
-                console.log("module.exports.kilometer -> error","zero")
+                console.log("module.exports.kilometer -> error", "zero")
                 return { kilometre: 0 };
             }
             var distanceInMeters = getDistanceBetweenPoints.getDistanceBetweenPoints(
@@ -722,7 +720,7 @@ module.exports.kilometer = async (parent, args, context, info) => {
             if (distanceInMeters && distanceInMeters > 0) {
                 return { kilometre: String(parseFloat(distanceInMeters * 0.001).toFixed(2)) };
             } else {
-                console.log("module.exports.kilometer -> error",distanceInMeters)
+                console.log("module.exports.kilometer -> error", distanceInMeters)
 
                 return { kilometre: 0 }
             }

@@ -363,7 +363,7 @@ const resolvers = {
                         let otp = String(Math.floor(100000 + Math.random() * 900000));
                         args.email_otp = otp;
                         args.last_email_otp_verification = moment.utc().format();
-                        var send_otp = await commonHelper.send_mail_sendgrid(args.email, 'otp', { otp });
+                        // var send_otp = await commonHelper.send_mail_sendgrid(args.email, 'otp', { otp });
                     }
                 }
                 if (args.old_password != undefined && args.old_password != '') {
