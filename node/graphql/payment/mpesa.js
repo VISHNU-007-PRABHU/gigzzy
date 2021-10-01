@@ -1,6 +1,7 @@
 
 const model = require('../../model_data');
 const _ = require('lodash');
+const safaricom = require('../safaricom');
 const dotenv = require('dotenv');
 dotenv.config();
 
