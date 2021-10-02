@@ -25,8 +25,8 @@ const PointLocation = React.lazy(() => import("./PointLocation"))
 const Appointments = React.lazy(() => import("./Appointments"))
 const StripePayout = React.lazy(() => import("./payment/stripe_payment"))
 const SEND_ACCEPT_MSG = gql`
-subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
-    send_accept_msg (_id:$_id,booking_id:$booking_id){
+subscription SENDACCEPTMSG($_id:ID,$booking_id:ID,$location_code:String){
+    send_accept_msg (_id:$_id,booking_id:$booking_id,location_code:$location_code){
         _id
         description
         user_image_url
@@ -43,6 +43,7 @@ subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
         base_price
         extra_price
         payment_type
+        payment_option(code:$location_code)
         mpeas_payment_callback
         ctob_shotcode
         ctob_billRef
@@ -124,6 +125,7 @@ class Bookings extends React.Component {
             rating: 0,
             rate: 0,
             accept_pay_modal: 0,
+            stripe_pay_modal: false,
             complete_button: 0,
             call_msg_sub: 0,
             msg_count: 0,
@@ -159,9 +161,13 @@ class Bookings extends React.Component {
         // console.log(option, id);
         if (option === true) {
             this.setState({ call_msg_sub: 1 });
+            let inputdata = { _id: id}
+            if(localStorage.getItem("currency")){
+                inputdata['location_code'] = JSON.parse(localStorage.getItem("currency")).location 
+            }
             await client.query({
                 query: GET_PARTICULAR_BOOKING,
-                variables: { _id: id, },
+                variables: inputdata,
                 fetchPolicy: 'no-cache',
             }).then(result => {
                 console.log(result);
@@ -177,9 +183,12 @@ class Bookings extends React.Component {
             });
         }
         if (this.state.particular_booking[0]?.payment_status === 4 && !this.state.particular_booking[0]?.mpeas_payment_callback) {
-            this.setState({ accept_pay_modal: 1, booking_detail: option })
+            if (this.state.particular_booking[0]?.payment_option === "stripe") {
+                this.setState({ stripe_pay_modal: true, booking_detail: option })
+            } else {
+                this.setState({ accept_pay_modal: 1, booking_detail: option })
+            }
         } else {
-            console.log(this.state.particular_booking[0].booking_status, 'vis');
             if (this.state.particular_booking[0]?.booking_status === 13) {
                 this.setState({ complete_button: 1, booking_detail: option });
             } else {
@@ -202,7 +211,11 @@ class Bookings extends React.Component {
                 if (result) {
                     console.log(result.data.send_accept_msg);
                     if (result.data.send_accept_msg.payment_status === 4) {
-                        that.setState({ particular_booking: [result.data.send_accept_msg], accept_pay_modal: 1 });
+                        if (result.data.send_accept_msg?.payment_option === "stripe") {
+                            this.setState({ stripe_pay_modal: true, particular_booking: [result.data.send_accept_msg], })
+                        } else {
+                            that.setState({ particular_booking: [result.data.send_accept_msg], accept_pay_modal: 1 });
+                        }
                     } else {
                         if (result.data.send_accept_msg.booking_status === 13) {
                             that.setState({ complete_button: 1 });
@@ -342,7 +355,7 @@ class Bookings extends React.Component {
     }
 
     render() {
-        console.log(this.state.accept_pay_modal)
+        console.log(this.state.stripe_pay_modal)
         return (
             <>
                 <h2 className="bold mb-5 text-center">My Bookings</h2>
@@ -410,6 +423,8 @@ class Bookings extends React.Component {
                             cancelButtonProps={{ className: 'd-none' }}
                             title={this.state.particular_booking[0].booking_category[0].category_type === 1 ? this.state.particular_booking[0].booking_category[0].category_name : this.state.particular_booking[0].booking_category[0].subCategory_name}
                             className="new_modal"
+                            footer={null}
+                            bodyStyle={{ padding: "0px 0px 35px 0px" }}
                             visible={this.state.booking_detail}
                             onCancel={() => this.setState({ booking_detail: false })}>
                             <div style={{ height: '100px', width: '100%' }}>
@@ -534,11 +549,11 @@ class Bookings extends React.Component {
                                     <label class="ml-auto bold">{this.state.particular_booking[0].final_payment}</label>
                                 </div>
                             </div>
-                            {/* <div>
+                            <div className={this.state.stripe_pay_modal ? "" : "d-none"}>
                                 <Suspense fallback={<Skeleton />}>
-                                    <StripePayout />
+                                    <StripePayout current_booking_status={14} data={this.state.particular_booking[0] ? this.state.particular_booking[0] : ""} />
                                 </Suspense>
-                            </div> */}
+                            </div>
                             <div className={this.state.accept_pay_modal ? "price_section px-3 d-flex" : "d-none"}>
                                 <CompletePayment handleResult={this.handleResult} data={this.state.particular_booking[0] ? this.state.particular_booking[0] : ""} />
                             </div>

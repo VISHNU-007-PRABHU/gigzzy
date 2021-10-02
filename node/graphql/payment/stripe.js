@@ -32,6 +32,7 @@ exports.stripe_payment = async (args, booking_detail) => {
                 "currency": payment_country_code || 'usd',
                 "source": args.stripe_token
             }
+            console.log("exports.stripe_payment -> change_data", change_data)
             var charge = await stripe.charges.create(change_data);
             return resolve({ msg: "Payment success", status: true,charge })
         } catch (error) {

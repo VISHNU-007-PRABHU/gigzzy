@@ -119,6 +119,7 @@ export const ADD_BOOKING = gql`
       lat
       lng
       user_image_url
+      payment_option(code:$local_location_code)
       user(_id:$user_id) {
         name
       }
@@ -148,8 +149,11 @@ mutation AcceptJobMutation($role: Int
   $booking_id: ID
   $provider_id: ID
   $booking_status:Int
-  $phone_number : String
-  $payment_type : String
+  $phone_number:String
+  $payment_type:String
+  $payment_option:String
+  $location_code:String
+  $stripe_token:String
 ){
   manage_booking(
     role:$role
@@ -158,6 +162,9 @@ mutation AcceptJobMutation($role: Int
     booking_status: $booking_status
     phone_number : $phone_number
     payment_type:$payment_type
+    payment_option:$payment_option
+    location_code:$location_code
+    stripe_token:$stripe_token
   ){
     status
     msg
@@ -206,8 +213,8 @@ query My_appointments($_id : ID,$role : Int,$booking_status : Int,$limit:Int,$pa
 }`
 
 export const GET_PARTICULAR_BOOKING = gql`
-query GETPARTICULARBOOKING($_id : ID) {
-  booking(_id:$_id) {
+query GETPARTICULARBOOKING($_id : ID,$location_code:String) {
+  booking(_id:$_id,location_code:$location_code) {
         _id
         description
         user_image_url
@@ -248,6 +255,7 @@ query GETPARTICULARBOOKING($_id : ID) {
       provider_rating
       provider_comments
       booking_type
+      payment_option(code:$location_code)
       get_booking_message(booking_id:$_id){
           message
           createdAt

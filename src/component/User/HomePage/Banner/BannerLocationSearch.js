@@ -97,7 +97,7 @@ const BannerLocationSearch = () => {
                     </Button>
                 </Col>
                 <Col sm={24} md={10} className="d-none d-md-flex px-0">
-                    <img alt='gigzzy link tag' src={link_img} loading="lazy" class="ml-3 position-absolute lazyload img-fluid" />
+                    <img alt='gigzzy link tag' src={link_img} loading="lazy" class="ml-5 position-absolute lazyload img-fluid" />
                 </Col>
             </Row>
             <Modal

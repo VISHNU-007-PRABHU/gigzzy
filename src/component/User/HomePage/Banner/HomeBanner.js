@@ -8,7 +8,7 @@ const HomeBanner = () => {
     return (
         <Row className="my-4">
             <Col className="mt-3 mb-5">
-                <Row className="align-items-center flex-column flex-md-row">
+                <Row className="d-flex align-items-center flex-column flex-md-row">
                     <Col sm={24} md={10} className="p-4">
                         <Suspense fallback={<Skeleton active />}>
                             <BannerSearch />

@@ -20,6 +20,7 @@ import Payment from "./Payment";
 import Address from "./Address";
 import MinImage from "./MinImage";
 import DescriptionValue from "./DescriptionValue";
+import StripePayout from "./payment/stripe_payment";
 const { Content } = Layout;
 const { Countdown } = Statistic;
 
@@ -120,7 +121,7 @@ class Description extends React.Component {
                 fetchPolicy: 'no-cache',
             }).then(result => {
                 console.log(result);
-                if (result.data.manage_booking[0].status === "success") {
+                if (result.data.manage_booking && result.data.manage_booking[0].status === "success") {
                     Alert_msg({ msg: "Job Booking Cancel Success", status: "success" });
                 } else {
                     Alert_msg({ msg: "Job Booking Cancel Failed", status: "failed" });
@@ -390,9 +391,13 @@ class Description extends React.Component {
                 },
             }).then((result, loading, error) => {
                 this.setState({ loading: false });
+                
                 console.log("book_now -> result.data.add_booking", result.data.add_booking)
                 if (result.data.add_booking && result.data.add_booking[0]?.id) {
                     this.setState({ description, book_requesting_modal: 1, add_booking: result.data.add_booking, deadline: moment().add(2, 'minutes') });
+                    if (result.data.add_booking[0]?.payment_option === "stripe") {
+                        this.setState({ isStripePayment: true })
+                    }
                     this.DontReadTheComments(result.data.add_booking[0].id);
                 } else {
                     Alert_msg({ msg: "Category currently not available", status: "failed" });
@@ -475,7 +480,7 @@ class Description extends React.Component {
 
     render() {
         // console.log(this.state.accept_provider[0]?.provider_rate[0]?.rating);
-        const { previewVisible, previewImage, fileList } = this.state;
+        const { isStripePayment, previewVisible, previewImage, fileList } = this.state;
         const uploadButton = (
             <div>
                 Upload
@@ -658,10 +663,15 @@ class Description extends React.Component {
                                             <img alt="" src={this.state.accept_provider[0] ? this.state.accept_provider[0].img_url : ''} />
                                             <p className="normal_font_size mt-3 bold">{this.state.accept_provider[0] ? this.state.accept_provider[0].name : ''}</p>
                                             <Rate allowHalf disabled value={this.state.accept_provider[0] ? Number(this.state.accept_provider[0].provider_rate[0].rating) : 0} />
-                                        </div>{ }
-                                        <div className="price_section px-3 d-flex justify-content-center">
+                                        </div>
+                                        {isStripePayment && <><div className="">
+                                            <StripePayout data={this.state.accept_data} current_booking_status={10} />
+                                        </div></>
+                                        }
+                                        {!isStripePayment && <><div className="price_section px-3 d-flex justify-content-center">
                                             <Payment data={this.state.accept_data} />
                                         </div>
+                                        </>}
                                     </Modal>
                                     <Modal okButtonProps={{ className: 'ok_btn' }} okText="Book" cancelButtonProps={{ className: 'd-none' }} title="Date and Time" className="new_modal" centered visible={this.state.book_later_modal} onOk={() => { this.book_later() }} onCancel={() => this.setLaterModal(false)}>
                                         <div className="price_section text-center">
