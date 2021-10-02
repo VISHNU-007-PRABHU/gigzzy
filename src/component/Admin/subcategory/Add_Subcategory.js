@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React,{Suspense} from 'react'
 import { withRouter } from "react-router-dom";
 import { Layout, Icon, Form, Input, Button, message, Typography, Row, Col, Select, Upload, Radio } from 'antd';
 import { ADD_SUBCATEGORY, CATEGORY_NAME, FIND_SUBCATEGORY, UPDATE_SUBCATEGORY } from '../../../graphql/Admin/sub_category';
@@ -57,7 +57,7 @@ class Add_Subcategory extends React.Component {
         }).then(result => {
             this.setState({
                 category: result.data.category,
-                certificate: result.data.category[0].Certificate
+                certificate: result.data.category[0]?.Certificate
             });
         });
     }
@@ -231,7 +231,7 @@ class Add_Subcategory extends React.Component {
                                                     initialValue: this.state.update_data.certificates,
                                                     rules: [{ required: true }]
                                                 })(<Select mode="tags" style={{ width: '100%' }} placeholder="Certificate" onChange={(value) => { console.log(value); }}>
-                                                    {this.state.certificate.map(data =>
+                                                    {this.state.certificate && this.state.certificate.map(data =>
                                                         <Option key={data._id}>{data.certificate_name}</Option>
                                                     )}
                                                 </Select>)}

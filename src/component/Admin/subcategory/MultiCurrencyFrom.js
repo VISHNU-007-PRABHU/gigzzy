@@ -18,11 +18,22 @@ const MultiCurrencyFrom = (props) => {
         getCurrencyResponse();
         if(props.data){
             set_update_data(props.data)
+            if(props.data.price_type){
+                set_price_type(props.data.price_type)
+            }
         }
     }, [])
 
     const getCurrencyResponse=async()=>{
-        let finaldata = await get_currencys.refetch()
+        let ids=[]
+        props?.currency_data && props.currency_data.forEach(element => {
+            ids.push(element.currency_id)
+        });
+        let inputdata={}
+        if(ids.length){
+            inputdata['search'] = {'$ne':ids}
+        }
+        let finaldata = await get_currencys.refetch(inputdata)
         set_currency(finaldata.data.get_currencys.data)
     }
     const onPriceTypeChange = (e) => {

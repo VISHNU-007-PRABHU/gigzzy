@@ -29,7 +29,7 @@ class User_Login extends React.Component {
             company_registration_detail: false,
             company_worker_detail: false,
             country_code: '',
-            location_code:'',
+            location_code:"",
             login: 1,
             company_id: "",
             m_no: '',
@@ -47,6 +47,7 @@ class User_Login extends React.Component {
                 }).then(result => {
                     console.log(result.data.addUser.status);
                     localStorage.setItem('user', JSON.stringify(result.data.addUser));
+                    localStorage.setItem('currency', JSON.stringify(result.data.addUser.get_currency));
                     Alert_msg({ msg: result.data.addUser.otp, status: "success" });
                     this.setState({ login: 0 });
                 });
@@ -60,11 +61,12 @@ class User_Login extends React.Component {
         console.log(data);
         await client.query({
             query: ADD_USER,
-            variables: { option: "otp", phone_no: data.phone_no, role: 1, country_code: data.phone_no },
+            variables: { option: "otp", phone_no: data.phone_no, role: 1, country_code: data.phone_no,location_code:this.state.location_code },
             fetchPolicy: 'no-cache',
         }).then(result => {
             console.log(result.data.addUser.status);
             localStorage.setItem('user', JSON.stringify(result.data.addUser));
+            localStorage.setItem('currency', JSON.stringify(result.data.addUser.get_currency));
             Alert_msg({ msg: result.data.addUser.otp, status: "success" });
             this.setState({ login: 0 });
         });
@@ -250,10 +252,10 @@ class User_Login extends React.Component {
                                             onChange={(value, data, event) => {
                                                 console.log("render -> data", data)
                                                 this.setState({
-                                                    m_no: value.replace(/[^0-9]+/g, '').slice(data.dialCode.length),
+                                                    m_no:value.replace(/[^0-9]+/g, '').slice(data.dialCode.length),
                                                     country_code: data.dialCode,
-                                                    location_code:data.countryCode,
-                                                });
+                                                    location_code: data.countryCode
+                                                    });
                                             }} />
 
                                         )}

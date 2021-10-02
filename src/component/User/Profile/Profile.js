@@ -194,162 +194,154 @@ class Profile extends React.Component {
             </div>
         );
         return (
-            <Layout className="white" style={{ minHeight: '100vh' }}>
-                <Suspense fallback={<Skeleton active />}>
-                    <UserHeader />
-                </Suspense>
-                <Content className="px-1">
-                    <Row>
-                        <Col lg={{ span: 20, offset: 2 }}>
-                            <div id="section-1" className="why_jiffy position-relative pt-1">
-                                <h2 className="bold mb-5 text-center">Profile</h2>
-                                <Row className="profile_section jiffy_border p-4 d-flex align-items-center mb-4">
-                                    <Col span={23} >
-                                        <img className="profile_pic circle float-left mr-4 avatar_shadow" alt="" src={user_data ? user_data.img_url : ''} />
-                                        <p className="larger_font_size m-0 pt-3 mb-2 ml-3">{user_data ? user_data.name : ''}</p>
-                                        <p className="normal_font_size m-0 ml-3">{user_data ? user_data.email : ''}</p>
-                                        <Modal okButtonProps={{ className: 'ok_btn' }} okText="Update" cancelButtonProps={{ className: 'd-none' }} title="Edit Profile" className="new_modal" centered visible={this.state.edit_profile_modal} onOk={this.update_user_detail} onCancel={() => this.setState({ edit_profile_modal: false, detail: 0 })}>
-                                            <div className="edit_profile p-5">
-                                                <div className="profile_img text-center col-12">
-                                                    <Form.Item label="">
-                                                        {form.getFieldDecorator('file', {
-                                                            rules: [],
-                                                            valuePropName: 'fileList',
-                                                            getValueFromEvent: this.normFile,
-                                                        })(
-                                                            <Upload
-                                                                name="avatar"
-                                                                listType="picture-card"
-                                                                className="avatar-uploader d-flex justify-content-center"
-                                                                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                                                                showUploadList={false}
-                                                                beforeUpload={this.beforeUpload}
-                                                                onChange={this.handleChange}
-                                                            >
-                                                                {user_data ? <img src={user_data.img_url} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
-                                                            </Upload>
+            <>
+                <Row>
+                    <Col lg={{ span: 20, offset: 2 }}>
+                        <div id="section-1" className="why_jiffy position-relative pt-1">
+                            <h2 className="bold mb-5 text-center">Profile</h2>
+                            <Row className="profile_section jiffy_border p-4 d-flex align-items-center mb-4">
+                                <Col span={23} >
+                                    <img className="profile_pic circle float-left mr-4 avatar_shadow" alt="" src={user_data ? user_data.img_url : ''} />
+                                    <p className="larger_font_size m-0 pt-3 mb-2 ml-3">{user_data ? user_data.name : ''}</p>
+                                    <p className="normal_font_size m-0 ml-3">{user_data ? user_data.email : ''}</p>
+                                    <Modal okButtonProps={{ className: 'ok_btn' }} okText="Update" cancelButtonProps={{ className: 'd-none' }} title="Edit Profile" className="new_modal" centered visible={this.state.edit_profile_modal} onOk={this.update_user_detail} onCancel={() => this.setState({ edit_profile_modal: false, detail: 0 })}>
+                                        <div className="edit_profile p-5">
+                                            <div className="profile_img text-center col-12">
+                                                <Form.Item label="">
+                                                    {form.getFieldDecorator('file', {
+                                                        rules: [],
+                                                        valuePropName: 'fileList',
+                                                        getValueFromEvent: this.normFile,
+                                                    })(
+                                                        <Upload
+                                                            name="avatar"
+                                                            listType="picture-card"
+                                                            className="avatar-uploader d-flex justify-content-center"
+                                                            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                                            showUploadList={false}
+                                                            beforeUpload={this.beforeUpload}
+                                                            onChange={this.handleChange}
+                                                        >
+                                                            {user_data ? <img src={user_data.img_url} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+                                                        </Upload>
 
-                                                        )}
-                                                    </Form.Item>
-                                                </div>
-                                                <div className="edit_inputs">
-                                                    <Row>
-                                                        <Col className="" lg={24}>
-                                                            <Form.Item label="Full Name">
-                                                                {form.getFieldDecorator("name", {
-                                                                    rules: this.state.detail ? [{ required: true,message:"Enter Full Name" }] : [],
-                                                                    initialValue: user_data ? user_data.name : ""
-                                                                })(<Input className="input_border text-indent-zero" />)}
-                                                            </Form.Item>
-                                                        </Col>
-                                                        <Col className="" lg={24}>
-                                                            <Form.Item label="Email">
-                                                                {form.getFieldDecorator("email", {
-                                                                    rules: this.state.detail ? [{ required: true,message:"Enter Email" }] : [],
-                                                                    initialValue: user_data ? user_data.email : ""
-                                                                })(<Input value={user_data ? user_data.email : ""} className="input_border text-indent-zero" />)}
-                                                            </Form.Item>
-                                                        </Col>
-                                                        <Col span={24}>
-                                                            <Form.Item label="Mobile Number">
-                                                                {form.getFieldDecorator("phone", {
-                                                                    rules: this.state.detail ? [{ required: true, message: 'Enter Phone Number' }] : [],
-                                                                    initialValue: user_data ? `+${user_data.country_code} ${user_data.phone_no}` : ""
-                                                                })(<PhoneInput
-                                                                    disabled
-                                                                    searchStyle={{ backgroundColor: 'white' }}
-                                                                    inputClass="input_border"
-                                                                    buttonClass="input_border"
-                                                                    inputStyle={{ height: '46px' }}
-                                                                    defaultCountry={'in'}
-                                                                    mask={{ in: '+ ..........' }}
-                                                                    onChange={(value, data, event) => {
-                                                                        this.setState({ country_code: data.dialCode });
-                                                                    }} />
-                                                                )}
-                                                            </Form.Item>
-                                                        </Col>
-                                                    </Row>
-                                                </div>
+                                                    )}
+                                                </Form.Item>
                                             </div>
-                                        </Modal>
-                                    </Col>
-                                    <Col orientation="left" justify="end" span={1}>
-                                        <div className="text-center cursor_point">
-                                            <Tooltip title="Edit Your Profile">
-                                                <Icon theme="filled" type="edit" onClick={() => { this.setState({location_modal:false,  edit_profile_modal: true, detail: 1 }) }} className="normal_font_size" />
-                                            </Tooltip>
-                                        </div>
-                                    </Col>
-                                </Row>
-                                <Row className="jiffy_border mb-4 d-flex flex-wrap">
-                                    <Col xs={{ span: 24 }} sm={{ span: 12 }} className="settings_section p-4">
-                                        <h4>Settings</h4>
-                                        <p className="normal_font_size">Change your login password under this section.</p>
-                                        <ul className="list-style-none p-0">
-                                            <li onClick={() => { this.setState({ change_password_modal: true,location_modal:false, pwd: 1 }) }} className="d-flex align-items-center justify-content-between mb-2 normal_font_size cursor_point">
-                                                Change Password
-                                                <GoChevronRight />
-                                            </li>
-                                            <li onClick={() => { this.setState({ location_modal: true }) }} className="d-flex align-items-center justify-content-between mb-2 normal_font_size cursor_point">
-                                                Manage Address
-                                                <GoChevronRight />
-                                            </li>
-                                        </ul>
-                                        <Modal okButtonProps={{ className: 'ok_btn' }} okText="Change Password" cancelButtonProps={{ className: 'd-none' }} title="Change Password" className="new_modal" centered visible={this.state.change_password_modal} onCancel={() => this.setState({ change_password_modal: 0, pwd: 0 })} onOk={this.update_user_password}>
-                                            <div className="edit_profile p-5">
-                                                <div className="edit_inputs">
-                                                    <Row>
-                                                        <Col className="" lg={24}>
-                                                            <Form.Item label="New Password">
-                                                                {form.getFieldDecorator("new_password", {
-                                                                    rules: this.state.pwd ? [{ required: true,message:"Enter New Password" }] : []
-                                                                })(<Input.Password className="input_border text-indent-zero" />)}
-                                                            </Form.Item>
-                                                        </Col>
-                                                        <Col className="" lg={24}>
-                                                            <Form.Item label="Confirm Password">
-                                                                {form.getFieldDecorator("old_password", {
-                                                                    rules: this.state.pwd ? [{ required: true ,message:"Enter Confirm Password"}] : []
-                                                                })(<Input.Password className="input_border text-indent-zero" />)}
-                                                            </Form.Item>
-                                                        </Col>
-                                                    </Row>
-                                                </div>
+                                            <div className="edit_inputs">
+                                                <Row>
+                                                    <Col className="" lg={24}>
+                                                        <Form.Item label="Full Name">
+                                                            {form.getFieldDecorator("name", {
+                                                                rules: this.state.detail ? [{ required: true, message: "Enter Full Name" }] : [],
+                                                                initialValue: user_data ? user_data.name : ""
+                                                            })(<Input className="input_border text-indent-zero" />)}
+                                                        </Form.Item>
+                                                    </Col>
+                                                    <Col className="" lg={24}>
+                                                        <Form.Item label="Email">
+                                                            {form.getFieldDecorator("email", {
+                                                                rules: this.state.detail ? [{ required: true, message: "Enter Email" }] : [],
+                                                                initialValue: user_data ? user_data.email : ""
+                                                            })(<Input value={user_data ? user_data.email : ""} className="input_border text-indent-zero" />)}
+                                                        </Form.Item>
+                                                    </Col>
+                                                    <Col span={24}>
+                                                        <Form.Item label="Mobile Number">
+                                                            {form.getFieldDecorator("phone", {
+                                                                rules: this.state.detail ? [{ required: true, message: 'Enter Phone Number' }] : [],
+                                                                initialValue: user_data ? `+${user_data.country_code} ${user_data.phone_no}` : ""
+                                                            })(<PhoneInput
+                                                                disabled
+                                                                searchStyle={{ backgroundColor: 'white' }}
+                                                                inputClass="input_border"
+                                                                buttonClass="input_border"
+                                                                inputStyle={{ height: '46px' }}
+                                                                defaultCountry={'in'}
+                                                                mask={{ in: '+ ..........' }}
+                                                                onChange={(value, data, event) => {
+                                                                    this.setState({ country_code: data.dialCode });
+                                                                }} />
+                                                            )}
+                                                        </Form.Item>
+                                                    </Col>
+                                                </Row>
                                             </div>
-                                        </Modal>
-                                    </Col>
-                                    <Col xs={{ span: 24 }} sm={{ span: 12 }} className="privacy_section p-4">
-                                        <h4>Privacy Policy</h4>
-                                        <p className="normal_font_size mb-4">it is a short explanation of what you are doing to observe visitors to your website.</p>
-                                        <ul className="list-style-none p-0">
-                                            <li className="d-flex align-items-center justify-content-between mb-2 normal_font_size cursor_point" onClick={() => { this.props.history.push('/static_page/about_us') }}>Help & Support <GoChevronRight /> </li>
-                                            <li className="d-flex align-items-center justify-content-between mb-2 normal_font_size cursor_point" onClick={() => { this.props.history.push('/static_page/terms') }}>Terms & Conditions <GoChevronRight /> </li>
-                                        </ul>
-                                    </Col>
-                                </Row>
-                                <Row className="jiffy_border p-4 d-flex align-items-center mb-4">
-                                    <Col span={23} className="logout_section">
-                                        <h4>Logout</h4>
-                                        <p className="normal_font_size m-0">You will be returned to the login screen.</p>
-                                    </Col>
-                                    <Col span={1} >
-                                        <div className="text-center cursor_point" onClick={this.logout}>
-                                            <Tooltip title="Logout">
-                                                <Icon type="logout" className="normal_font_size" />
-                                            </Tooltip>
                                         </div>
-                                    </Col>
-                                </Row>
-                            </div>
-                        </Col>
-                    </Row>
-                </Content>
+                                    </Modal>
+                                </Col>
+                                <Col orientation="left" justify="end" span={1}>
+                                    <div className="text-center cursor_point">
+                                        <Tooltip title="Edit Your Profile">
+                                            <Icon theme="filled" type="edit" onClick={() => { this.setState({ location_modal: false, edit_profile_modal: true, detail: 1 }) }} className="normal_font_size" />
+                                        </Tooltip>
+                                    </div>
+                                </Col>
+                            </Row>
+                            <Row className="jiffy_border mb-4 d-flex flex-wrap">
+                                <Col xs={{ span: 24 }} sm={{ span: 12 }} className="settings_section p-4">
+                                    <h4>Settings</h4>
+                                    <p className="normal_font_size">Change your login password under this section.</p>
+                                    <ul className="list-style-none p-0">
+                                        <li onClick={() => { this.setState({ change_password_modal: true, location_modal: false, pwd: 1 }) }} className="d-flex align-items-center justify-content-between mb-2 normal_font_size cursor_point">
+                                            Change Password
+                                            <GoChevronRight />
+                                        </li>
+                                        <li onClick={() => { this.setState({ location_modal: true }) }} className="d-flex align-items-center justify-content-between mb-2 normal_font_size cursor_point">
+                                            Manage Address
+                                            <GoChevronRight />
+                                        </li>
+                                    </ul>
+                                    <Modal okButtonProps={{ className: 'ok_btn' }} okText="Change Password" cancelButtonProps={{ className: 'd-none' }} title="Change Password" className="new_modal" centered visible={this.state.change_password_modal} onCancel={() => this.setState({ change_password_modal: 0, pwd: 0 })} onOk={this.update_user_password}>
+                                        <div className="edit_profile p-5">
+                                            <div className="edit_inputs">
+                                                <Row>
+                                                    <Col className="" lg={24}>
+                                                        <Form.Item label="New Password">
+                                                            {form.getFieldDecorator("new_password", {
+                                                                rules: this.state.pwd ? [{ required: true, message: "Enter New Password" }] : []
+                                                            })(<Input.Password className="input_border text-indent-zero" />)}
+                                                        </Form.Item>
+                                                    </Col>
+                                                    <Col className="" lg={24}>
+                                                        <Form.Item label="Confirm Password">
+                                                            {form.getFieldDecorator("old_password", {
+                                                                rules: this.state.pwd ? [{ required: true, message: "Enter Confirm Password" }] : []
+                                                            })(<Input.Password className="input_border text-indent-zero" />)}
+                                                        </Form.Item>
+                                                    </Col>
+                                                </Row>
+                                            </div>
+                                        </div>
+                                    </Modal>
+                                </Col>
+                                <Col xs={{ span: 24 }} sm={{ span: 12 }} className="privacy_section p-4">
+                                    <h4>Privacy Policy</h4>
+                                    <p className="normal_font_size mb-4">it is a short explanation of what you are doing to observe visitors to your website.</p>
+                                    <ul className="list-style-none p-0">
+                                        <li className="d-flex align-items-center justify-content-between mb-2 normal_font_size cursor_point" onClick={() => { this.props.history.push('/static_page/about_us') }}>Help & Support <GoChevronRight /> </li>
+                                        <li className="d-flex align-items-center justify-content-between mb-2 normal_font_size cursor_point" onClick={() => { this.props.history.push('/static_page/terms') }}>Terms & Conditions <GoChevronRight /> </li>
+                                    </ul>
+                                </Col>
+                            </Row>
+                            <Row className="jiffy_border p-4 d-flex align-items-center mb-4">
+                                <Col span={23} className="logout_section">
+                                    <h4>Logout</h4>
+                                    <p className="normal_font_size m-0">You will be returned to the login screen.</p>
+                                </Col>
+                                <Col span={1} >
+                                    <div className="text-center cursor_point" onClick={this.logout}>
+                                        <Tooltip title="Logout">
+                                            <Icon type="logout" className="normal_font_size" />
+                                        </Tooltip>
+                                    </div>
+                                </Col>
+                            </Row>
+                        </div>
+                    </Col>
+                </Row>
                 <Address visible={this.state.location_modal} />
-                <Suspense fallback={<Skeleton active />}>
-                    <UserFooter />
-                </Suspense>
-            </Layout>
+            </>
         );
     }
 }

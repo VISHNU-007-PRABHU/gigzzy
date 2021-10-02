@@ -141,7 +141,7 @@ class AddCurrency extends React.Component {
                                             <Col span={24}>
                                                 <Form.Item label="Name">
                                                     {form.getFieldDecorator("name", {
-                                                        initialValue: this.state.update_data.name,
+                                                        initialValue: this.state.update_data?.name,
                                                         rules: [{ required: true }]
                                                     })(<Input placeholder="Name" />)}
                                                 </Form.Item>
@@ -151,7 +151,7 @@ class AddCurrency extends React.Component {
                                             <Col span={24}>
                                                 <Form.Item label="Location">
                                                     {form.getFieldDecorator("location", {
-                                                        initialValue: this.state.update_data.location,
+                                                        initialValue: this.state.update_data?.location,
                                                         rules: [{ required: true }]
                                                     })(<Input placeholder="location" />)}
                                                 </Form.Item>
@@ -161,7 +161,7 @@ class AddCurrency extends React.Component {
                                             <Col span={24}>
                                                 <Form.Item label="Country Code">
                                                     {form.getFieldDecorator("country_code", {
-                                                        initialValue: this.state.update_data.country_code,
+                                                        initialValue: this.state.update_data?.country_code,
                                                         rules: [{ required: true }]
                                                     })(<Input placeholder="Country code" />)}
                                                 </Form.Item>
@@ -173,7 +173,7 @@ class AddCurrency extends React.Component {
                                             <Col span={24}>
                                                 <Form.Item label="Currency Code">
                                                     {form.getFieldDecorator("code", {
-                                                        initialValue: this.state.update_data.code,
+                                                        initialValue: this.state.update_data?.code,
                                                         rules: [{ required: true }]
                                                     })(<Input placeholder="Currency code" />)}
                                                 </Form.Item>
@@ -183,7 +183,7 @@ class AddCurrency extends React.Component {
                                             <Col span={24}>
                                                 <Form.Item label="Currency Rate">
                                                     {form.getFieldDecorator("rate", {
-                                                        initialValue: this.state.update_data.rate,
+                                                        initialValue: this.state.update_data?.rate,
                                                         rules: [{ required: true }]
                                                     })(<Input placeholder="Currency Rate" />)}
                                                 </Form.Item>
@@ -193,7 +193,7 @@ class AddCurrency extends React.Component {
                                             <Col span={24}>
                                                 <Form.Item label="Currency Symbol">
                                                     {form.getFieldDecorator("symbol", {
-                                                        initialValue: this.state.update_data.symbol,
+                                                        initialValue: this.state.update_data?.symbol,
                                                         rules: [{ required: true }]
                                                     })(<Input placeholder="Currency Symbol" />)}
                                                 </Form.Item>

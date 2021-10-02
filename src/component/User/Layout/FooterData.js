@@ -10,16 +10,7 @@ export const FooterData = [
         }, {
             title: "Careers",
             link: "/static_page/about_us"
-        }, {
-            title: "About",
-            link: "/static_page/about_us"
-        }, {
-            title: "Blog",
-            link: "/static_page/about_us"
-        }, {
-            title: "Careers",
-            link: "/static_page/about_us"
-        }, {
+        },{
             title: "Advertise with Us",
             link: "/static_page/about_us"
         }
@@ -29,22 +20,26 @@ export const FooterData = [
         title: "CUSTOMERS",
         data: [{
             title: "How it works",
-            link: "/static_page/about_us"
+            link: "/howlearnmore"
         }, {
             title: "Sign up as a customer",
             link: "/login"
-        }, {
-            title: "Resources",
-            link: "/static_page/about_us"
-        }, {
-            title: "Testimonials",
-            link: "/static_page/professional_screening_process"
-        }, {
+        },
+        //  {
+        //     title: "Resources",
+        //     link: "/static_page/about_us"
+        // }, {
+        //     title: "Testimonials",
+        //     link: "/static_page/professional_screening_process"
+        // }, 
+        {
             title: "iPhone app for customers",
             link:"https://apps.apple.com/us/app/gigzzy-user/id1574904567"
         }, {
             title: "Android app for customers",
-            link: "https://play.google.com/store/apps/details?id=com.gigzzy.user"
+            link: "https://play.google.com/store/apps/details?id=com.gigzzy.pro"
+        },{
+            title:"SHAREBUTTON"
         }
         ]
     },
@@ -55,16 +50,18 @@ export const FooterData = [
             link: "/static_page/faq"
         }, {
             title: "Sign up as a provider",
-            link: "/static_page/provider_login"
-        }, {
-            title: "Resources",
-            link: "/static_page/why_gigzzy"
-        }, {
-            title: "Testimonials",
-            link: "/static_page/faq"
-        }, {
+            link: "/provider_login"
+        },
+        //  {
+        //     title: "Resources",
+        //     link: "/static_page/why_gigzzy"
+        // }, {
+        //     title: "Testimonials",
+        //     link: "/static_page/faq"
+        // },
+         {
             title: "iPhone app for provider",
-            link:"https://apps.apple.com/us/app/gigzzy-user/id1574904567"
+            link:"https://apps.apple.com/us/app/gigzzy-pro/id1574905070"
         }, {
             title: "Android app for provider",
             link: "https://play.google.com/store/apps/details?id=com.gigzzy.user"
@@ -74,31 +71,25 @@ export const FooterData = [
     {
         title: "RESOURCES",
         data: [{
-            title: "Help",
-            link: "/static_page/faq"
-          }, {
-            title: "Safety",
+            title: "FAQ & Help",
             link: "/static_page/faq"
           }, {
             title: "COVID-19 Info",
-            link: "/static_page/faq"
+            link: "/static_page/covid"
           }, {
             title: " Terms of Use",
             link: "/static_page/terms"
-          }, {
-            title: "Client Guarantee",
-            link: "/static_page/client"
-          }, {
+          },  {
             title: "Privacy Policy",
             link: "/static_page/policy"
           }
           , {
             title: " CA Privacy Notice",
-            link: "/static_page/conduct"
+            link: "/static_page/ca_privacy"
           }
           , {
             title: "Do Not Sell My Info",
-            link: "/static_page/about_us"
+            link: "/static_page/do_not_sell"
           }
           ]
     }

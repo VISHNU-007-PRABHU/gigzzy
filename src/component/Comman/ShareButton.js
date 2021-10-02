@@ -13,7 +13,7 @@ class ShareButton extends React.Component {
 
     render() {
         return (
-            <div className="d-flex">
+            <div className="d-flex justify-content-around my-2">
 
                 <FacebookShareButton
                     url="https://web.facebook.com/gigzzy"
@@ -55,4 +55,4 @@ class ShareButton extends React.Component {
         );
     }
 }
-export default withRouter(ShareButton);
+export default ShareButton;

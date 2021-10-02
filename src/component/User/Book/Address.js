@@ -15,8 +15,8 @@ import { Alert_msg } from "../../Comman/alert_msg";
 import includes from 'lodash/includes'
 import { LocationContext, EditLocationContext } from "../../context/Location";
 const ADD_ADDRESS = gql`
-  mutation add_address($company_id:ID,$option: Int,$_id:ID,$user_id: String,$title: String,$flat_no: String ,$landmark: String,$address: String,$lat: String,$lng: String ) {
-     modified_address(company_id:$company_id,option: $option,_id:$_id,user_id: $user_id,title: $title,flat_no: $flat_no, landmark: $landmark,address: $address,lat: $lat,lng: $lng ) {
+  mutation add_address($company_id:ID,$location_code:String,$option: Int,$_id:ID,$user_id: String,$title: String,$flat_no: String ,$landmark: String,$address: String,$lat: String,$lng: String ) {
+     modified_address(company_id:$company_id,location_code:$location_code,option: $option,_id:$_id,user_id: $user_id,title: $title,flat_no: $flat_no, landmark: $landmark,address: $address,lat: $lat,lng: $lng ) {
         msg
         status
     }
@@ -33,6 +33,7 @@ query ADDRESS($user_id: ID) {
     address
     lat
     lng
+    location_code
   }
 }
 `;
@@ -43,6 +44,7 @@ const Address = (props) => {
     const [draggable, setdraggable] = useState(true);
     const [zoom, setzoom] = useState(15);
     const [address, setaddress] = useState('');
+    const [country_code, set_country_code] = useState('');
     const [lat, setlat] = useState(9.9619289);
     const [lng, setlng] = useState(78.1288218);
     const [flat_no, setflat_no] = useState("");
@@ -88,7 +90,16 @@ const Address = (props) => {
     const handleSelect = address => {
         setaddress(address);
         geocodeByAddress(address)
-            .then(results => getLatLng(results[0]))
+            .then(results => {
+                if (results[0]) {
+                    results[0].address_components.map(data => {
+                        if (data.types.includes("country")) {
+                            set_country_code(data.short_name)
+                        }
+                    })
+                }
+                getLatLng(results[0])
+            })
             .then(latLng => {
                 setlat(latLng.lat);
                 setlng(latLng.lng);
@@ -111,16 +122,16 @@ const Address = (props) => {
         // Get address from latidude & longitude.
         await Geocode.fromLatLng(mouse.lat, mouse.lng).then(
             response => {
+                console.log("onCircleInteraction -> response", response)
+                if (response.results[0].address_components) {
+                    response.results[0].address_components.map(data => {
+                        if (data.types.includes("country")) {
+                            set_country_code(data.short_name)
+                        }
+                    })
+                }
                 const address = response.results[0].formatted_address;
                 setaddress(address);
-                // geocodeByAddress(address)
-                // .then(results => getLatLng(results[0]))
-                // .then(latLng =>{
-                //     setlat(latLng.lat);
-                //     setlng(latLng.lng);
-                //     setcenter([latLng.lat, latLng.lng])
-                // } )
-                // .catch(error => console.error('Error', error));
             },
             error => {
                 console.error(error);
@@ -141,7 +152,8 @@ const Address = (props) => {
             landmark: landmark,
             address: address,
             lat: String(lat),
-            lng: String(lng)
+            lng: String(lng),
+            location_code:country_code
         };
         console.log(data)
         if(props.company){
@@ -174,7 +186,8 @@ const Address = (props) => {
             landmark: landmark,
             address: address,
             lat: String(lat),
-            lng: String(lng)
+            lng: String(lng),
+            location_code:country_code
         };
         console.log(data)
         if(props.company){

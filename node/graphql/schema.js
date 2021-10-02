@@ -7,8 +7,9 @@ const typeDefs = gql`
     scalar Cursor
 
     directive @ref on FIELD_DEFINITION
-    directive @payment(defaultFormat: String = "false") on FIELD_DEFINITION
-    directive @currency(defaultFormat: String = "KES") on FIELD_DEFINITION
+    directive @paymentOption(defaultFormat: String = "false") on FIELD_DEFINITION
+    directive @currency(defaultFormat: String = "KE") on FIELD_DEFINITION
+    directive @payment(defaultFormat: String = "KE") on FIELD_DEFINITION
     directive @upper on FIELD_DEFINITION
     directive @date(format: String) on FIELD_DEFINITION
     directive @imgSize(format: String) on FIELD_DEFINITION
@@ -16,11 +17,11 @@ const typeDefs = gql`
 
     type Subscription {
         messageSent(limit: Int,page:Int,user_id:ID,provider_id:ID,booking_id:ID):Chat
-        get_my_appointments(_id:ID,role:Int,booking_status:Int,limit:Int,page:Int):[Booking]
+        get_my_appointments(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[Booking]
         acceptedMessage(id:ID,online:Int): Booking   
-        send_jobs_provider(_id:ID,online:Int): Booking
-        send_accept_msg(_id:ID,booking_id:ID,online:Int): Booking
-        booking_details(booking_id:ID,online:Int): Booking
+        send_jobs_provider(_id:ID,online:Int,location_code:String): Booking
+        send_accept_msg(_id:ID,booking_id:ID,online:Int,location_code:String): Booking
+        booking_details(booking_id:ID,online:Int,location_code:String): Booking
         test(online:String):User
         proof_status(_id:ID,role:Int,):Detail
         demo_account(_id:ID):Detail
@@ -48,15 +49,15 @@ const typeDefs = gql`
         files: [String]
         resend_otp(_id:ID):Detail
         test:Category
-        get_my_appointments(_id:ID,role:Int,booking_status:Int,limit:Int,page:Int):BookingConnection
-        booking(_id:ID):[Booking]
+        get_my_appointments(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):BookingConnection
+        booking(_id:ID,location_code:String):[Booking]
         get_now_job(_id:ID,role:Int,booking_status:Int):[Booking]
         get_message(booking_id:ID,user_id:ID,provider_id:ID):[Chat]
         search_category(_id:ID,data:JSON):[Category] 
         search_category_mobile(data:String):[Category]
         get_trending(_id:ID):[Category]
-        get_is_future(_id:ID):[Category]
-        get_extra_fare(booking_id:ID,option:Int):[Booking]
+        get_is_future(_id:ID,limit:Int):[Category]
+        get_extra_fare(booking_id:ID,option:Int,location_code:String):[Booking]
         get_payout_detail(data:JSON):[Booking]
         site_setting_detail(_id:ID):Site
         payout_setting_detail(_id:ID):Payout
@@ -69,9 +70,9 @@ const typeDefs = gql`
         get_certificate(limit: Int,page:Int):CertificateConnection
         get_static(limit: Int,page:Int):StaticConnection
         get_review(limit: Int,page:Int,user_comments_status:Int,option:String,data:JSON):BookingConnection
-        get_booking(limit: Int,page:Int,booking_status:[Int],payment_status:[Int],provider_id:ID,user_id:ID,category_id:ID,booking_date:JSON,booking_ref:JSON):BookingConnection 
-        get_booking_details(limit: Int,page:Int,status:Int,_id:ID):BookingConnection 
-        get_payout(limit: Int,page:Int,provider_id:ID,booking_id:ID,booking_status:Int,option:Int):BookingConnection
+        get_booking(limit: Int,page:Int,booking_status:[Int],location_code:String,payment_status:[Int],provider_id:ID,user_id:ID,category_id:ID,booking_date:JSON,booking_ref:JSON):BookingConnection 
+        get_booking_details(limit: Int,page:Int,status:Int,_id:ID,location_code:String):BookingConnection 
+        get_payout(limit: Int,page:Int,provider_id:ID,booking_id:ID,booking_status:Int,option:Int,location_code:String):BookingConnection
         get_all_payout(limit: Int,page:Int,provider_id:ID,booking_id:ID,booking_status:Int,option:Int):BookingConnection
         get_booking_chart(option:Int):[Dashboard]
         get_cancel_chart(option:Int):[Dashboard]
@@ -598,8 +599,9 @@ const typeDefs = gql`
         last_name:String
         price(code: String): String @currency
         currency_code:String
+        currency_id:ID
         location_code:String
-        get_currency(location_code:String,country_code:String,_id:ID):Currency
+        get_currency(location_code:String,country_code:String,_id:ID,user_id:ID):Currency
     }
     
     type Account{
@@ -654,6 +656,8 @@ const typeDefs = gql`
         nextPage: String,
         currency_code:String,  
         currency_id:ID
+        location_code:String
+        ParentCategoryCurrency(root:Boolean,location_code:String,currency_id:ID,country_code:String,_id:ID):subCategory
     }
     type subCategory{
         id:ID
@@ -700,6 +704,7 @@ const typeDefs = gql`
         nextPage: String,
         currency_code:String, 
         currency_id:ID
+        location_code:String
         get_parent_currency:Currency
         GetCategoryCurrency(root:Boolean):SubCategoryConnection
         ParentCategoryCurrency(root:Boolean,location_code:String,currency_id:ID,country_code:String,_id:ID):subCategory
@@ -774,6 +779,7 @@ const typeDefs = gql`
         payment_message:String
         MpesaReceiptNumber:String
         payment_type:String
+        payment_option(code:String):String @paymentOption
         job_status:Int
         jobStart_time:Date
         jobEnd_time:Date
@@ -802,7 +808,7 @@ const typeDefs = gql`
         booking_provider(_id:ID):[Detail]
         provider(_id:ID):[Detail]
         find_payout_provider:[Detail]
-        get_my_appointments(_id:ID,booking_status:Int):[Booking]
+        get_my_appointments(_id:ID,booking_status:Int,location_code:String):[Booking]
         send_job_category(_id:ID,type:Int):[Category]
         get_booking_on_status(_id:ID,booking_status:Int):[Booking]
         find_payout_booking:[Booking]
@@ -812,6 +818,7 @@ const typeDefs = gql`
         msg:String
         location_code:String
         currency_code:String
+        symbol:String
     }
 
     type File {
@@ -848,6 +855,7 @@ const typeDefs = gql`
         zip_code: String,
         distance:String,
         location_code:String
+        country_code:String
     }
 
 
@@ -892,9 +900,9 @@ const typeDefs = gql`
         provider_document_verified(_id:ID,proof_status:String):Detail
         online_status(_id:ID,online_status:Int):Detail
         # booking process
-        add_booking( user_id:ID,location_code:String,provider_id:ID,category_id:ID,lat:Float,lng:Float,weekday:JSON,hours:String,description:String,booking_status:Int,booking_type:Int,data:[JSON],file:[Upload],category_type:Int,booking_date:String,booking_time:String,booking_hour:String):[Booking]
-        manage_booking(role:Int,booking_id:ID,user_id:ID,provider_id:ID,category_id:String,lat:Float,lng:Float,weekday:JSON,hours:String,description:String,booking_status:Int,category_type:Int,stripe_token:String,payment_type:String,phone_number:String,extra_fare:String,extra_fare_reason:String,option:Int,extra_fare_id:ID):[Booking]
-        update_booking(provider_id:ID,booking_id:ID,file:[Upload],option:Int):Booking
+        add_booking( user_id:ID,currency_id:ID,local_location_code:String,location_code:String,provider_id:ID,category_id:ID,lat:Float,lng:Float,weekday:JSON,hours:String,description:String,booking_status:Int,booking_type:Int,data:[JSON],file:[Upload],category_type:Int,booking_date:String,booking_time:String,booking_hour:String):[Booking]
+        manage_booking(location_code:String,role:Int,booking_id:ID,user_id:ID,provider_id:ID,category_id:String,lat:Float,lng:Float,weekday:JSON,hours:String,description:String,booking_status:Int,category_type:Int,stripe_token:String,payment_option:String,payment_type:String,phone_number:String,extra_fare:String,extra_fare_reason:String,option:Int,extra_fare_id:ID):[Booking]
+        update_booking(location_code:String,provider_id:ID,booking_id:ID,file:[Upload],option:Int):Booking
         update_booking_details(provider_id:ID,booking_id:ID,file:[Upload],option:Int,user_comments_status:Int):Booking
         pay_admin_to_provider(booking_status:Int,status:Int,provider_id:ID):Booking
         # chat
@@ -978,6 +986,7 @@ const typeDefs = gql`
             country: String,
             zip_code: String,
             distance:String,
+            location_code:String
             ):UserAddress
         # add company_detail
         CompanyFileUpload(
@@ -1029,11 +1038,3 @@ module.exports.Date = (value) => {
     throw new Error('DateTime cannot represent an invalid ISO-8601 Date string');
 };
 
-// module.exports = {
-//     // The cursor type. Will obfuscate the MongoID.
-//     Cursor: CursorType,
-//     // Apply the pagination resolvers for the connection and edge.
-//     ContactConnection: paginationResolvers.connection,
-//     ContactEdge: paginationResolvers.edge,
-
-//   };;

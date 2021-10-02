@@ -33,15 +33,12 @@ const mapOptions = {
     fullscreenControl: false,
 };
 
-
-const UserHeader = React.lazy(() => import('../Layout/UserHeader'));
-const UserFooter = React.lazy(() => import('../Layout/UserFooter'));
 const PointLocation = React.lazy(() => import("./PointLocation"))
 const Appointments = React.lazy(() => import("./Appointments"))
-
+const StripePayout = React.lazy(() => import("./payment/stripe_payment"))
 const SEND_ACCEPT_MSG = gql`
-subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
-    send_accept_msg (_id:$_id,booking_id:$booking_id){
+subscription SENDACCEPTMSG($_id:ID,$booking_id:ID,$location_code:String){
+    send_accept_msg (_id:$_id,booking_id:$booking_id,location_code:$location_code){
         _id
         description
         user_image_url
@@ -58,6 +55,7 @@ subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
         base_price
         extra_price
         payment_type
+        payment_option(code:$location_code)
         mpeas_payment_callback
         ctob_shotcode
         ctob_billRef
@@ -138,6 +136,7 @@ class Bookings extends React.Component {
             rating: 0,
             rate: 0,
             accept_pay_modal: 0,
+            stripe_pay_modal: false,
             complete_button: 0,
             call_msg_sub: 0,
             msg_count: 0,
@@ -172,9 +171,13 @@ class Bookings extends React.Component {
         // console.log(option, id);
         if (option === true) {
             this.setState({ call_msg_sub: 1 });
+            let inputdata = { _id: id}
+            if(localStorage.getItem("currency")){
+                inputdata['location_code'] = JSON.parse(localStorage.getItem("currency")).location 
+            }
             await client.query({
                 query: GET_PARTICULAR_BOOKING,
-                variables: { _id: id, },
+                variables: inputdata,
                 fetchPolicy: 'no-cache',
             }).then(result => {
                 console.log(result);
@@ -190,9 +193,12 @@ class Bookings extends React.Component {
             });
         }
         if (this.state.particular_booking[0]?.payment_status === 4 && !this.state.particular_booking[0]?.mpeas_payment_callback) {
-            this.setState({ accept_pay_modal: 1, booking_detail: option })
+            if (this.state.particular_booking[0]?.payment_option === "stripe") {
+                this.setState({ stripe_pay_modal: true, booking_detail: option })
+            } else {
+                this.setState({ accept_pay_modal: 1, booking_detail: option })
+            }
         } else {
-            console.log(this.state.particular_booking[0].booking_status, 'vis');
             if (this.state.particular_booking[0]?.booking_status === 13) {
                 this.setState({ complete_button: 1, booking_detail: option });
             } else {
@@ -215,7 +221,11 @@ class Bookings extends React.Component {
                 if (result) {
                     console.log(result.data.send_accept_msg);
                     if (result.data.send_accept_msg.payment_status === 4) {
-                        that.setState({ particular_booking: [result.data.send_accept_msg], accept_pay_modal: 1 });
+                        if (result.data.send_accept_msg?.payment_option === "stripe") {
+                            this.setState({ stripe_pay_modal: true, particular_booking: [result.data.send_accept_msg], })
+                        } else {
+                            that.setState({ particular_booking: [result.data.send_accept_msg], accept_pay_modal: 1 });
+                        }
                     } else {
                         if (result.data.send_accept_msg.booking_status === 13) {
                             that.setState({ complete_button: 1 });
@@ -355,300 +365,298 @@ class Bookings extends React.Component {
     }
 
     render() {
-        console.log(this.state.accept_pay_modal)
+        console.log(this.state.stripe_pay_modal)
         return (
-            <Layout className="white" style={{ minHeight: '100vh' }}>
+            <>
+                <h2 className="bold mb-5 text-center">My Bookings</h2>
+                <Row gutter={[10, 10]} className='ant-row d-flex d-lg-block d-md-flex flex-column-reverse flex-column-sm mb-5'>
+                    <Col lg={{ span: 16, offset: 2 }}>
+                        <Suspense fallback={<Skeleton />}>
+                            <Appointments
+                                handleInfiniteOnLoad={this.handleInfiniteOnLoad}
+                                page={this.state.pagination.current}
+                                status={this.state.mode}
+                                heading={this.state.mode_state}
+                                view_booking={this.view_booking} />
+                        </Suspense>
+                    </Col>
+                    <Col lg={{ span: 4 }}>
+                        <Card className="booking_view_showdow">
+                            <Card.Grid className='w-100 cursor_point' onClick={() => { this.handleModeChange("10") }}>
+                                <Row>
+                                    <Col span={20}>
+                                        <span className={this.state.mode_state === 'Pending' ? "primary_color bold" : "bold"}>Incoming</span>
+                                    </Col>
+                                    <Col span={4}>
+                                        <span className={this.state.mode_state === 'Pending' ? "primary_color float-right" : "float-right"}> <Icon type="hourglass" /> </span>
+                                    </Col>
+                                </Row>
+                            </Card.Grid>
+                            <Card.Grid className='w-100 cursor_point' onClick={() => { this.handleModeChange("4") }}>
+                                <Row>
+                                    <Col span={20}>
+                                        <span className={this.state.mode_state === 'OnGoing' ? "primary_color bold" : "bold"}>On Going</span>
+                                    </Col>
+                                    <Col span={4}>
+                                        <span className={this.state.mode_state === 'OnGoing' ? "primary_color float-right" : "float-right"}> <Icon type="fire" /> </span>
+                                    </Col>
+                                </Row>
+                            </Card.Grid>
+                            <Card.Grid className='w-100 cursor_point' onClick={() => { this.handleModeChange("14") }}>
+                                <Row >
+                                    <Col span={20}>
+                                        <span className={this.state.mode_state === 'Completed' ? "primary_color bold" : "bold"}>Completed</span>
+                                    </Col>
+                                    <Col span={4}>
+                                        <span className={this.state.mode_state === 'Completed' ? "primary_color float-right" : "float-right"}> <Icon type="carry-out" /> </span>
+                                    </Col>
+                                </Row>
+                            </Card.Grid>
+                        </Card>
+                    </Col>
+                </Row>
                 <Suspense fallback={<Skeleton active />}>
-                    <UserHeader />
+                    <PointLocation
+                        user_lat={this.state.particular_booking[0]?.lat}
+                        user_lng={this.state.particular_booking[0]?.lng}
+                        provider_lat={this.state.particular_booking[0]?.booking_provider[0]?.lat}
+                        provider_lng={this.state.particular_booking[0]?.booking_provider[0]?.lng}
+                        direction={this.state.direction}
+                        close_direction_model={this.close_direction_model} />
                 </Suspense>
-                <Content className="px-1">
-                    <h2 className="bold mb-5 text-center">My Bookings</h2>
-                    <Row gutter={[10, 10]} className='ant-row d-flex d-lg-block d-md-flex flex-column-reverse flex-column-sm mb-5'>
-                        <Col lg={{ span: 16, offset: 2 }}>
-                            <Suspense fallback={<Skeleton />}>
-                                <Appointments
-                                    handleInfiniteOnLoad={this.handleInfiniteOnLoad}
-                                    page={this.state.pagination.current}
-                                    status={this.state.mode}
-                                    heading={this.state.mode_state}
-                                    view_booking={this.view_booking} />
-                            </Suspense>
-                        </Col>
-                        <Col lg={{ span: 4 }}>
-                            <Card className="booking_view_showdow">
-                                <Card.Grid className='w-100 cursor_point' onClick={() => { this.handleModeChange("10") }}>
-                                    <Row>
-                                        <Col span={20}>
-                                            <span className={this.state.mode_state === 'Pending' ? "primary_color bold" : "bold"}>Incoming</span>
-                                        </Col>
-                                        <Col span={4}>
-                                            <span className={this.state.mode_state === 'Pending' ? "primary_color float-right" : "float-right"}> <Icon type="hourglass" /> </span>
-                                        </Col>
-                                    </Row>
-                                </Card.Grid>
-                                <Card.Grid className='w-100 cursor_point' onClick={() => { this.handleModeChange("4") }}>
-                                    <Row>
-                                        <Col span={20}>
-                                            <span className={this.state.mode_state === 'OnGoing' ? "primary_color bold" : "bold"}>On Going</span>
-                                        </Col>
-                                        <Col span={4}>
-                                            <span className={this.state.mode_state === 'OnGoing' ? "primary_color float-right" : "float-right"}> <Icon type="fire" /> </span>
-                                        </Col>
-                                    </Row>
-                                </Card.Grid>
-                                <Card.Grid className='w-100 cursor_point' onClick={() => { this.handleModeChange("14") }}>
-                                    <Row >
-                                        <Col span={20}>
-                                            <span className={this.state.mode_state === 'Completed' ? "primary_color bold" : "bold"}>Completed</span>
-                                        </Col>
-                                        <Col span={4}>
-                                            <span className={this.state.mode_state === 'Completed' ? "primary_color float-right" : "float-right"}> <Icon type="carry-out" /> </span>
-                                        </Col>
-                                    </Row>
-                                </Card.Grid>
-                            </Card>
-                        </Col>
-                    </Row>
-                    <Suspense fallback={<Skeleton active />}>
-                        <PointLocation
-                            user_lat={this.state.particular_booking[0]?.lat}
-                            user_lng={this.state.particular_booking[0]?.lng}
-                            provider_lat={this.state.particular_booking[0]?.booking_provider[0]?.lat}
-                            provider_lng={this.state.particular_booking[0]?.booking_provider[0]?.lng}
-                            direction={this.state.direction}
-                            close_direction_model={this.close_direction_model} />
-                    </Suspense>
 
-                    {this.state.particular_booking.length > 0 ?
-                        <>
-                            <Modal
-                                okButtonProps={{ className: 'd-none' }}
-                                okText="Update"
-                                cancelButtonProps={{ className: 'd-none' }}
-                                title={this.state.particular_booking[0].booking_category[0].category_type === 1 ? this.state.particular_booking[0].booking_category[0].category_name : this.state.particular_booking[0].booking_category[0].subCategory_name}
-                                className="new_modal"
-                                visible={this.state.booking_detail}
-                                onCancel={() => this.setState({ booking_detail: false })}>
-                                <div style={{ height: '100px', width: '100%' }}>
-                                    <GoogleMapReact
-                                        draggable={false}
-                                        center={this.state.center}
-                                        zoom={this.state.zoom}
-                                        options={mapOptions}
-                                    >
-                                    </GoogleMapReact>
-                                    <MdLocationOn className="direction_icon" onClick={() => { this.setState({ direction: 1 }); }} />
-                                    {this.state.particular_booking[0].job_end_time === "" ?
-                                        <Button className="normal_font_size jiffy_btn mr-3 primary-bg float-right position-relative t-40" onClick={() => { this.setState({ direction: 1 }); }}>Direction</Button>
-                                        :
-                                        <Button className="normal_font_size jiffy_btn mr-3 primary-bg float-right position-relative t-40" onClick={() => { this.setState({ rating: 1 }); }}>Review</Button>
-                                    }
-                                    <Button className="normal_font_size jiffy_btn mr-3 float-right position-relative t-40" onClick={() => { this.msg(true, this.state.particular_booking[0]._id, this.state.particular_booking[0].booking_user[0]._id, this.state.particular_booking[0].booking_provider[0]._id) }}>
-                                        Chat
-                                        <Badge className="inner_count" count={this.state.msg_count} />
-                                    </Button>
+                {this.state.particular_booking.length > 0 ?
+                    <>
+                        <Modal
+                            okButtonProps={{ className: 'd-none' }}
+                            okText="Update"
+                            cancelButtonProps={{ className: 'd-none' }}
+                            title={this.state.particular_booking[0].booking_category[0].category_type === 1 ? this.state.particular_booking[0].booking_category[0].category_name : this.state.particular_booking[0].booking_category[0].subCategory_name}
+                            className="new_modal"
+                            footer={null}
+                            bodyStyle={{ padding: "0px 0px 35px 0px" }}
+                            visible={this.state.booking_detail}
+                            onCancel={() => this.setState({ booking_detail: false })}>
+                            <div style={{ height: '100px', width: '100%' }}>
+                                <GoogleMapReact
+                                    draggable={false}
+                                    center={this.state.center}
+                                    zoom={this.state.zoom}
+                                    options={mapOptions}
+                                >
+                                </GoogleMapReact>
+                                <MdLocationOn className="direction_icon" onClick={() => { this.setState({ direction: 1 }); }} />
+                                {this.state.particular_booking[0].job_end_time === "" ?
+                                    <Button className="normal_font_size jiffy_btn mr-3 primary-bg float-right position-relative t-40" onClick={() => { this.setState({ direction: 1 }); }}>Direction</Button>
+                                    :
+                                    <Button className="normal_font_size jiffy_btn mr-3 primary-bg float-right position-relative t-40" onClick={() => { this.setState({ rating: 1 }); }}>Review</Button>
+                                }
+                                <Button className="normal_font_size jiffy_btn mr-3 float-right position-relative t-40" onClick={() => { this.msg(true, this.state.particular_booking[0]._id, this.state.particular_booking[0].booking_user[0]._id, this.state.particular_booking[0].booking_provider[0]._id) }}>
+                                    Chat
+                                    <Badge className="inner_count" count={this.state.msg_count} />
+                                </Button>
+                            </div>
+
+                            <div className="bookings_detail position-relative bb-detail">
+                                <Row>
+                                    <div className="profile floatup ml-3 mr-3">
+                                        <img alt='' src={this.state.particular_booking[0].booking_provider[0]?.img_url} />
+                                    </div>
+                                    <Col lg={{ span: 18, offset: 6 }} className="booking_profile">
+                                        <p className="m-0 bold">{this.state.particular_booking[0]?.booking_provider[0]?.name}</p>
+                                        <p className="m-0 pb-3">{this.state.particular_booking[0]?.booking_date}</p>
+                                        <span className="status position-absolute">
+                                            {this.state.mange_state === 10 ? 'Pending'
+                                                : this.state.mange_state === 4 ? 'On Going'
+                                                    : this.state.mange_state === 13 ? 'On Going'
+                                                        : this.state.mange_state === 14 ? 'Completed' : ''}
+                                        </span>
+                                    </Col>
+                                </Row>
+                            </div>
+                            <div className="working_detail py-3 px-4 position-relative bb-detail">
+                                <p className="normal_font_size bold">Job Description</p>
+
+                                <p className='mb-4'><DescriptionValue data={this.state.particular_booking[0].description} img={this.state.particular_booking[0].user_image_url} /></p>
+
+                                <Timeline>
+                                    <Timeline.Item color="green">
+                                        <p className="m-0">Professional assigned</p>
+                                        <small className="m-0">{this.state.particular_booking[0].created_at}</small>
+                                    </Timeline.Item>
+                                    <Timeline.Item color="green">
+                                        <p className="m-0">
+                                            {this.state.particular_booking[0].job_start_time == "" ? "Task not start" : "Tasks Started"}
+                                        </p>
+                                        <small className="m-0 mb-2">{this.state.particular_booking[0].job_start_time ? this.state.particular_booking[0].job_start_time : ""}</small>
+                                        {this.state.particular_booking[0].start_job_image_url.length > 0 ?
+                                            <>
+                                                <OwlCarousel className="owl-theme" style={{ opacity: '10' }} items={2} dots={false} nav={false} responsive={this.state.responsive} margin={10}>
+                                                    {this.state.particular_booking[0].start_job_image_url.map((data, i) =>
+                                                        <div className={"item"}>
+                                                            <img alt='' height="175" className="h-100x rounded object_fit" src={data} />
+                                                        </div>
+                                                    )}
+                                                </OwlCarousel>
+                                            </>
+                                            : <></>}
+                                    </Timeline.Item>
+                                    <Timeline.Item color="green">
+                                        <p className="m-0">
+                                            {this.state.particular_booking[0].job_end_time == "" ? "Task not completed" : "Completed"}
+                                        </p>
+                                        <small className="m-0 mb-2">{this.state.particular_booking[0].job_end_time ? this.state.particular_booking[0].job_end_time : ""}</small>
+                                        {this.state.particular_booking[0].start_job_image_url.length > 0 ?
+                                            <>
+                                                <OwlCarousel className="owl-theme" style={{ opacity: '10' }} items={2} dots={false} nav={false} responsive={this.state.responsive} margin={10}>
+                                                    {this.state.particular_booking[0].end_job_image_url.map((data, i) =>
+                                                        <div className={"item"}>
+                                                            <img alt='' height="175" className="h-100x rounded object_fit" src={data} />
+                                                        </div>
+                                                    )}
+                                                </OwlCarousel>
+                                            </>
+                                            : <></>}
+                                    </Timeline.Item>
+                                </Timeline>
+                            </div>
+                            <div className=" pb-1">
+
+                                <div className="price_section px-3 d-flex align-items-center">
+                                    <p className="m-0 normal_font_size ">Billing Details</p>
+                                    <label class="ml-auto">
+                                        <Button className="primary_color p-0" type="link" target="=_blank" onClick={() => { this.props.history.push({ pathname: `/admin-booking-invoice/${this.state.particular_booking[0]._id}` }) }}>View Invoice</Button>
+                                    </label>
+                                </div>
+                                <div className="price_section px-3 d-flex">
+                                    <p className="m-0 normal_font_size ">Booking Ref</p>
+                                    <label class="ml-auto">{this.state.particular_booking[0].booking_ref}</label>
+                                </div>
+                                <div className="price_section px-3 d-flex " style={{ borderBottom: "4px solid #f2f1ed", }}>
+                                    <p className="m-0 normal_font_size ">Task</p>
+                                    <label class="ml-auto">{this.state.particular_booking[0].booking_category[0].category_type === 1 ? this.state.particular_booking[0].booking_category[0].category_name : this.state.particular_booking[0].booking_category[0].subCategory_name}</label>
                                 </div>
 
-                                <div className="bookings_detail position-relative bb-detail">
-                                    <Row>
-                                        <div className="profile floatup ml-3 mr-3">
-                                            <img alt='' src={this.state.particular_booking[0].booking_provider[0].img_url} />
+                                <div className="price_section px-3 d-flex mt-2">
+                                    <p className="m-0 normal_font_size ">Amount paid</p>
+                                    <label class="ml-auto">{this.state.particular_booking[0].base_price}</label>
+                                </div>
+                                <div className={this.state.particular_booking[0]?.extra_price.split(" ")[1] > 0 ? "price_section px-3 d-flex" : "d-none"}>
+                                    <p className="m-0 normal_font_size ">Extra Price</p>
+                                    <label class="ml-auto">{this.state.particular_booking[0].extra_price}</label>
+                                </div>
+                                <div className={this.state.particular_booking[0]?.extra_hour_price.split(" ")[1] > 0 ? "price_section px-3 d-flex" : "d-none"}>
+                                    <p className="m-0 normal_font_size ">Extra Hour Price</p>
+                                    <label class="ml-auto">{this.state.particular_booking[0].extra_hour_price}</label>
+                                </div>
+
+                                <div className="price_section px-3 d-flex">
+                                    <p className="m-0 normal_font_size ">Bill Total</p>
+                                    <label class="ml-auto bold">{this.state.particular_booking[0].total}</label>
+                                </div>
+                                <div className={this.state.particular_booking[0]?.final_payment.split(" ")[1] > 0 ? "price_section px-3 d-flex" : "d-none"}>
+                                    <p className="m-0 normal_font_size ">To be paid</p>
+                                    <label class="ml-auto bold">{this.state.particular_booking[0].final_payment}</label>
+                                </div>
+                            </div>
+                            <div className={this.state.stripe_pay_modal ? "" : "d-none"}>
+                                <Suspense fallback={<Skeleton />}>
+                                    <StripePayout current_booking_status={14} data={this.state.particular_booking[0] ? this.state.particular_booking[0] : ""} />
+                                </Suspense>
+                            </div>
+                            <div className={this.state.accept_pay_modal ? "price_section px-3 d-flex" : "d-none"}>
+                                <CompletePayment handleResult={this.handleResult} data={this.state.particular_booking[0] ? this.state.particular_booking[0] : ""} />
+                            </div>
+                            <div className={this.state.particular_booking[0]?.mpeas_payment_callback ? "d-flex" : "d-none"}>
+                                <p> Waiting for your payment is processing.</p>
+                            </div>
+                            <div className={this.state.complete_button ? "price_section px-3 d-flex" : "d-none"}>
+                                <Button type="primary" className="w-100 mt-3" onClick={() => { this.complete_job(this.state.particular_booking[0]._id) }}>Complete</Button>
+                            </div>
+                        </Modal>
+                    </> : <></>}
+
+
+                <Modal
+                    className="new_modal chat"
+                    ref={(div) => {
+                        this.messageList = div;
+                    }}
+                    title={<>
+                        <div className="d-flex align-items-center">
+                            <Avatar src={this.state.particular_booking[0]?.booking_provider[0]?.img_url} />
+                            <span className="mx-2">{this.state.particular_booking[0]?.booking_provider[0]?.name}</span>
+                        </div>
+                    </>}
+                    visible={this.state.chat}
+                    onOk={this.handleOk}
+                    onCancel={this.close_msg}
+
+                    footer={<>
+                        <div className="d-flex">
+                            <Input placeholder="Write Something..." value={this.state.msg} onChange={(e) => { this.setState({ msg: e.target.value }) }} onPressEnter={() => { this.add_msg(this.state.particular_booking[0]._id) }} />
+                            <img alt='' src={send_icon} className="send_icons" onClick={() => { this.add_msg(this.state.particular_booking[0]._id) }} />
+                        </div>
+                    </>}
+                >
+                    <div className="border d-block" id="scroll" style={{ minHeight: "50vh", maxHeight: "50vh", overflowY: 'scroll' }}>
+                        {this.state.message.length > 0 ? <>
+                            {this.state.message.map(data => (
+                                <div className={data.role === 2 ? "d-flex m-3" : "d-flex m-3 flex-row-reverse"}>
+                                    <Avatar size="large" src={data.role === 1 ? JSON.parse(localStorage.getItem('user')).img_url : this.state.particular_booking[0]?.booking_provider[0]?.img_url} />
+                                    <div className="d-block mx-3">
+                                        <div className={data.role === 1 ? "d-flex flex-md-row-reverse" : ''}>
+                                            {data.message ? data.message !== null ? <card style={{
+                                                boxShadow: "#cccccc 0px 1px 5px 0px",
+                                                padding: "6px",
+                                                borderRadius: "7px"
+                                            }}>{data.message}</card> : " " : ''}
                                         </div>
-                                        <Col lg={{ span: 18, offset: 6 }} className="booking_profile">
-                                            <p className="m-0 bold">{this.state.particular_booking[0].booking_provider[0].name}</p>
-                                            <p className="m-0 pb-3">{this.state.particular_booking[0].booking_date}</p>
-                                            <span className="status position-absolute">
-                                                {this.state.mange_state === 10 ? 'Pending'
-                                                    : this.state.mange_state === 4 ? 'On Going'
-                                                        : this.state.mange_state === 13 ? 'On Going'
-                                                            : this.state.mange_state === 14 ? 'Completed' : ''}
-                                            </span>
-                                        </Col>
-                                    </Row>
-                                </div>
-                                <div className="working_detail py-3 px-4 position-relative bb-detail">
-                                    <p className="normal_font_size bold">Job Description</p>
-
-                                    <p className='mb-4'><DescriptionValue data={this.state.particular_booking[0].description} img={this.state.particular_booking[0].user_image_url} /></p>
-
-                                    <Timeline>
-                                        <Timeline.Item color="green">
-                                            <p className="m-0">Professional assigned</p>
-                                            <small className="m-0">{this.state.particular_booking[0].created_at}</small>
-                                        </Timeline.Item>
-                                        <Timeline.Item color="green">
-                                            <p className="m-0">
-                                                {this.state.particular_booking[0].job_start_time === "" ? "Task not start" : "Tasks Started"}
-                                            </p>
-                                            <small className="m-0 mb-2">{this.state.particular_booking[0].job_start_time ? this.state.particular_booking[0].job_start_time : ""}</small>
-                                            {this.state.particular_booking[0].start_job_image_url.length > 0 ?
-                                                <>
-                                                    <OwlCarousel className="owl-theme" style={{ opacity: '10' }} items={2} dots={false} nav={false} responsive={this.state.responsive} margin={10}>
-                                                        {this.state.particular_booking[0].start_job_image_url.map((data, i) =>
-                                                            <div className={"item"}>
-                                                                <img alt='' height="175" className="h-100x rounded object_fit" src={data} />
-                                                            </div>
-                                                        )}
-                                                    </OwlCarousel>
-                                                </>
-                                                : <></>}
-                                        </Timeline.Item>
-                                        <Timeline.Item color="green">
-                                            <p className="m-0">
-                                                {this.state.particular_booking[0].job_end_time === "" ? "Task not completed" : "Completed"}
-                                            </p>
-                                            <small className="m-0 mb-2">{this.state.particular_booking[0].job_end_time ? this.state.particular_booking[0].job_end_time : ""}</small>
-                                            {this.state.particular_booking[0].start_job_image_url.length > 0 ?
-                                                <>
-                                                    <OwlCarousel className="owl-theme" style={{ opacity: '10' }} items={2} dots={false} nav={false} responsive={this.state.responsive} margin={10}>
-                                                        {this.state.particular_booking[0].end_job_image_url.map((data, i) =>
-                                                            <div className={"item"}>
-                                                                <img alt='' height="175" className="h-100x rounded object_fit" src={data} />
-                                                            </div>
-                                                        )}
-                                                    </OwlCarousel>
-                                                </>
-                                                : <></>}
-                                        </Timeline.Item>
-                                    </Timeline>
-                                </div>
-                                <div className=" pb-1">
-
-                                    <div className="price_section px-3 d-flex align-items-center">
-                                        <p className="m-0 normal_font_size ">Billing Details</p>
-                                        <label class="ml-auto">
-                                            <Button className="primary_color p-0" type="link" target="=_blank" onClick={() => { this.props.history.push({ pathname: `/admin-booking-invoice/${this.state.particular_booking[0]._id}` }) }}>View Invoice</Button>
-                                        </label>
-                                    </div>
-                                    <div className="price_section px-3 d-flex">
-                                        <p className="m-0 normal_font_size ">Booking Ref</p>
-                                        <label class="ml-auto">{this.state.particular_booking[0].booking_ref}</label>
-                                    </div>
-                                    <div className="price_section px-3 d-flex " style={{ borderBottom: "4px solid #f2f1ed", }}>
-                                        <p className="m-0 normal_font_size ">Task</p>
-                                        <label class="ml-auto">{this.state.particular_booking[0].booking_category[0].category_type === 1 ? this.state.particular_booking[0].booking_category[0].category_name : this.state.particular_booking[0].booking_category[0].subCategory_name}</label>
-                                    </div>
-
-                                    <div className="price_section px-3 d-flex mt-2">
-                                        <p className="m-0 normal_font_size ">Amount paid</p>
-                                        <label class="ml-auto">{this.state.particular_booking[0].base_price}</label>
-                                    </div>
-                                    <div className={this.state.particular_booking[0]?.extra_price.replace("Ksh", '') > 0 ? "price_section px-3 d-flex" : "d-none"}>
-                                        <p className="m-0 normal_font_size ">Extra Price</p>
-                                        <label class="ml-auto">{this.state.particular_booking[0].extra_price}</label>
-                                    </div>
-                                    <div className={this.state.particular_booking[0]?.extra_hour_price.replace("Ksh", '') > 0 ? "price_section px-3 d-flex" : "d-none"}>
-                                        <p className="m-0 normal_font_size ">Extra Hour Price</p>
-                                        <label class="ml-auto">{this.state.particular_booking[0].extra_hour_price}</label>
-                                    </div>
-
-                                    <div className="price_section px-3 d-flex">
-                                        <p className="m-0 normal_font_size ">Bill Total</p>
-                                        <label class="ml-auto bold">{this.state.particular_booking[0].total}</label>
-                                    </div>
-                                    <div className={this.state.particular_booking[0]?.final_payment.replace("Ksh", '') > 0 ? "price_section px-3 d-flex" : "d-none"}>
-                                        <p className="m-0 normal_font_size ">To be paid</p>
-                                        <label class="ml-auto bold">{this.state.particular_booking[0].final_payment}</label>
-                                    </div>
-                                </div>
-                                <div className={this.state.accept_pay_modal ? "price_section px-3 d-flex" : "d-none"}>
-                                    <CompletePayment handleResult={this.handleResult} data={this.state.particular_booking[0] ? this.state.particular_booking[0] : ""} />
-                                </div>
-                                <div className={this.state.particular_booking[0]?.mpeas_payment_callback ? "d-flex" : "d-none"}>
-                                        <p> Waiting for your payment is processing.</p>                 
-                                </div>
-                                <div className={this.state.complete_button ? "price_section px-3 d-flex" : "d-none"}>
-                                    <Button type="primary" className="w-100 mt-3" onClick={() => { this.complete_job(this.state.particular_booking[0]._id) }}>Complete</Button>
-                                </div>
-                            </Modal>
-                        </> : <></>}
-
-
-                    <Modal
-                        className="new_modal chat"
-                        ref={(div) => {
-                            this.messageList = div;
-                        }}
-                        title={<>
-                            <div className="d-flex align-items-center">
-                                <Avatar src={this.state.particular_booking[0]?.booking_provider[0]?.img_url} />
-                                <span className="mx-2">{this.state.particular_booking[0]?.booking_provider[0]?.name}</span>
-                            </div>
-                        </>}
-                        visible={this.state.chat}
-                        onOk={this.handleOk}
-                        onCancel={this.close_msg}
-
-                        footer={<>
-                            <div className="d-flex">
-                                <Input placeholder="Write Something..." value={this.state.msg} onChange={(e) => { this.setState({ msg: e.target.value }) }} onPressEnter={() => { this.add_msg(this.state.particular_booking[0]._id) }} />
-                                <img alt='' src={send_icon} className="send_icons" onClick={() => { this.add_msg(this.state.particular_booking[0]._id) }} />
-                            </div>
-                        </>}
-                    >
-                        <div className="border d-block" id="scroll" style={{ minHeight: "50vh", maxHeight: "50vh", overflowY: 'scroll' }}>
-                            {this.state.message.length > 0 ? <>
-                                {this.state.message.map(data => (
-                                    <div className={data.role === 2 ? "d-flex m-3" : "d-flex m-3 flex-row-reverse"}>
-                                        <Avatar size="large" src={data.role === 1 ? JSON.parse(localStorage.getItem('user')).img_url : this.state.particular_booking[0]?.booking_provider[0]?.img_url} />
-                                        <div className="d-block mx-3">
-                                            <div className={data.role === 1 ? "d-flex flex-md-row-reverse" : ''}>
-                                                {data.message ? data.message !== null ? <card style={{
-                                                    boxShadow: "#cccccc 0px 1px 5px 0px",
-                                                    padding: "6px",
-                                                    borderRadius: "7px"
-                                                }}>{data.message}</card> : " " : ''}
-                                            </div>
-                                            <div style={{
-                                                fontSize: "10px",
-                                                margin: "8px 0px"
-                                            }}>
-                                                {data.msg_date} {data.msg_time}
-                                            </div>
+                                        <div style={{
+                                            fontSize: "10px",
+                                            margin: "8px 0px"
+                                        }}>
+                                            {data.msg_date} {data.msg_time}
                                         </div>
                                     </div>
-                                ))}
-                            </>
-                                :
-                                <div style={{ marginTop: "25%" }}><div className="d-flex justify-content-center"><Empty description={false} /></div></div>}
+                                </div>
+                            ))}
+                        </>
+                            :
+                            <div style={{ marginTop: "25%" }}><div className="d-flex justify-content-center"><Empty description={false} /></div></div>}
+                    </div>
+                </Modal>
+
+                <Modal
+                    className="new_modal rating"
+                    title="Review"
+                    visible={this.state.rating}
+                    onCancel={() => { this.setState({ rating: 0 }) }}
+                    footer={<>
+                        <div className={this.state.user_rating_status === 0 ? "" : "d-none"}>
+                            <Button type="primary" onClick={() => { this.add_comments(this.state.particular_booking[0]._id) }}>UPDATE REVIEW</Button>
                         </div>
-                    </Modal>
-
-                    <Modal
-                        className="new_modal rating"
-                        title="Review"
-                        visible={this.state.rating}
-                        onCancel={() => { this.setState({ rating: 0 }) }}
-                        footer={<>
-                            <div className={this.state.user_rating_status === 0 ? "" : "d-none"}>
-                                <Button type="primary" onClick={() => { this.add_comments(this.state.particular_booking[0]._id) }}>UPDATE REVIEW</Button>
-                            </div>
-                        </>}
-                    >
-                        <div className=" px-3">
-                            <span className="bold">Rate for service</span>
-                            <div className="d-flex justify-content-center my-4">
-                                <Rate disabled={this.state.user_rating_status === 0 ? false : true} value={Number(this.state.rate)} onChange={(value) => { this.setState({ rate: value }) }} />
-                            </div>
-                            <div>
-
-                                <TextArea
-                                    rows={4}
-                                    disabled={this.state.user_rating_status === 0 ? false : true}
-                                    value={this.state.comment}
-                                    placeholder="Write Something..."
-                                    onChange={(e) => { this.setState({ comment: e.target.value }) }} />
-
-                                {/* <TextArea rows={4} value={this.state.particular_booking[0] ? this.state.particular_booking[0].user_comments : "dsd"} placeholder="Write Something..." onChange={(e) => { this.setState({ comment: e.target.value }) }} /> */}
-                            </div>
+                    </>}
+                >
+                    <div className=" px-3">
+                        <span className="bold">Rate for service</span>
+                        <div className="d-flex justify-content-center my-4">
+                            <Rate disabled={this.state.user_rating_status === 0 ? false : true} value={Number(this.state.rate)} onChange={(value) => { this.setState({ rate: value }) }} />
                         </div>
-                    </Modal>
+                        <div>
 
-                </Content>
-                <Suspense fallback={<Skeleton active />}>
-                    <UserFooter />
-                </Suspense>
-            </Layout >
+                            <TextArea
+                                rows={4}
+                                disabled={this.state.user_rating_status === 0 ? false : true}
+                                value={this.state.comment}
+                                placeholder="Write Something..."
+                                onChange={(e) => { this.setState({ comment: e.target.value }) }} />
+
+                            {/* <TextArea rows={4} value={this.state.particular_booking[0] ? this.state.particular_booking[0].user_comments : "dsd"} placeholder="Write Something..." onChange={(e) => { this.setState({ comment: e.target.value }) }} /> */}
+                        </div>
+                    </div>
+                </Modal>
+            </>
         );
     }
 }

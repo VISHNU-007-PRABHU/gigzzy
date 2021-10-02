@@ -8,6 +8,7 @@ var Category_model = model.category;
 var subCategory_model = model.sub_category;
 var Detail_model = model.detail;
 var CategoryCurrency_model = model.CategoryCurrency;
+var Currency_model = model.currency;
 var providerSubcategory_model = model.providerSubcategory_model;
 
 const { createWriteStream, existsSync, mkdirSync, fs } = require("fs");
@@ -245,26 +246,30 @@ exports.GetCategoryCurrency = async (root, args) => {
 
 exports.ParentCategoryCurrency = async (root, args) => {
     try {
-        let query = {is_delete: false}
-        if(args.root){
+        let query = { is_delete: false }
+        if (args.root) {
             query["category_id"] = ObjectId(root._id)
-        }else{
+            query["currency_id"] = ObjectId(root.currency_id)
+        } else {
             query["category_id"] = ObjectId(args._id)
         }
-        if(args.currency_id){
+        if (args.currency_id) {
             query["currency_id"] = args.currency_id
         }
-        console.log("exports.ParentCategoryCurrency -> query", query)
+        if (args.location_code) {
+            let currencydata = await Currency_model.findOne({ is_delete: false, location: args.location_code }).lean();
+            if (_.size(currencydata)) {
+                query["currency_id"] = currencydata._id
+            }
+        }
         let data = await CategoryCurrency_model.findOne(query).lean();
-        console.log("exports.ParentCategoryCurrency -> data", data)
-        if(data){
+        if (data) {
             return data
-        }else{
+        } else {
             return {}
         }
 
     } catch (error) {
-        console.log("exports.ParentCategoryCurrency -> error", error)
         return {};
     }
 }
@@ -594,7 +599,14 @@ module.exports.search_category_mobile = async (parent, args, context, info) => {
 module.exports.get_is_future = async (parent, args, context, info) => {
     var category_result = await Category_model.find({ is_future: true, is_block: false, delete: 0 });
     var sub_category_result = await subCategory_model.find({ is_future: true, is_block: false, delete: 0 });
-    return [...category_result, ...sub_category_result];
+    let final_data = [...category_result, ...sub_category_result];
+    let result = []
+    if (args.limit) {
+        result = _.take(final_data, args.limit)
+    } else {
+        result = final_data
+    }
+    return result
 };
 
 

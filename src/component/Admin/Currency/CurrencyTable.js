@@ -63,7 +63,7 @@ class CurrencyTable extends React.Component {
         this.setState({ loading: true });
         let input = {};
         if (data && size(data)) {
-            input = { search:data, limit: this.state.pagination.pageSize, page: this.state.pagination.current, pagination: false };
+            input = { search: data, limit: this.state.pagination.pageSize, page: this.state.pagination.current, pagination: false };
         } else {
             input = { limit: this.state.pagination.pageSize, page: this.state.pagination.current, pagination: true };
         }

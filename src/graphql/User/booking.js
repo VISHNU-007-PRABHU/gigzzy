@@ -8,7 +8,8 @@ subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
       description
       booking_ref
       booking_date
-      base_price
+      base_price(code:"symbol")
+      ctob
       extra_price
       msg_date
       msg_time
@@ -33,7 +34,8 @@ $booking_status: Int
     _id
     status
     description
-    base_price
+    base_price(code:"symbol")
+    ctob
     booking_date
     jobStart_time
     jobEnd_time
@@ -93,10 +95,12 @@ subscription TESTS($online:String){
 
 
 export const ADD_BOOKING = gql`
- mutation ADDBOOKING($user_id:ID,$booking_time:String,$booking_hour:String,$booking_type:Int,$category_id:ID,$category_type:Int,$lat:Float,$lng:Float,$hours:String,$description:String,$booking_status:Int,$booking_date:String,$file:[Upload]) {
+ mutation ADDBOOKING($user_id:ID,$local_location_code:String,$location_code:String,$booking_time:String,$booking_hour:String,$booking_type:Int,$category_id:ID,$category_type:Int,$lat:Float,$lng:Float,$hours:String,$description:String,$booking_status:Int,$booking_date:String,$file:[Upload]) {
     add_booking(
       user_id: $user_id,
       category_id: $category_id
+      location_code:$location_code
+      local_location_code:$local_location_code
       category_type: $category_type
       lat: $lat
       lng: $lng
@@ -115,6 +119,7 @@ export const ADD_BOOKING = gql`
       lat
       lng
       user_image_url
+      payment_option(code:$local_location_code)
       user(_id:$user_id) {
         name
       }
@@ -130,6 +135,9 @@ export const ADD_BOOKING = gql`
         hour_limit
         description
         img_url
+        ParentCategoryCurrency(root: true,location_code:$location_code) {
+          base_price(code:"symbol")
+        }
       }
       hours
     }
@@ -141,8 +149,11 @@ mutation AcceptJobMutation($role: Int
   $booking_id: ID
   $provider_id: ID
   $booking_status:Int
-  $phone_number : String
-  $payment_type : String
+  $phone_number:String
+  $payment_type:String
+  $payment_option:String
+  $location_code:String
+  $stripe_token:String
 ){
   manage_booking(
     role:$role
@@ -151,6 +162,9 @@ mutation AcceptJobMutation($role: Int
     booking_status: $booking_status
     phone_number : $phone_number
     payment_type:$payment_type
+    payment_option:$payment_option
+    location_code:$location_code
+    stripe_token:$stripe_token
   ){
     status
     msg
@@ -188,7 +202,8 @@ query My_appointments($_id : ID,$role : Int,$booking_status : Int,$limit:Int,$pa
             _id
           booking_status
           booking_date
-          base_price
+          base_price(code:"symbol")
+          ctob
           booking_ref
           booking_type
           booking_date
@@ -217,8 +232,8 @@ query My_appointments($_id : ID,$role : Int,$booking_status : Int,$limit:Int,$pa
 }`
 
 export const GET_PARTICULAR_BOOKING = gql`
-query GETPARTICULARBOOKING($_id : ID) {
-  booking(_id:$_id) {
+query GETPARTICULARBOOKING($_id : ID,$location_code:String) {
+  booking(_id:$_id,location_code:$location_code) {
         _id
         description
         user_image_url
@@ -230,17 +245,18 @@ query GETPARTICULARBOOKING($_id : ID) {
         start_job_image_url
         end_job_image_url
         booking_ref
-        base_price
-        extra_price
-        extra_hour_price
-        total
-        final_payment
+        base_price(code:"symbol")
+        extra_price(code:"symbol")
+        extra_hour_price(code:"symbol")
+        total(code:"symbol")
+        final_payment(code:"symbol")
+        admin_fee(code:"symbol")
         charge_id
         MpesaReceiptNumber
         mpeas_payment_callback
+        ctob
         ctob_shotcode
         ctob_billRef
-        admin_fee
         service_fee
         lat
         lng
@@ -258,6 +274,7 @@ query GETPARTICULARBOOKING($_id : ID) {
       provider_rating
       provider_comments
       booking_type
+      payment_option(code:$location_code)
       get_booking_message(booking_id:$_id){
           message
           createdAt

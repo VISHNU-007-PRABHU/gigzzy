@@ -37,6 +37,8 @@ var bookingSchema = new Schema({
   data: [{}],
   current_currency:{},
   currency_id:String,
+  default_currency_rate:String,
+  currenct_local_rate:String,
   base_price: { type: String, default: "0.00" },
   hour_price: { type: String, default: "0.00" },
   extra_price: { type: String, default: "0.00" },
@@ -87,9 +89,13 @@ var bookingSchema = new Schema({
   payment_message:{type:String,default:""},
   mpeas_payment_callback:{ type: Boolean, default: false },
   manual_payment_status:{ type: Boolean, default: false },
+  extra_payment_callback:{ type: Boolean, default: false },
   payment_type:{ type: String, default: "" },
   ctob_shotcode:{ type: String, default: "" },
   ctob_billRef:{ type: String, default: "" },
+  payment_history:{},
+  currency_detail:{},
+  symbol:String
 }, schemaOptions);
 
 bookingSchema.virtual('uid').get(function () {

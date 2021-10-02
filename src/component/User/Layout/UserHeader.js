@@ -8,7 +8,17 @@ import Avatar from 'antd/lib/avatar';
 import Icon from 'antd/lib/icon';
 import Menu from 'antd/lib/menu';
 import Dropdown from 'antd/lib/dropdown';
-
+import {
+  Layout,
+  Row,
+  Button,
+  Col,
+  Avatar,
+  Menu,
+  Icon,
+  Dropdown,
+  Skeleton,
+} from "antd";
 import main from "../../../image/Gigzzy.png";
 import useReactRouter from "use-react-router";
 import { GET_SETTING } from "../../../graphql/Admin/static";
@@ -150,9 +160,9 @@ const UserHeader = () => {
 
   return (
     <div>
-      <Header className="white user_header px-0">
+      <Header className="white user_header px-2">
         <Row>
-          <Col lg={{ span: 20, offset: 2 }} className="px-1">
+          <Col>
             <img
               src={main}
               height="75"

@@ -4,7 +4,7 @@ const model = require('../../model_data');
 var ObjectId = require('mongodb').ObjectID;
 var CronJob = require('cron').CronJob;
 var commonHelper = require('../commonHelper');
-var round = require('mongo-round');
+var CommonFunction = require('../CommonFunction');
 // const pubsub = new PubSub();
 var Category_model = model.category;
 var subCategory_model = model.sub_category;
@@ -14,6 +14,7 @@ var Detail_model = model.detail;
 var Booking_model = model.booking;
 var Payout_model = model.payout;
 var Extra_model = model.Extra_fee;
+var Currency_model = model.currency;
 
 // const MESSAGE_CREATED = 'MESSAGE_CREATED';
 // const ACCEPT_MSG = 'ACCEPT_MSG';
@@ -49,7 +50,10 @@ module.exports.get_payout = async (root, args) => {
         provider_fee: 1,
         created_at: 1,
         bookingDate: 1,
-        booking_date: 1
+        booking_date: 1,
+        symbol:1,
+        currency_id:1,
+        base_price:1
     };
     var wmatch = {
         provider_fee: { $ne: 'NaN' },
@@ -101,37 +105,13 @@ module.exports.get_payout = async (root, args) => {
         ]
         total = [{ $project: { ...project, year: { $year: { date: "$created_at", timezone: "Asia/Kolkata" } } } }, { $match: ymatch },]
     }
-    let pipeline = [{
-        $project: {
-            _id: 1,
-            provider_id: 1,
-            booking_status: 1,
-            provider_fee: 1,
-            total_amount: 1
-        }
-    },
-    {
-        $match: {
-            provider_id: ObjectId(args.provider_id),
-            booking_status: 14,
-            provider_fee: { $ne: 'NaN' },
-        }
-    },
-    {
-        $group: {
-            _id: 1,
-            'total_amount': { $sum: { "$toDouble": '$provider_fee' } },
-        }
-    },
 
-    ];
+    let default_currency = await Currency_model.findOne({ location: args.location_code }).lean()
     var total = await Booking_model.aggregate(total);
-    var datas = await Booking_model.aggregate(pipeline);
+    var datas = await CommonFunction.get_total_payout(args.provider_id,default_currency);
+    console.log("module.exports.get_payout -> datas", datas)
     var data = await Booking_model.aggregate(filter);
-    //console.log("Vishnu");
-    //console.log(total);
-    // console.log(datas[0]);
-    var pageInfo = { totalDocs: total.length, page: args.page, total_amount: datas[0] ? String(parseFloat(datas[0].total_amount).toFixed(2)) : "0.00" }
+    var pageInfo = { totalDocs: total.length, page: args.page, total_amount: datas ? `${default_currency.symbol} ${String(parseFloat(datas).toFixed(2))}` : "0.00" }
     return { pageInfo, data };
 }
 
@@ -147,7 +127,7 @@ module.exports.get_all_payout = async (root, args) => {
     if (args.provider_id) {
         match_query = { status: 1, booking_status: 14, provider_id: args.provider_id, amount: { $ne: 'NaN' } }
     } else {
-        match_query = { status: 1, booking_status: 14,amount: { $ne: 'NaN' } }
+        match_query = { status: 1, booking_status: 14, amount: { $ne: 'NaN' } }
     }
     let pipeline = [
         { $match: match_query },
@@ -189,9 +169,9 @@ module.exports.update_manual_payment = async (parent, args) => {
     try {
         let update_params = { payment_status: 2, manual_payment_status: false }
         let cancelbooking = await Booking_model.update({ _id: args.booking_id }, update_params);
-        return { status: "success", msg: "Manual refund success" } 
+        return { status: "success", msg: "Manual refund success" }
     } catch (error) {
-        return { status: "failed", msg: "Manual refund failed" } 
+        return { status: "failed", msg: "Manual refund failed" }
     }
 };
 module.exports.find_payout_booking = async (parent, args) => {
@@ -201,9 +181,10 @@ module.exports.find_payout_booking = async (parent, args) => {
 
 // get booking
 module.exports.booking = async (parent, args, context, info) => {
+    if(args.location_code){
+        delete args.location_code
+    }
     const result = await Booking_model.find(args);
-    //console.log(result);
-    //console.log(result.length);
     return result;
 };
 
@@ -414,7 +395,7 @@ const job_reminder = new CronJob('* * * * * *', async () => {
         var minutes = Math.abs(Number(m) - Number(data[1]));
         if (Number(minutes) <= 15) {
             let user_detail = await Detail_model.findOne({ _id: booking[i].provider_id });
-            var email = await commonHelper.send_mail_sendgrid(user_detail.email,"schedule_job",{msg:'your next job almost ready ..'});
+            var email = await commonHelper.send_mail_sendgrid(user_detail.email, "schedule_job", { msg: 'your next job almost ready ..' });
             await commonHelper.send_sms(user_detail.country_code, user_detail.phone_no, "scheduled_job", {})
             // (to provider)
             var message = {

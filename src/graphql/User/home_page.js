@@ -129,8 +129,8 @@ query GETTRENDING{
 }`
 
 export const GET_FUTURE = gql`
-query GETFUTURE{
-    get_is_future {
+query GETFUTURE($limit:Int){
+    get_is_future (limit:$limit){
       _id
       category_name
       category_type

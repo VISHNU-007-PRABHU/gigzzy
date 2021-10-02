@@ -107,7 +107,7 @@ const MultiCurrency = (props) => {
         >
             <Form name="multicurrency-from" className="">
                 <Suspense fallback={<Skeleton active />}>
-                    <MultiCurrencyFrom form={form} />
+                    <MultiCurrencyFrom form={form} currency_data={currency_data}/>
                 </Suspense>
                 <div className="d-flex justify-content-end">
                     <Button className="align-items-center d-flex" type="primary" icon="plus" onClick={() => { udpateCurrency() }}>
