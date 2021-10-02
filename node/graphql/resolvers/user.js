@@ -979,6 +979,7 @@ exports.addUser = async (parent, args) => {
             status: "failed"
         }
     }
+}
 
 module.exports.deleteCompany = async (parent, args, context, info) => {
     try {

@@ -22,7 +22,6 @@ const _ = require('lodash');
 const cwd = process.cwd();
 const dotenv = require('dotenv');
 const expressStaticGzip = require('express-static-gzip');
-const _ = require("lodash");
 const commonHelper = require('./node/graphql/commonHelper')
 const CommonFunction = require('./node/graphql/CommonFunction')
 // const i18n = require("i18n");
