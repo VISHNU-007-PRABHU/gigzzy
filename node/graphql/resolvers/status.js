@@ -18,6 +18,7 @@ module.exports.status = async (_, args) => {
 };
 
 
+
 module.exports.online_status = async (parent, args) => {
     //console.log(args);
     var document_verified = await Detail_model.updateOne({ _id: args._id, }, { online: args.online_status });

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 
-
 import {
   Layout,
   Row,
@@ -154,9 +153,9 @@ const UserHeader = () => {
 
   return (
     <div>
-      <Header className="white user_header px-2">
+      <Header className="white user_header px-0">
         <Row>
-          <Col>
+          <Col lg={{ span: 20, offset: 2 }} className="px-1">
             <img
               src={main}
               height="75"

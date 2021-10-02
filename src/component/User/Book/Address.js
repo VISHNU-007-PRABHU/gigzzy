@@ -14,8 +14,8 @@ import { GoChevronLeft } from "react-icons/go";
 import { Alert_msg } from "../../Comman/alert_msg";
 import { LocationContext, EditLocationContext } from "../../context/Location";
 const ADD_ADDRESS = gql`
-  mutation add_address($location_code:String,$option: Int,$_id:ID,$user_id: String,$title: String,$flat_no: String ,$landmark: String,$address: String,$lat: String,$lng: String ) {
-     modified_address(location_code:$location_code,option: $option,_id:$_id,user_id: $user_id,title: $title,flat_no: $flat_no, landmark: $landmark,address: $address,lat: $lat,lng: $lng ) {
+  mutation add_address($option: Int,$_id:ID,$user_id: String,$title: String,$flat_no: String ,$landmark: String,$address: String,$lat: String,$lng: String ) {
+     modified_address(option: $option,_id:$_id,user_id: $user_id,title: $title,flat_no: $flat_no, landmark: $landmark,address: $address,lat: $lat,lng: $lng ) {
         msg
         status
     }
@@ -32,7 +32,6 @@ query ADDRESS($user_id: ID) {
     address
     lat
     lng
-    location_code
   }
 }
 `;
@@ -43,7 +42,6 @@ const Address = (props) => {
     const [draggable, setdraggable] = useState(true);
     const [zoom, setzoom] = useState(15);
     const [address, setaddress] = useState('');
-    const [country_code, set_country_code] = useState('');
     const [lat, setlat] = useState(9.9619289);
     const [lng, setlng] = useState(78.1288218);
     const [flat_no, setflat_no] = useState("");
@@ -76,16 +74,7 @@ const Address = (props) => {
     const handleSelect = address => {
         setaddress(address);
         geocodeByAddress(address)
-            .then(results => {
-                if (results[0]) {
-                    results[0].address_components.map(data => {
-                        if (data.types.includes("country")) {
-                            set_country_code(data.short_name)
-                        }
-                    })
-                }
-                getLatLng(results[0])
-            })
+            .then(results => getLatLng(results[0]))
             .then(latLng => {
                 setlat(latLng.lat);
                 setlng(latLng.lng);
@@ -108,16 +97,16 @@ const Address = (props) => {
         // Get address from latidude & longitude.
         await Geocode.fromLatLng(mouse.lat, mouse.lng).then(
             response => {
-                console.log("onCircleInteraction -> response", response)
-                if (response.results[0].address_components) {
-                    response.results[0].address_components.map(data => {
-                        if (data.types.includes("country")) {
-                            set_country_code(data.short_name)
-                        }
-                    })
-                }
                 const address = response.results[0].formatted_address;
                 setaddress(address);
+                // geocodeByAddress(address)
+                // .then(results => getLatLng(results[0]))
+                // .then(latLng =>{
+                //     setlat(latLng.lat);
+                //     setlng(latLng.lng);
+                //     setcenter([latLng.lat, latLng.lng])
+                // } )
+                // .catch(error => console.error('Error', error));
             },
             error => {
                 console.error(error);
@@ -138,8 +127,7 @@ const Address = (props) => {
             landmark: landmark,
             address: address,
             lat: String(lat),
-            lng: String(lng),
-            location_code:country_code
+            lng: String(lng)
         };
         console.log(data)
         if (data.lat === null || data.lat === '' || data.lng === '' || data.lng === null || data.address === '' || data.address === null || data.user_id === '' || data.user_id === null || data.title === '' || data.title === null) {
@@ -168,8 +156,7 @@ const Address = (props) => {
             landmark: landmark,
             address: address,
             lat: String(lat),
-            lng: String(lng),
-            location_code:country_code
+            lng: String(lng)
         };
         console.log(data)
         if (data.lat !== null && data.lat !== '' && data.lng !== '' && data.lng !== null && data.address !== '' && data.address !== null && data._id !== '' && data._id !== null && data.title !== '' && data.title !== null) {
@@ -227,11 +214,11 @@ const Address = (props) => {
                                                 <div className="my-2 no_color d-flex justify-content-between">
                                                     <div>
                                                         Set location
-                                                    </div>
+                                                </div>
                                                     <div className='primary_color'>
                                                         <Button className='primary_color' type="link" onClick={skip}>
                                                             <GoChevronLeft />  skip
-                                                        </Button>
+                                            </Button>
                                                     </div>
                                                 </div>
                                                 <div className="my-2">
@@ -290,13 +277,13 @@ const Address = (props) => {
                                                     <div className="my-2 d-flex justify-content-around">
                                                         <Button className={title === 'Home' ? "d-flex primary_color" : "d-flex no_color"} type="link" onClick={() => { settitle("Home") }} >
                                                             <Icon type="home" /> Home
-                                                        </Button>
+                                                </Button>
                                                         <Button className={title === 'Work' ? "d-flex primary_color" : "d-flex no_color"} type="link" onClick={() => { settitle('Work') }} >
                                                             <Icon type="shop" />Work
-                                                        </Button>
+                                                </Button>
                                                         <Button className={title !== "Home" && title !== "Work" ? "d-flex primary_color" : "d-flex no_color"} type="link" onClick={() => { settitle('Others') }} >
                                                             <Icon type="security-scan" />Others
-                                                        </Button>
+                                                </Button>
                                                     </div>
                                                     <div className="my-2">
                                                         {edit === true ?

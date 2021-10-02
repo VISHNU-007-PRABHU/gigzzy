@@ -16,18 +16,30 @@ function StaticPage() {
     if (loading) return <Skeleton active />;
     if (error) return `Error! ${error.message}`;
     return (
-        <>
-            <Row>
-                <Col lg={{ span: 20, offset: 2 }}>
-                    <div id="section-1" className="why_jiffy position-relative pt-1">
-                        {data.static.map((values, i) => (<>
-                            <h2 className="bold text-center">{values?.title}</h2>
-                            <ReactQuill theme={"bubble"} className="cursor_point" readOnly={true} value={values?.description} ></ReactQuill>
-                        </>))}
-                    </div>
-                </Col>
-            </Row>
-        </>
+        <Layout className="white" style={{ minHeight: "100vh" }}>
+            <span className=" d-none d-md-block">
+                <Suspense fallback={<Skeleton active />}>
+                    <UserHeader />
+                </Suspense>
+            </span>
+            <Content className="px-1">
+                <Row>
+                    <Col lg={{ span: 20, offset: 2 }}>
+                        <div id="section-1" className="why_jiffy position-relative pt-1">
+                            {data.static.map((values, i) => (<>
+                                <h2 className="bold text-center">{values?.title}</h2>
+                                <ReactQuill theme={"bubble"} className="cursor_point" readOnly={true} value={values?.description} ></ReactQuill>
+                            </>))}
+                        </div>
+                    </Col>
+                </Row>
+            </Content>
+            <span className=" d-none d-md-block">
+                <Suspense fallback={<Skeleton active />}>
+                    <UserFooter />
+                </Suspense>
+            </span>
+        </Layout>
     )
 }
 

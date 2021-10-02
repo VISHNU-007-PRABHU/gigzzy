@@ -16,7 +16,6 @@ query ADDRESS($user_id: ID) {
     address
     lat
     lng
-    location_code
   }
 }
 `;

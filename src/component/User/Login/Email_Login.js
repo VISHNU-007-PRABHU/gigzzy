@@ -29,7 +29,7 @@ class Email_Login extends React.Component {
             if (!err) {
                 await client.query({
                     query: EMAIL_LOGIN,
-                    variables: { role: 1, email: values.email, password: values.password,location_code:this.state.location_code },
+                    variables: { role: 1, email: values.email, password: values.password },
                     fetchPolicy: 'no-cache',
                 }).then(result => {
                     console.log(result.data.sign_up.status);
