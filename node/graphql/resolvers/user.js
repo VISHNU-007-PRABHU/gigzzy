@@ -667,7 +667,7 @@ module.exports.check_demo_app = async (parent, args, context, info) => {
 }
 
 
-exports.addUser = async (_, args) => {
+exports.addUser = async (parent, args) => {
     try {
 
         const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
