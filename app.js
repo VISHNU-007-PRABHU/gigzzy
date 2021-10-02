@@ -1,12 +1,12 @@
 const express = require('express')
 const app = require('express')()
-// const CronJob = require('cron').CronJob;
 const util = require('util');
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const path = require('path');
 const http = require('http');
 const https = require('https');
+var ObjectId = require('mongodb').ObjectID;
 const { ApolloServer, gql, SchemaDirectiveVisitor } = require('apollo-server-express');
 const { defaultFieldResolver, GraphQLString } = require('graphql');
 const { typeDefs } = require('./node/graphql/schema');
@@ -17,10 +17,16 @@ app.use(bodyParser.urlencoded({ limit: "100mb", extended: true, parameterLimit: 
 app.use(express.json());
 const getSymbolFromCurrency = require('currency-symbol-map')
 const fs = require('fs');
+const _ = require('lodash');
 const cwd = process.cwd();
 const dotenv = require('dotenv');
 const expressStaticGzip = require('express-static-gzip');
+const CommonFunction = require('./node/graphql/CommonFunction')
 // const i18n = require("i18n");
+const model = require('./node/model_data');
+var Currency_model = model.currency;
+var Booking_model = model.booking;
+
 dotenv.config();
 // i18n.configure({
 //   locales: ['en', 'es'],
@@ -92,12 +98,36 @@ class UpperCaseDirective extends SchemaDirectiveVisitor {
 class c2bDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
-    field.resolve = async function (...args) {
-      return true;
+    field.resolve = async function (source, { format, ...otherArgs }, context, info,) {
+      if (source && source.currency_detail && source.currency_detail.location == "KE") {
+        return true;
+      } else {
+        return false
+      }
     };
+
   }
 }
 
+
+class paymentDirective extends SchemaDirectiveVisitor {
+  visitFieldDefinition(field) {
+    const { resolve = defaultFieldResolver } = field;
+    const { defaultFormat } = this.args;
+    field.args.push({ name: 'format', type: GraphQLString});
+    field.resolve = async function (source,{ format, ...otherArgs },context, info, ) {
+      const date = await resolve.call(this, source, otherArgs, context, info);
+      let code = otherArgs.code
+      if (code === "KE") {
+        return "mpesa"
+      }else{
+        return "stripe"
+      }
+    };
+
+    field.type = GraphQLString;
+  }
+}
 class currencyDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
@@ -115,15 +145,54 @@ class currencyDirective extends SchemaDirectiveVisitor {
       info,
     ) {
       const date = await resolve.call(this, source, otherArgs, context, info);
-      // If a format argument was not provided, default to the optional
-      // defaultFormat argument taken by the @date directive:
-      // console.log(`${getSymbolFromCurrency(format || defaultFormat)}${date}`);
-      return `${getSymbolFromCurrency(format || defaultFormat)}${date}`;
+      let code = otherArgs.code
+      if (code === "symbol") {
+        let const_symbol = source.symbol || "$"
+        if (source.currency_id) {
+          var currency = await Currency_model.findOne({ _id: ObjectId(source.currency_id) }).lean()
+          if (currency && _.size(currency)) {
+            const_symbol = currency['symbol']
+          }
+        }
+        let symbol_data = `${const_symbol} ${date}`
+        return symbol_data
+      } else if (code) {
+        let currency_code = ""
+        if (source.currency_detail && source.currency_detail.code) {
+          currency_code = source.currency_detail.code
+        }
+        if (source.currency_id) {
+          var currency = await Currency_model.findOne({ _id: ObjectId(source.currency_id) }).lean()
+          if (currency && _.size(currency)) {
+            currency_code = currency['code']
+          }
+        }
+        if (source.booking_id) {
+          var bookingdata = await Booking_model.findOne({ _id: ObjectId(source.booking_id) }).lean()
+          if (bookingdata && _.size(bookingdata)) {
+            var currency = await Currency_model.findOne({ _id: ObjectId(bookingdata.currency_id) }).lean()
+            if (currency && _.size(currency)) {
+              currency_code = currency['code']
+            }
+          }
+        }
+        let inputdata = {
+          convert_code: otherArgs.code || defaultFormat,
+          amount: date,
+          currency_code: currency_code
+        }
+        let final_value = await CommonFunction.currency_calculation(inputdata)
+        return final_value
+      }else{
+        return date
+      }
     };
 
     field.type = GraphQLString;
   }
 }
+
+
 const server = new ApolloServer({
   cors: {
     origin: '*',			// <- allow request from all domains
@@ -133,6 +202,7 @@ const server = new ApolloServer({
   resolvers: [resolvers],
   schemaDirectives: {
     currency: currencyDirective,
+    paymentOption:paymentDirective,
     ref: refDirective,
     date: DateFormatDirective,
     upper: UpperCaseDirective,
@@ -211,7 +281,6 @@ app.post('/refund_confirmation', async (req, res, next) => {
   } catch (error) {
     console.log("confirmation error", error)
     return res.send(error)
-    return res.send({ status: true, message: "we reviced confirmation but error in code" })
   }
 })
 
@@ -225,7 +294,7 @@ app.post('/c2b_validation', async (req, res, next) => {
       "ResultDesc": "Accepted"
     })
   } catch (error) {
-    console.log("ops, not valid data",error)
+    console.log("ops, not valid data", error)
     return res.send({
       "ResultCode": 1,
       "ResultDesc": "Rejected"
@@ -274,7 +343,7 @@ app.use(cors({ origin: 'http://localhost:3000' }));
 
 
 
-mongoose.connect('mongodb://localhost/gigzzy').then(() => {
+mongoose.connect(process.env.DB_LINK).then(() => {
 }).catch((err) => {
   // console.log("Not Connected to Database ERROR! ", err);
 });

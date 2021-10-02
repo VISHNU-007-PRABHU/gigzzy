@@ -2,15 +2,19 @@ const model = require('../../model_data');
 const _ = require('lodash');
 const moment = require('moment');
 var Jimp = require('jimp');
+var ObjectId = require('mongodb').ObjectID;
 
 var Category_model = model.category;
 var subCategory_model = model.sub_category;
 var Detail_model = model.detail;
+var CategoryCurrency_model = model.CategoryCurrency;
+var Currency_model = model.currency;
 var providerSubcategory_model = model.providerSubcategory_model;
 
 const { createWriteStream, existsSync, mkdirSync, fs } = require("fs");
 const path = require("path");
 const express = require("express");
+const { paginate } = require('../../model/userDetail/user');
 const files = [];
 
 //  Find all category
@@ -18,12 +22,12 @@ module.exports.category = async (parent, args, context, info) => {
     args.delete = 0;
     args.is_block = false;
     var result = await Category_model.find(args);
-    console.log(_.size(result),"ops");
-    _.map(result,data=>{
+    console.log(_.size(result), "ops");
+    _.map(result, data => {
         console.log(_.size(result.child_category))
-        if(_.size(result.child_category))return data
+        if (_.size(result.child_category)) return data
     })
-    console.log(_.size(result),"ops");
+    console.log(_.size(result), "ops");
     return result;
 };
 
@@ -132,12 +136,10 @@ module.exports.get_subcategory = async (parent, args, context, info) => {
     data.delete = 0;
     var total = await subCategory_model.count(data);
     var result = await subCategory_model.find(data).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
-    // console.log(result);
     var pageInfo = { totalDocs: total, page: args.page }
     return { data: result, pageInfo };
 }
 
-//add category { 'category_name','description','file'}
 
 module.exports.addCategory = async (parent, args, { file }) => {
     //console.log("add category");
@@ -168,22 +170,22 @@ module.exports.addCategory = async (parent, args, { file }) => {
         delete args.file
     }
 
-    if (_.has(args,"base_price")) {
+    if (_.has(args, "base_price")) {
         var base_price = args.base_price.replace("KSh", "");
         if (!Number(base_price)) {
             base_price = 0
         }
         args.base_price = String(parseFloat(Number(base_price)).toFixed(2))
     }
-    
-    if (_.has(args,"hour_price")) {
+
+    if (_.has(args, "hour_price")) {
         var hour_price = args.hour_price.replace("KSh", "");
         if (!Number(hour_price)) {
             hour_price = 0
         }
         args.hour_price = String(parseFloat(Number(hour_price)).toFixed(2))
     }
-    if (_.has(args,"day_price")) {
+    if (_.has(args, "day_price")) {
         var day_price = args.day_price.replace("KSh", "");
         if (!Number(day_price)) {
             day_price = 0
@@ -204,6 +206,104 @@ module.exports.addCategory = async (parent, args, { file }) => {
 
 };
 
+
+exports.GetCategoryCurrency = async (root, args) => {
+    try {
+        var limit = args.limit || 10;
+        var page = args.page || 1;
+        var offset = Number(page - 1) * Number(limit);
+        var query = {
+            is_delete: false
+        };
+        if (args._id) {
+            query["_id"] = args._id
+        }
+        if (args.currency_id) {
+            query["currency_id"] = args.currency_id
+        }
+        if (args.category_id) {
+            query["category_id"] = args.category_id
+        }
+        if (args.root) {
+            query["category_id"] = ObjectId(root._id)
+        }
+        if (args.pagination && args.pagination === true) {
+            var total = await CategoryCurrency_model.count(query);
+            var result = await CategoryCurrency_model.find(query).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
+            var pageInfo = { totalDocs: total, page: args.page }
+            return { data: result, pageInfo };
+        } else {
+            var total = await CategoryCurrency_model.count(query);
+            var result = await CategoryCurrency_model.find(query).sort({ created_at: -1 });
+            var pageInfo = { totalDocs: total, page: args.page }
+            return { data: result, pageInfo };
+        }
+    } catch (error) {
+        return [];
+    }
+}
+
+
+exports.ParentCategoryCurrency = async (root, args) => {
+    try {
+        let query = { is_delete: false }
+        if (args.root) {
+            query["category_id"] = ObjectId(root._id)
+            query["currency_id"] = ObjectId(root.currency_id)
+        } else {
+            query["category_id"] = ObjectId(args._id)
+        }
+        if (args.currency_id) {
+            query["currency_id"] = args.currency_id
+        }
+        if (args.location_code) {
+            let currencydata = await Currency_model.findOne({ is_delete: false, location: args.location_code }).lean();
+            if (_.size(currencydata)) {
+                query["currency_id"] = currencydata._id
+            }
+        }
+        let data = await CategoryCurrency_model.findOne(query).lean();
+        if (data) {
+            return data
+        } else {
+            return {}
+        }
+
+    } catch (error) {
+        return {};
+    }
+}
+exports.UpdateCategoryCurrency = async (root, args) => {
+    try {
+        if (args._id) {
+            var update_result = await CategoryCurrency_model.update({ _id: args._id }, args.data);
+            var result = await CategoryCurrency_model.findOne({ _id: args._id }).lean();
+            result["msg"] = "update process success"
+            result['status'] = 'success'
+            return result
+        } else {
+            const add_currency_catgeory = new CategoryCurrency_model(args.data);
+            const save = await add_currency_catgeory.save();
+            save["msg"] = "update process success"
+            save['status'] = 'success'
+            return save
+        }
+    } catch (error) {
+        console.log("exports.UpdateCategoryCurrency -> error", error)
+        return { "msg": "update process failed", status: 'failed' };
+    }
+}
+exports.DeleteCategoryCurrency = async (root, args) => {
+    try {
+        var result = {}
+        var update_result = await CategoryCurrency_model.update({ _id: args._id }, { is_delete: true });
+        result["msg"] = "Delete process success"
+        result['status'] = 'success'
+        return result
+    } catch (error) {
+        return { "msg": "Delete process failed", status: 'failed' };
+    }
+}
 //  add sub category
 module.exports.addsubCategory = async (parent, args, { file }) => {
     // console.log("add sub category");
@@ -233,22 +333,22 @@ module.exports.addsubCategory = async (parent, args, { file }) => {
             });
         delete args.file
     }
-    if (_.has(args,"base_price")) {
+    if (_.has(args, "base_price")) {
         var base_price = args.base_price.replace("KSh", "");
         if (!Number(base_price)) {
             base_price = 0
         }
         args.base_price = String(parseFloat(Number(base_price)).toFixed(2))
     }
-    
-    if (_.has(args,"hour_price")) {
+
+    if (_.has(args, "hour_price")) {
         var hour_price = args.hour_price.replace("KSh", "");
         if (!Number(hour_price)) {
             hour_price = 0
         }
         args.hour_price = String(parseFloat(Number(hour_price)).toFixed(2))
     }
-    if (_.has(args,"day_price")) {
+    if (_.has(args, "day_price")) {
         var day_price = args.day_price.replace("KSh", "");
         if (!Number(day_price)) {
             day_price = 0
@@ -309,22 +409,22 @@ module.exports.updateCategory = async (parent, args, { file }) => {
             });
         }
     }
-    if (_.has(args,"base_price")) {
+    if (_.has(args, "base_price")) {
         var base_price = args.base_price.replace("KSh", "");
         if (!Number(base_price)) {
             base_price = 0
         }
         args.base_price = String(parseFloat(Number(base_price)).toFixed(2))
     }
-    
-    if (_.has(args,"hour_price")) {
+
+    if (_.has(args, "hour_price")) {
         var hour_price = args.hour_price.replace("KSh", "");
         if (!Number(hour_price)) {
             hour_price = 0
         }
         args.hour_price = String(parseFloat(Number(hour_price)).toFixed(2))
     }
-    if (_.has(args,"day_price")) {
+    if (_.has(args, "day_price")) {
         var day_price = args.day_price.replace("KSh", "");
         if (!Number(day_price)) {
             day_price = 0
@@ -387,22 +487,22 @@ module.exports.updatesubCategory = async (parent, args, { file }) => {
                 });
             }
         }
-        if (_.has(args,"base_price")) {
+        if (_.has(args, "base_price")) {
             var base_price = args.base_price.replace("KSh", "");
             if (!Number(base_price)) {
                 base_price = 0
             }
             args.base_price = String(parseFloat(Number(base_price)).toFixed(2))
         }
-        
-        if (_.has(args,"hour_price")) {
+
+        if (_.has(args, "hour_price")) {
             var hour_price = args.hour_price.replace("KSh", "");
             if (!Number(hour_price)) {
                 hour_price = 0
             }
             args.hour_price = String(parseFloat(Number(hour_price)).toFixed(2))
         }
-        if (_.has(args,"day_price")) {
+        if (_.has(args, "day_price")) {
             var day_price = args.day_price.replace("KSh", "");
             if (!Number(day_price)) {
                 day_price = 0
@@ -499,7 +599,14 @@ module.exports.search_category_mobile = async (parent, args, context, info) => {
 module.exports.get_is_future = async (parent, args, context, info) => {
     var category_result = await Category_model.find({ is_future: true, is_block: false, delete: 0 });
     var sub_category_result = await subCategory_model.find({ is_future: true, is_block: false, delete: 0 });
-    return [...category_result, ...sub_category_result];
+    let final_data = [...category_result, ...sub_category_result];
+    let result = []
+    if (args.limit) {
+        result = _.take(final_data, args.limit)
+    } else {
+        result = final_data
+    }
+    return result
 };
 
 

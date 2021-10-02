@@ -1,27 +1,16 @@
 import React, { useCallback,useEffect } from "react";
 import useReactRouter from 'use-react-router';
-
-// Alert_file //
 import { Alert_msg } from '../../Comman/alert_msg';
-
-//img files //
 import jiffy from '../../../image/Gigzzy.png';
-
-// antd files //
 import { Layout, Icon, Avatar, Input, Tooltip, Button, Typography, Card, Row, Col } from 'antd';
-
-// graphql flies //
 import { useMutation } from "@apollo/react-hooks";
 import { ADMIN_LOGIN } from '../../../graphql/Admin/login';
-
-// css files  //
 import '../../../scss/LoginPage.scss';
 import '../../../scss/template.scss';
 const { Header, Content } = Layout;
 const { Text } = Typography;
 
-
-export const LoginPage = (props) => {
+ const LoginPage = (props) => {
     const { history } = useReactRouter();
     const [adminlogin] = useMutation(ADMIN_LOGIN);
     const [email, setEmail] = React.useState('');
@@ -29,7 +18,6 @@ export const LoginPage = (props) => {
     useEffect(() => {
         localStorage.getItem('adminLogin') === "success"? history.push({ pathname: '/admin-dashboard' }) : history.push({ pathname: '/admin' }); 
     }, []);
-
     const onClick = useCallback(
         async (event) => {
             if (email === '' || password === '') {
@@ -91,5 +79,6 @@ export const LoginPage = (props) => {
             </Layout>
         </div>
     );
-
 };
+
+export default LoginPage;

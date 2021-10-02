@@ -35,20 +35,24 @@ var bookingSchema = new Schema({
   start_date: String,
   end_date: String,
   data: [{}],
-  base_price: { type: String, default: 0.00 },
+  current_currency:{},
+  currency_id:String,
+  default_currency_rate:String,
+  currenct_local_rate:String,
+  base_price: { type: String, default: "0.00" },
   hour_price: { type: String, default: "0.00" },
-  extra_price: { type: String, default: 0.00 },
+  extra_price: { type: String, default: "0.00" },
   extra_price_reason: { type: [String] },
-  total: { type: String, default: 0.00 },
+  total: { type: String, default: "0.00" },
   hour_limit: { type: String, default: "0" },
   price_type: { type: String, default: "job" },
   day_price: { type: String, default: "0.00" },
   day_limit: { type: String, default: "0" },
-  service_fee: { type: String, default: 0.00 },
-  admin_fee: { type: String, default: 0.00 },    //admin fee
-  provider_fee: { type: String, default: 0.00 }, //provider fee
-  final_payment: { type: String, default: 0.00 },
-  extra_hour_price: { type: String, default: 0.00 },
+  service_fee: { type: String, default: "0.00" },
+  admin_fee: { type: String, default: "0.00" },    //admin fee
+  provider_fee: { type: String, default: "0.00" }, //provider fee
+  final_payment: { type: String, default: "0.00" },
+  extra_hour_price: { type: String, default: "0.00" },
   description: { type: String },
   job_status: { type: Number },    //0.start,10.pending,4.ongoing,13.end,14.completed
   jobStart_time: { type: Date },
@@ -85,9 +89,13 @@ var bookingSchema = new Schema({
   payment_message:{type:String,default:""},
   mpeas_payment_callback:{ type: Boolean, default: false },
   manual_payment_status:{ type: Boolean, default: false },
+  extra_payment_callback:{ type: Boolean, default: false },
   payment_type:{ type: String, default: "" },
   ctob_shotcode:{ type: String, default: "" },
   ctob_billRef:{ type: String, default: "" },
+  payment_history:{},
+  currency_detail:{},
+  symbol:String
 }, schemaOptions);
 
 bookingSchema.virtual('uid').get(function () {

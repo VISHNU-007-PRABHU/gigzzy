@@ -16,13 +16,13 @@ var schemaOptions = {
 var sub_categorySchema = new mongoose.Schema({
   category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'category' },
   subCategory_name: { type: String },
-  base_price: { type: String, default: 0.00 },
-  hour_price: { type: String, default: 0.00 },
+  base_price: { type: String, default: "0.00" },
+  hour_price: { type: String, default: "0.00" },
   hour_limit: { type: String,default: "0" },
   day_price: { type: String, default: "0.00" },
   day_limit: { type: String, default: "0" },
   price_type: { type: String, default: "job" },
-  service_fee: { type: String, default: 0 },
+  service_fee: { type: String, default: "0" },
   description: { type: String },
   certificates: [],
   created_at: { type: String },
@@ -55,6 +55,15 @@ sub_categorySchema.virtual('small_img_url').get(function () {
 sub_categorySchema.virtual('uid').get(function () {
   return this._id;
 });
+
+
+sub_categorySchema.virtual('currency_convert', {
+  ref: 'CategoryCurrency',
+  localField: '_id',
+  foreignField: 'category_id',
+  justOne: true
+});
+  
 
 sub_categorySchema.pre('save', function (next) {
   // get the current date

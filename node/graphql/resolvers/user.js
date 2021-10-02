@@ -286,136 +286,6 @@ module.exports.admin_update_user = async (_, args) => {
     }
 }
 
-
-// add new user(1) and provider(2) with otp process
-module.exports.addUser = async (_, args) => {
-    const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
-    // console.log(user);
-    //console.log("user");
-    //add new user 
-    if (args.option == "add") {
-        const get_role = await Detail_model.find({ _id: args._id });
-        //console.log(args.email);
-        if (get_role[0].role == 1) {
-            args.role = 1;
-        } else {
-            args.role = 2;
-        }
-        if (args.phone_no != '') {
-            if (args.phone_no != null) {
-                if (args.phone_no != undefined) {
-                    const find_pn = await Detail_model.find({ delete: 0, phone_no: args.phone_no, role: args.role, _id: { $ne: args._id } });
-                    if (find_pn.length > 0) {
-                        return { msg: "mobile no exists", status: 'failed' }
-                    }
-                }
-            }
-        }
-        if (args.email != '') {
-            if (args.email != null) {
-                if (args.email != undefined) {
-                    const find_email = await Detail_model.find({ delete: 0, email: args.email, role: args.role, _id: { $ne: args._id } });
-                    if (find_email.length > 0) {
-                        return { msg: "Email already exists", status: 'failed' }
-                    }
-                }
-            }
-        }
-        args.Upload_percentage = 50;
-        if (get_role[0].role == 2) {
-            if (args.email != '') {
-                let otp = String(Math.floor(100000 + Math.random() * 900000));
-                args.email_otp = otp;
-                args.last_email_otp_verification = moment.utc().format();
-                var send_otp = await commonHelper.send_mail_sendgrid(args.email, "mail_register", { otp });
-            }
-        }
-        if (args.old_password != undefined && args.old_password != '') {
-            if (args.old_password != get_role[0].password) {
-                return { ...args, "msg": "Wrong Current Password", status: "failed" };
-            }
-            else {
-                delete args.old_password;
-            }
-        }
-        if (args.lat != undefined && args.lng != undefined) {
-            args.location = { type: 'Point', coordinates: [args.lng, args.lat] };
-        }
-        const add_detail = await Detail_model.updateOne({ _id: args._id }, args);
-        // console.log(add_detail);
-        var data = await Detail_model.findOne({ _id: args._id });
-        if (add_detail.n == add_detail.nModified) {
-            data.msg = "User Detail Sucessfully Updated";
-            data.status = "success";
-            //console.log(data);
-            return data
-        } else {
-            data.msg = "User Detail Update  Process Failed";
-            data.status = "failed";
-            return data;
-        }
-    } else if (user.length == 0 && args.option == "otp") {
-
-        let otp = String(Math.floor(1000 + Math.random() * 9000));
-        args.otp = otp;
-        args.last_otp_verification = moment.utc().format();
-        args.Upload_percentage = 25;
-        //console.log(args);
-        const add_user = new Detail_model(args);
-        await add_user.save();
-        var data = await Detail_model.findOne({ role: args.role, phone_no: args.phone_no, delete: 0 });
-        if (args.device_id != null && args.device_id != undefined && args.device_id != '') {
-            const add_detail = await Detail_model.updateOne({ _id: data._id }, { device_id: args.device_id });
-        }
-        data.msg = "New User";
-        data.status = "success";
-        await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp })
-        return data;
-    } else if (args.phone_no == undefined || args.phone_no == '') {
-        return { ...args, "msg": "Please Enter phone Number", status: "failed" };
-    }
-    else {
-        //already insert and check the otp time and reset
-        update_time = new Date(moment(user[0].last_otp_verification));
-        current_time = new Date(moment.utc());
-        let otp_time_diff = Math.round(Math.abs(current_time - update_time) / 60000, 2);
-        // "otp is not change"
-        var return_msg = {};
-        var data = await Detail_model.findOne({ phone_no: args.phone_no, role: args.role, delete: 0 });
-        if (args.device_id != null && args.device_id != undefined && args.device_id != '') {
-            const add_detail = await Detail_model.updateOne({ _id: data._id }, { device_id: args.device_id });
-        }
-        if (otp_time_diff <= 15) {
-            if (data.Upload_percentage == 25) {
-                data.msg = "New User"; data.status = 'success';
-            } else {
-                data.msg = "otp no change", data.status = 'failed';
-            }
-            // console.log({ ...data._doc, ...return_msg });
-            await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp })
-            return data;
-        }
-        //"otp is change"
-        else {
-
-            let otp = String(Math.floor(1000 + Math.random() * 9000));
-            if (args.device_id != null && args.device_id != undefined && args.device_id != '') {
-                const update_opt_time = await Detail_model.updateOne({ phone_no: args.phone_no, role: args.role }, { device_id: args.device_id, otp: otp, last_otp_verification: moment.utc().format() });
-            } else {
-                const update_opt_time = await Detail_model.updateOne({ phone_no: args.phone_no, role: args.role }, { otp: otp, last_otp_verification: moment.utc().format() });
-            }
-            const update_result = await Detail_model.findOne({ phone_no: args.phone_no, role: args.role });
-            if (update_result.Upload_percentage == 25) {
-                update_result.msg = "New User"; update_result.status = 'success';
-            } else {
-                update_result.msg = "otp changed"; update_result.status = 'failed';
-            }
-            await commonHelper.send_sms(update_result.country_code, update_result.phone_no, "otp", { otp })
-            return update_result;
-        }
-    }
-};
-
 // add user details
 module.exports.addDetails = async (parent, args) => {
     //console.log(args);
@@ -620,9 +490,7 @@ module.exports.checkOtp = async (_, args) => {
             result = { ...result._doc, ...message };
         } else {
             let message = {}
-            if (check_user[0].role == 2 && check_user[0].Upload_percentage == 50 && (check_user[0].email_otp_verification == 0)) {
-                message = { pending_status: 2, msg: "Email not verified", status: "success" };
-            } else if (check_user[0].provider_subCategoryID.length == 0 && check_user[0].role == 2 && check_user[0].Upload_percentage == 50) {
+            if (check_user[0].provider_subCategoryID.length == 0 && check_user[0].role == 2 && check_user[0].Upload_percentage == 50) {
                 message = { pending_status: 5, msg: " category not upload", status: "success" };
             } else if (check_user[0].role == 2 && check_user[0].Upload_percentage == 50 && (check_user[0].personal_document == undefined || check_user[0].personal_document == '')) {
                 message = { pending_status: 6, msg: "personal_document not upload", status: "success" };
@@ -707,12 +575,12 @@ module.exports.kilometer = async (parent, args, context, info) => {
             result = await Booking_model.findOne({ _id: parent._id });
 
             if (!_.size(result) || !result.location.coordinates[1] || !result.location.coordinates[0] || !args.lat || !args.lng) {
-                console.log("module.exports.kilometer -> error","size zero")
+                console.log("module.exports.kilometer -> error", "size zero")
                 return { kilometre: 0 };
             }
 
             if (args.lat == result.location.coordinates[1] && args.lng == result.location.coordinates[0]) {
-                console.log("module.exports.kilometer -> error","zero")
+                console.log("module.exports.kilometer -> error", "zero")
                 return { kilometre: 0 };
             }
             var distanceInMeters = getDistanceBetweenPoints.getDistanceBetweenPoints(
@@ -722,7 +590,7 @@ module.exports.kilometer = async (parent, args, context, info) => {
             if (distanceInMeters && distanceInMeters > 0) {
                 return { kilometre: String(parseFloat(distanceInMeters * 0.001).toFixed(2)) };
             } else {
-                console.log("module.exports.kilometer -> error",distanceInMeters)
+                console.log("module.exports.kilometer -> error", distanceInMeters)
 
                 return { kilometre: 0 }
             }
@@ -799,4 +667,160 @@ module.exports.check_demo_app = async (parent, args, context, info) => {
 }
 
 
+exports.addUser = async (parent, args) => {
+    try {
+        const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
+        //add new user 
+        if(_.size(user) || args._id){
+            let comman_update ={}
+            if(args.location_code){
+                comman_update['location_code'] = args.location_code
+            }
+            if(args.device_id){
+                comman_update['device_id'] = args.device_id
+            }
+            let _id =  args._id || user[0]._id 
+            if(_.size(comman_update)){
+                await Detail_model.updateOne({ _id }, comman_update);
+            }
+        }
+        if (args.option == "add") {
+            const get_role = await Detail_model.findOne({ _id: args._id });
+            //console.log(args.email);
+            if (get_role.role == 1) {
+                args.role = 1;
+            } else {
+                args.role = 2;
+            }
+            if (args.phone_no) {
+                const find_pn = await Detail_model.find({ delete: 0, phone_no: args.phone_no, role: args.role, _id: { $ne: args._id } });
+                if (_.size(find_pn)) {
+                    return { msg: "mobile no exists", status: 'failed' }
+                }
+            }
+            if (args.email) {
+                const find_email = await Detail_model.find({ delete: 0, email: args.email, role: args.role, _id: { $ne: args._id } });
+                if (_.size(find_email)) {
+                    return { msg: "Email already exists", status: 'failed' }
+                }
+            }
 
+            args.Upload_percentage = 50;
+            if (get_role.role == 2) {
+                if (args.email != '') {
+                    let otp = String(Math.floor(100000 + Math.random() * 900000));
+                    args.email_otp = otp;
+                    args.last_email_otp_verification = moment.utc().format();
+                    // var send_otp = await commonHelper.send_mail_sendgrid(args.email, 'otp', { otp });
+                }
+            }
+            if (args.old_password) {
+                if (args.old_password != get_role.password) {
+                    return { ...args, "msg": "Wrong Current Password", status: "failed" };
+                }
+                else {
+                    delete args.old_password;
+                }
+            }
+            if (args.lat && args.lng) {
+                args.location = { type: 'Point', coordinates: [args.lng, args.lat] };
+            }
+
+            var preview_data = get_role.provider_subCategoryID;
+            var check_category = false;
+            if (Array.isArray(args.provider_subCategoryID)) {
+                for (let i = 0; i < args.provider_subCategoryID.length; i++) {
+                    check_category = preview_data.includes(args.provider_subCategoryID[i]);
+                    if (!check_category) {
+                        args.proof_status = 0;
+                        var msg = "please wait for admin confrimation in new category";
+                        // console.log('true')
+                        // ================= push_notifiy ================== //
+                        var message = {
+                            to: get_role.device_id,
+                            collapse_key: 'your_collapse_key',
+                            notification: {
+                                title: "Proof Status",
+                                body: msg,
+                                click_action: ".activities.HomeActivity",
+                            },
+                            data: {
+                                my_key: commonHelper.on_going,
+                                my_another_key: commonHelper.on_going
+                            }
+                        };
+                        await commonHelper.push_notifiy(message);
+                        // ================= push_notifiy ================== //  
+                        var send_verification = await commonHelper.send_mail_sendgrid(user.email, "admin_approved", { msg });
+                        await commonHelper.send_sms(get_role.country_code, get_role.phone_no, "admin_apporved", {})
+                        await global.pubsub.publish("PROOF_STATUS", { proof_status: 0, _id: args._id });
+                        break;
+                    }
+                }
+            }
+
+            await Detail_model.updateOne({ _id: args._id }, args);
+            var data = await Detail_model.findOne({ _id: args._id });
+            data.msg = "User Detail Sucessfully Updated";
+            data.status = "success";
+            return data
+
+        } else if (user.length == 0 && args.option == "otp") {
+
+            let otp = String(Math.floor(1000 + Math.random() * 9000));
+            args.otp = otp;
+            args.last_otp_verification = moment.utc().format();
+            args.Upload_percentage = 25;
+
+            const add_user = new Detail_model(args);
+            await add_user.save();
+            var data = await Detail_model.findOne({ role: args.role, phone_no: args.phone_no, delete: 0 });
+         
+            await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp })
+            data.msg = "New User";
+            data.status = "success";
+            return data;
+        } else if (!args.phone_no) {
+            return { ...args, "msg": "Please Enter phone Number", status: "failed" };
+        }
+        else {
+            //already insert and check the otp time and reset
+            update_time = new Date(moment(user[0].last_otp_verification));
+            current_time = new Date(moment.utc());
+            let otp_time_diff = Math.round(Math.abs(current_time - update_time) / 60000, 2);
+            var data = await Detail_model.findOne({ phone_no: args.phone_no, role: args.role, delete: 0 });
+            if (otp_time_diff <= 15) {
+                if (data.Upload_percentage == 25) {
+                    data.msg = "New User"; data.status = 'success';
+                } else {
+                    data.msg = "otp no change", data.status = 'failed';
+                }
+                await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp: data.otp })
+                return data;
+            }
+            else {
+                //"otp is change"
+                let updatedata = {
+                    otp: String(Math.floor(1000 + Math.random() * 9000)),
+                    last_otp_verification: moment.utc().format()
+                };
+                await Detail_model.updateOne({ phone_no: args.phone_no, role: args.role }, updatedata);
+                const update_result = await Detail_model.findOne({ phone_no: args.phone_no, role: args.role });
+                if (update_result.Upload_percentage == 25) {
+                    update_result.msg = "New User"; update_result.status = 'success';
+                } else {
+                    update_result.msg = "otp changed"; update_result.status = 'failed';
+                }
+                await commonHelper.send_sms(update_result.country_code, update_result.phone_no, "otp", { otp })
+                return update_result;
+            }
+        }
+    } catch (error) {
+        console.log("exports.addUser -> error", error)
+        return {
+            msg: "User Detail Update  Process Failed",
+            status: "failed"
+        }
+    }
+
+}
