@@ -672,10 +672,24 @@ exports.addUser = async (_, args) => {
 
         const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
         //add new user 
+        if(_.size(user) || args._id){
+            let comman_update ={}
+            if(args.location_code){
+                comman_update['location_code'] = args.location_code
+            }
+            if(args.device_id){
+                comman_update['device_id'] = args.device_id
+            }
+            let _id =  args._id || user[0]._id 
+            if(_.size(comman_update)){
+             
+                await Detail_model.updateOne({ _id }, comman_update);
+            }
+        }
         if (args.option == "add") {
-            const get_role = await Detail_model.find({ _id: args._id });
+            const get_role = await Detail_model.findOne({ _id: args._id });
             //console.log(args.email);
-            if (get_role[0].role == 1) {
+            if (get_role.role == 1) {
                 args.role = 1;
             } else {
                 args.role = 2;
@@ -694,7 +708,7 @@ exports.addUser = async (_, args) => {
             }
 
             args.Upload_percentage = 50;
-            if (get_role[0].role == 2) {
+            if (get_role.role == 2) {
                 if (args.email != '') {
                     let otp = String(Math.floor(100000 + Math.random() * 900000));
                     args.email_otp = otp;
@@ -703,7 +717,7 @@ exports.addUser = async (_, args) => {
                 }
             }
             if (args.old_password) {
-                if (args.old_password != get_role[0].password) {
+                if (args.old_password != get_role.password) {
                     return { ...args, "msg": "Wrong Current Password", status: "failed" };
                 }
                 else {
@@ -714,8 +728,7 @@ exports.addUser = async (_, args) => {
                 args.location = { type: 'Point', coordinates: [args.lng, args.lat] };
             }
 
-            var user_deails = await Detail_model.findOne({ _id: args._id });
-            var preview_data = user_deails.provider_subCategoryID;
+            var preview_data = get_role.provider_subCategoryID;
             var check_category = false;
             if (Array.isArray(args.provider_subCategoryID)) {
                 for (let i = 0; i < args.provider_subCategoryID.length; i++) {
@@ -726,7 +739,7 @@ exports.addUser = async (_, args) => {
                         // console.log('true')
                         // ================= push_notifiy ================== //
                         var message = {
-                            to: user_deails.device_id,
+                            to: get_role.device_id,
                             collapse_key: 'your_collapse_key',
                             notification: {
                                 title: "Proof Status",
@@ -738,10 +751,10 @@ exports.addUser = async (_, args) => {
                                 my_another_key: commonHelper.on_going
                             }
                         };
-                        var msg_notification = await commonHelper.push_notifiy(message);
+                        await commonHelper.push_notifiy(message);
                         // ================= push_notifiy ================== //  
                         var send_verification = await commonHelper.send_mail_sendgrid(user.email, "admin_approved", { msg });
-                        await commonHelper.send_sms(user_deails.country_code, user_deails.phone_no, "admin_apporved", {})
+                        await commonHelper.send_sms(get_role.country_code, get_role.phone_no, "admin_apporved", {})
                         await global.pubsub.publish("PROOF_STATUS", { proof_status: 0, _id: args._id });
                         break;
                     }
@@ -764,9 +777,7 @@ exports.addUser = async (_, args) => {
             const add_user = new Detail_model(args);
             await add_user.save();
             var data = await Detail_model.findOne({ role: args.role, phone_no: args.phone_no, delete: 0 });
-            if (args.device_id) {
-                await Detail_model.updateOne({ _id: data._id }, { device_id: args.device_id });
-            }
+         
             await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp })
             data.msg = "New User";
             data.status = "success";
@@ -779,11 +790,7 @@ exports.addUser = async (_, args) => {
             update_time = new Date(moment(user[0].last_otp_verification));
             current_time = new Date(moment.utc());
             let otp_time_diff = Math.round(Math.abs(current_time - update_time) / 60000, 2);
-            // "otp is not change"
             var data = await Detail_model.findOne({ phone_no: args.phone_no, role: args.role, delete: 0 });
-            if (args.device_id) {
-                await Detail_model.updateOne({ _id: data._id }, { device_id: args.device_id });
-            }
             if (otp_time_diff <= 15) {
                 if (data.Upload_percentage == 25) {
                     data.msg = "New User"; data.status = 'success';
@@ -799,10 +806,6 @@ exports.addUser = async (_, args) => {
                     otp: String(Math.floor(1000 + Math.random() * 9000)),
                     last_otp_verification: moment.utc().format()
                 };
-                if (args.device_id) {
-                    updatedata['device_id'] = args.device_id;
-                }
-
                 await Detail_model.updateOne({ phone_no: args.phone_no, role: args.role }, updatedata);
                 const update_result = await Detail_model.findOne({ phone_no: args.phone_no, role: args.role });
                 if (update_result.Upload_percentage == 25) {
