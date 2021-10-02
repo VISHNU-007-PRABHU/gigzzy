@@ -682,7 +682,6 @@ exports.addUser = async (_, args) => {
             }
             let _id =  args._id || user[0]._id 
             if(_.size(comman_update)){
-             
                 await Detail_model.updateOne({ _id }, comman_update);
             }
         }
@@ -818,6 +817,7 @@ exports.addUser = async (_, args) => {
             }
         }
     } catch (error) {
+        console.log("exports.addUser -> error", error)
         return {
             msg: "User Detail Update  Process Failed",
             status: "failed"
