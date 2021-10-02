@@ -27,10 +27,10 @@ function Appointments(props) {
             variables={{
                 limit: 10,
                 page: props.page,
-                // _id:user_id,
+                _id:user_id,
                 user_id: user_id,
                 role: 1,
-                // booking_status: Number(props.status)
+                booking_status: Number(props.status)
             }}
             fetchPolicy='no-cache'
         // pollInterval={25000}
@@ -38,7 +38,6 @@ function Appointments(props) {
             {({ loading, error, data, startPolling, stopPolling }) => {
                 if (loading) return <Skeleton />;
                 if (error) return `Error! ${error}`;
-                console.log(data);
                 const handleInfiniteOnLoad = (page, pagesize) => {
                     props.handleInfiniteOnLoad(page);
                 }
@@ -51,7 +50,7 @@ function Appointments(props) {
                                     simple={true}
                                     current={props.page}
                                     onChange={(page) => { handleInfiniteOnLoad(page) }}
-                                    total={data.get_contracts_pagination.pageInfo.totalDocs} />
+                                    total={data.get_contracts_pagination?.pageInfo?.totalDocs} />
                             }
                             title={props.heading}
                             loading={loading}>

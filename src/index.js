@@ -14,8 +14,8 @@ import * as serviceWorker from './serviceWorker';
 import { client } from "./apollo";
 import { ApolloProvider } from "react-apollo";
 import { ApolloProvider as ApolloProviderHooks } from "@apollo/react-hooks";
-const { Content } = Layout;
 import RoleView, { RoleViewFunction } from './component/Comman/roles_permission_view'
+const { Content } = Layout;
 
 
 const Category = React.lazy(() => import('./component/Admin/Category/Category'));
@@ -37,8 +37,8 @@ const Roles = React.lazy(() => import('./component/Admin/Roles/Roles'));
 const Add_Admin = React.lazy(() => import('./component/Admin/Roles/Add_Admin'));
 const AdminRoles = React.lazy(() => import('./component/Admin/Roles/Add_Roles'));
 const Company = React.lazy(() => import('./component/Admin/Company/Company'));
+const Add_Company = React.lazy(() => import('./component/Admin/Company/Add_Company'));
 const CompanyWorkerAdmin = React.lazy(() => import('./component/Admin/Company/CompanyWorkerAdmin'));
-
 const ContractBooking = React.lazy(() => import('./component/User/Book/contract/ContractBooking'));
 const ContractUserDetail = React.lazy(() => import('./component/User/Book/contract/view/ContractUserDetail'));
 const User_Login = React.lazy(() => import('./component/User/Login/User_Login'));
@@ -46,7 +46,6 @@ const Home_Page = React.lazy(() => import('./component/User/HomePage/Home_Page')
 const HomePage = React.lazy(() => import('./component/User/HomePage/HomePage'));
 const Profile_Page = React.lazy(() => import('./component/User/Profile/Profile'));
 const Bookings_Page = React.lazy(() => import('./component/User/Book/Bookings'));
-const NotFound = React.lazy(() => import('./component/Comman/NotFound'));
 const Description_Page = React.lazy(() => import('./component/User/Book/Description'));
 const Payouts = React.lazy(() => import('./component/Admin/Payouts/Payouts'));
 const Review = React.lazy(() => import('./component/Admin/Review/Review'));
@@ -55,6 +54,10 @@ const Email_Login = React.lazy(() => import("./component/User/Login/Email_Login"
 const Request = React.lazy(() => import("./component/Admin/Request/Request"));
 const Booking_Details = React.lazy(() => import("./component/Admin/Booking/Booking_Details"));
 const Invoice = React.lazy(() => import('./component/Admin/Booking/invoice'));
+
+const NotFound = React.lazy(() => import('./component/Comman/NotFound'));
+const NotAccess = React.lazy(() => import('./component/Comman/NotAccess'));
+
 const provider_detail = React.lazy(() => import('./component/User/Provider/Provider_Details'));
 const provider_earnings = React.lazy(() => import('./component/User/Provider/Provider_Earns'));
 const Booking_Detail = React.lazy(() => import('./component/User/Provider/Booking_Detail'));

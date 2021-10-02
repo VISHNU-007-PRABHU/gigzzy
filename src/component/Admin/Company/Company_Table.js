@@ -64,7 +64,7 @@ class CompanyTable extends React.Component {
             fetchPolicy: 'no-cache',
         }).then(result => {
             const pagination = { ...this.state.pagination };
-            pagination.total = result.data.get_company_detail.pageInfo.totalDocs;
+            pagination.total = result.data.get_company_detail?.pageInfo?.totalDocs;
             this.setState({ loading: false, pagination, dataSource: result.data.get_company_detail.data });
         });
     }
