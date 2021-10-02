@@ -1,4 +1,4 @@
-import React,{Suspense} from 'react'
+import React from 'react'
 import { withRouter } from "react-router-dom";
 import { Layout, Icon, Form, Input, Button, message, Typography, Row, Col, Select, Upload, Radio } from 'antd';
 import { ADD_SUBCATEGORY, CATEGORY_NAME, FIND_SUBCATEGORY, UPDATE_SUBCATEGORY } from '../../../graphql/Admin/sub_category';
@@ -12,7 +12,7 @@ const { Content } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
 
-const MultiCurrency = React.lazy(() => import('./MultiCurrency'));
+
 class Add_Subcategory extends React.Component {
     constructor(props) {
         super(props);
@@ -55,9 +55,9 @@ class Add_Subcategory extends React.Component {
             variables: { is_parent: true },
             fetchPolicy: 'no-cache',
         }).then(result => {
-            this.setState({
-                category: result.data.category,
-                certificate: result.data.category[0]?.Certificate
+            this.setState({ 
+                category: result.data.category, 
+                certificate: result.data.category[0].Certificate 
             });
         });
     }
@@ -73,7 +73,7 @@ class Add_Subcategory extends React.Component {
                 update_data: result.data.sub_category[0],
                 certificate: result.data.sub_category[0].Certificate,
                 imageUrl: result.data.sub_category[0].img_url,
-                price_type: result.data.sub_category[0].price_type || 'job'
+                price_type:result.data.sub_category[0].price_type || 'job'
             });
         });
     }
@@ -127,7 +127,7 @@ class Add_Subcategory extends React.Component {
                     mutation: ADD_SUBCATEGORY,
                     variables: {
                         subCategory_name: values.subCategory_name, base_price: values.base_price, hour_limit: values.hour_limit, hour_price: values.hour_price, service_fee: values.service_fee, certificates: values.certificates,
-                        category_id: values.category_name, description: values.description, file: this.state.file, price_type: this.state.price_type, day_price: values.day_price, day_limit: values.day_limi
+                        category_id: values.category_name, description: values.description, file: this.state.file,price_type:this.state.price_type,day_price: values.day_price,day_limit: values.day_limi
                     },
                 }).then((result, loading, error) => {
                     Alert_msg(result.data.addsubCategory.info);
@@ -147,7 +147,7 @@ class Add_Subcategory extends React.Component {
                     mutation: UPDATE_SUBCATEGORY,
                     variables: {
                         subCategory_name: values.subCategory_name, base_price: values.base_price, hour_limit: values.hour_limit, hour_price: values.hour_price, service_fee: values.service_fee, certificates: values.certificates,
-                        category_id: values.category_name, description: values.description, file: this.state.file, _id: this.props.match.params.id, price_type: this.state.price_type, day_price: values.day_price, day_limit: values.day_limit,
+                        category_id: values.category_name, description: values.description, file: this.state.file, _id: this.props.match.params.id,price_type:this.state.price_type,day_price: values.day_price,day_limit: values.day_limit, 
                     },
                 }).then((result, loading, error) => {
                     Alert_msg(result.data.updatesubCategory.info);
@@ -224,7 +224,7 @@ class Add_Subcategory extends React.Component {
                                         </Col>
                                     </Row>
                                     <Row>
-                                        {/*   <Radio.Group name="price_type" onChange={this.onPriceTypeChange} value={this.state.price_type}>
+                                        <Radio.Group name="price_type" onChange={this.onPriceTypeChange} value={this.state.price_type}>
                                             <Radio value={"hour"}>Per hour</Radio>
                                             <Radio value={"day"}>Per day</Radio>
                                             <Radio value={"job"}>Per job</Radio>
@@ -283,14 +283,14 @@ class Add_Subcategory extends React.Component {
                                                     rules: [{ required: true, message: 'Service Fee is required' }]
                                                 })(<Input placeholder="service Fee" addonAfter="%" />)}
                                             </Form.Item>
-                                        </Col> */}
+                                        </Col>
                                         <Col span={24}>
                                             <Form.Item label="Certificates">
                                                 {form.getFieldDecorator("certificates", {
                                                     initialValue: this.state.update_data.certificates,
                                                     rules: [{ required: true }]
                                                 })(<Select mode="tags" style={{ width: '100%' }} placeholder="Certificate" onChange={(value) => { console.log(value); }}>
-                                                    {this.state.certificate && this.state.certificate.map(data =>
+                                                    {this.state.certificate.map(data =>
                                                         <Option key={data._id}>{data.certificate_name}</Option>
                                                     )}
                                                 </Select>)}
@@ -335,13 +335,6 @@ class Add_Subcategory extends React.Component {
                                     </Form.Item>
                                 </Col>
                             </Form>
-                        </Row>
-                        <Row className="jumbotron p-1">
-                            <Col>
-                                <Suspense fallback={<div>.......</div>}>
-                                    <MultiCurrency id={this.props.match.params.id} />
-                                </Suspense>
-                            </Col>
                         </Row>
                     </Content>
                 </Layout>

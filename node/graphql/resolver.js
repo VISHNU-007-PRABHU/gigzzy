@@ -5,7 +5,6 @@ const moment = require("moment");
 const path = require("path");
 var CronJob = require('cron').CronJob;
 const pubsub = new PubSub();
-global.pubsub = pubsub;
 const { createWriteStream } = require("fs");
 var userResolver = require('./resolvers/user');
 var categoryResolver = require('./resolvers/category');
@@ -15,12 +14,10 @@ var bookingResolver = require('./resolvers/booking');
 var adminResolver = require('./resolvers/admin');
 var certificateResolver = require('./resolvers/certificate');
 var staticResolver = require('./resolvers/static');
-var currencyResolver = require('./resolvers/currency');
 var settingResolver = require('./resolvers/setting');
 const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
-const payment_choose = require('./payment/choose')
 dotenv.config();
 
 var Detail_model = model.detail;
@@ -30,8 +27,6 @@ var Category_model = model.category;
 var message_model = model.message;
 var Payout_model = model.payout;
 var Extra_fee_model = model.Extra_fee;
-var CategoryCurrency_model = model.CategoryCurrency;
-var Currency_model = model.currency;
 var providerSubcategory_model = model.providerSubcategory_model;
 
 const MESSAGE_CREATED = 'MESSAGE_CREATED';
@@ -204,9 +199,6 @@ const resolvers = {
         site_setting_detail: settingResolver.site_setting_detail,
         payout_setting_detail: settingResolver.payout_setting_detail,
         user_address: userResolver.user_address,
-        get_currencys: currencyResolver.get_currencys,
-        get_currency: currencyResolver.get_currency,
-        GetCategoryCurrency: categoryResolver.GetCategoryCurrency,
         get_my_appointments: async (parent, args, context, info) => {
             try {
 
@@ -234,7 +226,7 @@ const resolvers = {
                     }
                 }
                 const result = await Booking_model.find(data).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
-                console.log("result", result.length)
+                // console.log("result", result)
                 var total = await Booking_model.count(data);
                 var pageInfo = { totalDocs: total, page: args.page }
                 return { data: result, pageInfo };
@@ -274,14 +266,10 @@ const resolvers = {
         sub_category: categoryResolver.subcategory,
         child_category: categoryResolver.child_category, //display child categor based on parent _id 
         Certificate: certificateResolver.certificate,   //display certificate  based on category
-        ParentCategoryCurrency: categoryResolver.ParentCategoryCurrency,
     },
     subCategory: {
         category: categoryResolver.subcategory_category,
         Certificate: certificateResolver.certificate,  //display certificate  based on category
-        get_parent_currency: currencyResolver.get_parent_currency,
-        GetCategoryCurrency: categoryResolver.GetCategoryCurrency,
-        ParentCategoryCurrency: categoryResolver.ParentCategoryCurrency,
     },
 
     User: {
@@ -294,7 +282,6 @@ const resolvers = {
         category: categoryResolver.category,
         provider_rating: userResolver.provider_rating,
         provider_rate: userResolver.provider_rate,
-        get_currency: currencyResolver.get_currency,
 
     },
 
@@ -320,11 +307,168 @@ const resolvers = {
 
     Mutation: {
         adminLogin: adminResolver.adminlogin,
-        update_currency: currencyResolver.update_currency,
-        delete_currency: currencyResolver.delete_currency,
-        UpdateCategoryCurrency: categoryResolver.UpdateCategoryCurrency,
-        DeleteCategoryCurrency: categoryResolver.DeleteCategoryCurrency,
-        addUser:userResolver.addUser,
+        addUser: async (_, args) => {
+            const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
+            // console.log(user);
+            //console.log("user");
+            //add new user 
+            if (args.option == "add") {
+                const get_role = await Detail_model.find({ _id: args._id });
+                //console.log(args.email);
+                if (get_role[0].role == 1) {
+                    args.role = 1;
+                } else {
+                    args.role = 2;
+                }
+                if (args.phone_no != '') {
+                    if (args.phone_no != null) {
+                        if (args.phone_no != undefined) {
+                            const find_pn = await Detail_model.find({ delete: 0, phone_no: args.phone_no, role: args.role, _id: { $ne: args._id } });
+                            if (find_pn.length > 0) {
+                                return { msg: "mobile no exists", status: 'failed' }
+                            }
+                        }
+                    }
+                }
+                if (args.email != '') {
+                    if (args.email != null) {
+                        if (args.email != undefined) {
+                            const find_email = await Detail_model.find({ delete: 0, email: args.email, role: args.role, _id: { $ne: args._id } });
+                            if (find_email.length > 0) {
+                                return { msg: "Email already exists", status: 'failed' }
+                            }
+                        }
+                    }
+                }
+                args.Upload_percentage = 50;
+                if (get_role[0].role == 2) {
+                    if (args.email != '') {
+                        let otp = String(Math.floor(100000 + Math.random() * 900000));
+                        args.email_otp = otp;
+                        args.last_email_otp_verification = moment.utc().format();
+                        var send_otp = await commonHelper.send_mail_sendgrid(args.email, 'otp', { otp });
+                    }
+                }
+                if (args.old_password != undefined && args.old_password != '') {
+                    if (args.old_password != get_role[0].password) {
+                        return { ...args, "msg": "Wrong Current Password", status: "failed" };
+                    }
+                    else {
+                        delete args.old_password;
+                    }
+                }
+                if (args.lat != undefined && args.lng != undefined) {
+                    args.location = { type: 'Point', coordinates: [args.lng, args.lat] };
+                }
+
+                var user_deails = await Detail_model.findOne({ _id: args._id });
+                var preview_data = user_deails.provider_subCategoryID;
+                var check_category = false;
+                if (Array.isArray(args.provider_subCategoryID)) {
+                    for (let i = 0; i < args.provider_subCategoryID.length; i++) {
+                        check_category = preview_data.includes(args.provider_subCategoryID[i]);
+                        if (!check_category) {
+                            args.proof_status = 0;
+                            var msg = "please wait for admin confrimation in new category";
+                            // console.log('true')
+                            // ================= push_notifiy ================== //
+                            var message = {
+                                to: user_deails.device_id,
+                                collapse_key: 'your_collapse_key',
+                                notification: {
+                                    title: "Proof Status",
+                                    body: msg,
+                                    click_action: ".activities.HomeActivity",
+                                },
+                                data: {
+                                    my_key: commonHelper.on_going,
+                                    my_another_key: commonHelper.on_going
+                                }
+                            };
+                            var msg_notification = await commonHelper.push_notifiy(message);
+                            // ================= push_notifiy ================== //  
+                            var send_verification = await commonHelper.send_mail_sendgrid(user.email, "admin_approved", { msg });
+                            await commonHelper.send_sms(user_deails.country_code, user_deails.phone_no, "admin_apporved", {})
+                            await pubsub.publish(PROOF_STATUS, { proof_status: 0, _id: args._id });
+                            break;
+                        }
+                    }
+                }
+
+                const add_detail = await Detail_model.updateOne({ _id: args._id }, args);
+                // console.log(add_detail);
+                var data = await Detail_model.findOne({ _id: args._id });
+                if (add_detail.n == add_detail.nModified) {
+                    data.msg = "User Detail Sucessfully Updated";
+                    data.status = "success";
+                    //console.log(data);
+                    return data
+                } else {
+                    data.msg = "User Detail Update  Process Failed";
+                    data.status = "failed";
+                    return data;
+                }
+            } else if (user.length == 0 && args.option == "otp") {
+
+                let otp = String(Math.floor(1000 + Math.random() * 9000));
+                args.otp = otp;
+                args.last_otp_verification = moment.utc().format();
+                args.Upload_percentage = 25;
+                //console.log(args);
+                const add_user = new Detail_model(args);
+                await add_user.save();
+                var data = await Detail_model.findOne({ role: args.role, phone_no: args.phone_no, delete: 0 });
+                if (args.device_id != null && args.device_id != undefined && args.device_id != '') {
+                    const add_detail = await Detail_model.updateOne({ _id: data._id }, { device_id: args.device_id });
+                }
+                await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp })
+                data.msg = "New User";
+                data.status = "success";
+                return data;
+            } else if (args.phone_no == undefined || args.phone_no == '') {
+                return { ...args, "msg": "Please Enter phone Number", status: "failed" };
+            }
+            else {
+                //already insert and check the otp time and reset
+                update_time = new Date(moment(user[0].last_otp_verification));
+                current_time = new Date(moment.utc());
+                let otp_time_diff = Math.round(Math.abs(current_time - update_time) / 60000, 2);
+                // "otp is not change"
+                var return_msg = {};
+                var data = await Detail_model.findOne({ phone_no: args.phone_no, role: args.role, delete: 0 });
+                if (args.device_id != null && args.device_id != undefined && args.device_id != '') {
+                    const add_detail = await Detail_model.updateOne({ _id: data._id }, { device_id: args.device_id });
+                }
+                if (otp_time_diff <= 15) {
+                    if (data.Upload_percentage == 25) {
+                        data.msg = "New User"; data.status = 'success';
+                    } else {
+                        data.msg = "otp no change", data.status = 'failed';
+                    }
+                    // console.log({ ...data._doc, ...return_msg });
+                    await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp: data.otp })
+                    return data;
+                }
+                //"otp is change"
+                else {
+
+                    let otp = String(Math.floor(1000 + Math.random() * 9000));
+                    if (args.device_id != null && args.device_id != undefined && args.device_id != '') {
+                        const update_opt_time = await Detail_model.updateOne({ phone_no: args.phone_no, role: args.role }, { device_id: args.device_id, otp: otp, last_otp_verification: moment.utc().format() });
+                    } else {
+                        const update_opt_time = await Detail_model.updateOne({ phone_no: args.phone_no, role: args.role }, { otp: otp, last_otp_verification: moment.utc().format() });
+                    }
+                    const update_result = await Detail_model.findOne({ phone_no: args.phone_no, role: args.role });
+                    if (update_result.Upload_percentage == 25) {
+                        update_result.msg = "New User"; update_result.status = 'success';
+                    } else {
+                        update_result.msg = "otp changed"; update_result.status = 'failed';
+                    }
+                    await commonHelper.send_sms(update_result.country_code, update_result.phone_no, "otp", { otp })
+                    return update_result;
+                }
+            }
+        },
         reset_password: userResolver.reset_password,
         admin_add_user: userResolver.admin_add_user,
         admin_update_user: admin_update_user = async (_, args) => {
@@ -428,8 +572,6 @@ const resolvers = {
         update_manual_payment: bookingResolver.update_manual_payment,
         //add new booking
         add_booking: async (parent, args, context, info) => {
-            console.log("args.location", args.location_code)
-            console.log("args loval location", args.local_location_code)
             var img = [];
             if (args.file != '' && args.file != undefined) {
                 for (let i = 0; i < args.file.length; i++) {
@@ -484,18 +626,7 @@ const resolvers = {
             } else if (args.category_type == 2) {
                 var category = await subCategory_model.findOne({ _id: args.category_id });
             }
-            var CurrencyDetail = await Currency_model.findOne({ location: args.location_code }).lean()
-            console.log("CurrencyDetail", CurrencyDetail._id)
-            if (!_.size(CurrencyDetail)) {
-                return []
-            }
-            var categoryCurrency = await CategoryCurrency_model.findOne({ category_id: args.category_id, currency_id: CurrencyDetail._id }).lean()
-            if (!_.size(categoryCurrency)) {
-                console.log("sscaCurrencyDetail")
-                return []
-            }
-            var default_currency = await Currency_model.findOne({ default_currency: 1, is_delete: false }).lean()
-            var local_currency = await Currency_model.findOne({ location: args.local_location_code, is_delete: false }).lean()
+
             if (args.booking_type == 1) {
                 args['booking_date'] = moment.utc().format();
             } else if (args.booking_type == 2) {
@@ -506,20 +637,14 @@ const resolvers = {
                 args['booking_time'] = a.utc().format("HH:mm:ss");
             }
             args['available_provider'] = available_provider;
-            args['currency_id'] = CurrencyDetail._id;
-            args['symbol'] = CurrencyDetail.symbol || "";
-            args['current_currency'] = categoryCurrency;
-            args['currency_detail'] = CurrencyDetail;
-            args['default_currency_rate'] = default_currency.rate;
-            args['currenct_local_rate'] = local_currency.rate;
             args['location'] = { coordinates: [args.lng, args.lat] }
-            args['service_fee'] = String(parseFloat(categoryCurrency.service_fee).toFixed(2));
-            args['base_price'] = String(parseFloat(categoryCurrency.base_price).toFixed(2));
-            args['hour_price'] = String(parseFloat(categoryCurrency.hour_price).toFixed(2));
-            args['hour_limit'] = categoryCurrency.hour_limit;
-            args['day_price'] = String(parseFloat(categoryCurrency.day_price).toFixed(2));
-            args['day_limit'] = categoryCurrency.day_limit;
-            args['price_type'] = categoryCurrency.price_type;
+            args['service_fee'] = String(parseFloat(category.service_fee).toFixed(2));
+            args['base_price'] = String(parseFloat(category.base_price).toFixed(2));
+            args['hour_price'] = String(parseFloat(category.hour_price).toFixed(2));
+            args['hour_limit'] = category.hour_limit;
+            args['day_price'] = String(parseFloat(category.day_price).toFixed(2));
+            args['day_limit'] = category.day_limit;
+            args['price_type'] = category.price_type;
 
             args['booking_ref'] = String(Math.floor(1000 + Math.random() * 9000));
             args['ctob_shotcode'] = process.env.MPESA_SHORT_CODE;
@@ -690,12 +815,10 @@ const resolvers = {
 
                 } else if (args.booking_status == 16) {
                     var end_data = {};
-                    let s_extra_fare = 0
-                    console.log("args.extra_fare", args.extra_fare)
                     if (args.extra_fare) {
-                        if (args.extra_fare && Number(args.extra_fare)) {
-                            s_extra_fare = args.extra_fare
-                            console.log("s_extra_fare", s_extra_fare)
+                        var s_extra_fare = args.extra_fare.replace("KSh", "");
+                        if (!Number(s_extra_fare)) {
+                            s_extra_fare = 0
                         }
                     }
                     args.extra_fare = String(parseFloat(Number(s_extra_fare)).toFixed(2))
@@ -769,7 +892,7 @@ const resolvers = {
                         }
                     }
                     if (args.option == 3) {
-
+                        
                         var find_extra = await Extra_fee_model.find({ booking_id: args.booking_id });
                         var find_extra_data = await Extra_fee_model.findOne({ _id: args.extra_fare_id }).lean();
                         if (find_extra.length == 0) {
@@ -944,6 +1067,10 @@ const resolvers = {
                         return [{ msg: "Booking Cancel Failed", status: 'failed' }];
                     }
                 } else if (args.booking_status == 10 && booking_detail.booking_status == 9) {
+                    var data = {};
+                    // console.log("========================");
+                    // console.log("TRNSCATIONS START");
+                    // console.log(args);
                     let base_amount = booking_detail.base_price;
                     let service_fee = booking_detail.service_fee;
                     let admin_fee = (service_fee / 100) * base_amount;              // store admin fee  ....
@@ -952,21 +1079,68 @@ const resolvers = {
                     args['admin_fee'] = admin_fee;
                     args['provider_fee'] = provider_fee
                     args['total'] = amount;
-                    args['amount'] = amount;
+                    // console.log("osp")
+                    try {
+                        if (args['payment_type'] && args['payment_type'] === "c2b") {
+                            var update_booking_c2b = await Booking_model.update({ _id: args.booking_id }, {
+                                accept_date: moment.utc().format(),
+                                admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
+                                provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
+                                total: String(parseFloat(args.total).toFixed(2)),
+                                booking_status: 50, // 50 means waiting booking
+                                phone_number: args.phone_number || "",
+                                payment_type: "c2b",
+                            }, { new: true });
+                            var findBooking = await Booking_model.find({ _id: args.booking_id });
+                            data = {
+                                user_parent: true,
+                                ...findBooking,
+                                msg: "user accept the job ",
+                                status: 'success',
+                                msg_status: 'to_provider'
+                            }
+                            // console.log("data", data)
+                            return [data]
+                        } else {
 
-                    let payment_data = await payment_choose.choose_payment(args, booking_detail)
-                    console.log("payment_data", payment_data)
-                    if (payment_data.status) {
-                        var findBooking = await Booking_model.findOne({ _id: args.booking_id }).lean();
-                        findBooking['user_parent'] = true;
-                        findBooking['msg'] = "user accept the job ";
-                        findBooking['status'] = 'success';
-                        findBooking['msg_status'] = 'to_provider';
-                        // console.log("data", data)
-                        return [findBooking]
-                    } else {
+                            var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(amount),booking_detail.booking_ref)
+                            // console.log("charge", charge)
+                            if (charge.status == true && charge.data.ResponseCode === '0') {
+                                // update charge amount
+                                // console.log(charge.data.MerchantRequestID, args.booking_id)
+                                var update_booking = await Booking_model.update({ _id: args.booking_id }, {
+                                    accept_date: moment.utc().format(),
+                                    admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
+                                    provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
+                                    total: String(parseFloat(args.total).toFixed(2)),
+                                    booking_status: 50, // 50 means waiting booking
+                                    phone_number: args.phone_number,
+                                    payment_type: "lipesa",
+                                    // job_status: 10,
+                                    // payment_status: 1,
+                                    MerchantRequestID: charge.data.MerchantRequestID || 0,
+                                    CheckoutRequestID: charge.data.CheckoutRequestID || 0
+                                }, { new: true });
+                                var findBooking = await Booking_model.find({ _id: args.booking_id });
+                                data = {
+                                    user_parent: true,
+                                    ...findBooking,
+                                    msg: "user accept the job ",
+                                    status: 'success',
+                                    msg_status: 'to_provider'
+                                }
+                                // console.log("data", data)
+                                return [data]
+                            } else {
+                                return [{ msg: "Payment charge failed", status: 'failed' }]
+                            }
+                        }
+
+                    } catch (err) {
+                        // console.log("err", err)
                         return [{ msg: "Booking Payment failed", status: 'failed' }]
                     }
+
 
 
                 } else if (args.booking_status == 11 && booking_detail.booking_status == 9) {
@@ -1038,19 +1212,56 @@ const resolvers = {
 
                 } else if (args.booking_status == 14) {
                     var final_job = await Booking_model.findOne({ _id: args.booking_id });
+                    // console.log(final_job);
+                    // console.log(Number(final_job.final_payment));
+                    // console.log(parseFloat(Number(final_job.final_payment) * 100).toFixed(0));
                     if (final_job.payment_status == 4) {
+                        var res = []
                         let admin_fee = (final_job.service_fee / 100) * final_job.final_payment;              // store admin fee  ....
                         let provider_fee = Number(final_job.provider_fee) - Number(admin_fee);     //store provider fee ...
                         args['admin_fee'] = Number(final_job.admin_fee) + Number(admin_fee);
                         args['provider_fee'] = provider_fee;
-                        args['amount'] = Number(final_job.final_payment);
+
                         try {
-                            let payment_data = await payment_choose.choose_payment(args, booking_detail)
-                            console.log("payment_data", payment_data)
-                            if (payment_data.status) {
+                            let final_amount = Number(final_job.final_payment)
+
+                            if (args['payment_type'] && args['payment_type'] === "c2b") {
+                                var update_booking = await Booking_model.update({ _id: args.booking_id }, {
+                                    end_date: moment.utc().format(),
+                                    admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
+                                    provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
+                                    phone_number: args.phone_number,
+                                    payment_type: "c2b",
+                                    mpeas_payment_callback: true,
+                                    // job_status: 10,
+                                    // payment_status: 1,
+                                }, { new: true });
+                                var findBooking = await Booking_model.find({ _id: args.booking_id });
                                 return [{ job_status: 14, msg: "job is completed successfully", status: 'success' }];
                             } else {
-                                return [{ msg: "Booking Payment failed", status: 'failed' }]
+                                var charge = await safaricom.safaricom_lipesa_simulate(args.phone_number, String(final_amount),booking_detail.booking_ref)
+
+                                if (charge.status == true && charge.data.ResponseCode === '0') {
+                                    // update charge amount
+                                    var update_booking = await Booking_model.update({ _id: args.booking_id }, {
+                                        end_date: moment.utc().format(),
+                                        admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
+                                        provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
+                                        phone_number: args.phone_number,
+                                        payment_type: "lipesa",
+                                        mpeas_payment_callback: true,
+                                        // job_status: 10,
+                                        // payment_status: 1,
+                                        MerchantRequestID: charge.data.MerchantRequestID || 0,
+                                        CheckoutRequestID: charge.data.CheckoutRequestID || 0
+                                    }, { new: true });
+                                    var findBooking = await Booking_model.find({ _id: args.booking_id });
+                                    return [{ job_status: 14, msg: "job is completed successfully", status: 'success' }];
+
+                                } else {
+                                    return [{ job_status: 14, msg: "job is completed failed", status: 'failed' }];
+
+                                }
                             }
 
                         } catch (err) {
@@ -1058,6 +1269,10 @@ const resolvers = {
                         }
 
 
+                        // }).catch(err => {
+                        //     // console.log("Error:", err);
+                        // });
+                        return res;
                     } else {
                         await Booking_model.update({ _id: args.booking_id }, { payment_status: 5, booking_status: 14, job_status: 14 }, { new: true });
                         await Payout_model.update({ booking_id: args.booking_id }, { booking_status: 14 }, { new: true });

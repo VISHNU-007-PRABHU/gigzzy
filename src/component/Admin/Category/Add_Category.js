@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 import { withRouter } from "react-router-dom";
 import { Layout, Icon, Form, Input, Button, message, Typography, Row, Col, Select, Upload, Checkbox, Radio } from 'antd';
 import { ADD_CATEGORY, FIND_CATEGORY, UPDATE_CATEGORY } from '../../../graphql/Admin/category';
@@ -12,7 +12,8 @@ import { CERTIFICATE } from '../../../graphql/Admin/certificate';
 const { Content } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
-const MultiCurrency = React.lazy(() => import('../subcategory/MultiCurrency'));
+
+
 class Add_Category extends React.Component {
     constructor(props) {
         super(props);
@@ -211,19 +212,77 @@ class Add_Category extends React.Component {
                                         </Col>
 
                                     </Row>
-                                    {!this.state.is_parent && <>
-                                        <Row>
-                                            <Col span={24}>
-                                                <Form.Item label="Description">
-                                                    {form.getFieldDecorator("description", {
-                                                        initialValue: this.state.update_data.description,
-                                                        rules: [{ required: true }]
-                                                    })(<Input.TextArea placeholder="Description" />)}
+                                    <Row>
+                                        <Col span={24}>
+                                            <Form.Item label="Description">
+                                                {form.getFieldDecorator("description", {
+                                                    initialValue: this.state.update_data.description,
+                                                    rules: [{ required: true }]
+                                                })(<Input.TextArea placeholder="Description" />)}
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                    <Row className={this.state.is_parent ? "py-3 d-none" : "py-3"} gutter={12}>
+                                        <Row className="py-4">
+                                            <Radio.Group name="price_type" onChange={this.onPriceTypeChange} value={this.state.price_type}>
+                                                <Radio value={"hour"}>Per hour</Radio>
+                                                <Radio value={"day"}>Per day</Radio>
+                                                <Radio value={"job"}>Per job</Radio>
+                                            </Radio.Group>
+                                        </Row>
+                                        <Row gutter={12} className={this.state.price_type === "hour" ? "d-flex" : "d-none"}>
+                                            <Col className="" lg={12}>
+                                                <Form.Item label="Limit (Per hour)">
+                                                    {form.getFieldDecorator("hour_limit", {
+                                                        initialValue: this.state.update_data.hour_limit,
+                                                        rules: [{ required: false, message: 'Hour Limit is required' }]
+                                                    })(<Input placeholder="Limit (Per hour)" />)}
+                                                </Form.Item>
+                                            </Col>
+                                            <Col className="" lg={12}>
+                                                <Form.Item label="Price (Per hour price)">
+                                                    {form.getFieldDecorator("hour_price", {
+                                                        initialValue: this.state.update_data.hour_price,
+                                                        rules: [{ required: false }]
+                                                    })(<Input placeholder="Price (Per hour price)" />)}
                                                 </Form.Item>
                                             </Col>
                                         </Row>
-                                    </>}
-                                    <Row>
+
+                                        <Row gutter={12} className={this.state.price_type === "day" ? "d-flex" : "d-none"}>
+                                            <Col className="" lg={12}>
+                                                <Form.Item label="Limit (Per day)">
+                                                    {form.getFieldDecorator("day_limit", {
+                                                        initialValue: this.state.update_data.day_limit,
+                                                        rules: [{ required: false, message: 'Day Limit is required' }]
+                                                    })(<Input placeholder="Limit (Per day)" />)}
+                                                </Form.Item>
+                                            </Col>
+                                            <Col className="" lg={12}>
+                                                <Form.Item label="Price (Per day price)">
+                                                    {form.getFieldDecorator("day_price", {
+                                                        initialValue: this.state.update_data.day_price,
+                                                        rules: [{ required: false }]
+                                                    })(<Input placeholder="Price (Per day price)" />)}
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                        <Col className="" lg={12}>
+                                            <Form.Item label="Basic Price">
+                                                {form.getFieldDecorator("base_price", {
+                                                    initialValue: this.state.update_data.base_price,
+                                                    rules: this.state.is_parent ? [{ required: false }] : [{ required: true }]
+                                                })(<Input placeholder="Basic Price" />)}
+                                            </Form.Item>
+                                        </Col>
+                                        <Col className="" lg={12}>
+                                            <Form.Item label="Service Fee">
+                                                {form.getFieldDecorator("service_fee", {
+                                                    initialValue: this.state.update_data.service_fee,
+                                                    rules: this.state.is_parent ? [{ required: false }] : [{ required: true, message: 'Service Fee is required' }]
+                                                })(<Input placeholder="Service Fee" />)}
+                                            </Form.Item>
+                                        </Col>
                                         <Col span={24}>
                                             <Form.Item label="Certificates">
                                                 {form.getFieldDecorator("certificates", {
@@ -278,15 +337,6 @@ class Add_Category extends React.Component {
                                 </Col>
                             </Form>
                         </Row>
-                        {!this.state.is_parent && <>
-                            <Row className="jumbotron p-1">
-                                <Col>
-                                    <Suspense fallback={<div>.......</div>}>
-                                        <MultiCurrency id={this.props.match.params.id} />
-                                    </Suspense>
-                                </Col>
-                            </Row>
-                        </>}
                     </Content>
                 </Layout>
             </Layout >

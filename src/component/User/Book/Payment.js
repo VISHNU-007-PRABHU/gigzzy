@@ -41,7 +41,7 @@ class _CardForm extends Component {
 
         await client.mutate({
             mutation: ACCEPT_JOB_MSG,
-            variables: { booking_status: 10,payment_type:"mpesa",payment_option:"mpesa", booking_id: this.props.data._id, role: 1, phone_number: phone_number },
+            variables: { booking_status: 10, booking_id: this.props.data._id, role: 1, phone_number: phone_number },
             fetchPolicy: 'no-cache',
         }).then(result => {
             this.setState({ loading: false });
@@ -59,11 +59,11 @@ class _CardForm extends Component {
 
         await client.mutate({
             mutation: ACCEPT_JOB_MSG,
-            variables: { booking_status: 10,payment_type:"c2b",payment_option:"mpesa", booking_id: this.props.data._id, role: 1, payment_type: "c2b" },
+            variables: { booking_status: 10, booking_id: this.props.data._id, role: 1, payment_type: "c2b" },
             fetchPolicy: 'no-cache',
         }).then(result => {
             this.setState({ loading: false });
-            if (result.data.manage_booking && result.data.manage_booking[0].status === "success") {
+            if (result.data.manage_booking[0].status === "success") {
                 Alert_msg({ msg: "Waiting for your payment confirmation", status: "success" });
                 this.props.history.push(`/admin-booking-invoice/${this.props.data._id}`)
             } else {
@@ -72,16 +72,23 @@ class _CardForm extends Component {
         });
         this.setState({ loading: false });
     }
- 
-    render() {
-        const { ctob,ctob_billRef, ctob_shotcode, mpeas_payment_callback, base_price, extra_price } = this.props.data
-        return (
+    //     });
+    // } else {
+    //     Alert_msg({ msg: "Stripe is not working now ...", status: "failed" });
+    // }
 
+    render() {
+        const { ctob_billRef, ctob_shotcode, mpeas_payment_callback, base_price, extra_price } = this.props.data
+        return (
             <div className="CardDemo w-100">
+                <label className="w-100">
+                    Payment Instructions
+                </label>
                 <Collapse
                     bordered={false}
                     defaultActiveKey={['1']}
                     expandIcon={({ isActive }) => <Icon type="caret-right" rotate={isActive ? 90 : 0} />}
+                    className="site-collapse-custom-collapse"
                 >
                     <Panel header=" Mpesa phone number" key="1" className="site-collapse-custom-panel">
                         <Spin spinning={this.state.loading} className="d-flex justify-content-center mt-4" size="large" >

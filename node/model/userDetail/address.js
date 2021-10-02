@@ -29,7 +29,6 @@ const addressSchema = new  mongoose.Schema({
     state: String,
     country: String,
     zip_code: String,
-    location_code:String,
     distance:{
       type:String,
       default:"0km"

@@ -1,36 +1,33 @@
-const { gql, SchemaDirectiveVisitor } = require('apollo-server');
+const { gql,SchemaDirectiveVisitor } = require('apollo-server');
 const { defaultFieldResolver } = require('graphql');
 
-const typeDefs = gql`
+const typeDefs = gql `
     scalar Date
     scalar JSON
     scalar Cursor
 
     directive @ref on FIELD_DEFINITION
-    directive @paymentOption(defaultFormat: String = "false") on FIELD_DEFINITION
-    directive @currency(defaultFormat: String = "KE") on FIELD_DEFINITION
-    directive @payment(defaultFormat: String = "KE") on FIELD_DEFINITION
+    directive @payment(defaultFormat: String = "false") on FIELD_DEFINITION
+    directive @currency(defaultFormat: String = "KES") on FIELD_DEFINITION
     directive @upper on FIELD_DEFINITION
     directive @date(format: String) on FIELD_DEFINITION
     directive @imgSize(format: String) on FIELD_DEFINITION
-    directive @imgUrl(format: String) on FIELD_DEFINITION
 
     type Subscription {
         messageSent(limit: Int,page:Int,user_id:ID,provider_id:ID,booking_id:ID):Chat
-        get_my_appointments(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[Booking]
+        get_my_appointments(_id:ID,role:Int,booking_status:Int,limit:Int,page:Int):[Booking]
         acceptedMessage(id:ID,online:Int): Booking   
-        send_jobs_provider(_id:ID,online:Int,location_code:String): Booking
-        send_accept_msg(_id:ID,booking_id:ID,online:Int,location_code:String): Booking
-        booking_details(booking_id:ID,online:Int,location_code:String): Booking
+        send_jobs_provider(_id:ID,online:Int): Booking
+        send_accept_msg(_id:ID,booking_id:ID,online:Int): Booking
+        booking_details(booking_id:ID,online:Int): Booking
         test(online:String):User
         proof_status(_id:ID,role:Int,):Detail
         demo_account(_id:ID):Detail
     }
     type Query {
         testmail:Detail
-        delete_all_user:User
         user(_id:ID): [Detail]
-        user_search(data:JSON,role:Int,email:String,type:String):[Detail]
+        user_search(data:JSON):[Detail]
         check_demo_app(_id:ID):Detail
         category(_id:ID,is_parent:Boolean,category_type:Int):[Category] 
         sub_category(category_id:ID,_id:ID):[subCategory]
@@ -49,15 +46,15 @@ const typeDefs = gql`
         files: [String]
         resend_otp(_id:ID):Detail
         test:Category
-        get_my_appointments(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):BookingConnection
-        booking(_id:ID,location_code:String):[Booking]
+        get_my_appointments(_id:ID,role:Int,booking_status:Int,limit:Int,page:Int):BookingConnection
+        booking(_id:ID):[Booking]
         get_now_job(_id:ID,role:Int,booking_status:Int):[Booking]
         get_message(booking_id:ID,user_id:ID,provider_id:ID):[Chat]
         search_category(_id:ID,data:JSON):[Category] 
         search_category_mobile(data:String):[Category]
         get_trending(_id:ID):[Category]
-        get_is_future(_id:ID,limit:Int):[Category]
-        get_extra_fare(booking_id:ID,option:Int,location_code:String):[Booking]
+        get_is_future(_id:ID):[Category]
+        get_extra_fare(booking_id:ID,option:Int):[Booking]
         get_payout_detail(data:JSON):[Booking]
         site_setting_detail(_id:ID):Site
         payout_setting_detail(_id:ID):Payout
@@ -70,47 +67,19 @@ const typeDefs = gql`
         get_certificate(limit: Int,page:Int):CertificateConnection
         get_static(limit: Int,page:Int):StaticConnection
         get_review(limit: Int,page:Int,user_comments_status:Int,option:String,data:JSON):BookingConnection
-        get_booking(limit: Int,page:Int,booking_status:[Int],location_code:String,payment_status:[Int],provider_id:ID,user_id:ID,category_id:ID,booking_date:JSON,booking_ref:JSON):BookingConnection 
-        get_booking_details(limit: Int,page:Int,status:Int,_id:ID,location_code:String):BookingConnection 
-        get_payout(limit: Int,page:Int,provider_id:ID,booking_id:ID,booking_status:Int,option:Int,location_code:String):BookingConnection
+        get_booking(limit: Int,page:Int,booking_status:[Int],payment_status:[Int],provider_id:ID,user_id:ID,category_id:ID,booking_date:JSON,booking_ref:JSON):BookingConnection 
+        get_booking_details(limit: Int,page:Int,status:Int,_id:ID):BookingConnection 
+        get_payout(limit: Int,page:Int,provider_id:ID,booking_id:ID,booking_status:Int,option:Int):BookingConnection
         get_all_payout(limit: Int,page:Int,provider_id:ID,booking_id:ID,booking_status:Int,option:Int):BookingConnection
         get_booking_chart(option:Int):[Dashboard]
         get_cancel_chart(option:Int):[Dashboard]
         get_earnings_chart(option:Int):[Dashboard]
         get_others_chart(option:Int):[Dashboard]
-        get_admin_users(option:Int,page:Int,limit:Int,_id:ID):AdminConnection
-        get_admin_roles(option:Int,page:Int,limit:Int,_id:ID):RolesConnection
-        get_admin_permission(option:Int,page:Int,limit:Int,_id:ID):PermissionConnection
-        role_based_permissions_detail(data:JSON):[Permission]
-        individual_based_permissions_detail(data:JSON):[Permission]
-        admin_role_detail(data:JSON):Roles
-        get_admin_roles_all:Roles
-        get_all_admin_permission:[Permission]
-        non_role_permissions_detail:[Permission]
-        admin_search(data:JSON):[Admin]
-        full_permission_list(data:JSON):[Admin]
-        roles_search(data:JSON):[Roles]
-        # company detail
-        get_company_detail(data:JSON,provider_search:JSON,search:JSON,_id:ID,page:Int,limit:Int,company_id:ID,user_id:ID,provider_id:ID):CompanyConnection
-        get_parent_company_provider(provider_search:JSON,provider_id:Boolean,user_id:Boolean,company_id:ID):[CompanyProvider]
-        get_contract_files(company_id:ID,user_id:ID,provider_id:ID,contract_id:ID):[CompanyImage]
-        get_contracts(company_id:ID,contract_id:ID,provider_id:ID,user_id:ID):[ContractJob]
-        get_contracts_pagination(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
-        get_contract_all_files(contract_id:ID):[CompanyImage]
-        get_currencys(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,pagination:Boolean,page:Int,limit:Int):CurrencyConnection
-        get_currency(_id:ID,country_code:String,location_code:String):Currency
-        get_biding_pagination(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int,contract_id:ID):BidingConnection
-        GetCategoryCurrency(pagination:Boolean,data:JSON,_id:ID,category_id:ID,country_code:String,country_id:ID):SubCategoryConnection
     }
 
-    # sub category pagination data  
+    # sub category pagination data
     type SubCategoryConnection {
         data: [subCategory]
-        pageInfo: PageInfo!
-    }
-    # Location pagination data  
-    type CurrencyConnection {
-        data: [Currency]
         pageInfo: PageInfo!
     }
 
@@ -119,41 +88,14 @@ const typeDefs = gql`
         data:[Category]
         pageInfo: PageInfo!
     }
+
      # user pagination data
      type UserConnection {
         data:[Detail]
         pageInfo: PageInfo!
     }
-     # Company pagination data
-     type CompanyConnection {
-        data:[Company]
-        pageInfo: PageInfo!
-    }
-     # Company pagination data
-     type ContractConnection {
-        data:[ContractJob]
-        pageInfo: PageInfo!
-    }
-     # Company pagination data
-     type BidingConnection {
-        data:[Biding]
-        pageInfo: PageInfo!
-    }
-    # Admin pagination data
-    type AdminConnection {
-        data:[Admin]
-        pageInfo: PageInfo!
-    }
-       # Roles pagination data
-    type RolesConnection {
-        data:[Roles]
-        pageInfo: PageInfo!
-    }
-        # Permission pagination data
-    type PermissionConnection {
-        data:[Permission]
-        pageInfo: PageInfo!
-    }
+
+
      # certificate pagination data
      type CertificateConnection {
         data:[Certificate]
@@ -204,8 +146,8 @@ const typeDefs = gql`
         msg:String
         status:String
         total:Float 
-        earning(code: String):Float  @currency
-        revenue(code: String):Float  @currency
+        earning:Float  @currency
+        revenue:Float  @currency
         user:Int
         provider:Int
         _id:Int
@@ -243,10 +185,6 @@ const typeDefs = gql`
         pagingCounter: Int
         prevPage: String
         nextPage: String
-        company_id:ID
-        user_type:String
-        currency_code:String
-        location_code:String
     }
     type Chat{
         id:ID
@@ -271,189 +209,11 @@ const typeDefs = gql`
         prevPage: String
         nextPage: String
     }
-    # biding schema
-    type Biding{
-        _id:ID
-        status:String
-        msg:String
-        user_id:ID,
-        contract_id:ID
-        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
-        data: JSON 
-        biding_ref:String
-        budget:String
-        timeline:String
-        timeline_type:String
-        cover_letter:String
-        description:String
-        experience:String
-        no_of_people:String
-        get_user:[Detail]
-    }
-
-    type BidingImages{
-        _id:ID
-        data: JSON 
-    }
-      # milestone schema
-    type MilestoneImages{
-        _id:ID
-        data: JSON 
-    }
-    type Milestone{
-        _id:ID
-        data: JSON 
-    }
-    type Currency{
-        _id:ID,
-        name:String,
-        location_code:String
-        currency_code:String
-        country_code:String
-        is_delete:Boolean
-        code:String 
-        symbol: String 
-        rate:String 
-        location:String 
-        default_currency:String 
-        status:String 
-        msg:String   
-    }
-
-    type ContractJob{
-        _id:ID
-        msg:String
-        status:String
-        name:String
-        website_url:String
-        address:String
-        address_id:ID
-        description:String
-        budget:String, 
-        timeline:String
-        timeline_type:String 
-        terms_condition: String 
-        lat:Float
-        lng:Float
-        contract_status:String
-        category_id:ID
-        category_type:Int
-        contract_ref:String
-        biding_count:Int
-        get_contract_category(contract_id:ID,_id:ID,category_type:Int):[Category]
-        get_contract_files(contract_id:ID):[CompanyImage]
-        get_contract_all_files(contract_id:ID):[CompanyImage]
-        currency_code:String
-        location_code:String
-        current_page:String
-    }
-    type Company{
-        _id:ID
-        user_id:ID
-        provider_id:ID
-        msg:String
-        status:String
-        name:String
-        first_name:String
-        last_name:String
-        confirm_password:String
-        mobileNumber:String
-        company_name:String
-        company_website:String
-        company_category:String
-        about_company:String
-        add_later:Boolean
-        password:String
-        address:String
-        provider_email:[String]
-        workers:[CompanyProvider]
-        get_parent_company_provider(provider_search:JSON,company_id:ID,provider_id:ID,):[CompanyProvider]
-        get_company_address_detail(company_id:ID,option:Int,type:String):[UserAddress]
-        get_company_images(company_id:ID,image_tag:String):[CompanyImage]
-        get_company_user_detail(user_id:ID):[Detail]
-        data: JSON 
-        currency_code:String
-        location_code:String
-    }
-    type CompanyProvider{
-        _id:ID
-        email:String
-        register_status:String
-        register_link_status:String
-        provider_id:ID
-        provider_detail:[Detail]
-        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
-        data: JSON 
-        msg:String
-        status:String
-        currency_code:String
-        location_code:String
-    }
-    type CompanyImage{
-        _id:ID
-        company_id: String,
-        small_image: String  @imgUrl(format: "contract"),
-        large_image: String  @imgUrl(format: "contract"),
-        image_tag: String,
-        doc_type: String,
-        doc_category: String,
-        doc_formate: String,
-        delete: Boolean,
-        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
-        data: JSON 
-        msg:String
-        status:String
-        images:[CompanyImage]
-        get_contract_files(contract_id:ID):[CompanyImage]
-        get_contract_all_files(contract_id:ID):[CompanyImage]
-
-    }
     type Admin{
-        _id:ID
-        name:String
+        username:String
         email:String
         password:String
-        permissions:[ID]
-        roles_permissions:[ID]
-        role_based_permissions_detail:[Permission]
-        individual_based_permissions_detail:[Permission]
-        non_role_permissions_detail:[Permission]
-        admin_role_detail:Roles
-        get_admin_roles_all:[Roles]
-        full_permission_list:[Permission]
-        roles:ID
         info:JSON
-        count:Int
-        msg:String
-        status:String
-        admin_search:[Admin]
-        GizzyDeveloper:Boolean
-    }
-    type Roles{
-        name:String
-        key:String
-        type:String
-        is_delete:Boolean
-        _id:ID
-        count:Int
-        permission:[Permission]
-        permissions:[ID]
-        admin_type:Int
-        role_based_permissions_detail:[Permission]
-        msg:String
-        status:String
-        roles_search:[Roles]
-    }
-    type Permission{
-        name:String
-        key:String
-        type:String
-        is_delete:Boolean
-        _id:ID
-        count:Int
-        msg:String
-        status:String
-        permission:[Permission]
     }
     type Certificate{
         id: ID
@@ -507,7 +267,7 @@ const typeDefs = gql`
         provider_id:ID
         booking_id:ID
         amount:String
-        total_amount(code: String):String @currency
+        total_amount:String @currency
         status:String
         info:JSON
         totalDocs: Int
@@ -592,16 +352,6 @@ const typeDefs = gql`
         pagingCounter: Int
         prevPage: String
         nextPage: String
-        company_id:ID
-        user_type:String
-        company_register_status:Int
-        first_name:String 
-        last_name:String
-        price(code: String): String @currency
-        currency_code:String
-        currency_id:ID
-        location_code:String
-        get_currency(location_code:String,country_code:String,_id:ID,user_id:ID):Currency
     }
     
     type Account{
@@ -622,10 +372,10 @@ const typeDefs = gql`
         Certificate:[Certificate]
         certificates:[ID]
         subCategory_name:String  @upper
-        base_price(code: String):String  @currency
-        hour_price(code: String):String  @currency
+        base_price:String  @currency
+        hour_price:String  @currency
         hour_limit:String
-        day_price(code: String):String  @currency
+        day_price:String  @currency
         day_limit:String
         price_type:String
         service_fee:String
@@ -653,11 +403,7 @@ const typeDefs = gql`
         totalPages: Int,
         pagingCounter: Int,
         prevPage: String,
-        nextPage: String,
-        currency_code:String,  
-        currency_id:ID
-        location_code:String
-        ParentCategoryCurrency(root:Boolean,location_code:String,currency_id:ID,country_code:String,_id:ID):subCategory
+        nextPage: String 
     }
     type subCategory{
         id:ID
@@ -673,10 +419,10 @@ const typeDefs = gql`
         categoryid:JSON
         certificates:[ID]
         subCategory_name:String  @upper
-        base_price(code: String): String @currency
-        hour_price(code: String):String  @currency
+        base_price:String  @currency
+        hour_price:String  @currency
         hour_limit:String
-        day_price(code: String):String  @currency
+        day_price:String  @currency
         day_limit:String
         price_type:String
         img_url:String
@@ -701,13 +447,7 @@ const typeDefs = gql`
         totalPages: Int,
         pagingCounter: Int,
         prevPage: String,
-        nextPage: String,
-        currency_code:String, 
-        currency_id:ID
-        location_code:String
-        get_parent_currency:Currency
-        GetCategoryCurrency(root:Boolean):SubCategoryConnection
-        ParentCategoryCurrency(root:Boolean,location_code:String,currency_id:ID,country_code:String,_id:ID):subCategory
+        nextPage: String 
     }
     
     type Status{
@@ -739,9 +479,9 @@ const typeDefs = gql`
         booked:String
         status:String
         hours:String
-        base_price(code: String):String @currency
-        hour_price(code: String):String @currency
-        extra_price(code: String):String @currency
+        base_price:String @currency
+        hour_price:String @currency
+        extra_price:String @currency
         created_date:String
         bookingDate:String
         job_start_time:String @date(format: "DD/MM/YYYY hh:mm a")
@@ -765,8 +505,8 @@ const typeDefs = gql`
         provider_msg_is_read:Int
         user_msg_is_read:Int
         created_at:String @date(format: "DD/MM/YYYY hh:mm a")
-        amount(code: String):String  @currency
-        extra_fare(code: String):String  @currency
+        amount:String  @currency
+        extra_fare:String  @currency
         start_job_image:[String]
         accept_date:String @date(format: "DD/MM/YYYY hh:mm a")
         end_date:Date
@@ -779,27 +519,26 @@ const typeDefs = gql`
         payment_message:String
         MpesaReceiptNumber:String
         payment_type:String
-        payment_option(code:String):String @paymentOption
         job_status:Int
         jobStart_time:Date
         jobEnd_time:Date
         location:JSON
         extra_fare_reason:String
-        total(code: String):String @currency
+        total:String @currency
         booking_alert:Int
         user_rating:Int
         provider_rating:Int
         provider_comments:String
         user_comments:String
-        provider_fee(code: String):String  @currency
-        admin_fee(code: String):Int  @currency
+        provider_fee:String  @currency
+        admin_fee:Int  @currency
         payment_status:Int
-        final_payment(code: String):String  @currency
-        extra_hour_price(code: String):String  @currency
+        final_payment:String  @currency
+        extra_hour_price:String  @currency
         category_type:String
         description: String
         availability:[JSON] 
-        total_amount(code: String):String  @currency
+        total_amount:String  @currency
         find_kilometre(lat:Float,lng:Float):Detail
         category(_id:ID,category_type:Int):[Category]
         booking_category(_id:ID,category_type:Int):[Category]
@@ -808,7 +547,7 @@ const typeDefs = gql`
         booking_provider(_id:ID):[Detail]
         provider(_id:ID):[Detail]
         find_payout_provider:[Detail]
-        get_my_appointments(_id:ID,booking_status:Int,location_code:String):[Booking]
+        get_my_appointments(_id:ID,booking_status:Int):[Booking]
         send_job_category(_id:ID,type:Int):[Category]
         get_booking_on_status(_id:ID,booking_status:Int):[Booking]
         find_payout_booking:[Booking]
@@ -816,9 +555,6 @@ const typeDefs = gql`
         mpeas_payment_callback:Boolean
         ok:Int
         msg:String
-        location_code:String
-        currency_code:String
-        symbol:String
     }
 
     type File {
@@ -841,8 +577,6 @@ const typeDefs = gql`
         delete:Int
         _id:ID
         user_id: String,
-        company_id:ID,
-        user_type:String
         title: String,
         flat_no: String,
         landmark: String,
@@ -854,8 +588,6 @@ const typeDefs = gql`
         country: String,
         zip_code: String,
         distance:String,
-        location_code:String
-        country_code:String
     }
 
 
@@ -867,7 +599,7 @@ const typeDefs = gql`
         addCategory(category_name:String,file:Upload,description:String,base_price:String,hour_price:String,day_price:String,hour_limit:String,day_limit:String,price_type:String,service_fee:String,is_parent:Boolean,certificates:[ID]): Category
         addsubCategory(file: Upload,category_id:ID,subCategory_name:String,base_price:String,hour_price:String,day_price:String,hour_limit:String,day_limit:String,price_type:String,service_fee:String,description:String,certificates:[ID]):subCategory
         addDetails(_id:ID,email:String,password:String,name:String,address:String,rating:Float,comments:String,lat:Float,lng:Float,profile:String,availability:String,Upload_percentage:String,device_id:String):Detail
-        addUser(role:Int,first_name:String,last_name:String,user_type:String,_id:ID,option:String,location_code:String,country_code:String,phone_no:String,email:String,old_password:String,password:String,name:String,provider_subCategoryID:[ID],lat:Float,lng:Float,bank_name:String,payout_option:String,ifsc_code:String,account_no:String,branch_name:String,routing_name:String,account_name:String,device_id:String,kra_pin:String,payout_phone:String,payout_frist_name:String,payout_second_name:String,payout_id:String): Detail!
+        addUser(role:Int,_id:ID,option:String,country_code:String,phone_no:String,email:String,old_password:String,password:String,name:String,provider_subCategoryID:[ID],lat:Float,lng:Float,bank_name:String,payout_option:String,ifsc_code:String,account_no:String,branch_name:String,routing_name:String,account_name:String,device_id:String,kra_pin:String,payout_phone:String,payout_frist_name:String,payout_second_name:String,payout_id:String): Detail!
         addProvider_Category(user_id: ID,provider_subCategoryID:[ID]):Detail
         add_providerDocument(user_id:ID,file:[Upload],option:String):Detail
         delete_providerDocument(user_id:ID,filename:String,option:String):Detail
@@ -886,8 +618,6 @@ const typeDefs = gql`
         deletesubCategory(_id:ID,category_name:String,category_id:String,subCategory_name:String):subCategory
         deleteProvider_Category(user_id: ID,provider_subCategoryID:[ID]):Detail
         deleteBooking(_id:ID,user_id:ID):Booking
-        deleteCompany(company_id:ID):Company
-        deleteCompanyProvider(company_id:ID,_id:ID,provider_id:ID):CompanyProvider
          # --------------------- delete function ------------------------------------ #
 
         remove_providerDocument(user_id:ID,document:[String]):Detail
@@ -900,9 +630,9 @@ const typeDefs = gql`
         provider_document_verified(_id:ID,proof_status:String):Detail
         online_status(_id:ID,online_status:Int):Detail
         # booking process
-        add_booking( user_id:ID,currency_id:ID,local_location_code:String,location_code:String,provider_id:ID,category_id:ID,lat:Float,lng:Float,weekday:JSON,hours:String,description:String,booking_status:Int,booking_type:Int,data:[JSON],file:[Upload],category_type:Int,booking_date:String,booking_time:String,booking_hour:String):[Booking]
-        manage_booking(location_code:String,role:Int,booking_id:ID,user_id:ID,provider_id:ID,category_id:String,lat:Float,lng:Float,weekday:JSON,hours:String,description:String,booking_status:Int,category_type:Int,stripe_token:String,payment_option:String,payment_type:String,phone_number:String,extra_fare:String,extra_fare_reason:String,option:Int,extra_fare_id:ID):[Booking]
-        update_booking(location_code:String,provider_id:ID,booking_id:ID,file:[Upload],option:Int):Booking
+        add_booking( user_id:ID,provider_id:ID,category_id:ID,lat:Float,lng:Float,weekday:JSON,hours:String,description:String,booking_status:Int,booking_type:Int,data:[JSON],file:[Upload],category_type:Int,booking_date:String,booking_time:String,booking_hour:String):[Booking]
+        manage_booking(role:Int,booking_id:ID,user_id:ID,provider_id:ID,category_id:String,lat:Float,lng:Float,weekday:JSON,hours:String,description:String,booking_status:Int,category_type:Int,stripe_token:String,payment_type:String,phone_number:String,extra_fare:String,extra_fare_reason:String,option:Int,extra_fare_id:ID):[Booking]
+        update_booking(provider_id:ID,booking_id:ID,file:[Upload],option:Int):Booking
         update_booking_details(provider_id:ID,booking_id:ID,file:[Upload],option:Int,user_comments_status:Int):Booking
         pay_admin_to_provider(booking_status:Int,status:Int,provider_id:ID):Booking
         # chat
@@ -930,51 +660,13 @@ const typeDefs = gql`
             client_key:String,
             signature:String,
             payout_status:Int):Payout
-            add_admin_roles(
-                name: String,
-                type:String,
-                key:String,
-                page_type:String,
-                admin_type:Int
-            ):Roles
-            update_admin_roles(
-                _id:ID
-                fun_type:String,
-                permissions:[ID],
-            ):Roles
-            delete_admin_roles(_id:ID):Roles
-            update_admin_user_permission(
-                _id:ID
-                name:String
-                email:String
-                password:String
-                GizzyDeveloper:Boolean
-                roles_permissions:[ID]
-                roles:ID
-                permissions:[ID]
-            ):Admin
-            add_admin_permission(
-                _id:ID,
-                name: String,
-                type:String,
-                key:String,
-                page_type:String,
-            ):Permission
-            delete_admin_permission(
-                _id:ID
-            ):Permission
-            delete_admin_user(
-                _id:ID
-            ):Admin
+
         modified_address(
             option:Int  
             is_default:Int
             delete:Int
             _id:ID
             user_id: String,
-            company_id:ID,
-            contract_id:ID,
-            user_type:String
             title: String,
             flat_no: String,
             landmark: String,
@@ -986,42 +678,8 @@ const typeDefs = gql`
             country: String,
             zip_code: String,
             distance:String,
-            location_code:String
             ):UserAddress
-        # add company_detail
-        CompanyFileUpload(
-            option:String  
-            _id:ID
-            file:Upload,
-        ):Company
-        update_company_detail(
-            option:String  
-            _id:ID
-            user_id: String,
-            provider_ID:ID,
-            company_data:JSON,
-            logo_file:Upload,
-            profile_file:Upload
-        ):Company
-        # contract jobs
-        update_contract(currency_code:String,_id:ID,contract_data:JSON,search_data:JSON):ContractJob
-        update_currency(_id:ID,currency_data:JSON):Currency
-        delete_currency(_id:ID,currency_data:JSON):Currency
-        ContractJobFileUpload(_id:ID,contract_id:ID,category:String,image_tag:String,data:[JSON],file:[Upload]):CompanyImage
-        DeleteContractJobFile(_id:ID):ContractJob
-        # update biding 
-         update_biding(
-            option:String  
-            _id:ID
-            user_id: String
-            provider_ID:ID
-            company_id:ID
-            biding_data:[JSON]
-        ):Biding
-
-        UpdateCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
-        DeleteCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
-    }
+        }
 `;
 module.exports.typeDefs = typeDefs;
 module.exports.JSON = (data) => {
@@ -1038,3 +696,11 @@ module.exports.Date = (value) => {
     throw new Error('DateTime cannot represent an invalid ISO-8601 Date string');
 };
 
+// module.exports = {
+//     // The cursor type. Will obfuscate the MongoID.
+//     Cursor: CursorType,
+//     // Apply the pagination resolvers for the connection and edge.
+//     ContactConnection: paginationResolvers.connection,
+//     ContactEdge: paginationResolvers.edge,
+
+//   };;

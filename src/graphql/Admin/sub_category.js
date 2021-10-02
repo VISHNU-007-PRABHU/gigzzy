@@ -98,48 +98,10 @@ query FINDSUBCATEGORY($_id:ID) {
     }
 }
 `;
-export const GET_CATEGORY_CURRENCY = gql`
-query GETCATEGORYCURRENCY($category_id:ID,$pagination:Boolean) {
-    GetCategoryCurrency(category_id:$category_id,pagination:$pagination) {
-        data{
-            _id
-            currency_id
-            category_type
-            base_price
-            hour_price
-            hour_limit
-            day_price
-            day_limit
-            price_type
-            service_fee
-            get_parent_currency{
-                name
-                currency_code
-            }
-        }
-    }
-}
-`;
 
 export const DELETE_SUBCATEGORY = gql`
     mutation DELETESUBCATEGORY($_id:ID){
         deletesubCategory(_id:$_id) {
-            msg
-            status
-        }
-    }
-`;
-export const UPDATE_CATEGORY_CURRENCY = gql`
-    mutation UPDATECATEGORYCURRENCY($_id:ID,$data:JSON){
-        UpdateCategoryCurrency(_id:$_id,data:$data) {
-            msg
-            status
-        }
-    }
-`;
-export const REMOVE_CATEGORY_CURRENCY = gql`
-    mutation REMOVECATEGORYCURRENCY($_id:ID){
-        DeleteCategoryCurrency(_id:$_id) {
             msg
             status
         }
