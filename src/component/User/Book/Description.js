@@ -14,17 +14,15 @@ import {
     geocodeByAddress,
     getLatLng,
 } from 'react-places-autocomplete';
-import { IoIosAlbums } from "react-icons/io";
 import Geocode from "react-geocode";
 import moment from "moment";
 import Payment from "./Payment";
 import Address from "./Address";
 import MinImage from "./MinImage";
 import DescriptionValue from "./DescriptionValue";
+import StripePayout from "./payment/stripe_payment";
 const { Content } = Layout;
-const { Panel } = Collapse;
 const { Countdown } = Statistic;
-const UserHeader = React.lazy(() => import('../Layout/UserHeader'));
 
 const SEND_ACCEPT_MSG = gql`
 subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
@@ -34,12 +32,13 @@ subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
       description
       booking_ref
       booking_date
-      base_price
-      extra_price
+      base_price(code:"symbol")
+      extra_price(code:"symbol")
       payment_type
       mpeas_payment_callback
       ctob_shotcode
       ctob_billRef
+      ctob
       booking_category {
         category_name
         category_type
@@ -122,7 +121,7 @@ class Description extends React.Component {
                 fetchPolicy: 'no-cache',
             }).then(result => {
                 console.log(result);
-                if (result.data.manage_booking[0].status === "success") {
+                if (result.data.manage_booking && result.data.manage_booking[0].status === "success") {
                     Alert_msg({ msg: "Job Booking Cancel Success", status: "success" });
                 } else {
                     Alert_msg({ msg: "Job Booking Cancel Failed", status: "failed" });
@@ -177,6 +176,7 @@ class Description extends React.Component {
             description_loading: 0,
             short_description: [],
             str: '#@image@#',
+            location_code: "",
             description: "I need a handyman for #@half a day ( up to 4 hours ),a full day ( up to 8 hours )@# to #@assemble furniture,fix things,do odd jobs@# #@description@# here are some photos #@image@# at #@location@#"
         }
     }
@@ -319,7 +319,7 @@ class Description extends React.Component {
     };
 
     handleSelect = address => {
-        console.log(address);
+        console.log(address, "asde");
         this.setState({ address, location: address });
         geocodeByAddress(address)
             .then(results => getLatLng(results[0]))
@@ -379,6 +379,8 @@ class Description extends React.Component {
                 variables: {
                     booking_status: 12,
                     booking_type: 1,
+                    location_code: this.state.location_code,
+                    local_location_code: JSON.parse(localStorage.getItem('currency')).location || 'KE',
                     lat: parseFloat(this.state.center[0]),
                     lng: parseFloat(this.state.center[1]),
                     description: description,
@@ -388,12 +390,18 @@ class Description extends React.Component {
                     file: file_data
                 },
             }).then((result, loading, error) => {
-                this.setState({ loading: 0 });
-                console.log(result);
-                // Alert_msg(result.data.add_booking);
-                if (result.data.add_booking[0].id !== undefined && result.data.add_booking[0].id !== null) {
+                this.setState({ loading: false });
+                
+                console.log("book_now -> result.data.add_booking", result.data.add_booking)
+                if (result.data.add_booking && result.data.add_booking[0]?.id) {
                     this.setState({ description, book_requesting_modal: 1, add_booking: result.data.add_booking, deadline: moment().add(2, 'minutes') });
+                    if (result.data.add_booking[0]?.payment_option === "stripe") {
+                        this.setState({ isStripePayment: true })
+                    }
                     this.DontReadTheComments(result.data.add_booking[0].id);
+                } else {
+                    Alert_msg({ msg: "Category currently not available", status: "failed" });
+                    this.setState({ book_requesting_modal: 0 });
                 }
             });
 
@@ -423,6 +431,8 @@ class Description extends React.Component {
                 variables: {
                     booking_status: 12,
                     booking_type: 2,
+                    location_code: this.state.location_code,
+                    local_location_code: JSON.parse(localStorage.getItem('currency')).location || 'KE',
                     lat: parseFloat(this.state.center[0]),
                     lng: parseFloat(this.state.center[1]),
                     description: description,
@@ -435,11 +445,12 @@ class Description extends React.Component {
                 },
             }).then(result => {
                 this.setState({ loading: 0 });
-                // console.log(result); 
-                // Alert_msg(result.data.add_booking);
-                if (result.data.add_booking[0].id !== undefined && result.data.add_booking[0].id !== null) {
+                if (result.data.add_booking && result.data.add_booking[0].id) {
                     this.setState({ book_later_modal: 0, book_requesting_modal: 1, add_booking: result.data.add_booking, deadline: moment().add(2, 'minutes') });
                     this.DontReadTheComments(result.data.add_booking[0].id);
+                } else {
+                    Alert_msg({ msg: "Category currently not available", status: "failed" });
+                    this.setState({ book_later_modal: 0 });
                 }
             });
 
@@ -463,14 +474,13 @@ class Description extends React.Component {
     }
 
     on_location_change = (item) => {
-        // console.log(item);
-        this.setState({ location: item.address, center: [item.lat, item.lng], location_modal: 0 });
+        this.setState({ location_code: item.location_code, location: item.address, center: [item.lat, item.lng], location_modal: 0 });
     }
 
 
     render() {
         // console.log(this.state.accept_provider[0]?.provider_rate[0]?.rating);
-        const { previewVisible, previewImage, fileList } = this.state;
+        const { isStripePayment, previewVisible, previewImage, fileList } = this.state;
         const uploadButton = (
             <div>
                 Upload
@@ -483,213 +493,212 @@ class Description extends React.Component {
                 state: this.state,
                 location_change: this.on_location_change,
             }}>
-                <Layout className="white">
-                    <Suspense fallback={<Skeleton active />}>
-                        <UserHeader />
-                    </Suspense>
 
-                    <h2 className="bold mb-5 text-center">What do you need?</h2>
+                <h2 className="bold mb-5 text-center">What do you need?</h2>
 
-                    <Content className="px-1 description_page container user_select">
-                        <Row>
-                            <Col lg={{ span: 20, offset: 2 }}>
-                                <div id="section-1" className="need position-relative pt-1">
-                                    <Row>
-                                        <Skeleton loading={this.state.description_loading} active >
-                                            <Col span={24} className="dynamic_description" id="ee">
-                                                {this.state.short_description.map((value, index) => {
+                <Content className="px-1 description_page container user_select">
+                    <Row>
+                        <Col lg={{ span: 20, offset: 2 }}>
+                            <div id="section-1" className="need position-relative pt-1">
+                                <Row>
+                                    <Skeleton loading={this.state.description_loading} active >
+                                        <Col span={24} className="dynamic_description" id="ee">
+                                            {this.state.short_description.map((value, index) => {
 
-                                                    if (value.substr(0, 1) === "@") {
-                                                        if (value === "@description@") {
-                                                            return <div key={index} placeholder=" + description " className="description description_font_size mr-1" contentEditable="true"></div>
-                                                        }
-                                                        else if (value === "@image@") {
-                                                            return <div id="tag_change" className="tag_change d-inline-flex mb-3 mr-3">
-                                                                <Button key={index} type="primary" onClick={() => { this.setState({ location_modal: 0, file_upload_modal: 1 }) }} className="mr-0 img_btn a_hover" icon={this.state.fileList.length > 0 ? 'check-circle' : 'camera'}></Button>
-                                                                <MinImage img={this.state.fileList} />
-                                                            </div>
-                                                        }
-                                                        else if (value === "@location@") {
-                                                            return <Button key={index} type="primary" onClick={() => { this.setState({ location_modal: 1 }) }} className="location_btn a_hover w-auto" icon="environment">{this.state.location}</Button>
-                                                        }
-                                                        else {
-                                                            var fill_data = value.slice(1, -1);
-                                                            var fill_first = fill_data.split(',');
-                                                            if (typeof this.state.label[index] === "undefined") {
-                                                                this.state.label[index] = fill_first[0];
-                                                            }
-                                                            return <label key={index} className="filler a_hover" onClick={() => { this.change_label(fill_first, index) }} data-current={fill_first[0]} data={fill_first}>{this.state.label[index]}</label>
-                                                        }
+                                                if (value.substr(0, 1) === "@") {
+                                                    if (value === "@description@") {
+                                                        return <div key={index} placeholder=" + description " className="description description_font_size mr-1" contentEditable="true"></div>
+                                                    }
+                                                    else if (value === "@image@") {
+                                                        return <div id="tag_change" className="tag_change d-inline-flex mb-3 mr-3">
+                                                            <Button key={index} type="primary" onClick={() => { this.setState({ location_modal: 0, file_upload_modal: 1 }) }} className="mr-0 img_btn a_hover" icon={this.state.fileList.length > 0 ? 'check-circle' : 'camera'}></Button>
+                                                            <MinImage img={this.state.fileList} />
+                                                        </div>
+                                                    }
+                                                    else if (value === "@location@") {
+                                                        return <Button key={index} type="primary" onClick={() => { this.setState({ location_modal: 1 }) }} className="location_btn a_hover w-auto" icon="environment">{this.state.location}</Button>
                                                     }
                                                     else {
-                                                        return <label key={index} className="description_font_size">{value}<span>&nbsp;</span></label>
+                                                        var fill_data = value.slice(1, -1);
+                                                        var fill_first = fill_data.split(',');
+                                                        if (typeof this.state.label[index] === "undefined") {
+                                                            this.state.label[index] = fill_first[0];
+                                                        }
+                                                        return <label key={index} className="filler a_hover" onClick={() => { this.change_label(fill_first, index) }} data-current={fill_first[0]} data={fill_first}>{this.state.label[index]}</label>
                                                     }
+                                                }
+                                                else {
+                                                    return <label key={index} className="description_font_size">{value}<span>&nbsp;</span></label>
+                                                }
 
-                                                })}
-                                            </Col>
-                                        </Skeleton>
+                                            })}
+                                        </Col>
+                                    </Skeleton>
+                                    <Address
+                                        visible={this.state.location_modal}
+                                    />
 
-                                        <Address
-                                            visible={this.state.location_modal}
-                                        />
+                                    <Modal title="Upload Your Image" footer={<></>} className="new_modal upload_img" centered visible={this.state.file_upload_modal} onOk={() => this.setState({ file_upload_modal: false })} onCancel={() => this.setState({ file_upload_modal: false })}>
+                                        <div className={fileList.length === 0 ? "clearfix upload_content" : "clearfix"} >
+                                            <Upload
+                                                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                                listType="picture-card"
+                                                fileList={fileList}
+                                                multiple={true}
+                                                onPreview={this.handlePreview}
+                                                onChange={this.handleChange}
+                                                showUploadList={this.state.showIcon}
+                                            >
+                                                {uploadButton}
+                                            </Upload>
+                                            <Button onClick={() => this.setState({ file_upload_modal: false })} className={fileList.length > 0 ? 'btnn' : 'd-none'}>Done</Button>
+                                            <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+                                                <img alt="example" className='object_fit' style={{ width: '100%', height: "500px" }} src={previewImage} />
+                                            </Modal>
 
-                                        <Modal title="Upload Your Image" footer={<></>} className="new_modal upload_img" centered visible={this.state.file_upload_modal} onOk={() => this.setState({ file_upload_modal: false })} onCancel={() => this.setState({ file_upload_modal: false })}>
-                                            <div className={fileList.length === 0 ? "clearfix upload_content" : "clearfix"} >
-                                                <Upload
-                                                    action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                                                    listType="picture-card"
-                                                    fileList={fileList}
-                                                    multiple={true}
-                                                    onPreview={this.handlePreview}
-                                                    onChange={this.handleChange}
-                                                    showUploadList={this.state.showIcon}
-                                                >
-                                                    {uploadButton}
-                                                </Upload>
-                                                <Button onClick={() => this.setState({ file_upload_modal: false })} className={fileList.length > 0 ? 'btnn' : 'd-none'}>Done</Button>
-                                                <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
-                                                    <img alt="example" className='object_fit' style={{ width: '100%', height: "500px" }} src={previewImage} />
-                                                </Modal>
+                                        </div>
+                                    </Modal>
 
-                                            </div>
-                                        </Modal>
+                                    <Modal okButtonProps={{ disabled: true, className: 'd-none' }} cancelButtonProps={{ className: 'cancel_btn' }} title="Requesting Job" className="new_modal" centered visible={this.state.book_requesting_modal} onOk={() => this.setRequestingModal(false)} onCancel={() => { this.setRequestingModal(false) }}>
 
-                                        <Modal okButtonProps={{ disabled: true, className: 'd-none' }} cancelButtonProps={{ className: 'cancel_btn' }} title="Requesting Job" className="new_modal" centered visible={this.state.book_requesting_modal} onOk={() => this.setRequestingModal(false)} onCancel={() => { this.setRequestingModal(false) }}>
-
-                                            <div className="job_description">
-                                                <DescriptionValue data={this.state.add_booking[0]?.description} img={this.state.add_booking[0]?.user_image_url} />
-                                            </div>
-                                            <div className={this.state.book_requesting_modal === 1 ? "loader" : ""} >
-                                                <div className="loaderBar"></div>
-                                            </div>
-                                            <div className="price_section text-center">
-                                                <p className="price">{this.state.add_booking[0] ? this.state.add_booking[0].category[0] ? this.state.add_booking[0].category[0].base_price : 'price is not fixed' : "error"}</p>
-                                                <label className="normal_font_size">Base Price</label>
-                                            </div>
-                                            <div style={{ height: '200px', width: '100%' }}>
-                                                <GoogleMapReact
-                                                    bootstrapURLKeys={{ key: 'AIzaSyDYRYnxipjEBUNazDUwUa_8BDvm8ON7TIk' }}
-                                                    center={{
-                                                        lat: this.state.add_booking[0]?.location.coordinates[1],
-                                                        lng: this.state.add_booking[0]?.location.coordinates[0]
-                                                    }}
-                                                    defaultZoom={18}
-                                                    options={createMapOptions}
-                                                >
-                                                    <div
-                                                        className="place"
-                                                        lat={this.state.add_booking[0]?.location.coordinates[1]}
-                                                        lng={this.state.add_booking[0]?.location.coordinates[0]}>
-                                                        <img src={require("../../../image/pin_location.png")} alt="your Place" />
-                                                    </div>
-                                                </GoogleMapReact>
-                                            </div>
-                                            {this.state.booking_status === 12 ?
-                                                <Countdown className="coutdown mt-n4" value={this.state.deadline} format="mm:ss" onFinish={this.onFinish_job} /> : ''
-                                            }
-                                        </Modal>
-                                        <Modal okButtonProps={{ className: 'jiffy_btn white-text' }} okText="Confirm Job" cancelButtonProps={{ className: 'jiffy_btn' }} title="Requesting Job" visible={this.state.confirm_job_modal} className="new_modal" centered onOk={() => this.setPayModal(true)} onCancel={() => this.setConfirmJobModal(false)}>
-
-                                            <div className="job_description">
-                                                <DescriptionValue data={this.state.add_booking[0]?.description} img={this.state.add_booking[0]?.user_image_url} />
-                                            </div>
-                                            <div className="price_section text-center">
-                                                <p className="price">
-                                                    {this.state.add_booking[0] ? this.state.add_booking[0].category[0] ? this.state.add_booking[0].category[0].base_price : 'price is not fixed' : "error"}
-                                                </p>
-                                                <label className="normal_font_size">Base Price</label>
-                                            </div>
-                                            <div style={{ height: '200px', width: '100%' }}>
-                                                <GoogleMapReact
-                                                    bootstrapURLKeys={{ key: 'AIzaSyDYRYnxipjEBUNazDUwUa_8BDvm8ON7TIk' }}
-                                                    defaultCenter={this.props.center}
-                                                    defaultZoom={this.props.zoom}
-                                                    options={createMapOptions}
-                                                >
-                                                    <div
-                                                        className="place"
-                                                        lat={this.state.accept_provider[0] ? this.state.accept_provider[0].lat : ""}
-                                                        lng={this.state.accept_provider[0] ? this.state.accept_provider[0].lng : ""}>
-                                                        <img src={require("../../../image/pin_location.png")} alt="your Place" />
-                                                    </div>
-                                                </GoogleMapReact>
-                                            </div>
-                                            <div className="profile text-center liftup">
-                                                <img alt="" src={this.state.accept_provider[0] ? this.state.accept_provider[0].img_url : 'asd'} />
-                                                <p className="normal_font_size mt-3 bold">{this.state.accept_provider[0] ? this.state.accept_provider[0].name : 'as'}</p>
-                                                <Rate allowHalf disabled value={this.state.accept_provider[0] ? Number(this.state.accept_provider[0].provider_rate[0].rating) : 0} />
-
-                                            </div>
-                                        </Modal>
-                                        <Modal okButtonProps={{ className: '' }} okText="Accept and Pay" cancelButtonProps={{ className: 'd-none' }} title="Accept and Pay" className="new_modal" centered visible={this.state.accept_pay_modal} footer={<></>} onOk={() => this.setPayModal(false)} onCancel={() => { this.setState({ accept_pay_modal: 0 }) }}>
-                                            <div className="price_section px-3 pt-4 pb-3 d-flex">
-                                                <div className="">
-                                                    <p className="m-0 normal_font_size bold">{JSON.parse(localStorage.getItem('user')).name}</p>
-                                                    <label className="normal_font_size">{this.state.booking_category[0] ?
-                                                        this.state.booking_category[0].category_type === 1 ?
-                                                            this.state.booking_category[0].category_name : this.state.booking_category[0].subCategory_name : ""}</label>
+                                        <div className="job_description">
+                                            <DescriptionValue data={this.state.add_booking[0]?.description} img={this.state.add_booking[0]?.user_image_url} />
+                                        </div>
+                                        <div className={this.state.book_requesting_modal === 1 ? "loader" : ""} >
+                                            <div className="loaderBar"></div>
+                                        </div>
+                                        <div className="price_section text-center">
+                                            <p className="price">{this.state.add_booking[0] ? this.state.add_booking[0].category[0] ? this.state.add_booking[0].category[0]?.ParentCategoryCurrency?.base_price : 'price is not fixed' : "error"}</p>
+                                            <label className="normal_font_size">Base Price</label>
+                                        </div>
+                                        <div style={{ height: '200px', width: '100%' }}>
+                                            <GoogleMapReact
+                                                bootstrapURLKeys={{ key: 'AIzaSyDYRYnxipjEBUNazDUwUa_8BDvm8ON7TIk' }}
+                                                center={{
+                                                    lat: this.state.add_booking[0]?.location.coordinates[1],
+                                                    lng: this.state.add_booking[0]?.location.coordinates[0]
+                                                }}
+                                                defaultZoom={18}
+                                                options={createMapOptions}
+                                            >
+                                                <div
+                                                    className="place"
+                                                    lat={this.state.add_booking[0]?.location.coordinates[1]}
+                                                    lng={this.state.add_booking[0]?.location.coordinates[0]}>
+                                                    <img src={require("../../../image/pin_location.png")} alt="your Place" />
                                                 </div>
-                                                <p class="ml-auto price">{this.state.accept_data ? this.state.accept_data.base_price : ''}</p>
-                                            </div>
-                                            <div className="price_section px-3 d-flex pt-4 btc">
-                                                <p className="m-0 normal_font_size ">Booking Ref</p>
-                                                <label class="ml-auto">{this.state.accept_data ? this.state.accept_data.booking_ref : ''}</label>
-                                            </div>
-                                            <div className="price_section px-3 d-flex  pb-4 bbc">
-                                                <p className="m-0 normal_font_size ">Date</p>
-                                                <label class="ml-auto">{this.state.accept_data ? this.state.accept_data.booking_date : ''}</label>
-                                            </div>
-                                            <div className="px-3 pt-3 normal_font_size bold d-flex justify-content-between my-2">
-                                                <div>Task</div>
-                                                <div>{this.state.booking_category[0] ?
+                                            </GoogleMapReact>
+                                        </div>
+                                        {this.state.booking_status === 12 ?
+                                            <Countdown className="coutdown mt-n4" value={this.state.deadline} format="mm:ss" onFinish={this.onFinish_job} /> : ''
+                                        }
+                                    </Modal>
+                                    <Modal okButtonProps={{ className: 'jiffy_btn white-text' }} okText="Confirm Job" cancelButtonProps={{ className: 'jiffy_btn' }} title="Requesting Job" visible={this.state.confirm_job_modal} className="new_modal" centered onOk={() => this.setPayModal(true)} onCancel={() => this.setConfirmJobModal(false)}>
+
+                                        <div className="job_description">
+                                            <DescriptionValue data={this.state.add_booking[0]?.description} img={this.state.add_booking[0]?.user_image_url} />
+                                        </div>
+                                        <div className="price_section text-center">
+                                            <p className="price">
+                                                {this.state.add_booking[0] ? this.state.add_booking[0].category[0] ? this.state.add_booking[0].category[0]?.ParentCategoryCurrency?.base_price : 'price is not fixed' : "error"}
+                                            </p>
+                                            <label className="normal_font_size">Base Price</label>
+                                        </div>
+                                        <div style={{ height: '200px', width: '100%' }}>
+                                            <GoogleMapReact
+                                                bootstrapURLKeys={{ key: 'AIzaSyDYRYnxipjEBUNazDUwUa_8BDvm8ON7TIk' }}
+                                                defaultCenter={this.props.center}
+                                                defaultZoom={this.props.zoom}
+                                                options={createMapOptions}
+                                            >
+                                                <div
+                                                    className="place"
+                                                    lat={this.state.accept_provider[0] ? this.state.accept_provider[0].lat : ""}
+                                                    lng={this.state.accept_provider[0] ? this.state.accept_provider[0].lng : ""}>
+                                                    <img src={require("../../../image/pin_location.png")} alt="your Place" />
+                                                </div>
+                                            </GoogleMapReact>
+                                        </div>
+                                        <div className="profile text-center liftup">
+                                            <img alt="" src={this.state.accept_provider[0] ? this.state.accept_provider[0].img_url : 'asd'} />
+                                            <p className="normal_font_size mt-3 bold">{this.state.accept_provider[0] ? this.state.accept_provider[0].name : 'as'}</p>
+                                            <Rate allowHalf disabled value={this.state.accept_provider[0] ? Number(this.state.accept_provider[0].provider_rate[0].rating) : 0} />
+
+                                        </div>
+                                    </Modal>
+                                    <Modal okButtonProps={{ className: '' }} okText="Accept and Pay" cancelButtonProps={{ className: 'd-none' }} title="Accept and Pay" className="new_modal" centered visible={this.state.accept_pay_modal} footer={<></>} onOk={() => this.setPayModal(false)} onCancel={() => { this.setState({ accept_pay_modal: 0 }) }}>
+                                        <div className="price_section px-3 pt-4 pb-3 d-flex">
+                                            <div className="">
+                                                <p className="m-0 normal_font_size bold">{JSON.parse(localStorage.getItem('user')).name}</p>
+                                                <label className="normal_font_size">{this.state.booking_category[0] ?
                                                     this.state.booking_category[0].category_type === 1 ?
-                                                        this.state.booking_category[0].category_name : this.state.booking_category[0].subCategory_name : ""}</div>
+                                                        this.state.booking_category[0].category_name : this.state.booking_category[0].subCategory_name : ""}</label>
                                             </div>
-                                            <div className="price_section px-3 d-flex">
-                                                <p className="m-0 normal_font_size ">Base Price</p>
-                                                <label class="ml-auto">{this.state.accept_data ? this.state.accept_data.base_price : ''}</label>
-                                            </div>
-                                            {/* <div className="price_section px-3 d-flex">
+                                            <p class="ml-auto price">{this.state.accept_data ? this.state.accept_data.code : ''}</p>
+                                        </div>
+                                        <div className="price_section px-3 d-flex pt-4 btc">
+                                            <p className="m-0 normal_font_size ">Booking Ref</p>
+                                            <label class="ml-auto">{this.state.accept_data ? this.state.accept_data.booking_ref : ''}</label>
+                                        </div>
+                                        <div className="price_section px-3 d-flex  pb-4 bbc">
+                                            <p className="m-0 normal_font_size ">Date</p>
+                                            <label class="ml-auto">{this.state.accept_data ? this.state.accept_data.booking_date : ''}</label>
+                                        </div>
+                                        <div className="px-3 pt-3 normal_font_size bold d-flex justify-content-between my-2">
+                                            <div>Task</div>
+                                            <div>{this.state.booking_category[0] ?
+                                                this.state.booking_category[0].category_type === 1 ?
+                                                    this.state.booking_category[0].category_name : this.state.booking_category[0].subCategory_name : ""}</div>
+                                        </div>
+                                        <div className="price_section px-3 d-flex">
+                                            <p className="m-0 normal_font_size ">Base Price</p>
+                                            <label class="ml-auto">{this.state.accept_data ? this.state.accept_data.base_price : ''}</label>
+                                        </div>
+                                        {/* <div className="price_section px-3 d-flex">
                                                 <p className="m-0 normal_font_size ">Others</p>
                                                 <label class="ml-auto">{this.state.accept_data ? this.state.accept_data.extra_price : ''}</label>
                                             </div> */}
 
-                                            <div className="profile text-center">
-                                                <img alt="" src={this.state.accept_provider[0] ? this.state.accept_provider[0].img_url : ''} />
-                                                <p className="normal_font_size mt-3 bold">{this.state.accept_provider[0] ? this.state.accept_provider[0].name : ''}</p>
-                                                <Rate allowHalf disabled value={this.state.accept_provider[0] ? Number(this.state.accept_provider[0].provider_rate[0].rating) : 0} />
-                                            </div>
-                                            <div className="price_section px-3 d-flex justify-content-center">
-                                                <Payment data={this.state.accept_data} />
-                                            </div>
-                                        </Modal>
-                                        <Modal okButtonProps={{ className: 'ok_btn' }} okText="Book" cancelButtonProps={{ className: 'd-none' }} title="Date and Time" className="new_modal" centered visible={this.state.book_later_modal} onOk={() => { this.book_later() }} onCancel={() => this.setLaterModal(false)}>
-                                            <div className="price_section text-center">
-                                                <DatePicker className='w-50' size='large' showTime use12Hours format='YYYY-MM-DD HH:mm:ss' placeholder="Select Date" disabledDate={this.disabledDate} onChange={this.onChange} onOk={this.onOk} />
-                                            </div>
-                                        </Modal>
+                                        <div className="profile text-center">
+                                            <img alt="" src={this.state.accept_provider[0] ? this.state.accept_provider[0].img_url : ''} />
+                                            <p className="normal_font_size mt-3 bold">{this.state.accept_provider[0] ? this.state.accept_provider[0].name : ''}</p>
+                                            <Rate allowHalf disabled value={this.state.accept_provider[0] ? Number(this.state.accept_provider[0].provider_rate[0].rating) : 0} />
+                                        </div>
+                                        {isStripePayment && <><div className="">
+                                            <StripePayout data={this.state.accept_data} current_booking_status={10} />
+                                        </div></>
+                                        }
+                                        {!isStripePayment && <><div className="price_section px-3 d-flex justify-content-center">
+                                            <Payment data={this.state.accept_data} />
+                                        </div>
+                                        </>}
+                                    </Modal>
+                                    <Modal okButtonProps={{ className: 'ok_btn' }} okText="Book" cancelButtonProps={{ className: 'd-none' }} title="Date and Time" className="new_modal" centered visible={this.state.book_later_modal} onOk={() => { this.book_later() }} onCancel={() => this.setLaterModal(false)}>
+                                        <div className="price_section text-center">
+                                            <DatePicker className='w-50' size='large' showTime use12Hours format='YYYY-MM-DD HH:mm:ss' placeholder="Select Date" disabledDate={this.disabledDate} onChange={this.onChange} onOk={this.onOk} />
+                                        </div>
+                                    </Modal>
 
-                                    </Row>
-                                </div>
-                            </Col>
-                        </Row>
-                        <div className="d-flex justify-content-center">
-                            <Spin tip="Loading..." spinning={this.state.loading} size="large" />
-                        </div>
-                        <Row className="fixed_book_btn">
-                            <Col sm={{ span: 4, offset: 7 }} xs={{ span: 9, offset: 2 }} className="">
-                                <Button className="w-100 h-50x normal_font_size jiffy_btn" onClick={() => this.setLaterModal(true)}>
-                                    Book Later
-                                </Button>
-                            </Col>
-                            <Col sm={{ span: 4, offset: 1 }} xs={{ span: 9, offset: 2 }} className="">
-                                <Button className="w-100 h-50x normal_font_size jiffy_btn primary-bg" onClick={() => this.book_now()}>
-                                    Book Now
-                                </Button>
-                            </Col>
-                        </Row>
-                    </Content>
-                </Layout >
+                                </Row>
+                            </div>
+                        </Col>
+                    </Row>
+                    <div className="d-flex justify-content-center">
+                        <Spin tip="Loading..." spinning={this.state.loading} size="large" />
+                    </div>
+                    <Row className="fixed_book_btn">
+                        <Col sm={{ span: 4, offset: 7 }} xs={{ span: 9, offset: 2 }} className="">
+                            <Button className="w-100 h-50x normal_font_size jiffy_btn" onClick={() => this.setLaterModal(true)}>
+                                Book Later
+                            </Button>
+                        </Col>
+                        <Col sm={{ span: 4, offset: 1 }} xs={{ span: 9, offset: 2 }} className="">
+                            <Button className="w-100 h-50x normal_font_size jiffy_btn primary-bg" onClick={() => this.book_now()}>
+                                Book Now
+                            </Button>
+                        </Col>
+                    </Row>
+                </Content>
             </LocationContext.Provider>
         );
     }

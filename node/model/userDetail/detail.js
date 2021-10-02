@@ -68,6 +68,8 @@ var detailSchema = new Schema({
   account_name:{ type: String },
   branch_name:{ type: String },
   routing_name:{ type: String },
+  location_code:{ type: String,default:"" },
+  currency_id:String
 }, schemaOptions);
 
 detailSchema.virtual('img_url').get(function () {
