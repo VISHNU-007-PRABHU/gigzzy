@@ -669,6 +669,7 @@ module.exports.check_demo_app = async (parent, args, context, info) => {
 
 exports.addUser = async (parent, args) => {
     try {
+        console.log("exports.addUser -> args", args)
         const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
         //add new user 
         if(_.size(user) || args._id){
