@@ -14,6 +14,7 @@ import * as serviceWorker from './serviceWorker';
 import { client } from "./apollo";
 import { ApolloProvider } from "react-apollo";
 import { ApolloProvider as ApolloProviderHooks } from "@apollo/react-hooks";
+import RoleView, { RoleViewFunction } from './component/Comman/roles_permission_view'
 const { Content } = Layout;
 
 
@@ -30,13 +31,20 @@ const User = React.lazy(() => import('./component/Admin/User/User'));
 const Add_User = React.lazy(() => import('./component/Admin/User/Add_User'));
 const Static = React.lazy(() => import('./component/Admin/Static/Static'));
 const Add_Static = React.lazy(() => import('./component/Admin/Static/Add_static'));
-
+const Contract = React.lazy(() => import('./component/Admin/Contract/Contract'));
+const ContractDetail = React.lazy(() => import('./component/Admin/Contract/ContractDetail'));
+const Roles = React.lazy(() => import('./component/Admin/Roles/Roles'));
+const Add_Admin = React.lazy(() => import('./component/Admin/Roles/Add_Admin'));
+const AdminRoles = React.lazy(() => import('./component/Admin/Roles/Add_Roles'));
+const Company = React.lazy(() => import('./component/Admin/Company/Company'));
+const Add_Company = React.lazy(() => import('./component/Admin/Company/Add_Company'));
+const CompanyWorkerAdmin = React.lazy(() => import('./component/Admin/Company/CompanyWorkerAdmin'));
+const ContractBooking = React.lazy(() => import('./component/User/Book/contract/ContractBooking'));
+const ContractUserDetail = React.lazy(() => import('./component/User/Book/contract/view/ContractUserDetail'));
 const User_Login = React.lazy(() => import('./component/User/Login/User_Login'));
-const Home_Page = React.lazy(() => import('./component/User/HomePage/Home_Page'));
 const HomePage = React.lazy(() => import('./component/User/HomePage/HomePage'));
 const Profile_Page = React.lazy(() => import('./component/User/Profile/Profile'));
 const Bookings_Page = React.lazy(() => import('./component/User/Book/Bookings'));
-const NotFound = React.lazy(() => import('./component/Comman/NotFound'));
 const Description_Page = React.lazy(() => import('./component/User/Book/Description'));
 const Payouts = React.lazy(() => import('./component/Admin/Payouts/Payouts'));
 const Review = React.lazy(() => import('./component/Admin/Review/Review'));
@@ -45,6 +53,10 @@ const Email_Login = React.lazy(() => import("./component/User/Login/Email_Login"
 const Request = React.lazy(() => import("./component/Admin/Request/Request"));
 const Booking_Details = React.lazy(() => import("./component/Admin/Booking/Booking_Details"));
 const Invoice = React.lazy(() => import('./component/Admin/Booking/invoice'));
+
+const NotFound = React.lazy(() => import('./component/Comman/NotFound'));
+const NotAccess = React.lazy(() => import('./component/Comman/NotAccess'));
+
 const provider_detail = React.lazy(() => import('./component/User/Provider/Provider_Details'));
 const provider_earnings = React.lazy(() => import('./component/User/Provider/Provider_Earns'));
 const Booking_Detail = React.lazy(() => import('./component/User/Provider/Booking_Detail'));
@@ -62,20 +74,35 @@ const LoginPage = React.lazy(() => import('./component/Admin/Layout/LoginPage'))
 const Dashboard = React.lazy(() => import('./component/Admin/Dashboard/Dashboard'));
 
 
-function PrivateRoute({ component: Component, ...rest }) {
+function PrivateRoute({ permission, component: Component, ...rest }) {
+  console.log("PrivateRoute -> permission", permission)
+  let permission_condition = true
+  if (permission) {
+    permission_condition = RoleViewFunction(permission)
+  }
   return (
     <Route
       {...rest}
-      render={props =>
-        localStorage.getItem('adminLogin') === "success" ? (
-          <Component {...props} />
-        ) : (
-          <Redirect
+      render={props => {
+        if (localStorage.getItem('adminLogin') === "success") {
+          if (permission_condition) {
+            console.log("PrivateRoute -> permission_condition", "permission_condition")
+            return (<Component {...props} />)
+          } else {
+            return <Redirect
+              to={{
+                pathname: "/notaccess",
+              }}
+            />
+          }
+        } else {
+          return <Redirect
             to={{
               pathname: "/admin",
             }}
           />
-        )
+        }
+      }
       }
     />
   );
@@ -138,7 +165,7 @@ function ProviderRoute({ component: Component, ...rest }) {
   );
 }
 
-function UnAuthRoute({ component: Component, isHeader,isFooter, ...rest }) {
+function UnAuthRoute({ component: Component, isHeader, isFooter, ...rest }) {
   return (
     <Route
       {...rest}
@@ -180,8 +207,8 @@ ReactDOM.render(
             <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "100px" }}></p> */}
           </>}>
             <PrivateRoute path="/admin-dashboard" component={Dashboard} />
-            <PrivateRoute exact path="/admin-category/add" component={Add_Category}  />
-            <PrivateRoute exact path="/admin-category/add/:id" component={Add_Category}  />
+            <PrivateRoute exact path="/admin-category/add" component={Add_Category} />
+            <PrivateRoute exact path="/admin-category/add/:id" component={Add_Category} />
             <PrivateRoute exact path="/admin-category" component={Category} />
             <PrivateRoute exact path="/admin-add-subcategory/:id" component={Add_Subcategory} />
             <PrivateRoute exact path="/admin-add-subcategory" component={Add_Subcategory} />
@@ -190,7 +217,7 @@ ReactDOM.render(
             <PrivateRoute exact path="/admin-booking-detail" component={Booking_Details} />
             <PrivateRoute exact path="/admin-request" component={Request} />
             <PrivateRoute exact path="/admin-payouts" component={Payouts} />
-            <PrivateRoute exact path="/admin-provider/add" component={Add_Provider}  />
+            <PrivateRoute exact path="/admin-provider/add" component={Add_Provider} />
             <PrivateRoute path="/admin-provider/add/:id" component={Add_Provider} exact />
             <PrivateRoute path="/admin-provider/view/:id" component={Provider_Verified} exact />
             <PrivateRoute path="/admin-provider" component={Provider} exact />
@@ -203,16 +230,28 @@ ReactDOM.render(
             <PrivateRoute path="/admin-static/add/:id" component={Add_Static} exact />
             <PrivateRoute path="/admin-static" component={Static} exact />
             <PrivateRoute path="/admin-settings" component={Settings} exact />
-            <PrivateRoute path="/admin-currency/add/:id" component={AddCurrency} exact/>
-            <PrivateRoute path="/admin-currency/add" component={AddCurrency} exact/>
-            <PrivateRoute permission="view_currency" path="/admin-currency" component={Currency} exact/>
+            <PrivateRoute path="/admin-currency/add/:id" component={AddCurrency} exact />
+            <PrivateRoute path="/admin-currency/add" component={AddCurrency} exact />
+            <PrivateRoute permission="view_currency" path="/admin-currency" component={Currency} exact />
             <ProviderRoute exact path="/provider_detail" component={provider_detail} />
             <ProviderRoute exact path="/provider_earnings" component={provider_earnings} />
             <ProviderRoute exact path="/provider-booking-detail" component={Booking_Detail} />
+            <PrivateRoute permission="" path="/admin-company/add" component={Add_Company} exact />
+            <PrivateRoute permission="" path="/admin-company/add/:id" component={Add_Company} exact />
+            <PrivateRoute exact path="/admin-company" component={Company} />
+            <PrivateRoute exact path="/admin-company-worker-detail" component={CompanyWorkerAdmin} />
+            <PrivateRoute exact path="/admin-contract/view/:id" component={ContractDetail} />
+            <PrivateRoute exact path="/admin-contract" component={Contract} />
+            <PrivateRoute permission="view_roles" path="/admin-roles" component={Roles} exact />
+            <PrivateRoute permission="add_roles" path="/admin-roles/add" component={AdminRoles} exact />
+            <PrivateRoute permission="edit_roles" path="/admin-roles/add/:id" component={AdminRoles} exact />
+            <PrivateRoute permission="add_admin" path="/admin-admin/add" component={Add_Admin} exact />
+            <PrivateRoute permission="edit_admin" path="/admin-admin/add/:id" component={Add_Admin} exact />
+            <PrivateRoute exact path="/contract_booking/:id" component={ContractBooking} />
+            <PrivateRoute exact path="/contract/view/:id" component={ContractUserDetail} />
 
             <UnAuthRoute path="/admin-booking-invoice/:id" component={Invoice} exact />
             <UnAuthRoute exact path="/admin" component={LoginPage} />
-            <UnAuthRoute isHeader={true} isFooter={true} exact path="/old" component={Home_Page} />
             <UnAuthRoute isHeader={true} isFooter={true} exact path="/" component={HomePage} />
             <UnAuthRoute exact path="/login" component={User_Login} />
             <UnAuthRoute exact path="/Confrim_password/:id" component={ConfrimPassword} />
@@ -222,6 +261,7 @@ ReactDOM.render(
             <UnAuthRoute isHeader={true} isFooter={true} exact path="/faq" component={FAQ} />
             <UnAuthRoute exact path="/provider_login" component={Provider_Login} />
             <UnAuthRoute exact path="/provider_signup" component={Provider_Email_Login} />
+            <UnAuthRoute exact path="/notaccess" component={NotAccess} />
 
             <UserRoute exact path="/profile" component={Profile_Page} />
             <UserRoute exact path="/description/:id" component={Description_Page} />
@@ -229,10 +269,10 @@ ReactDOM.render(
 
           </Suspense>
           <Route component={NotFound} />
-        </Switch>
-      </ApolloProviderHooks>
-    </ApolloProvider>
-  </BrowserRouter>,
+        </Switch >
+      </ApolloProviderHooks >
+    </ApolloProvider >
+  </BrowserRouter >,
   document.getElementById('root'));
 
 serviceWorker.unregister();

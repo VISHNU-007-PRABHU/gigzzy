@@ -21,6 +21,8 @@ export const CHECK_OPT = gql`
         rating
         profile
         status
+        user_type
+        company_register_status
     }
 }`
 
@@ -112,8 +114,8 @@ export const RESET_PwD = gql`
 `
 
 export const ADD_USER = gql`
-    mutation ADDUSER($_id:ID,$option:String,$location_code:String,$phone_no:String,$role:Int,$country_code:String,$email:String,$password:String,$name:String,$lng:Float,$lat:Float,$provider_subCategoryID:[ID]){
-        addUser(_id:$_id,option:$option,phone_no:$phone_no,role:$role,country_code:$country_code,email:$email,password:$password,name:$name,lng:$lng,lat:$lat,provider_subCategoryID:$provider_subCategoryID){
+    mutation ADDUSER($_id:ID,$user_type:String,$option:String,$phone_no:String,$role:Int,$location_code:String,$country_code:String,$email:String,$password:String,$first_name:String,$last_name:String,$lng:Float,$lat:Float,$provider_subCategoryID:[ID]){
+        addUser(_id:$_id,user_type:$user_type,option:$option,phone_no:$phone_no,role:$role,location_code:$location_code,country_code:$country_code,email:$email,password:$password,last_name:$last_name,first_name:$first_name,lng:$lng,lat:$lat,provider_subCategoryID:$provider_subCategoryID){
             msg
             otp
             status
@@ -126,6 +128,7 @@ export const ADD_USER = gql`
             address
             phone_number
             country_code
+            location_code
             phone_no
             location
             img_url
@@ -133,6 +136,19 @@ export const ADD_USER = gql`
             lng
             rating
             profile
+            user_type
+            company_register_status
+           company_id
+        }
+    }
+`
+export const UPDATE_COMPANY = gql`
+    mutation UPDATECOMPANY($_id:ID,$company_data:JSON){
+        update_company_detail(_id:$_id,company_data:$company_data){
+            msg
+            status
+            _id
+            user_id
             get_currency(location_code:$location_code) {
                 _id
                 country_code

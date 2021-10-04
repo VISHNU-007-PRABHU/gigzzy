@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { withRouter } from "react-router";
 import { client } from "../../../apollo";
-import { Radio, Layout, Button, Empty, Form, Card, Avatar, Row, Col, Rate, Skeleton } from 'antd';
+import { Layout, Button, Empty, Form, Card, Avatar, Row, Col, Rate, Skeleton } from 'antd';
 import 'antd/dist/antd.css';
 import '../../../scss/template.scss';
 import { FaBarcode, FaDollarSign, FaRegImage, FaSignInAlt, FaSignOutAlt, FaUserAlt, FaUserCog, FaEye } from 'react-icons/fa';

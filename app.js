@@ -11,6 +11,7 @@ const { ApolloServer, gql, SchemaDirectiveVisitor } = require('apollo-server-exp
 const { defaultFieldResolver, GraphQLString } = require('graphql');
 const { typeDefs } = require('./node/graphql/schema');
 const { resolvers, confrimation_call, c2b_confirmation, c2b_validation } = require('./node/graphql/resolver');
+const { confrimation_company_worker } = require('./node/graphql/resolvers/user')
 const moment = require('moment');
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true, parameterLimit: 5000000 }));
@@ -21,6 +22,7 @@ const _ = require('lodash');
 const cwd = process.cwd();
 const dotenv = require('dotenv');
 const expressStaticGzip = require('express-static-gzip');
+const commonHelper = require('./node/graphql/commonHelper')
 const CommonFunction = require('./node/graphql/CommonFunction')
 // const i18n = require("i18n");
 const model = require('./node/model_data');
@@ -28,10 +30,6 @@ var Currency_model = model.currency;
 var Booking_model = model.booking;
 
 dotenv.config();
-// i18n.configure({
-//   locales: ['en', 'es'],
-//   directory: __dirname + '/locales'
-// });
 class refDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
@@ -93,7 +91,25 @@ class UpperCaseDirective extends SchemaDirectiveVisitor {
     };
   }
 }
-
+class UrlDirective extends SchemaDirectiveVisitor {
+  visitFieldDefinition(field) {
+    const { resolve = defaultFieldResolver } = field;
+    const { format } = this.args;
+    field.resolve = async function (...args) {
+       const file_type =  args[0].doc_type || "png"
+      const img = await resolve.apply(this, args);
+      if (img && file_type && file_type !== "pdf") {
+        return `${commonHelper.getBaseurl()}/images/${format}/${img}`;
+      } else if(file_type && file_type === "pdf") {
+        return `${commonHelper.no_image('pdf')}`;
+      }else{
+        return `${commonHelper.no_image()}`;
+      }
+    };
+    // The formatted Date becomes a String, so the field type must change:
+    field.type = GraphQLString;
+  }
+}
 
 class c2bDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
@@ -132,18 +148,18 @@ class currencyDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
     const { defaultFormat } = this.args;
-
+    
     field.args.push({
       name: 'format',
       type: GraphQLString
     });
-
+    
     field.resolve = async function (
       source,
       { format, ...otherArgs },
       context,
       info,
-    ) {
+      ) {
       const date = await resolve.call(this, source, otherArgs, context, info);
       let code = otherArgs.code
       if (code === "symbol") {
@@ -207,7 +223,8 @@ const server = new ApolloServer({
     date: DateFormatDirective,
     upper: UpperCaseDirective,
     imgSize: ImgSizeDirective,
-    payment: c2bDirective
+    payment: c2bDirective,
+    imgUrl: UrlDirective
   },
   subscriptions: {
     onConnect: () => { },
@@ -254,11 +271,25 @@ existsSync(path.join(__dirname, "./node/images/provider/document")) || mkdirSync
 existsSync(path.join(__dirname, "./node/images/provider/profile")) || mkdirSync(path.join(__dirname, "./node/images/provider/profile"));
 existsSync(path.join(__dirname, "./node/images/category")) || mkdirSync(path.join(__dirname, "./node/images/category"));
 existsSync(path.join(__dirname, "./node/images/subcategory")) || mkdirSync(path.join(__dirname, "./node/images/subcategory"));
+existsSync(path.join(__dirname, "./node/images/contract")) || mkdirSync(path.join(__dirname, "./node/images/contract"));
+existsSync(path.join(__dirname, "./node/images/company")) || mkdirSync(path.join(__dirname, "./node/images/company"));
 
 app.use("/images", express.static(path.join(__dirname, "./node/images")));
 app.use("/document", express.static(path.join(__dirname, "./node/document")));
 app.use('/static', express.static(__dirname + '/public'));
 
+
+app.get('/company_user_accepted', async (req, res, next) => {
+  try {
+    if (req.query['sid']) {
+      res.redirect(301, '/errors');
+    }
+    let { status, msg, link } = await confrimation_company_worker(req.query)
+    res.redirect(301, link);
+  } catch (error) {
+    res.redirect(301, '/errors');
+  }
+})
 
 app.post('/confirmation', async (req, res, next) => {
   try {
@@ -270,6 +301,7 @@ app.post('/confirmation', async (req, res, next) => {
     return res.send(error)
   }
 })
+
 
 app.post('/refund_confirmation', async (req, res, next) => {
   try {
@@ -315,14 +347,19 @@ app.post('/c2b_confirmation', async (req, res, next) => {
 app.use(async (req, res, next) => {
   const url = req.url;
   // console.log(url);
+  let SubURL = ['graphql',
+    'c2b_confirmation',
+    'c2b_validation',
+    'confirmation',
+    'validation',
+    'cancelled'
+  ]
   const uriArray = url.split('/');
-  if (uriArray[1] !== 'graphql' && uriArray[1] !== "c2b_confirmation" && uriArray[1] !== "c2b_validation" && uriArray[1] !== "confirmation" && uriArray[1] !== "validation" && uriArray[1] !== "cancelled") {
-    // console.log("react run");
+  if (!_.includes(SubURL, uriArray[1])) {
+    console.log("react run");
     const readFile = util.promisify(fs.readFile)
     try {
-
       var text = await readFile(cwd + '/build/index.html', 'utf8');
-
       return res.send(text);
     } catch (error) {
       return res.send(error.message)

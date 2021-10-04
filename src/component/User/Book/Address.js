@@ -12,10 +12,11 @@ import gql from 'graphql-tag';
 import SetAddress from './SetAddress';
 import { GoChevronLeft } from "react-icons/go";
 import { Alert_msg } from "../../Comman/alert_msg";
+import includes from 'lodash/includes'
 import { LocationContext, EditLocationContext } from "../../context/Location";
 const ADD_ADDRESS = gql`
-  mutation add_address($location_code:String,$option: Int,$_id:ID,$user_id: String,$title: String,$flat_no: String ,$landmark: String,$address: String,$lat: String,$lng: String ) {
-     modified_address(location_code:$location_code,option: $option,_id:$_id,user_id: $user_id,title: $title,flat_no: $flat_no, landmark: $landmark,address: $address,lat: $lat,lng: $lng ) {
+  mutation add_address($company_id:ID,$location_code:String,$option: Int,$_id:ID,$user_id: String,$title: String,$flat_no: String ,$landmark: String,$address: String,$lat: String,$lng: String ) {
+     modified_address(company_id:$company_id,location_code:$location_code,option: $option,_id:$_id,user_id: $user_id,title: $title,flat_no: $flat_no, landmark: $landmark,address: $address,lat: $lat,lng: $lng ) {
         msg
         status
     }
@@ -38,7 +39,7 @@ query ADDRESS($user_id: ID) {
 `;
 const Address = (props) => {
     let location = useLocation();
-
+    const [user_id, setuser_id] = useState("");
     const [service_modal, setservice_modal] = useState(false);
     const [draggable, setdraggable] = useState(true);
     const [zoom, setzoom] = useState(15);
@@ -53,13 +54,26 @@ const Address = (props) => {
     const [center, setcenter] = useState([9.9619289, 78.1288218]);
     const [add, setadd] = useState(false);
     const [edit, setedit] = useState(false);
+
+    useEffect(() => {
+        let local_user_id = ""
+        if(JSON.parse(localStorage.getItem('user'))){
+            local_user_id= JSON.parse(localStorage.getItem('user'))._id
+        }
+        if (props.user_id) {
+            setuser_id(props.user_id)
+        } else if (local_user_id) {
+            setuser_id(local_user_id)
+        }
+    }, [props])
     const [updateTodo] = useMutation(ADD_ADDRESS, {
-        refetchQueries: [{ query: GET_ADDRESS, variables: { user_id: JSON.parse(localStorage.getItem('user'))._id } }],
+        refetchQueries: [{ query: GET_ADDRESS, variables: { user_id } }],
         awaitRefetchQueries: true,
     });
 
 
     useEffect(() => {
+        console.log(props)
         setservice_modal(props.visible);
         setadd(false);
     }, [props])
@@ -142,13 +156,17 @@ const Address = (props) => {
             location_code:country_code
         };
         console.log(data)
+        if(props.company){
+            data['company_id'] = localStorage.getItem('user_company_id')
+        }
         if (data.lat === null || data.lat === '' || data.lng === '' || data.lng === null || data.address === '' || data.address === null || data.user_id === '' || data.user_id === null || data.title === '' || data.title === null) {
 
             Alert_msg({ msg: "Please add mandatory field", status: 'failed' })
         } else {
             updateTodo({ variables: data }).then(results => {
                 if (results.data.modified_address.status === 'success') {
-                    if (location.pathname !== '/profile') {
+                    let url_value=['/profile', '/contract_booking','/login']
+                    if (!includes(url_value,location.pathname)) {
                         value.location_change(data);
                     }
                     Alert_msg({ msg: "Address saved", status: "success" });
@@ -172,10 +190,14 @@ const Address = (props) => {
             location_code:country_code
         };
         console.log(data)
+        if(props.company){
+            console.log("edit_data -> props.company", props.company)
+            data['company_id'] = localStorage.getItem('user_company_id')
+        }
         if (data.lat !== null && data.lat !== '' && data.lng !== '' && data.lng !== null && data.address !== '' && data.address !== null && data._id !== '' && data._id !== null && data.title !== '' && data.title !== null) {
             updateTodo({ variables: data }).then(results => {
                 if (results.data.modified_address.status === 'success') {
-                    if (location.pathname !== '/profile') {
+                    if (location.pathname !== '/profile' && location.pathname !== '/login') {
                         value.location_change(data);
                     }
                     Alert_msg({ msg: "Address update saved", status: "success" });
@@ -314,7 +336,7 @@ const Address = (props) => {
                                     }
                                 >
                                     {add === false ? <div className="d-block map_modal">
-                                        <SetAddress />
+                                        <SetAddress user_id={user_id}/>
                                     </div> :
                                         <div className="d-block maps_modal">
                                             <div style={{ height: '30vh', width: '100%' }}>

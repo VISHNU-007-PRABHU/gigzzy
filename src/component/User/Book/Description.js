@@ -1,7 +1,19 @@
 import React, { Suspense } from "react";
 import { LocationContext } from '../../context/Location'
 import 'antd/dist/antd.css';
-import { Rate, Statistic, Spin, Skeleton, DatePicker, Collapse, Modal, Layout, Icon, Form, Button, Row, Col, Upload } from 'antd';
+import Modal from 'antd/lib/modal';
+import Spin from 'antd/lib/spin';
+import Layout from 'antd/lib/layout';
+import Row from 'antd/lib/row';
+import Col from 'antd/lib/col';
+import Form from 'antd/lib/form';
+import Button from 'antd/lib/button';
+import Skeleton from 'antd/lib/skeleton';
+import Rate from 'antd/lib/rate';
+import Statistic from 'antd/lib/statistic';
+import DatePicker from 'antd/lib/date-picker';
+import Upload from 'antd/lib/upload';
+
 import { FIND_CATEGORY, FIND_SUBCATEGORY } from '../../../graphql/User/home_page';
 import htmlToText from 'html-to-text';
 import { ADD_BOOKING, ACCEPT_JOB_MSG } from '../../../graphql/User/booking';

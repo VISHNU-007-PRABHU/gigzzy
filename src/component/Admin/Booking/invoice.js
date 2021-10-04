@@ -157,7 +157,7 @@ class Invoice extends React.Component {
                     </div>
                     <div className="user_batch mx-3">
                         <p><b>{booking_user[0] ? booking_user[0].name : ""}</b></p>
-                        <p>Thanks for using gigzzy</p>
+                        <p>Thanks for using gigzzy.</p>
                     </div>
                     <div className="total_fare">
                         <h5>TOTAL COST</h5>

@@ -1,4 +1,4 @@
-import React, { useCallback,useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import useReactRouter from 'use-react-router';
 import { Alert_msg } from '../../Comman/alert_msg';
 import jiffy from '../../../image/Gigzzy.png';
@@ -7,6 +7,7 @@ import { useMutation } from "@apollo/react-hooks";
 import { ADMIN_LOGIN } from '../../../graphql/Admin/login';
 import '../../../scss/LoginPage.scss';
 import '../../../scss/template.scss';
+import { UserContext } from "../../context/Location";
 const { Header, Content } = Layout;
 const { Text } = Typography;
 
@@ -15,17 +16,22 @@ const { Text } = Typography;
     const [adminlogin] = useMutation(ADMIN_LOGIN);
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
+    const [userData, setuserData] = React.useState({});
+    let userContextData = React.useContext(UserContext);
     useEffect(() => {
-        localStorage.getItem('adminLogin') === "success"? history.push({ pathname: '/admin-dashboard' }) : history.push({ pathname: '/admin' }); 
+        localStorage.getItem('adminLogin') === "success" ? history.push({ pathname: '/admin-dashboard' }) : history.push({ pathname: '/admin' });
     }, []);
     const onClick = useCallback(
         async (event) => {
             if (email === '' || password === '') {
                 Alert_msg({ msg: "Please Fill All Data", status: 'failed' });
-            }else{
+            } else {
                 const res = await adminlogin({ variables: { "email": email, "password": password } });
                 if (res.data.adminLogin.info.status === "success") {
                     localStorage.setItem('adminLogin', 'success');
+                    let datas =JSON.stringify(res.data.adminLogin)
+                    console.log("LoginPage -> datas", datas)
+                    localStorage.setItem('hokjighsasd',window.btoa(datas)) 
                     history.push('/admin-dashboard');
                 } else {
                     Alert_msg(res.data.adminLogin.info);

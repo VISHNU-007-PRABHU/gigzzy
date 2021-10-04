@@ -2,6 +2,7 @@ import React from 'react';
 const LocationContext = React.createContext({});
 const EditLocationContext = React.createContext({});
 const settingContext = React.createContext({});
+const UserContext = React.createContext({});
 const HomeContext = React.createContext({
     comman_data: {},
     on_book:()=>{},
@@ -11,5 +12,6 @@ export  {
     LocationContext,
     EditLocationContext,
     settingContext,
+    UserContext,
     HomeContext
 }

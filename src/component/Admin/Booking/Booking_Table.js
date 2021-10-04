@@ -4,12 +4,10 @@ import { Table, Form, Icon, Tag } from 'antd';
 import { GET_BOOKING } from '../../../graphql/Admin/booking';
 import { client } from "../../../apollo";
 import Search from "antd/lib/input/Search";
-
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 const EmailSearch = React.lazy(() => import('../User/EmailSearch'));
 const DateSearch = React.lazy(() => import('../User/DateSearch'));
-const SearchCategory = React.lazy(() => import('../User/SearchCategory'));
 const SearchSubcategory = React.lazy(() => import('../User/SearchSubcategory'));
-
 class BookingTable extends React.Component {
     constructor(props) {
         super(props);
@@ -78,18 +76,18 @@ class BookingTable extends React.Component {
         if (data[Object.keys(data)[0]] == '') {
             delete this.state.input_data[Object.keys(data)[0]];
             var data_pass = this.state.input_data;
-            this.setState({ input_data: data_pass})
-            this.fetch_booking({...data_pass,limit: 10, page: 1, booking_status: [13, 10] });
+            this.setState({ input_data: data_pass })
+            this.fetch_booking({ ...data_pass, limit: 10, page: 1, booking_status: [13, 10] });
         } else {
             this.setState({ input_data: { ...this.state.input_data, ...data } });
             var input_data = { ...this.state.input_data, ...data };
-            this.fetch_booking({...input_data,limit: 10, page: 1, booking_status: [13, 10] });
+            this.fetch_booking({ ...input_data, limit: 10, page: 1, booking_status: [13, 10] });
         }
     }
 
     onFilter_Ref = async (data) => {
         if (data.target.value) {
-            this.fetch_booking({ booking_ref: { $regex: '.*' + data.target.value + '.*', $options: 'i' },limit: 10, page: 1 });
+            this.fetch_booking({ booking_ref: { $regex: '.*' + data.target.value + '.*', $options: 'i' }, limit: 10, page: 1 });
         } else {
             this.fetch_booking({ limit: 10, page: 1, booking_status: [13, 10] });
         }
@@ -233,10 +231,13 @@ class BookingTable extends React.Component {
             {
                 title: 'Action',
                 dataIndex: 'operation',
+                className: RoleViewFunction('view_booking_detail') ? '' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
                         <span title="...." className="d-flex d-sm-inline justify-content-around">
-                            <span className='cursor_point' onClick={() => { this.props.history.push({ pathname: '/admin-booking-detail', state: { _id: record._id } }) }}><Icon type="eye" theme="twoTone" twoToneColor="#52c41a" className='f_25' /></span>
+                            <RoleView permission="view_booking_detail">
+                                <span className='cursor_point' onClick={() => { this.props.history.push({ pathname: '/admin-booking-detail', state: { _id: record._id } }) }}><Icon type="eye" theme="twoTone" twoToneColor="#52c41a" className='f_25' /></span>
+                            </RoleView>
                             {/* <span href="#" onClick={() => this.find_booking(record._id)}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span> */}
                             {/* <Popconfirm title="Sure to delete because may be under some more sub_category ?" onConfirm={() => this.delete_booking(record.key)}>
                                 <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />

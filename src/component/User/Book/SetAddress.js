@@ -1,10 +1,11 @@
-import React from 'react'
+import React,{useState,useEffect} from 'react'
 import { useLocation } from "react-router";
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Icon, Empty, List, Skeleton, Button } from 'antd';
 import gql from 'graphql-tag';
 import { LocationContext, EditLocationContext } from '../../context/Location'
 import { Alert_msg } from "../../Comman/alert_msg";
+import size from 'lodash/size'
 
 const GET_ADDRESS = gql`
 query ADDRESS($user_id: ID) {
@@ -32,14 +33,22 @@ const DELETE_ADDRESS = gql`
 
 
 
-const SetAddress = () => {
+const SetAddress = (props) => {
     let location = useLocation();
+    const [user_id, setuser_id] = useState("");
+    useEffect(() => {
+        if (props['user_id']) {
+            setuser_id(props['user_id'])
+        } else if(JSON.parse(localStorage.getItem('user'))){
+            setuser_id(JSON.parse(localStorage.getItem('user'))._id)
+        }
 
+    }, [props])
     const { loading, error, data } = useQuery(GET_ADDRESS, {
-        variables: { user_id: JSON.parse(localStorage.getItem('user'))._id },
+        variables: { user_id: user_id },
     });
     const [delete_address, { loading: removeLoading }] = useMutation(DELETE_ADDRESS, {
-        refetchQueries: [{ query: GET_ADDRESS, variables: { user_id: JSON.parse(localStorage.getItem('user'))._id } }],
+        refetchQueries: [{ query: GET_ADDRESS, variables: { user_id:user_id} }],
         awaitRefetchQueries: true,
     });
 
@@ -64,7 +73,9 @@ const SetAddress = () => {
         });
     }
     const loader = (values) => {
-        values.no_data();
+        if(values && size(values)){
+            values.no_data();
+        }
     }
     return (
         <LocationContext.Consumer>
@@ -88,7 +99,7 @@ const SetAddress = () => {
                                                         dataSource={data.user_address}
                                                         renderItem={item => (
                                                             <List.Item
-                                                                className='cursor_point'
+                                                                className={props && props.address_id ?'cursor_point table-active':'cursor_point'}
                                                                 actions={[
                                                                     <Button type="link primary_color d-flex" size="small"
                                                                         onClick={() => { values.location_edit(item) }} >

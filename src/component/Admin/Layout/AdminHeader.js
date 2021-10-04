@@ -1,6 +1,6 @@
 import React from 'react'
 import { withRouter } from "react-router";
-import { Layout, Row, Col, Avatar, Menu, Icon, message, Dropdown, Drawer } from 'antd';
+import { Layout, Row, Col, Avatar, Menu, Icon, message, Dropdown } from 'antd';
 import DrawerForm from './DrawerForm';
 const { Header } = Layout;
 class AdminHeader extends React.Component {
@@ -29,15 +29,14 @@ class AdminHeader extends React.Component {
 
         const menu = (
             <Menu onClick={(key) => { this.handleMenuClick(key) }}>
-
-                <Menu.Item key="/admin-settings" className=" d-flex align-items-center px-3">
+                {/* <Menu.Item key="/admin-settings" className=" d-flex align-items-center px-3">
                     <Icon type="setting" />
                     Setting
-        </Menu.Item>
+        </Menu.Item> */}
                 <Menu.Item key="/admin" className="d-flex align-items-center px-3">
                     <Icon type="logout" />
                     Logout
-        </Menu.Item>
+                </Menu.Item>
             </Menu>
         );
 
@@ -53,7 +52,7 @@ class AdminHeader extends React.Component {
                                 <Dropdown className='cursor_point' overlay={menu} placement="bottomCenter">
                                     <Avatar style={{ backgroundColor: "Green", verticalAlign: 'middle' }} size="large">
                                         Admin
-                                     </Avatar>
+                                    </Avatar>
                                 </Dropdown>
 
                             </div>

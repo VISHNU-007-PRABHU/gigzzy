@@ -1,15 +1,11 @@
 import React from "react";
 import 'antd/dist/antd.css';
-import 'antd/dist/antd.css';
 import '../../../scss/template.scss';
 import AdminSider from '../Layout/AdminSider';
 import AdminHeader from '../Layout/AdminHeader';
 import PayoutsTable from './Payouts_Table';
-import { Layout } from 'antd';
-
+import Layout from 'antd/es/layout';
 const { Content } = Layout;
-
-
 class Payouts extends React.Component {
     state = {
         collapsed: false,

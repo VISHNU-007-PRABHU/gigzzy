@@ -5,9 +5,15 @@ export const ADMIN_LOGIN = gql`
             adminLogin(email:$email,password:$password){ 
                   info
                   email
+                  _id
                   password
-                  # username
                   name
+                  GizzyDeveloper
+                  full_permission_list{
+                        name
+                        _id
+                        key
+                  }
             }
       }
 `;

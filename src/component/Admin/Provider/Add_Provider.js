@@ -1,5 +1,5 @@
 import React from 'react'
-import { Layout, Form, Input, Button, message, Typography, Row, Col, Select, Checkbox } from 'antd';
+import { Layout, Form, Input, Button, message, Typography, Row, Col, Select } from 'antd';
 import { SUBCATEGORY_NAME, CATEGORY_NAME } from '../../../graphql/Admin/sub_category';
 import { ADD_USER, FIND_USER, UPDATE_USER } from '../../../graphql/Admin/user';
 import PlacesAutocomplete, {

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { Suspense } from "react";
 import 'antd/dist/antd.css';
-import { Button, Row, Col, Typography, Form, Input } from 'antd';
+import { Button, Row, Col, Typography, Form, Input, Skeleton } from 'antd';
 import jiffy from '../../../image/Gigzzy.png';
 import main from '../../../image/Gigzzy.png';
 import PhoneInput from 'react-phone-input-2';
@@ -9,22 +9,31 @@ import 'react-phone-input-2/lib/style.css'
 import '../../../scss/user.scss';
 import { TiRefresh } from "react-icons/ti";
 
-import { ADD_USER, CHECK_OPT, EMAIL_LOGIN } from '../../../graphql/User/login';
+import { ADD_USER, CHECK_OPT, EMAIL_LOGIN, UPDATE_COMPANY } from '../../../graphql/User/login';
 import { client } from "../../../apollo";
 import { Alert_msg } from "../../Comman/alert_msg";
 const { Text, Title } = Typography;
+
+const ChooseRegistration = React.lazy(() => import('./ChooseRegistration'));
+const CompanyRegistrationDetail = React.lazy(() => import('./CompanyRegistrationDetail'));
+const CompanyWorkerDetail = React.lazy(() => import('./CompanyWorkerDetail'));
 class User_Login extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             otp: '',
             register: 0,
-            otp_login: 1,
+            otp_login: true,
             email_login: 0,
+            choose_registration: false,
+            company_registration_detail: false,
+            company_worker_detail: false,
             country_code: '',
             location_code:"",
             login: 1,
-            m_no:'',
+            company_id: "",
+            m_no: '',
+            user_type: "individual"
         };
     }
     get_otp = async () => {
@@ -78,13 +87,22 @@ class User_Login extends React.Component {
                     // console.log(result.data);
                     if (result.data.checkOtp.msg === "new user") {
                         Alert_msg(result.data.checkOtp);
-                        this.setState({ register: 1, otp_login: 0 });
+                        this.setState({ choose_registration: 1, otp_login: 0 });
                     } else if (result.data.checkOtp.msg === "Wrong OTP") {
                         // console.log(this.props);
                         Alert_msg(result.data.checkOtp);
                         localStorage.setItem('userLogin', "failed");
                     } else {
                         // console.log(this.props);
+                        if (result.data.checkOtp.user_type && result.data.checkOtp.user_type === "company") {
+                            if (result.data.checkOtp.company_register_status === 1) {
+                                this.setState({ company_registration_detail: 1, otp_login: 0 });
+                                return false
+                            } else if (result.data.checkOtp.company_register_status === 2) {
+                                this.setState({ company_worker_detail: 1, otp_login: 0 });
+                                return false
+                            }
+                        }
                         localStorage.setItem('userLogin', "success");
                         this.props.history.push('/');
                     }
@@ -92,6 +110,59 @@ class User_Login extends React.Component {
 
             }
         });
+    }
+
+    change_from_type = (data, option = {}) => {
+        if (data === "COMPANY_REGISTRATION") {
+            this.setState({ user_type: "company", register: 1, choose_registration: 0 });
+        } else if (data === "INDIVIDUAL_REGISTRATION") {
+            this.setState({ user_type: "individual", register: 1, choose_registration: 0 });
+        } else if (data === "CHO0SE_REGISTRATION") {
+            this.setState({ user_type: "individual", choose_registration: true, });
+        } else if (data === "COMPANY_REGISTRATION_DETAIL") {
+            this.setState({ user_type: "individual", company_registration_detail: true, });
+        } else if (data === "COMPANY_WORKER_DETAIL") {
+            this.setState({ user_type: "individual", company_worker_detail: true,company_registration_detail:false });
+        }
+    }
+
+
+    submitFromData = async (data,type="") => {
+        console.log("submitFromData -> data", data)
+        data['user_type'] = this.state.user_type
+        // this.setState({ company_registration_detail: 0, company_worker_detail: 1 });
+        var user = localStorage.getItem('user');
+        if (user) {
+            data['user_id'] = JSON.parse(user)._id
+        }
+        let companyID = ""
+        if (localStorage.getItem('user_company_id')) {
+            companyID = localStorage.getItem('user_company_id')
+        }
+        if (data) {
+            await client.mutate({
+                mutation: UPDATE_COMPANY,
+                variables: { _id: companyID, company_data: [data] },
+            }).then(result => {
+                console.log(result.data);
+                Alert_msg(result.data.update_company_detail);
+                if (result.data.update_company_detail.status === "success") {
+                    if(type === "COMPANY_REGISTRATION_DETAIL"){
+                        this.setState({ company_id: result.data.update_company_detail._id, company_registration_detail: 0, company_worker_detail: true });
+                    }else if(type === "COMPANY_WORKER_DETAIL"){
+                        localStorage.setItem("userLogin",'success')
+                        this.props.history.push('/');
+                    }
+                } else {
+                    if(type === "COMPANY_REGISTRATION_DETAIL"){
+                        this.setState({ company_registration_detail: 1 });
+                    }else if(type === "COMPANY_WORKER_DETAIL") {
+                        this.setState({ company_worker_detail: 1 });
+                    }
+                }
+            });
+
+        }
     }
 
     emailLogin = async () => {
@@ -118,17 +189,21 @@ class User_Login extends React.Component {
         form.validateFields(async (err, values) => {
             console.log(values);
             var user = localStorage.getItem('user');
-            console.log(user);
             if (!err) {
                 await client.mutate({
                     mutation: ADD_USER,
-                    variables: { option: 'add', _id: JSON.parse(user)._id, name: values.name, email: values.email, password: values.password },
+                    variables: { user_type: this.state.user_type, option: 'add', _id: JSON.parse(user)._id, last_name: values.last_name, first_name: values.first_name, email: values.email, password: values.password },
                 }).then(result => {
-                    console.log(result.data);
+                    console.log(result.data, "userdata");
                     Alert_msg(result.data.addUser);
                     if (result.data.addUser.status === "success") {
-                        localStorage.setItem('userLogin', "success");
-                        this.props.history.push('/');
+                        if (result.data.addUser.company_id && this.state.user_type === "company") {
+                            this.setState({ company_id: result.data.addUser.company_id, company_registration_detail: 1, register: 0 });
+                            localStorage.setItem('user_company_id', result.data.addUser.company_id);
+                        } else {
+                            localStorage.setItem('userLogin', "success")
+                            this.props.history.push('/');
+                        }
                     } else {
                         this.setState({ register: 1, otp_login: 0 });
                     }
@@ -144,7 +219,7 @@ class User_Login extends React.Component {
             <Row style={{ overflow: 'auto', height: '100vh' }}>
                 <Col lg={12} className="d-none d-lg-flex d-xl-flex justify-content-center align-items-center overflow-hidden h-100">
                     <div className="d-flex justify-content-around">
-                        <img src={jiffy} alt="jiffy" style={{width:300}} />
+                        <img src={jiffy} alt="jiffy" style={{ width: 300 }} />
                     </div>
                 </Col>
                 <Col lg={12} md={24} sm={24} className="froms" style={{ overflow: 'auto', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -169,12 +244,13 @@ class User_Login extends React.Component {
                                             inputStyle={{ height: '46px' }}
                                             country={'ke'}
                                             mask={{ in: '..........' }}
-                                            onKeyDown={(event)=>{
-                                                if(event.keyCode == 13){
+                                            onKeyDown={(event) => {
+                                                if (event.keyCode === 13) {
                                                     this.get_otp();
                                                 }
                                             }}
                                             onChange={(value, data, event) => {
+                                                console.log("render -> data", data)
                                                 this.setState({
                                                     m_no:value.replace(/[^0-9]+/g, '').slice(data.dialCode.length),
                                                     country_code: data.dialCode,
@@ -243,7 +319,7 @@ class User_Login extends React.Component {
                                     <Form.Item label="Password">
                                         {form.getFieldDecorator("password", {
                                             rules: this.state.email_login ? [{ required: true }] : []
-                                        })(<Input.Password placeholder="Password" className="input_border border_less" onPressEnter={this.check_otp}/>)}
+                                        })(<Input.Password placeholder="Password" className="input_border border_less" onPressEnter={this.check_otp} />)}
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -271,24 +347,31 @@ class User_Login extends React.Component {
                             </Col>
                             <Row>
                                 <Col className="" lg={24}>
-                                    <Form.Item label="Full Name">
-                                        {form.getFieldDecorator("name", {
+                                    <Form.Item label="First Name">
+                                        {form.getFieldDecorator("frist_name", {
                                             rules: this.state.register ? [{ required: true }] : []
-                                        })(<Input  className="input_border" />)}
+                                        })(<Input className="input_border" />)}
+                                    </Form.Item>
+                                </Col>
+                                <Col className="" lg={24}>
+                                    <Form.Item label="Last Name">
+                                        {form.getFieldDecorator("last_name", {
+                                            rules: this.state.register ? [{ required: true }] : []
+                                        })(<Input className="input_border" />)}
                                     </Form.Item>
                                 </Col>
                                 <Col className="" lg={24}>
                                     <Form.Item label="Email">
                                         {form.getFieldDecorator("email", {
                                             rules: this.state.register ? [{ required: true }] : []
-                                        })(<Input  className="input_border" />)}
+                                        })(<Input className="input_border" />)}
                                     </Form.Item>
                                 </Col>
                                 <Col className="" lg={24}>
                                     <Form.Item label="Password">
                                         {form.getFieldDecorator("password", {
                                             rules: this.state.register ? [{ required: true }] : []
-                                        })(<Input.Password  className="input_border" />)}
+                                        })(<Input.Password className="input_border" />)}
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -305,7 +388,21 @@ class User_Login extends React.Component {
                             </Col>
                         </Row>
                     </div>
-
+                    <div className={this.state.choose_registration ? "w-75 mw-450" : " d-none"}>
+                        <Suspense fallback={<Skeleton />}>
+                            <ChooseRegistration change_from_type={this.change_from_type}></ChooseRegistration>
+                        </Suspense>
+                    </div>
+                    <div className={this.state.company_registration_detail ? "w-75 mw-450" : " d-none"}>
+                        <Suspense fallback={<Skeleton />}>
+                            <CompanyRegistrationDetail change_from_type={this.change_from_type} submitFromData={this.submitFromData}></CompanyRegistrationDetail>
+                        </Suspense>
+                    </div>
+                    <div className={this.state.company_worker_detail ? "w-75 mw-450" : " d-none"}>
+                        <Suspense fallback={<Skeleton />}>
+                            <CompanyWorkerDetail change_from_type={this.change_from_type} submitFromData={this.submitFromData}></CompanyWorkerDetail>
+                        </Suspense>
+                    </div>
                 </Col>
             </Row>
         );

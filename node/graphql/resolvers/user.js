@@ -1,14 +1,13 @@
 const model = require('../../model_data');
-const nodemailer = require("nodemailer");
 const moment = require('moment');
 var ObjectId = require('mongodb').ObjectID;
 const { createWriteStream, existsSync, mkdirSync, fs } = require("fs");
+var Jimp = require('jimp');
 const path = require("path");
-const express = require("express");
 const _ = require("lodash");
 var commonHelper = require('../commonHelper');
+var CommonFunction = require('../CommonFunction');
 var saf = require('../safaricom');
-var CronJob = require('cron').CronJob;
 const dotenv = require('dotenv');
 var getDistanceBetweenPoints = require('get-distance-between-points');
 dotenv.config();
@@ -19,6 +18,9 @@ var Status_model = model.status;
 var Detail_model = model.detail;
 var Booking_model = model.booking;
 var Address_model = model.address;
+var Company_model = model.company;
+var CompanyImage_model = model.company_images;
+var CompanyProvider_model = model.companyProvider;
 module.exports.testmail = async (parent, args, context, info) => {
     return {
         msg: "test"
@@ -27,7 +29,20 @@ module.exports.testmail = async (parent, args, context, info) => {
 
 module.exports.testinfmail = async (parent, args, context, info) => {
     try {
-        let data = await saf.safaricom_ctob_register();
+        // let data = await saf.safaricom_ctob_register();
+        let data ={
+            currency_code:'EUR',
+            convert_code:'INR',
+            amount:"500"
+        }
+    //    let result = await CommonFunction.currency_calculation(data)
+    //    console.log("module.exports.testinfmail -> result", result)
+        // let user_detail ={
+        //     country_code:91,
+        //     phone_no:9894177165
+        // }
+        // await commonHelper.send_sms(user_detail.country_code, user_detail.phone_no, "scheduled_job", {})
+
         // let data = await saf.safaricom_lipesa_simulate('254705924459',"20");
         // let data =  await saf.safaricom_ctob_simulate('254705924459',"20")
         // console.log("module.exports.testinfmail -> data", data)
@@ -38,7 +53,7 @@ module.exports.testinfmail = async (parent, args, context, info) => {
 
         // let chargePayment = await commonHelper.send_sms("254","705924459","otp",{otp:9213})
         // console.log("module.exports.testinfmail -> chargePayment", chargePayment)
-        return { msg: "success test api" };
+        return {price:"500"};
     } catch (error) {
         // console.log("module.exports.testinfmail -> error", error)
         return { msg: error.msg };
@@ -57,6 +72,14 @@ module.exports.user = async (parent, args, context, info) => {
     }
     return result;
 };
+
+// find user (based on data)
+module.exports.delete_all_user = async (parent, args, context, info) => {
+
+    await Detail_model.remove({});
+    return {status:"false",msg:"ops"};
+};
+
 
 module.exports.confirm_email = async (parent, args, context, info) => {
     var data = args;
@@ -479,26 +502,38 @@ module.exports.resend_otp = async (_, args) => {
 };
 
 // check otp from user
-module.exports.checkOtp = async (_, args) => {
+module.exports.checkOtp = async (parent, args) => {
     var result = await Detail_model.findOne({ _id: args._id, otp: args.otp });
     const otp_verified = await Detail_model.find({ _id: args._id, otp: args.otp });
     // console.log(otp_verified);
     if (otp_verified.length == 1) {
-        const check_user = await Detail_model.find({ _id: args._id });
-        if (check_user[0].Upload_percentage == 25) {
-            let message = { pending_status: 1, msg: "new user", status: "success" };
-            result = { ...result._doc, ...message };
+        if (result['user_type'] === "company") {
+            let message = { pending_status: 0, company_register_status: 0 }
+            message['msg'] = "OTP verified";
+            message['status'] = "success";
+            let pre_company_result = await Company_model.findOne({ user_id: args._id }).lean()
+            message['company_id'] = pre_company_result['_id']
+            if (pre_company_result && _.size(pre_company_result) && !pre_company_result['company_name']) {
+                message['company_register_status'] = 1
+            } else if (pre_company_result && _.size(pre_company_result)) {
+                let pre_address_result = await Address_model.findOne({ company_id: pre_company_result._id }).lean()
+                if (!pre_address_result || !_.size(pre_address_result)) {
+                    message['company_register_status'] = 2
+                }
+            }
+            return { ...result._doc, ...message };
         } else {
             let message = {}
-            if (check_user[0].provider_subCategoryID.length == 0 && check_user[0].role == 2 && check_user[0].Upload_percentage == 50) {
+            if (result.provider_subCategoryID.length == 0 && result.role == 2 && result.Upload_percentage == 50) {
                 message = { pending_status: 5, msg: " category not upload", status: "success" };
-            } else if (check_user[0].role == 2 && check_user[0].Upload_percentage == 50 && (check_user[0].personal_document == undefined || check_user[0].personal_document == '')) {
+            } else if (result.role == 2 && result.Upload_percentage == 50 && (result.personal_document == undefined || result.personal_document == '')) {
                 message = { pending_status: 6, msg: "personal_document not upload", status: "success" };
-            } else if (check_user[0].role == 2 && check_user[0].Upload_percentage == 50 && (check_user[0].professional_document == undefined || check_user[0].personal_document == '')) {
+            } else if (result.role == 2 && result.Upload_percentage == 50 && (result.professional_document == undefined || result.personal_document == '')) {
                 message = { pending_status: 7, msg: "professional_document not upload", status: "success" };
             } else { message = { pending_status: 0, msg: "OTP verified", status: "success" } };
             result = { ...result._doc, ...message };
         }
+
     } else {
         //console.log("please check the data");
         let message = { msg: "Wrong OTP", status: 'failed' };
@@ -575,12 +610,12 @@ module.exports.kilometer = async (parent, args, context, info) => {
             result = await Booking_model.findOne({ _id: parent._id });
 
             if (!_.size(result) || !result.location.coordinates[1] || !result.location.coordinates[0] || !args.lat || !args.lng) {
-                console.log("module.exports.kilometer -> error", "size zero")
+                // console.log("module.exports.kilometer -> error", "size zero")
                 return { kilometre: 0 };
             }
 
             if (args.lat == result.location.coordinates[1] && args.lng == result.location.coordinates[0]) {
-                console.log("module.exports.kilometer -> error", "zero")
+                // console.log("module.exports.kilometer -> error", "zero")
                 return { kilometre: 0 };
             }
             var distanceInMeters = getDistanceBetweenPoints.getDistanceBetweenPoints(
@@ -645,8 +680,25 @@ module.exports.user_address = async (parent, args, context, info) => {
 
 
 module.exports.user_search = async (parent, args, context, info) => {
-    // console.log(args)
-    return await Detail_model.find(args.data);
+    let find_data = {}
+    if (args.data && _.size(args.data)) {
+        find_data = args.data
+        return await Detail_model.find(find_data);
+    } else {
+        if (args.email) {
+            find_data['email'] = { "$regex": `.*${args.email}.*`, "$options": "i" }
+        }else{
+            return []
+        }
+        if (args.role) {
+            find_data['role'] = args.role
+        }
+        if (args.type) {
+            find_data['type'] = args.type
+        }
+        return await Detail_model.find(find_data);
+    }
+ 
 }
 
 module.exports.forget_password = async (parent, args, context, info) => {
@@ -665,6 +717,111 @@ module.exports.check_demo_app = async (parent, args, context, info) => {
         return { msg: "demo account still now", status: 'failed' };
     }
 }
+
+module.exports.get_company_detail = async (parent, args, context, info) => {
+    try {
+        var limit = args.limit || 10;
+        var page = args.page || 1;
+        var offset = Number(page - 1) * Number(limit);
+        var total = 0;
+        var result = [];
+        let find_query = { delete: false }
+        if (args['search']) {
+            find_query = { ...find_query, ...args['search'] }
+        }
+        if (args['company_id']) {
+            find_query['_id'] = args['company_id']
+        }
+        total = await Company_model.count(find_query);
+        result = await Company_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
+        var pageInfo = { totalDocs: total, page: args.page }
+        return { data: result, pageInfo };
+    } catch (error) {
+        return []
+    }
+};
+
+module.exports.get_company_provider = async (parent, args, context, info) => {
+    try {
+        var limit = args.limit || 10;
+        var page = args.page || 1;
+        var offset = Number(page - 1) * Number(limit);
+        var total = 0;
+        var result = [];
+        let find_query = { delete: false }
+        if (args['search']) {
+            find_query = { ...find_query, ...args['search'] }
+        }
+        if (args['provider_id']) {
+            find_query['provider_id'] = args['provider_id']
+        }
+        total = await CompanyProvider_model.count(find_query);
+        result = await CompanyProvider_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
+        var pageInfo = { totalDocs: total, page: args.page }
+        // console.log("module.exports.get_company_detail -> pageInfo", pageInfo)
+        return { data: result, pageInfo };
+    } catch (error) {
+        return []
+    }
+};
+
+module.exports.get_parent_company_provider = async (parent, args, context, info) => {
+    try {
+        let find_query = { delete: false }
+        if (args['provider_search']) {
+            find_query = { ...find_query, ...args['provider_search'] }
+        }
+        if (args['provider_id']) {
+            find_query['provider_id'] = args['provider_id']
+        }
+        if (args['company_id']) {
+            find_query['company_id'] = args['company_id']
+        }
+        result = await CompanyProvider_model.find(find_query);
+        return result;
+    } catch (error) {
+        return []
+    }
+};
+
+module.exports.get_company_address_detail = async (parent, args, context, info) => {
+    try {
+        let find_query = {}
+        if (args['company_id']) {
+            find_query['company_id'] = args['company_id']
+        }
+        if (args['option']) {
+            find_query['option'] = args['option']
+        }
+        if (args['type']) {
+            find_query['type'] = args['type']
+        }
+        console.log("module.exports.get_company_address_detail -> find_query", find_query)
+        result = await Address_model.find(find_query);
+        return result;
+    } catch (error) {
+        return []
+    }
+};
+module.exports.get_company_images = async (parent, args, context, info) => {
+    try {
+        let find_query = {}
+        if (args['company_id']) {
+            find_query['company_id'] = args['company_id']
+        }
+        if (args['option']) {
+            find_query['option'] = args['option']
+        }
+        if (args['image_tag']) {
+            find_query['image_tag'] = args['image_tag']
+        }
+        console.log("module.exports.get_company_images -> find_query", find_query)
+        result = await CompanyImage_model.find(find_query);
+        return result;
+    } catch (error) {
+        return []
+    }
+};
 
 
 exports.addUser = async (parent, args) => {
@@ -822,5 +979,186 @@ exports.addUser = async (parent, args) => {
             status: "failed"
         }
     }
+}
 
+module.exports.deleteCompany = async (parent, args, context, info) => {
+    try {
+        let company_query = {}
+        let company_pro_query = {}
+        if (args['company_id']) {
+            company_query['_id'] = args['company_id']
+            company_pro_query['company_id'] = args['company_id']
+        }
+        await Company_model.updateOne(company_query, { delete: true }).exec();
+        await CompanyProvider_model.updateOne(company_pro_query, { delete: true }).exec();
+        return { status: "success", msg: "Deleted success" };
+    } catch (error) {
+        return { status: "failed", msg: "Deleted failed" };
+    }
+};
+
+module.exports.deleteCompanyProvider = async (parent, args, context, info) => {
+    try {
+        let find_query = {}
+        if (args['provider_id']) {
+            find_query['provider_id'] = args['provider_id']
+        }
+        if (args['company_id']) {
+            find_query['company_id'] = args['company_id']
+        }
+        if (args['_id']) {
+            find_query['_id'] = args['_id']
+        }
+        await CompanyProvider_model.updateOne(find_query, { delete: true }).exec();
+        return { status: "success", msg: "Deleted success" };
+    } catch (error) {
+        return { status: "failed", msg: "Deleted failed" };
+    }
+};
+
+
+module.exports.CompanyFileUpload = async (parent, args, context, info) => {
+    try {
+        console.log("module.exports.CompanyFileUpload -> args", args)
+        if (!args['_id']) {
+            return { msg: "Invalid ID", status: "failed" }
+        }
+        if (args['file']) {
+            const { createReadStream, filename } = await args['file'];
+            var file_name = `${args['_id']}_${moment().valueOf()}_${filename}`;
+            var small_file_name = `${args['_id']}_${moment().valueOf()}_${filename}_small.jpg`;
+            await new Promise(res =>
+                createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/company", file_name))).on("close", res)
+            );
+            args['image'] = file_name;
+            var file_resize = await Jimp.read(path.join(__dirname, "../../images/company", file_name))
+                .then(image => {
+                    image.resize(260, Jimp.AUTO)
+                        .quality(30)
+                        .write(path.join(__dirname, "../../images/company", small_file_name));
+                })
+                .catch(err => {
+                });
+
+            /**
+             * @info add company info after file update 
+             */
+            let img_data = {
+                company_id: args['_id'],
+                small_image: small_file_name,
+                large_image: file_name,
+                image_tag: args['option'],
+                doc_category: "Approvals",
+            }
+            let add_company_image_job = new CompanyImage_model(img_data)
+            let added_company_image_job = await add_company_image_job.save()
+            added_company_image_job['status'] = "success";
+            added_company_image_job['msg'] = "company profiles added success"
+            // return added_company_image_job
+        }
+        return { status: "success", msg: "File upload success" }
+    } catch (error) {
+        return { status: "failed", msg: "File upload failed" }
+    }
+}
+
+module.exports.update_company_detail = async (parent, args, context, info) => {
+    try {
+        let company_data = args['company_data'][0]
+        console.log("module.exports.update_company_detail -> company_data", company_data)
+        if (!_.size(company_data)) {
+            return { msg: "Invalid company data", status: 'failed' };
+        }
+        if (args['_id']) {
+            let find_query = { _id: args['_id'] }
+            if (company_data['provider_email'] && _.size(company_data['provider_email'])) {
+                let CompanyProviderDetail = await this.SendCompanyProviders(args['_id'], company_data['provider_email'])
+            }
+            let update_company_detail = await Company_model.updateOne(find_query, company_data).exec()
+            let fetch_data = await Company_model.findOne(find_query).lean()
+            fetch_data['msg'] = "updated success"
+            fetch_data['status'] = "success"
+            return fetch_data;
+        } else {
+            let add_company_detail = new Company_model(company_data)
+            let added_detail = await add_company_detail.save()
+            if (company_data['provider_email'] && _.size(company_data['provider_email'])) {
+                let CompanyProviderDetail = await this.SendCompanyProviders(added_detail['_id'], company_data['provider_email'])
+            }
+            added_detail['msg'] = "updated success"
+            added_detail['status'] = "success"
+            return added_detail;
+        }
+    } catch (error) {
+        console.error("module.exports.update_company_detail -> error", error);
+        let error_msg = "Update failed"
+        return { msg: error_msg, status: 'failed' };
+    }
+}
+
+exports.SendCompanyProviders = (company_id, emails) => {
+    try {
+        _.forEach(emails, async emailData => {
+            let find_query = {
+                email: _.trim(emailData),
+                company_id: company_id,
+                delete: false,
+            }
+            let update_query = {
+                email: _.trim(emailData),
+                company_id: company_id,
+                register_link_status: "Pending",
+                register_status: "Pending",
+            }
+            let fetch_data = await CompanyProvider_model.findOne(find_query).lean()
+            if (_.size(fetch_data)) {
+                console.log("already send register link in this email in same company")
+            } else {
+                console.log("new send register link in this email")
+                let add_email = new CompanyProvider_model(update_query)
+                let added_detail = await add_email.save()
+                let link = `${process.env.APP_URL}/company_user_accepted?sid=${added_detail['_id']}`
+                await commonHelper.send_mail_sendgrid(emailData, "new_company_register", { link });
+            }
+        })
+        return true
+    } catch (error) {
+        return false
+    }
+}
+
+module.exports.confrimation_company_worker = async (data) => {
+    try {
+        let { sid } = data
+        let link = '/provider_login'
+        let error_link = '/ops'
+        let find_query = { _id: sid }
+        let update_query = { register_link_status: "accepted" }
+        let fetch_provider = await CompanyProvider_model.findOne(find_query).lean()
+        let fetch_provider_by_email = await CompanyProvider_model.findOne({
+            register_link_status: "accepted",
+            register_status: "success",
+            email: fetch_provider['email'],
+            delete: false
+        }).lean()
+        if (fetch_provider_by_email && _.size(fetch_provider_by_email)) {
+            return { status: "failed", msg: "This email already registered to another company", link: error_link }
+        }
+        if (fetch_provider && _.size(fetch_provider)) {
+            let detail_find_query = {
+                email: fetch_provider['email'],
+                role: 2
+            }
+            let fetch_pro_detail = await Detail_model.findOne(detail_find_query).lean()
+            if (fetch_pro_detail && _.size(fetch_pro_detail)) {
+                update_query['provider_id'] = fetch_pro_detail['_id']
+                update_query['register_status'] = "success"
+            }
+        }
+        let update_email_data = await CompanyProvider_model.updateOne(find_query, update_query).exec()
+        return { status: "success", msg: "User acepted", link }
+    } catch (error) {
+        let error_link = '/ops'
+        return { status: "failed", msg: "User acepted failed", link: error_link }
+    }
 }

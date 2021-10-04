@@ -1,18 +1,13 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
-
-
-import {
-  Layout,
-  Row,
-  Button,
-  Col,
-  Avatar,
-  Menu,
-  Icon,
-  Dropdown,
-  Skeleton,
-} from "antd";
+import Layout from 'antd/lib/layout';
+import Row from 'antd/lib/row';
+import Col from 'antd/lib/col';
+import Button from 'antd/lib/button';
+import Avatar from 'antd/lib/avatar';
+import Icon from 'antd/lib/icon';
+import Menu from 'antd/lib/menu';
+import Dropdown from 'antd/lib/dropdown';
 import main from "../../../image/Gigzzy.png";
 import useReactRouter from "use-react-router";
 import { GET_SETTING } from "../../../graphql/Admin/static";
@@ -162,7 +157,8 @@ const UserHeader = () => {
               height="75"
               width="120"
               alt={"Jiffy"}
-              className="object_fit cursor_point"
+              className="object_fit cursor_point lazyload"
+              loading="lazy" 
               onClick={() => {
                 history.push("/");
               }}

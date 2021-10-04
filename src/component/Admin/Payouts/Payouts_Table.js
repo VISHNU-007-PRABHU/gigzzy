@@ -3,6 +3,7 @@ import { Table, Form, Icon, Row, Col, Modal, Collapse, Button, Tag } from 'antd'
 import { GET_PAYOUT_DETAIL, GET_ALL_PAYOUT, ADMIN_TO_PROVIDER } from '../../../graphql/Admin/booking';
 import { client } from "../../../apollo";
 import { Alert_msg } from '../../Comman/alert_msg';
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 const { Panel } = Collapse;
 
 const EmailSearch = React.lazy(() => import('../User/EmailSearch'));
@@ -105,7 +106,7 @@ class PayoutsTable extends React.Component {
 
     onFilter = async (data) => {
         console.log(Object.keys(data)[0]);
-        if (data[Object.keys(data)[0]] == '') {
+        if (data[Object.keys(data)[0]] === '') {
             delete this.state.input_data[Object.keys(data)[0]];
             var data_pass = this.state.input_data;
             this.setState({ input_data: data_pass })
@@ -151,15 +152,14 @@ class PayoutsTable extends React.Component {
                 title: 'Action',
                 dataIndex: 'operation',
                 key: "provider_opertaion",
+                className: RoleViewFunction('view_payout') ? '' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
-                        <span title="...." className="d-flex d-sm-inline justify-content-around">
-                            <span className='cursor_point' onClick={() => { this.payout_detail(record._id, record?.total_amount) }}><Icon type="eye" theme="twoTone" twoToneColor="#52c41a" className='f_25' /></span>
-                            {/* <span href="#" onClick={() => this.find_booking(record._id)}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span> */}
-                            {/* <Popconfirm title="Sure to delete because may be under some more sub_category ?" onConfirm={() => this.delete_booking(record.key)}>
-                                <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
-                            </Popconfirm> */}
-                        </span>
+                        <RoleView permission="view_payout">
+                            <span title="...." className="d-flex d-sm-inline justify-content-around">
+                                <span className='cursor_point' onClick={() => { this.payout_detail(record._id, record?.total_amount) }}><Icon type="eye" theme="twoTone" twoToneColor="#52c41a" className='f_25' /></span>
+                            </span>
+                        </RoleView>
 
                     ) : null,
             },
@@ -167,13 +167,6 @@ class PayoutsTable extends React.Component {
         const { dataSource } = this.state;
         return (
             <React.Fragment>
-                <>
-                    {/* <Row className="py-3">
-                        <Col span={24}>
-                            <RangePicker onChange={this.date_filter} />
-                        </Col>
-                    </Row> */}
-                </>
                 <>
                     <Modal
                         title="basic Payout details (all)"
@@ -190,7 +183,7 @@ class PayoutsTable extends React.Component {
                                             <Icon className="px-3" type="bank" />
                                             Bank Details
                                         </div>
-                                        <Tag visible={this.state.provider_data[0]?.booking_provider[0]?.payout_option == "mpesa" ? true : false} color="green">Provider Preferred</Tag>
+                                        <Tag visible={this.state.provider_data[0]?.booking_provider[0]?.payout_option === "mpesa" ? true : false} color="green">Provider Preferred</Tag>
                                     </div>
                                 </>
                             } key="1">
@@ -233,7 +226,7 @@ class PayoutsTable extends React.Component {
                                         <Icon className="px-3" type="bank" />
                                         Mpesa Details
                                     </div>
-                                    <Tag visible={this.state.provider_data[0]?.booking_provider[0]?.payout_option == "bank" ? true : false} color="green">Provider Preferred</Tag>
+                                    <Tag visible={this.state.provider_data[0]?.booking_provider[0]?.payout_option === "bank" ? true : false} color="green">Provider Preferred</Tag>
                                 </div>} key="2">
                                 <Row>
                                     <Col span={24}>
@@ -286,7 +279,9 @@ class PayoutsTable extends React.Component {
                                         <div>
                                             <div className="d-flex justify-content-center">Total</div>
                                             <div className="d-flex justify-content-center m-4 bold">{this.state.provider_total}</div>
-                                            <Button className="d-flex mx-auto" type="primary" onClick={this.payout_to_provider}>Done Payment</Button>
+                                            <RoleView permission="approve_payout">
+                                                <Button className="d-flex mx-auto" type="primary" onClick={this.payout_to_provider}>Done Payment</Button>
+                                            </RoleView>
 
                                             {/* <Button className="d-flex mx-auto" type="primary" onClick={this.payout_to_provider(this.state.provider_data[0]?this.state.provider_data[0]._id:"")}>Done Payment</Button> */}
                                         </div>

@@ -23,9 +23,13 @@ var detailSchema = new Schema({
 
   role: { type: Number, },             // 1->user, 2->provider
   name: { type: String, },
+  first_name:{ type: String,},
+  last_name:{ type: String },
+  user_type:{ type: String },
   password: { type: String, },
   email: { type: String, },
   country_code: { type: String, },
+  location_code:{ type: String, },
   phone_no: { type: String, },
   address: { type: String, },
   location: {

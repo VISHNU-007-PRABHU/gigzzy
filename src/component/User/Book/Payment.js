@@ -101,7 +101,7 @@ class _CardForm extends Component {
                                 country={'ke'}
                                 mask={{ in: '..........' }}
                                 onKeyDown={(event) => {
-                                    if (event.keyCode == 13) {
+                                    if (event.keyCode === 13) {
                                         this.handleSubmit();
                                     }
                                 }}

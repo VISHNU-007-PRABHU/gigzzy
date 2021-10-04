@@ -5,10 +5,9 @@ import { GET_SUBCATEGORY, UPDATE_SUBCATEGORY, DELETE_SUBCATEGORY } from '../../.
 import { client } from "../../../apollo";
 import { Alert_msg } from '../../Comman/alert_msg';
 import '../../../scss/template.scss';
-
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 const SearchCategory = React.lazy(() => import('../User/SearchCategory'));
 const SearchSubcategory = React.lazy(() => import('../User/SearchSubcategory'));
-
 class EditableTable extends React.Component {
     constructor(props) {
         super(props);
@@ -72,7 +71,7 @@ class EditableTable extends React.Component {
         await client.mutate({
             mutation: UPDATE_SUBCATEGORY,
             variables: data,
-            refetchQueries: [{ query:GET_SUBCATEGORY}],
+            refetchQueries: [{ query: GET_SUBCATEGORY }],
             awaitRefetchQueries: true,
         }).then((result, loading, error) => {
             Alert_msg(result.data.updatesubCategory.info);
@@ -95,7 +94,7 @@ class EditableTable extends React.Component {
 
     onFilter = async (data) => {
         console.log(Object.keys(data)[0]);
-        if (data[Object.keys(data)[0]] == '') {
+        if (data[Object.keys(data)[0]] === '') {
             delete this.state.input_data[Object.keys(data)[0]];
             var data_pass = this.state.input_data;
             this.setState({ input_data: data_pass })
@@ -222,13 +221,18 @@ class EditableTable extends React.Component {
                 title: 'Action',
                 width: '7%',
                 dataIndex: 'operation',
+                className: RoleViewFunction('edit_subcatgeory') || RoleViewFunction('delete_subcatgeory') ? '' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
                         <span title="...." className="d-flex d-sm-inline justify-content-around">
-                            <span className="cursor-point" onClick={() => { this.props.history.push(`/admin-add-subcategory/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
-                            <Popconfirm title="Sure to delete because may be under some more bookings ?" onConfirm={() => this.handleDelete(record._id)}>
-                                <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
-                            </Popconfirm>
+                            <RoleView permission="edit_subcatgeory">
+                                <span className="cursor-point" onClick={() => { this.props.history.push(`/admin-add-subcategory/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
+                            </RoleView>
+                            <RoleView permission="delete_subcatgeory">
+                                <Popconfirm title="Sure to delete because may be under some more bookings ?" onConfirm={() => this.handleDelete(record._id)}>
+                                    <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
+                                </Popconfirm>
+                            </RoleView>
                         </span>
                     ) : null,
             },
@@ -237,13 +241,13 @@ class EditableTable extends React.Component {
 
         return (
             <div>
-                <div className='my-3'>
-                    <Button type="primary" onClick={() => { this.props.history.push('/admin-add-subcategory'); }}>
-                        Add Sub Category
-                    </Button>
-                </div>
-
-
+                <RoleView permission="add_subcatgeory">
+                    <div className='my-3'>
+                        <Button type="primary" onClick={() => { this.props.history.push('/admin-add-subcategory'); }}>
+                            Add Sub Category
+                        </Button>
+                    </div>
+                </RoleView>
                 <div id="no-more-tables">
                     <Table
                         rowClassName={() => 'editable-row'}

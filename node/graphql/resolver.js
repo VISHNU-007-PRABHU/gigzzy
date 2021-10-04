@@ -17,12 +17,17 @@ var certificateResolver = require('./resolvers/certificate');
 var staticResolver = require('./resolvers/static');
 var currencyResolver = require('./resolvers/currency');
 var settingResolver = require('./resolvers/setting');
+var rolesResolver = require('./resolvers/roles');
+var contractResolver = require('./resolvers/contract');
+var currencyResolver = require('./resolvers/currency');
+var bidingResolver = require('./resolvers/biding');
 const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
 const payment_choose = require('./payment/choose')
 dotenv.config();
 
+var Company_model = model.company;
 var Detail_model = model.detail;
 var Booking_model = model.booking;
 var subCategory_model = model.sub_category;
@@ -51,8 +56,8 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([TEST_MSG]),
                 (payload, variables) => {
-                    // console.log("Message created");
-                    // console.log(payload);
+                    console.log("Message created");
+                    console.log(payload);
                     // console.log(variables);
                     return true;
                 })
@@ -72,7 +77,6 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([PROOF_STATUS]),
                 (payload, variables) => {
-                    // console.log(payload);
                     if (payload.proof_status._id == variables._id) {
                         return true;
                     }
@@ -83,8 +87,6 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([MESSAGE_CREATED]),
                 (payload, variables) => {
-                    // console.log(payload.messageSent.booking_id);
-                    // console.log(variables);
                     if (payload.messageSent.booking_id == variables.booking_id) {
                         return true;
                     }
@@ -95,11 +97,7 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([APPOINTMENTS]),
                 (payload, variables) => {
-                    // console.log("Appointment MSG");
-                    // console.log(payload.get_my_appointments);
-                    // console.log(variables);
                     for (let i = 0; i <= payload.get_my_appointments.length; i++) {
-                        //console.log("()()()()()()()()()");
                         if (payload.get_my_appointments[i].provider_id == variables._id) {
                             if (variables.booking_status === 10) {
                                 return true;
@@ -113,9 +111,6 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([SEND_ACCEPT_MSG]),
                 (payload, variables) => {
-                    // console.log("Accepted MSG");
-                    // console.log(payload);
-                    // console.log(payload.send_accept_msg.user_id);
                     if (payload.send_accept_msg.msg_status != undefined && payload.send_accept_msg.msg_status == 'to_provider') {
                         if (payload.send_accept_msg.provider_id == variables._id) {
                             console.log("msg to provider");
@@ -136,21 +131,8 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([SEND_JOB_MSG]),
                 (payload, variables) => {
-                    //console.log("sada");
                     for (let i = 0; i <= payload.send_jobs_provider.available_provider.length; i++) {
-                        // console.log("()()()()()()()()()");
                         if (payload.send_jobs_provider.available_provider[i] == variables._id) {
-                            // console.log("send successfull");
-                            // var message = { 
-                            //     to: 'registration_token', 
-                            //     collapse_key: 'your_collapse_key',
-                            //     notification: {
-                            //         title: 'Title of your push notification', 
-                            //         body: 'Body of your push notification' 
-                            //     },
-
-                            // };
-                            // commonHelper.push_notifiy(message);
                             return true;
                         }
                     }
@@ -160,10 +142,6 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([BOOK_MSG]),
                 (payload, variables) => {
-                    // console.log("Soory MSG");
-                    //console.log(payload);
-                    //console.log(payload.booking_details._id);
-                    //console.log(variables);
                     if (payload.booking_details._id == variables.booking_id) {
                         return true;
                     }
@@ -176,6 +154,7 @@ const resolvers = {
 
     Query: {
         testmail: userResolver.testinfmail,
+        delete_all_user:userResolver.delete_all_user,
         // get data using pagination  
         get_user: userResolver.get_user,
         user_search: userResolver.user_search,
@@ -204,9 +183,23 @@ const resolvers = {
         site_setting_detail: settingResolver.site_setting_detail,
         payout_setting_detail: settingResolver.payout_setting_detail,
         user_address: userResolver.user_address,
-        get_currencys: currencyResolver.get_currencys,
-        get_currency: currencyResolver.get_currency,
-        GetCategoryCurrency: categoryResolver.GetCategoryCurrency,
+        // admin roles and permission
+        get_admin_users: rolesResolver.get_admin_users,
+        get_admin_roles: rolesResolver.get_admin_roles,
+        get_admin_permission: rolesResolver.get_admin_permission,
+        get_all_admin_permission: rolesResolver.get_all_admin_permission,
+        admin_search: rolesResolver.admin_search,
+        roles_search: rolesResolver.roles_search,
+        // company detail
+        get_company_detail: userResolver.get_company_detail,
+        get_contract_files:contractResolver.get_contract_files,
+        get_contracts:contractResolver.get_contracts,
+        get_contracts_pagination:contractResolver.get_contracts_pagination,
+        get_contract_all_files:contractResolver.get_contract_all_files,
+        get_currencys:currencyResolver.get_currencys,
+        get_currency:currencyResolver.get_currency,
+        get_biding_pagination:bidingResolver.get_biding_pagination,
+        GetCategoryCurrency:categoryResolver.GetCategoryCurrency,
         get_my_appointments: async (parent, args, context, info) => {
             try {
 
@@ -269,6 +262,20 @@ const resolvers = {
         user: userResolver.user,
         provider: userResolver.user
     },
+    Admin: {
+        role_based_permissions_detail: rolesResolver.role_based_permissions_detail,
+        individual_based_permissions_detail: rolesResolver.individual_based_permissions_detail,
+        admin_role_detail: rolesResolver.admin_role_detail,
+        non_role_permissions_detail: rolesResolver.non_role_permissions_detail,
+        get_admin_roles_all: rolesResolver.get_admin_roles_all,
+        full_permission_list: rolesResolver.full_permission_list,
+    },
+    Roles: {
+        role_based_permissions_detail: rolesResolver.role_table_based_permissions_detail,
+    },
+    Biding:{
+        get_user: userResolver.available_booking_user,
+    },
     Category: {
         booking_parent_category: categoryResolver.booking_parent_category,
         sub_category: categoryResolver.subcategory,
@@ -279,9 +286,9 @@ const resolvers = {
     subCategory: {
         category: categoryResolver.subcategory_category,
         Certificate: certificateResolver.certificate,  //display certificate  based on category
-        get_parent_currency: currencyResolver.get_parent_currency,
-        GetCategoryCurrency: categoryResolver.GetCategoryCurrency,
-        ParentCategoryCurrency: categoryResolver.ParentCategoryCurrency,
+        get_parent_currency:currencyResolver.get_parent_currency,
+        GetCategoryCurrency:categoryResolver.GetCategoryCurrency,
+        ParentCategoryCurrency:categoryResolver.ParentCategoryCurrency,
     },
 
     User: {
@@ -294,10 +301,25 @@ const resolvers = {
         category: categoryResolver.category,
         provider_rating: userResolver.provider_rating,
         provider_rate: userResolver.provider_rate,
-        get_currency: currencyResolver.get_currency,
+        get_currency:currencyResolver.get_currency,
 
     },
-
+    Company: {
+        get_parent_company_provider: userResolver.get_parent_company_provider,
+        get_company_address_detail: userResolver.get_company_address_detail,
+        get_company_images: userResolver.get_company_images,
+        get_company_user_detail: userResolver.available_booking_user,
+    },
+    ContractJob:{
+        get_contract_files:contractResolver.get_contract_files,
+        get_contract_category:categoryResolver.available_booking_category,
+        get_contract_all_files:contractResolver.get_contract_all_files,
+        biding_count:bidingResolver.biding_count,
+    },
+    CompanyImage:{
+        get_contract_files:contractResolver.get_contract_files,
+        get_contract_all_files:contractResolver.get_contract_all_files,
+    },
     Booking: {
         user: userResolver.user,
         booking_provider: userResolver.available_booking_povider,
@@ -320,10 +342,20 @@ const resolvers = {
 
     Mutation: {
         adminLogin: adminResolver.adminlogin,
-        update_currency: currencyResolver.update_currency,
-        delete_currency: currencyResolver.delete_currency,
-        UpdateCategoryCurrency: categoryResolver.UpdateCategoryCurrency,
-        DeleteCategoryCurrency: categoryResolver.DeleteCategoryCurrency,
+        // contract job
+        update_contract: contractResolver.update_contract,
+        update_currency:currencyResolver.update_currency,
+        delete_currency:currencyResolver.delete_currency,
+        ContractJobFileUpload: contractResolver.ContractJobFileUpload,
+        DeleteContractJobFile: contractResolver.DeleteContractJobFile,
+        update_biding:bidingResolver.update_biding,
+        // company detiail
+        UpdateCategoryCurrency:categoryResolver.UpdateCategoryCurrency,
+        DeleteCategoryCurrency:categoryResolver.DeleteCategoryCurrency,
+        update_company_detail: userResolver.update_company_detail,
+        CompanyFileUpload: userResolver.CompanyFileUpload,
+        deleteCompany: userResolver.deleteCompany,
+        deleteCompanyProvider: userResolver.deleteCompanyProvider,
         addUser:userResolver.addUser,
         reset_password: userResolver.reset_password,
         admin_add_user: userResolver.admin_add_user,
@@ -1146,6 +1178,15 @@ const resolvers = {
         add_static: staticResolver.add_static,
         update_static: staticResolver.update_static,
 
+        // ------------------admin roles functions.......................//
+        add_admin_permission: rolesResolver.add_admin_permission,
+        delete_admin_permission: rolesResolver.delete_admin_permission,
+        delete_admin_roles: rolesResolver.delete_admin_roles,
+        delete_admin_user: rolesResolver.delete_admin_user,
+        add_admin_roles: rolesResolver.add_admin_roles,
+        update_admin_roles: rolesResolver.update_admin_roles,
+        update_admin_user_permission: rolesResolver.update_admin_user_permission,
+        // ---------------- admin roles function ........................//
         online_status: statusResolver.online_status,
         available_deleteBooking: bookingResolver.available_deleteBooking,
         addRating: bookingResolver.addRating,

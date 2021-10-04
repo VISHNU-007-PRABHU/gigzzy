@@ -1,19 +1,21 @@
-import React, { Suspense } from "react";
+import React from "react";
 import 'antd/dist/antd.css';
 import PhoneInput from 'react-phone-input-2';
-import { Tooltip, Modal, Layout, Icon, Form, Input, Row, Col, Upload, message, Skeleton } from 'antd';
+import Modal from 'antd/lib/modal';
+import Tooltip from 'antd/lib/tooltip';
+import Upload from 'antd/lib/upload';
+import Icon from 'antd/lib/icon';
+import Form from 'antd/lib/form';
+import Input from 'antd/lib/index';
+import message from 'antd/lib/message';
+import Row from 'antd/lib/row';
+import Col from 'antd/lib/col';
 import '../../../scss/user.scss';
-
 import { ADD_USER, USERS, UPDATE_IMG } from '../../../graphql/User/login';
 import { client } from "../../../apollo";
 import { Alert_msg } from "../../Comman/alert_msg";
 import Address from "../Book/Address";
 import { GoChevronRight } from "react-icons/go";
-const { Content } = Layout;
-
-const UserHeader = React.lazy(() => import('../Layout/UserHeader'));
-const UserFooter = React.lazy(() => import('../Layout/UserFooter'));
-
 class Profile extends React.Component {
     constructor(props) {
         super(props);
@@ -104,8 +106,6 @@ class Profile extends React.Component {
             });
         }
     };
-
-
     update_user_detail = async () => {
         const { form } = this.props;
         form.validateFields(async (err, values) => {
@@ -293,14 +293,14 @@ class Profile extends React.Component {
                                                         <Form.Item label="New Password">
                                                             {form.getFieldDecorator("new_password", {
                                                                 rules: this.state.pwd ? [{ required: true, message: "Enter New Password" }] : []
-                                                            })(<Input.Password className="input_border text-indent-zero" />)}
+                                                            })(<Input className="input_border text-indent-zero" />)}
                                                         </Form.Item>
                                                     </Col>
                                                     <Col className="" lg={24}>
                                                         <Form.Item label="Confirm Password">
                                                             {form.getFieldDecorator("old_password", {
                                                                 rules: this.state.pwd ? [{ required: true, message: "Enter Confirm Password" }] : []
-                                                            })(<Input.Password className="input_border text-indent-zero" />)}
+                                                            })(<Input className="input_border text-indent-zero" />)}
                                                         </Form.Item>
                                                     </Col>
                                                 </Row>

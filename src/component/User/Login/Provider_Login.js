@@ -168,7 +168,7 @@ class Provider_Login extends React.Component {
                                             country={'ke'}
                                             // defaultCountry={I}
                                             onKeyDown={(event)=>{
-                                                if(event.keyCode == 13){
+                                                if(event.keyCode === 13){
                                                     this.get_otp();
                                                 }
                                             }}

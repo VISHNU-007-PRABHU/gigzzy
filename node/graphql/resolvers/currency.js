@@ -83,7 +83,6 @@ module.exports.get_parent_currency = async (root, args) => {
         if (root['currency_id']) {
             match['_id'] = ObjectId(root['currency_id'])
         }
-
         const currency = await Currency_model.findOne(match).lean()
         return currency
     } catch (error) {

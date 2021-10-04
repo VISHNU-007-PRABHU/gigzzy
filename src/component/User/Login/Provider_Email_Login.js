@@ -2,7 +2,6 @@ import React from "react";
 import 'antd/dist/antd.css';
 import { Button, Row, Col, Typography, Form, Input } from 'antd';
 import jiffy from '../../../image/Gigzzy.png';
-import main from '../../../image/main.png';
 import '../../../scss/user.scss';
 import { EMAIL_LOGIN } from '../../../graphql/User/login';
 import { client } from "../../../apollo";

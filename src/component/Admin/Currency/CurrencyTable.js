@@ -5,6 +5,7 @@ import { GET_CURRENCY_PAGINATION, DELETE_CURRENCY } from '../../../graphql/Admin
 import { client } from "../../../apollo";
 import { Alert_msg } from '../../Comman/alert_msg';
 import size from 'lodash/size';
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 const { Panel } = Collapse;
 
 const CommonSearch = React.lazy(() => import('../User/CommonSearch'));
@@ -168,16 +169,20 @@ class CurrencyTable extends React.Component {
             {
                 title: 'Action',
                 dataIndex: 'operation',
-                className:'d-flex',
+                className: RoleViewFunction('view_currency') ? 'd-flex' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
                         <>
-                            <span onClick={() => { this.props.history.push(`/admin-currency/add/${record._id}`); }} title="...." className="d-flex d-sm-inline justify-content-around">
-                                <span className='cursor_point'><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='f_25' /></span>
-                            </span>
-                            <Popconfirm title="Sure to delete this currency ?" onConfirm={() => this.delete_booking(record._id)}>
-                                <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25 px-3' />
-                            </Popconfirm>
+                            <RoleView permission="view_currency">
+                                <span onClick={() => { this.props.history.push(`/admin-currency/add/${record._id}`); }} title="...." className="d-flex d-sm-inline justify-content-around">
+                                    <span className='cursor_point'><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='f_25' /></span>
+                                </span>
+                            </RoleView>
+                            <RoleView permission="view_currency">
+                                <Popconfirm title="Sure to delete this currency ?" onConfirm={() => this.delete_booking(record._id)}>
+                                    <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25 px-3' />
+                                </Popconfirm>
+                            </RoleView>
                         </>
                     ) : null,
             },

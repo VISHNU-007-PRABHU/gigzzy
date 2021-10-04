@@ -1,13 +1,12 @@
-import React,{Suspense} from "react";
+import React, { Suspense } from "react";
 import { withRouter } from "react-router";
 import { Table, Icon, Tag } from 'antd';
 import { GET_BOOKING } from '../../../graphql/Admin/booking';
 import { client } from "../../../apollo";
 import Search from "antd/lib/input/Search";
-
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 const EmailSearch = React.lazy(() => import('../User/EmailSearch'));
 const DateSearch = React.lazy(() => import('../User/DateSearch'));
-const SearchCategory = React.lazy(() => import('../User/SearchCategory'));
 const SearchSubcategory = React.lazy(() => import('../User/SearchSubcategory'));
 
 class CompletedTable extends React.Component {
@@ -35,13 +34,13 @@ class CompletedTable extends React.Component {
     }
 
     componentDidMount() {
-        this.fetch_booking({limit: this.state.pagination.pageSize, page: this.state.pagination.current, booking_status: [14]});
+        this.fetch_booking({ limit: this.state.pagination.pageSize, page: this.state.pagination.current, booking_status: [14] });
     }
     handleTableChange = pagination => {
         const pager = { ...pagination };
         pager.current = pagination.current;
         this.setState({ loading: true });
-        var input = { ...this.state.input_data, limit: pager.pageSize, page: pager.current, booking_status: [14]}
+        var input = { ...this.state.input_data, limit: pager.pageSize, page: pager.current, booking_status: [14] }
         client.query({
             query: GET_BOOKING,
             variables: input,
@@ -72,15 +71,15 @@ class CompletedTable extends React.Component {
 
     onFilter = async (data) => {
         console.log(Object.keys(data)[0]);
-        if (data[Object.keys(data)[0]] == '') {
+        if (data[Object.keys(data)[0]] === '') {
             delete this.state.input_data[Object.keys(data)[0]];
             var data_pass = this.state.input_data;
-            this.setState({ input_data: data_pass})
-            this.fetch_booking({...data_pass,limit: 10, page: 1,booking_status: [14] });
+            this.setState({ input_data: data_pass })
+            this.fetch_booking({ ...data_pass, limit: 10, page: 1, booking_status: [14] });
         } else {
             this.setState({ input_data: { ...this.state.input_data, ...data } });
             var input_data = { ...this.state.input_data, ...data };
-            this.fetch_booking({...input_data,limit: 10, page: 1,booking_status: [14]});
+            this.fetch_booking({ ...input_data, limit: 10, page: 1, booking_status: [14] });
         }
     }
 
@@ -88,7 +87,7 @@ class CompletedTable extends React.Component {
         if (data.target.value) {
             this.fetch_booking({ booking_ref: { $regex: '.*' + data.target.value + '.*', $options: 'i' }, limit: 10, page: 1 });
         } else {
-            this.fetch_booking({ limit: 10, page: 1,booking_status: [14]});
+            this.fetch_booking({ limit: 10, page: 1, booking_status: [14] });
         }
     }
 
@@ -216,11 +215,11 @@ class CompletedTable extends React.Component {
                     // booking==12,provider_cancel==8,provider_accept==9,user_accept==10,user_cancel==11,end==13,complete=14, 
                     if (record.booking_status === 14) {
                         return <span title="Status"> <Tag color="cyan">Completed</Tag> </span>;
-                    }else if (record.booking_status === 13) {
+                    } else if (record.booking_status === 13) {
                         return <span title="Status"> <Tag color="cyan">End</Tag> </span>;
                     } else if (record.booking_status === 10) {
                         return <span title="Status"> <Tag color="cyan">User Accept</Tag> </span>;
-                    }else if (record.booking_status === 8) {
+                    } else if (record.booking_status === 8) {
                         return <span title="Status"> <Tag color="cyan">Provider Cancel</Tag> </span>;
                     } else if (record.booking_status === 11) {
                         return <span title="Status"> <Tag color="cyan">User Cancel</Tag> </span>;
@@ -230,10 +229,13 @@ class CompletedTable extends React.Component {
             {
                 title: 'Action',
                 dataIndex: 'operation',
+                className: RoleViewFunction('view_booking_detail') ? '' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
                         <span title="...." className="d-flex d-sm-inline justify-content-around">
-                            <span className='cursor_point' onClick={() => { this.props.history.push({ pathname: '/admin-booking-detail', state: { _id: record._id } }) }}><Icon type="eye" theme="twoTone" twoToneColor="#52c41a" className='f_25' /></span>
+                            <RoleView permission="view_booking_detail">
+                                <span className='cursor_point' onClick={() => { this.props.history.push({ pathname: '/admin-booking-detail', state: { _id: record._id } }) }}><Icon type="eye" theme="twoTone" twoToneColor="#52c41a" className='f_25' /></span>
+                            </RoleView>
                             {/* <span href="#" onClick={() => this.find_booking(record._id)}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span> */}
                             {/* <Popconfirm title="Sure to delete because may be under some more sub_category ?" onConfirm={() => this.delete_booking(record.key)}>
                                 <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />

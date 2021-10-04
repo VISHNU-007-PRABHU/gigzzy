@@ -4,6 +4,7 @@ import '../../../scss/template.scss';
 import AdminSider from '../Layout/AdminSider';
 import AdminHeader from '../Layout/AdminHeader';
 import { Tabs, Button } from 'antd';
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 import Layout from 'antd/es/layout';
 import CurrencyTable from "./CurrencyTable";
 
@@ -29,9 +30,11 @@ class Currency extends React.Component {
                     <AdminHeader />
                     <Content className="main_frame">
                         <Tabs tabBarExtraContent={
-                            <Button type="primary" onClick={() => { this.props.history.push('/admin-currency/add'); }}>
-                                Add Currency
-                            </Button>
+                            <RoleView permission="">
+                                <Button type="primary" onClick={() => { this.props.history.push('/admin-currency/add'); }}>
+                                    Add Currency
+                                </Button>
+                            </RoleView>
                         }>
                             <TabPane tab="Currency" key="1">
                                 <CurrencyTable />

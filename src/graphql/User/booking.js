@@ -171,6 +171,25 @@ mutation AcceptJobMutation($role: Int
   }
 }`
 
+
+export const MY_CONTRACT_APPOINTMENTS = gql`
+    query MY_CONTRACT_APPOINTMENTS($user_id:ID,$role:Int,$limit:Int,$page:Int){
+      get_contracts_pagination(user_id:$user_id,role:$role,limit:$limit,page:$page){
+        pageInfo{
+          totalDocs
+          page
+        }
+        data{
+          _id
+          name
+          contract_ref
+          budget
+          # created_at
+        }
+    }
+}`
+
+
 export const My_APPOINTMENTS = gql`
 query My_appointments($_id : ID,$role : Int,$booking_status : Int,$limit:Int,$page:Int)
 {

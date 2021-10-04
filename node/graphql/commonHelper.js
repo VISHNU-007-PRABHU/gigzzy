@@ -11,7 +11,7 @@ const senderAddress = process.env.senderAddress;
 const smtpUsername = process.env.smtpUsername;
 const smtpPassword = process.env.smtpPassword;
 const SMS_SENDERID = process.env.AFRICASTALKING_SENDERID;
-var serverKey =process.env.PUSHNOTIFICATION_KEY;
+var serverKey = process.env.PUSHNOTIFICATION_KEY;
 var fcm = new FCM(serverKey);
 const env = process.env;
 const africa = require("africastalking")({
@@ -39,9 +39,23 @@ module.exports.completed = 3;
 module.exports.chat = 4;
 module.exports.booking_view = 5;
 
-module.exports.no_image = () => {
-  return env.APP_URL + "/images/public/no_img.png";
+module.exports.no_image = (file = "normal") => {
+  if (file === "pdf") {
+    return env.APP_URL + "/images/public/pdf.jpeg";
+  } else {
+    return env.APP_URL + "/images/public/no_img.png";
+  }
 };
+
+
+exports.url_path = (path, file) => {
+  if (file) {
+    return `${this.getBaseurl()}/images/${path}/${file}`;
+  } else {
+    return this.no_image();
+  }
+}
+
 module.exports.siteName = () => {
   return env.APP_NAME;
 };
@@ -118,19 +132,34 @@ module.exports.send_sms = async (country_code, phone_no, type, data) => {
   try {
     let message = await static_sms_template(type, data)
     let phone_number = `${country_code}${phone_no}`
-    const options = {
-      to: `+${phone_number}`,
-      message: message,
-      from: SMS_SENDERID
+
+    if (process.env.SMS_GATEWAY && process.env.SMS_GATEWAY === "africastalking") {
+      let options = {
+        to: `+${phone_number}`,
+        message: message,
+        from: SMS_SENDERID
+      }
+      sms.send(options)
+        .then((suc) => {
+          console.log("send sms ==>", suc['SMSMessageData']['Recipients']);
+        })
+        .catch((err) => {
+          console.log("error sms ===>", err);
+        });
+      return true
+    } else if (process.env.SMS_GATEWAY && process.env.SMS_GATEWAY === "twillo") {
+      const accountSid = process.env.TWILIO_ACCOUNT_SID;
+      const authToken = process.env.TWILIO_AUTH_TOKEN;
+      const client = require('twilio')(accountSid, authToken);
+      let options = {
+        to: `+${phone_number}`,
+        body: message,
+        from: process.env.TWILIO_ACCOUNT_FROM_NO
+      }
+      let smsResult = await client.messages.create(options)
+      // console.log("module.exports.send_sms -> smsResult", smsResult)
+      // .then(message => console.log(message.sid, "twillo"));
     }
-    sms.send(options)
-      .then((suc) => {
-        console.log("send sms ==>",suc['SMSMessageData']['Recipients']);
-      })
-      .catch((err) => {
-        console.log("error sms ===>", err);
-      });
-    return true
   } catch (error) {
     return false
   }
@@ -181,6 +210,12 @@ const static_mail_template = (type, data) => {
         text: "Your reset password link",
         html: `<b>${link}</b>`
       }
+    case "new_company_register":
+      return {
+        subject: "GIGZZY PRO✔",
+        text: "Please accept your company request through  below the link",
+        html: `<b>${link}</b>`
+      }
     default:
       return {
         subject: "GIGZZY ✔",
@@ -203,7 +238,7 @@ module.exports.send_mail_sendgrid = async (email, type, datas) => {
     let data = await sgMail.send(mail_msg);
     return true
   } catch (error) {
-    console.log("module.exports.send_mail_sendgrid -> error", error)
+    console.log("module.exports.send_mail_sendgrid -> error", error.response.body)
     return false
   }
 }

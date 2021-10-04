@@ -1,5 +1,5 @@
 import React from 'react'
-import { Layout, Form, Input, Button, message, Typography, Row, Col, Checkbox } from 'antd';
+import { Layout, Form, Input, Button, message, Typography, Row, Col } from 'antd';
 import { ADD_USER, FIND_USER, UPDATE_USER } from '../../../graphql/Admin/user';
 
 import PlacesAutocomplete, {

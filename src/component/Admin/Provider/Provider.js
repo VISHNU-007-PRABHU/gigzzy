@@ -6,8 +6,9 @@ import '../../../scss/template.scss';
 import AdminSider from '../Layout/AdminSider';
 import AdminHeader from '../Layout/AdminHeader';
 import ProviderComponent from './Provider_Table';
-import { Layout, Tabs,Button } from 'antd';
+import { Layout, Tabs, Button } from 'antd';
 import PendingProvider from "./PendingProvider";
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 const { Content } = Layout;
 const { TabPane } = Tabs;
 class Provider extends React.Component {
@@ -32,12 +33,14 @@ class Provider extends React.Component {
                     <AdminHeader />
                     <Content className="main_frame ">
                         <Tabs tabBarExtraContent={
-                            <Button type="primary" onClick={() => { this.props.history.push('/admin-provider/add'); }}>
-                                Add Provider
-                            </Button>
+                            <RoleView permission="add_provider">
+                                <Button type="primary" onClick={() => { this.props.history.push('/admin-provider/add'); }}>
+                                    Add Provider
+                                </Button>
+                            </RoleView>
                         }>
                             <TabPane tab="Pending Provider" key="1">
-                                <PendingProvider/>
+                                <PendingProvider />
                             </TabPane>
                             <TabPane tab="Approved Provider" key="2">
                                 <ProviderComponent />

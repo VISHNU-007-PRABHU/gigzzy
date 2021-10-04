@@ -89,8 +89,71 @@ query USEREMAILQUERY($data:JSON) {
         proof_status
         phone_no
         name
+        role
+    }
+}
+`;
+
+export const GET_COMPANY = gql`
+ query GETCOMPANY($limit: Int,$page:Int,$search:JSON,$company_id:ID,$provider_search:JSON) {
+    get_company_detail(limit:$limit,page:$page,search:$search,company_id:$company_id) {
+        pageInfo{
+            totalDocs
+            page
+        }
+        data{
+            _id
+            user_id
+            company_name
+            company_website
+            about_company
+            company_category
+            get_company_user_detail {
+                first_name
+                last_name
+                role
+            }
+            get_company_address_detail(company_id:$company_id) {
+                address
+                lat
+                lng
+            }
+            get_parent_company_provider(provider_search:$provider_search,company_id:$company_id) {
+                email
+                created_at
+                provider_id
+                register_status
+                register_link_status
+                _id
+            }
+        }
     }
 }
 `;
 
 
+
+export const UPDATE_COMPANY_DETAIL = gql`
+    mutation UPDATECOMPANYDETAIL($_id: ID,$company_data:JSON,$logo_file:Upload,$profile_file:Upload)  {
+        update_company_detail(_id:$_id,company_data:$company_data,logo_file:$logo_file,profile_file:$profile_file){
+        msg
+        status         
+    }
+}`
+
+export const DELETE_COMPANY = gql`
+    mutation DELETECOMPANY($company_id: ID)  {
+        deleteCompany(company_id:$company_id){
+        msg
+        status         
+    }
+}`
+
+
+export const DELETE_COMPANY_PROVIDER = gql`
+    mutation DELETECOMPANYPROVIDER($_id:ID,$company_id: ID)  {
+        deleteCompanyProvider(_id:$_id,company_id:$company_id){
+        msg
+        status         
+    }
+}`

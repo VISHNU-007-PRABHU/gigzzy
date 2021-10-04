@@ -9,6 +9,7 @@ import '../../../scss/template.scss';
 import '../../../scss/Category.scss';
 import { Alert_msg } from '../../Comman/alert_msg';
 import size from 'lodash/size'
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 const { Content } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
