@@ -6,7 +6,7 @@ var ObjectId = require('mongodb').ObjectID;
 var CronJob = require('cron').CronJob;
 var commonHelper = require('../commonHelper');
 var Biding_model = model.Biding;
-
+var BidingImage_model =model.BidingImage;
 
 module.exports.get_biding_pagination = async (root, args) => {
     console.log(args);
@@ -72,36 +72,93 @@ module.exports.get_biding_milestone_detail = async (root, args) => {
     return {};
 }
 
-exports.BidingFileUpload = (id, files) => {
-    _.forEach(files, file => {
-        if (file) {
-            // const { createReadStream, filename } = await args.file;
-            // var file_name = `${id}_${moment().unix()}_${filename}`;
-            // await new Promise(res =>
-            //     createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/biding", file_name))).on("close", res)
-            // );
-            // args['image'] = file_name;
-            // var file_resize = await Jimp.read(path.join(__dirname, "../../images/biding", file_name))
-            //     .then(image => {
-            //         image.resize(260, Jimp.AUTO)
-            //             .quality(30)
-            //             .write(path.join(__dirname, "../../images/biding", file_name + "_small.jpg"));
-            //     })
-            //     .catch(err => {
-            //     });
+
+
+exports.uploading_files = async (files, args) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            _.forEach(files, async (file, i) => {
+                if (file) {
+                    const { createReadStream, filename } = await file;
+                    var extension = filename.split('.').pop();
+                    var file_name = `${args['biding_id']}_${moment().valueOf()}_${filename}`;
+                    var small_file_name = `${args['biding_id']}_${moment().valueOf()}_${filename}_small.jpg`;
+                    await new Promise(res =>
+                        createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/biding", file_name))).on("close", res)
+                    );
+                    args['image'] = file_name;
+                    var file_resize = await Jimp.read(path.join(__dirname, "../../images/biding", file_name))
+                        .then(image => {
+                            image.resize(260, Jimp.AUTO)
+                                .quality(30)
+                                .write(path.join(__dirname, "../../images/biding", small_file_name));
+                        })
+                        .catch(err => {
+                        });
+
+                    /**
+                     * @info add biding info after file update
+                     */
+                    let img_data = {
+                        biding_id: args['biding_id'],
+                        small_image: small_file_name,
+                        large_image: file_name,
+                        // image_tag: args['image_tag'] || "",
+                        doc_type: extension || "",
+                        // doc_category: args['category'] || "others",
+                    }
+                    let add_biding_image_job = new BidingImage_model(img_data)
+                    await add_biding_image_job.save()
+                }
+                if (_.size(files) === i + 1) {
+                    return resolve(true)
+                }
+            })
+        } catch (error) {
+            reject(false)
         }
     })
 }
 
 
+exports.BidingFileUpload = (id, files) => {
+    try {
+        let files = args['file']
+        if (files && _.size(files)) {
+            let filesUpload = await this.uploading_files(files, args)
+            return { status: "success", msg: "File added success" }
+        } else {
+            let update_data = {
+                doc_category: "others",
+            }
+            if (args['category']) {
+                update_data['doc_category'] = args['category'];
+            }
+            if (args['image_tag']) {
+                update_data['image_tag'] = args['image_tag'];
+            }
+            let add_biding_image_job = await BidingImage_model.updateOne({ _id: args['_id'] }, update_data).exec()
+            return { status: "success", msg: "File update success" }
+        }
+    } catch (error) {
+        console.log("module.exports.BidingFileUpload -> error", error)
+        return { status: "failed", msg: "File upload failed" }
+    }
+}
+
 module.exports.update_biding = async (root, args) => {
     try {
+        let files = args['file']
         let biding_detail = args['biding_data'][0]
         if (args['_id']) {
             let find_query = {
                 _id: args["_id"]
             }
             let update_bid = await Biding_model.updateOne(find_query, biding_detail).exec()
+            if (files && _.size(files)) {
+                args['biding_id'] = args['_id']
+                let filesUpload = await this.uploading_files(files, args)
+            } 
             let fetch_bid = await Biding_model.findOne(find_query).lean()
             fetch_bid['status'] = "success";
             fetch_bid['msg'] = "Biding update success"
@@ -111,7 +168,10 @@ module.exports.update_biding = async (root, args) => {
             console.log("module.exports.update_biding -> biding_detail", biding_detail)
             let add_bid = new Biding_model(biding_detail)
             let added_bid = await add_bid.save()
-            console.log("module.exports.update_biding -> added_bid", added_bid)
+            if (files && _.size(files)) {
+                args['biding_id'] = added_bid['_id']
+                let filesUpload = await this.uploading_files(files, args)
+            } 
             added_bid['status'] = "success";
             added_bid['msg'] = "Biding added success"
             return added_bid
@@ -193,3 +253,52 @@ module.exports.delete_biding = async (root, args) => {
     }
 }
 
+module.exports.get_biding_files = async (root, args) => {
+    try {
+        let match = {
+            delete: false
+        }
+        if (args['biding_id']) {
+            match['biding_id'] = ObjectId(args['biding_id'])
+        }
+        let pipeline = [
+            {
+                $match: match
+            },
+            {
+                $group: {
+                    _id: "$doc_category",
+                    images: { $push: "$$ROOT" }
+                }
+            }
+        ]
+
+        let grouped_images = await BidingImage_model.aggregate(pipeline)
+        return grouped_images
+    } catch (error) {
+        console.log("module.exports.get_biding_files -> error", error)
+        return []
+    }
+}
+
+module.exports.get_biding_all_files = async (root, args) => {
+    try {
+        let match = {
+            delete: false
+        }
+        if (args['biding_id']) {
+            match['biding_id'] = ObjectId(args['biding_id'])
+        }
+        let pipeline = [
+            {
+                $match: match
+            },
+        ]
+
+        let grouped_images = await BidingImage_model.aggregate(pipeline)
+        return grouped_images
+    } catch (error) {
+        console.log("module.exports.get_biding_files -> error", error)
+        return []
+    }
+}

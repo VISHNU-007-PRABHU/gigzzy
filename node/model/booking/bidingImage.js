@@ -18,6 +18,7 @@ function url_path(data){
 }
 var bidingImageSchema = new Schema({
   contract_id: { type: mongoose.Schema.Types.ObjectId, ref: 'contract' },
+  biding_id: { type: mongoose.Schema.Types.ObjectId, ref: 'contract' },
   company_id: { type: mongoose.Schema.Types.ObjectId, ref: 'company' },
   small_image: { type: String, default: '',get:url_path  },
   large_image: { type: String, default: '',get:url_path  },
