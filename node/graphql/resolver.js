@@ -452,7 +452,7 @@ const resolvers = {
                 online: 1,
                 delete: 0,
                 proof_status: 1,
-                location: { $near: { $maxDistance: 10000, $geometry: { type: "Point", coordinates: [args.lng, args.lat] } } },
+                location: { $near: { $maxDistance: 50 * 1000, $geometry: { type: "Point", coordinates: [args.lng, args.lat] } } },
                 provider_subCategoryID: { $in: [args.category_id] },
             };
             let find_provider = await Detail_model.find(filter);
