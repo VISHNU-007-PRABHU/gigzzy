@@ -114,7 +114,7 @@ export const RESET_PwD = gql`
 `
 
 export const ADD_USER = gql`
-    mutation ADDUSER($_id:ID,$user_type:String,$option:String,$location_code:String,$phone_no:String,$role:Int,$location_code:String,$country_code:String,$email:String,$password:String,$first_name:String,$last_name:String,$lng:Float,$lat:Float,$provider_subCategoryID:[ID]){
+    mutation ADDUSER($_id:ID,$user_type:String,$option:String,$phone_no:String,$role:Int,$location_code:String,$country_code:String,$email:String,$password:String,$first_name:String,$last_name:String,$lng:Float,$lat:Float,$provider_subCategoryID:[ID]){
         addUser(_id:$_id,user_type:$user_type,option:$option,phone_no:$phone_no,role:$role,location_code:$location_code,country_code:$country_code,email:$email,password:$password,last_name:$last_name,first_name:$first_name,lng:$lng,lat:$lat,provider_subCategoryID:$provider_subCategoryID){
             msg
             otp

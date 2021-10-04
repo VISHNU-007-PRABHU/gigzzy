@@ -42,7 +42,6 @@ const CompanyWorkerAdmin = React.lazy(() => import('./component/Admin/Company/Co
 const ContractBooking = React.lazy(() => import('./component/User/Book/contract/ContractBooking'));
 const ContractUserDetail = React.lazy(() => import('./component/User/Book/contract/view/ContractUserDetail'));
 const User_Login = React.lazy(() => import('./component/User/Login/User_Login'));
-const Home_Page = React.lazy(() => import('./component/User/HomePage/Home_Page'));
 const HomePage = React.lazy(() => import('./component/User/HomePage/HomePage'));
 const Profile_Page = React.lazy(() => import('./component/User/Profile/Profile'));
 const Bookings_Page = React.lazy(() => import('./component/User/Book/Bookings'));
@@ -253,7 +252,6 @@ ReactDOM.render(
 
             <UnAuthRoute path="/admin-booking-invoice/:id" component={Invoice} exact />
             <UnAuthRoute exact path="/admin" component={LoginPage} />
-            <UnAuthRoute isHeader={true} isFooter={true} exact path="/old" component={Home_Page} />
             <UnAuthRoute isHeader={true} isFooter={true} exact path="/" component={HomePage} />
             <UnAuthRoute exact path="/login" component={User_Login} />
             <UnAuthRoute exact path="/Confrim_password/:id" component={ConfrimPassword} />

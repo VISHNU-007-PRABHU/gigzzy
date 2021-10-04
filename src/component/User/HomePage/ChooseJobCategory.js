@@ -14,10 +14,6 @@ const ChooseJobCategory = (props) => {
     const datas = useContext(HomeContext);
     console.log("ChooseJobCategory -> comman_data", datas)
     const { history } = useReactRouter();
-    // const value = useMemo(() => (
-    //     console.log("ChooseJobCategory -> comman_data", comman_data)
-    // ), [comman_data]);
-
     const gopage = (pagetype) => {
         console.log(props)
         if (pagetype === "contract") {
