@@ -31,6 +31,7 @@ var bidingSchema = new Schema({
   description: String,
   experience: String,
   no_of_people: String,
+  add_to_shortlist:Boolean,
 
   location: {
     type: { type: String },
@@ -51,6 +52,7 @@ var bidingSchema = new Schema({
   booking_alert: { type: Number, default: 0 },
   end_date: Date,
   accept_date: Date,
+  is_reject: { type: Boolean, default: false },
   is_delete: { type: Boolean, default: false },
   phone_number: { type: String, default: "" },
   user_msg_is_read: { type: Number, default: 0 },

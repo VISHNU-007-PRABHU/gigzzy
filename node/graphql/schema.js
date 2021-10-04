@@ -100,6 +100,7 @@ const typeDefs = gql`
         get_currencys(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,pagination:Boolean,page:Int,limit:Int):CurrencyConnection
         get_currency(_id:ID,country_code:String,location_code:String):Currency
         get_biding_pagination(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int,contract_id:ID):BidingConnection
+        get_biding_all_files(contract_id:ID):[CompanyImage]
         GetCategoryCurrency(pagination:Boolean,data:JSON,_id:ID,category_id:ID,country_code:String,country_id:ID):SubCategoryConnection
     }
 
@@ -392,6 +393,7 @@ const typeDefs = gql`
     type CompanyImage{
         _id:ID
         company_id: String,
+        biding_id:String,
         small_image: String  @imgUrl(format: "contract"),
         large_image: String  @imgUrl(format: "contract"),
         image_tag: String,
@@ -1014,10 +1016,12 @@ const typeDefs = gql`
             option:String  
             _id:ID
             user_id: String
-            provider_ID:ID
+            provider_id:ID
             company_id:ID
+            file:[Upload]
             biding_data:[JSON]
         ):Biding
+        BidingFileUpload(_id:ID,contract_id:ID,category:String,image_tag:String,data:[JSON],file:[Upload]):CompanyImage
 
         UpdateCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
         DeleteCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory

@@ -275,6 +275,7 @@ const resolvers = {
     },
     Biding:{
         get_user: userResolver.available_booking_user,
+        get_biding_all_files:bidingResolver.get_biding_all_files,
     },
     Category: {
         booking_parent_category: categoryResolver.booking_parent_category,
@@ -349,6 +350,7 @@ const resolvers = {
         ContractJobFileUpload: contractResolver.ContractJobFileUpload,
         DeleteContractJobFile: contractResolver.DeleteContractJobFile,
         update_biding:bidingResolver.update_biding,
+        BidingFileUpload:bidingResolver.BidingFileUpload,
         // company detiail
         UpdateCategoryCurrency:categoryResolver.UpdateCategoryCurrency,
         DeleteCategoryCurrency:categoryResolver.DeleteCategoryCurrency,
