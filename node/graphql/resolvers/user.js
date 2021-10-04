@@ -751,7 +751,7 @@ exports.addUser = async (parent, args) => {
                         };
                         await commonHelper.push_notifiy(message);
                         // ================= push_notifiy ================== //  
-                        var send_verification = await commonHelper.send_mail_sendgrid(user.email, "admin_approved", { msg });
+                        var send_verification = await commonHelper.send_mail_sendgrid(get_role.email, "admin_approved", { msg });
                         await commonHelper.send_sms(get_role.country_code, get_role.phone_no, "admin_apporved", {})
                         await global.pubsub.publish("PROOF_STATUS", { proof_status: 0, _id: args._id });
                         break;
