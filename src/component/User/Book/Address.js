@@ -165,8 +165,8 @@ const Address = (props) => {
         } else {
             updateTodo({ variables: data }).then(results => {
                 if (results.data.modified_address.status === 'success') {
-                    let url_value=['/profile', '/contract_booking','/login']
-                    if (!includes(url_value,location.pathname)) {
+                    let url_value=['/profile', '/contract_booking','/admin-company','/login']
+                    if (!includes(url_value,location.pathname.split('/')[1])) {
                         value.location_change(data);
                     }
                     Alert_msg({ msg: "Address saved", status: "success" });

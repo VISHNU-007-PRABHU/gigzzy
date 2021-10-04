@@ -6,6 +6,7 @@ import gql from 'graphql-tag';
 import { LocationContext, EditLocationContext } from '../../context/Location'
 import { Alert_msg } from "../../Comman/alert_msg";
 import size from 'lodash/size'
+import includes from 'lodash/includes'
 
 const GET_ADDRESS = gql`
 query ADDRESS($user_id: ID) {
@@ -113,8 +114,10 @@ const SetAddress = (props) => {
                                                                 <Skeleton avatar title={true} loading={item.loading} active>
                                                                     <List.Item.Meta
                                                                         onClick={() => {
-                                                                            if (location.pathname !== '/profile') {
-                                                                                value.location_change(item)
+                                                                            let url_value=['profile', 'contract_booking','admin-company']
+                                                                            console.log("location.pathname.split('/')[1])", location.pathname.split('/')[1])
+                                                                            if (!includes(url_value,location.pathname.split('/')[1])) {
+                                                                                value.location_change(data);
                                                                             }
                                                                         }}
                                                                         avatar={item.title === 'Work' ?

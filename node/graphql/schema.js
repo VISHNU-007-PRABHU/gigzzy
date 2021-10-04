@@ -290,6 +290,8 @@ const typeDefs = gql`
         experience:String
         no_of_people:String
         get_user:[Detail]
+        get_biding_all_files(contract_id:ID):[CompanyImage]
+        get_parent_company_provider(user_id:ID,provider_id:ID):CompanyProvider
     }
 
     type BidingImages{

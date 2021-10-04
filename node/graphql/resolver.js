@@ -276,6 +276,7 @@ const resolvers = {
     Biding:{
         get_user: userResolver.available_booking_user,
         get_biding_all_files:bidingResolver.get_biding_all_files,
+        get_parent_company_provider: userResolver.get_parent_company_provider,
     },
     Category: {
         booking_parent_category: categoryResolver.booking_parent_category,

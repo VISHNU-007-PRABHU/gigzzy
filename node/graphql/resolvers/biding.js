@@ -121,7 +121,7 @@ exports.uploading_files = async (files, args) => {
 }
 
 
-exports.BidingFileUpload = (id, files) => {
+exports.BidingFileUpload =async (id, files) => {
     try {
         let files = args['file']
         if (files && _.size(files)) {

@@ -30,13 +30,13 @@ module.exports.testmail = async (parent, args, context, info) => {
 module.exports.testinfmail = async (parent, args, context, info) => {
     try {
         // let data = await saf.safaricom_ctob_register();
-        let data ={
-            currency_code:'EUR',
-            convert_code:'INR',
-            amount:"500"
+        let data = {
+            currency_code: 'EUR',
+            convert_code: 'INR',
+            amount: "500"
         }
-    //    let result = await CommonFunction.currency_calculation(data)
-    //    console.log("module.exports.testinfmail -> result", result)
+        //    let result = await CommonFunction.currency_calculation(data)
+        //    console.log("module.exports.testinfmail -> result", result)
         // let user_detail ={
         //     country_code:91,
         //     phone_no:9894177165
@@ -53,7 +53,7 @@ module.exports.testinfmail = async (parent, args, context, info) => {
 
         // let chargePayment = await commonHelper.send_sms("254","705924459","otp",{otp:9213})
         // console.log("module.exports.testinfmail -> chargePayment", chargePayment)
-        return {price:"500"};
+        return { price: "500" };
     } catch (error) {
         // console.log("module.exports.testinfmail -> error", error)
         return { msg: error.msg };
@@ -77,7 +77,7 @@ module.exports.user = async (parent, args, context, info) => {
 module.exports.delete_all_user = async (parent, args, context, info) => {
 
     await Detail_model.remove({});
-    return {status:"false",msg:"ops"};
+    return { status: "false", msg: "ops" };
 };
 
 
@@ -687,7 +687,7 @@ module.exports.user_search = async (parent, args, context, info) => {
     } else {
         if (args.email) {
             find_data['email'] = { "$regex": `.*${args.email}.*`, "$options": "i" }
-        }else{
+        } else {
             return []
         }
         if (args.role) {
@@ -698,7 +698,7 @@ module.exports.user_search = async (parent, args, context, info) => {
         }
         return await Detail_model.find(find_data);
     }
- 
+
 }
 
 module.exports.forget_password = async (parent, args, context, info) => {
@@ -828,16 +828,16 @@ exports.addUser = async (parent, args) => {
     try {
         const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
         //add new user 
-        if(_.size(user) || args._id){
-            let comman_update ={}
-            if(args.location_code){
+        if (_.size(user) || args._id) {
+            let comman_update = {}
+            if (args.location_code) {
                 comman_update['location_code'] = args.location_code
             }
-            if(args.device_id){
+            if (args.device_id) {
                 comman_update['device_id'] = args.device_id
             }
-            let _id =  args._id || user[0]._id 
-            if(_.size(comman_update)){
+            let _id = args._id || user[0]._id
+            if (_.size(comman_update)) {
                 await Detail_model.updateOne({ _id }, comman_update);
             }
         }
@@ -932,7 +932,7 @@ exports.addUser = async (parent, args) => {
             const add_user = new Detail_model(args);
             await add_user.save();
             var data = await Detail_model.findOne({ role: args.role, phone_no: args.phone_no, delete: 0 });
-         
+
             await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp })
             data.msg = "New User";
             data.status = "success";
@@ -1082,6 +1082,17 @@ module.exports.update_company_detail = async (parent, args, context, info) => {
         } else {
             let add_company_detail = new Company_model(company_data)
             let added_detail = await add_company_detail.save()
+
+            let update_query = {
+                email: "",
+                provider_id: ObjectId(company_data['user_id']),
+                company_id: ObjectId(added_detail['_id']),
+                register_link_status: "accepted",
+                register_status: "success",
+                user_type:"Owner"
+            }
+            let defaul_user = new CompanyProvider_model(update_query)
+            await defaul_user.save()
             if (company_data['provider_email'] && _.size(company_data['provider_email'])) {
                 let CompanyProviderDetail = await this.SendCompanyProviders(added_detail['_id'], company_data['provider_email'])
             }
