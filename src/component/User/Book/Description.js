@@ -384,7 +384,7 @@ class Description extends React.Component {
         let tag = document.getElementById('ee').outerHTML;
         tag = tag.replace(tag_change, this.state.str);
         const description = htmlToText.fromString(tag.toString(), { wordwrap: 130 });
-        if (localStorage.getItem("userLogin") === "success") {
+        if (localStorage.getItem("userLogin") === "success" && localStorage.getItem('currency') && localStorage.getItem('currency') !== "undefind") {
             this.setState({ loading: 1 });
             await client.mutate({
                 mutation: ADD_BOOKING,
