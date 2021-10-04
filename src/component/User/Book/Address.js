@@ -74,22 +74,21 @@ const Address = (props) => {
     const skip = () => { setadd(false) }
     const handleChange1 = address => { setaddress(address); };
     const handleSelect = address => {
+        console.log("skip -> address", address)
         setaddress(address);
         geocodeByAddress(address)
-            .then(results => {
+            .then(async results => {
                 if (results[0]) {
                     results[0].address_components.map(data => {
                         if (data.types.includes("country")) {
                             set_country_code(data.short_name)
                         }
                     })
+                    let latLng = await getLatLng(results[0])
+                    setlat(latLng.lat);
+                    setlng(latLng.lng);
+                    setcenter([latLng.lat, latLng.lng])
                 }
-                getLatLng(results[0])
-            })
-            .then(latLng => {
-                setlat(latLng.lat);
-                setlng(latLng.lng);
-                setcenter([latLng.lat, latLng.lng])
             })
             .catch(error => console.error('Error', error));
     };
@@ -139,7 +138,7 @@ const Address = (props) => {
             address: address,
             lat: String(lat),
             lng: String(lng),
-            location_code:country_code
+            location_code: country_code
         };
         console.log(data)
         if (data.lat === null || data.lat === '' || data.lng === '' || data.lng === null || data.address === '' || data.address === null || data.user_id === '' || data.user_id === null || data.title === '' || data.title === null) {
@@ -169,7 +168,7 @@ const Address = (props) => {
             address: address,
             lat: String(lat),
             lng: String(lng),
-            location_code:country_code
+            location_code: country_code
         };
         console.log(data)
         if (data.lat !== null && data.lat !== '' && data.lng !== '' && data.lng !== null && data.address !== '' && data.address !== null && data._id !== '' && data._id !== null && data.title !== '' && data.title !== null) {
