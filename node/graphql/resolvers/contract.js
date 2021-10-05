@@ -187,7 +187,13 @@ module.exports.get_contract_all_files = async (root, args) => {
         ]
 
         let grouped_images = await ContractJobImage_model.aggregate(pipeline)
-        return grouped_images
+        if(_.size(grouped_images)){
+            return grouped_images
+        }else{
+            return [{
+                small_image:commonHelper.no_image()
+            }]
+        }
     } catch (error) {
         console.log("module.exports.get_contract_files -> error", error)
         return []
