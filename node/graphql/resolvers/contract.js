@@ -11,6 +11,7 @@ var subCategory_model = model.sub_category;
 var Detail_model = model.detail;
 var ContractJob_model = model.contract_job;
 var ContractJobImage_model = model.contract_job_images;
+var Address_model = model.address
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 const path = require("path");
 var fs = require('fs');
@@ -262,6 +263,20 @@ module.exports.get_contracts = async (root, args) => {
     }
 }
 
+
+module.exports.get_contract_address_detail = async (parent, args, context, info) => {
+    try {
+        let find_query = {}
+        if (root['address_id']) {
+            find_query['_id'] = root['address_id']
+        }
+        console.log("module.exports.get_contract_address_detail -> find_query", find_query)
+       let result = await Address_model.findOne(find_query);
+        return result;
+    } catch (error) {
+        return {}
+    }
+};
 /**
  * @info 'add contract job detail's
  * @info global.pubsub.publish('TEST_MSG', { test: { info: { message: "sd", status: "ok" } } });

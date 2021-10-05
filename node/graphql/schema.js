@@ -367,6 +367,7 @@ const typeDefs = gql`
         get_contract_files(contract_id:ID):[CompanyImage]
         get_contract_all_files(contract_id:ID,limit:Int):[CompanyImage]
         get_company_root_detail(root:Boolean):Company
+        get_contract_address_detail(root:Boolean):UserAddress
         get_user:[Detail]
         currency_code:String
         location_code:String

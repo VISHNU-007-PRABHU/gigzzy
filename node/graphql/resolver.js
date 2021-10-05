@@ -324,6 +324,7 @@ const resolvers = {
         get_contract_category: categoryResolver.available_booking_category,
         get_contract_all_files: contractResolver.get_contract_all_files,
         biding_count: bidingResolver.biding_count,
+        get_contract_address_detail:contractResolver.get_contract_address_detail,
     },
     CompanyImage: {
         get_contract_files: contractResolver.get_contract_files,
