@@ -14,6 +14,9 @@ import size from 'lodash/size'
 import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 import Table from 'antd/es/table'
 import Address from "../../User/Book/Address";
+import SetAddress from '../../User/Book/SetAddress'
+import { LocationContext } from '../../context/Location'
+
 const { Content } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
@@ -23,8 +26,8 @@ class Add_Company extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            user_id:"",
-            visibleAddress:false,
+            user_id: "",
+            visibleAddress: false,
             modalVisible: false,
             dataSource: [],
             loading: false,
@@ -48,18 +51,19 @@ class Add_Company extends React.Component {
             emails: [],
             company_provider: [],
             visible: false,
-            company_address: []
+            company_address: [],
+            address_id: '',
         };
 
     }
     componentDidMount() {
         const { form } = this.props;
         let data = localStorage.getItem('hokjighsasd')
-        if(data){
-          this.setState({user_id:JSON.parse(window.atob(data))._id})
+        if (data) {
+            this.setState({ user_id: JSON.parse(window.atob(data))._id })
         }
         form.resetFields();
-        if (this.props.match.params.id !== undefined) {
+        if (this.props.match.params.company_id !== undefined) {
             this.fetch_find_company();
         }
     }
@@ -67,7 +71,7 @@ class Add_Company extends React.Component {
     fetch_find_company = async () => {
         await client.query({
             query: GET_COMPANY,
-            variables: { company_id: this.props.match.params.id },
+            variables: { company_id: this.props.match.params.company_id },
             fetchPolicy: 'no-cache',
         }).then(result => {
             console.log(result);
@@ -153,6 +157,12 @@ class Add_Company extends React.Component {
         }
     };
 
+    on_location_change = (data) => {
+        if (data) {
+            this.setState({ address_id: data.user_address[0]._id, visibleAddress: false })
+        }
+    }
+
     update_company = () => {
         const { form, history } = this.props;
         form.validateFields(async (err, values) => {
@@ -167,16 +177,19 @@ class Add_Company extends React.Component {
                 if (values['company_category']) {
                     company_data['company_category'] = values['company_category']
                 }
-                
+
                 if (values['company_website']) {
                     company_data['company_website'] = values['company_website']
                 }
                 if (values['provider_email'] && values['provider_email'].length) {
                     company_data['provider_email'] = values['provider_email']
                 }
+                if (this.props.match.params.user_id) {
+                    company_data['user_id'] = this.props.match.params.user_id
+                }
                 let update_data = {}
-                if (this.props.match.params.id) {
-                    update_data['_id'] = this.props.match.params.id
+                if (this.props.match.params.company_id) {
+                    update_data['_id'] = this.props.match.params.company_id
                 }
                 if (size(company_data)) {
                     update_data['company_data'] = [company_data]
@@ -211,9 +224,10 @@ class Add_Company extends React.Component {
     goPage = (page, id) => {
         if (page === "profile") {
             let user_url = `/admin-user/add/`
-            if(this.state.update_data.user_id){
-                user_url = `/admin-user/add/${this.state.update_data.user_id}`
+            if (this.props.match.params.user_id) {
+                user_url = `/admin-user/add/${this.props.match.params.user_id}`
             }
+
             this.props.history.push(user_url)
         }
     }
@@ -325,10 +339,17 @@ class Add_Company extends React.Component {
 
                                             </Col>
                                         </Row>
-                                        <Card onClick={()=>{this.setState({visibleAddress:true})}}>
-                                            Address
-                                        </Card>
-                                        <Address user_id={""} visible={this.state.visibleAddress}/>
+
+                                        <LocationContext.Provider value={{
+                                            location_change: this.on_location_change,
+                                        }}>
+                                            <Card onClick={() => { this.setState({ visibleAddress: true }) }}>
+                                                Address
+                                                {this.state.address_id}
+                                            </Card>
+                                            <SetAddress user_id={this.state.user_id} address_id={this.state.address_id} />
+                                        <Address visible={this.state.visibleAddress} user_id={this.state.user_id} address_id={this.state.address_id} />
+                                        </LocationContext.Provider>
                                     </Col>
                                 </Row>
                             </Form>

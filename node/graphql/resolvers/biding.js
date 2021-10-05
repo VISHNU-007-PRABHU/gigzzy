@@ -286,8 +286,15 @@ module.exports.get_biding_all_files = async (root, args) => {
         let match = {
             delete: false
         }
-        if (args['biding_id']) {
-            match['biding_id'] = ObjectId(args['biding_id'])
+     
+        if(args.root){
+            if (root['_id']) {
+                match['biding_id'] = ObjectId(root['_id'])
+            }
+        }else{
+            if (args['biding_id']) {
+                match['biding_id'] = ObjectId(args['biding_id'])
+            }
         }
         let pipeline = [
             {
@@ -295,6 +302,7 @@ module.exports.get_biding_all_files = async (root, args) => {
             },
         ]
 
+        console.log("module.exports.get_biding_all_files -> pipeline", pipeline)
         let grouped_images = await BidingImage_model.aggregate(pipeline)
         return grouped_images
     } catch (error) {

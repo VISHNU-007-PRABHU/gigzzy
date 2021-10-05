@@ -38,6 +38,7 @@ const SetAddress = (props) => {
     let location = useLocation();
     const [user_id, setuser_id] = useState("");
     useEffect(() => {
+        console.log("SetAddress -> props", props)
         if (props['user_id']) {
             setuser_id(props['user_id'])
         } else if(JSON.parse(localStorage.getItem('user'))){
@@ -78,6 +79,9 @@ const SetAddress = (props) => {
             values.no_data();
         }
     }
+
+    console.log("SetAddress -> props-<oapdsujikl", props)
+
     return (
         <LocationContext.Consumer>
             {
@@ -114,8 +118,7 @@ const SetAddress = (props) => {
                                                                 <Skeleton avatar title={true} loading={item.loading} active>
                                                                     <List.Item.Meta
                                                                         onClick={() => {
-                                                                            let url_value=['profile', 'contract_booking','admin-company']
-                                                                            console.log("location.pathname.split('/')[1])", location.pathname.split('/')[1])
+                                                                            let url_value=['profile']
                                                                             if (!includes(url_value,location.pathname.split('/')[1])) {
                                                                                 value.location_change(data);
                                                                             }

@@ -29,13 +29,14 @@ class Company extends React.Component {
                 <Layout>
                     <AdminHeader />
                     <Content className="main_frame">
-                        <Tabs tabBarExtraContent={
+                        <Tabs>
+                         {/* tabBarExtraContent={
                             <RoleView permission="">
                                 <Button type="primary" onClick={() => { this.props.history.push('/admin-company/add'); }}>
                                     Add Company
                                 </Button>
                             </RoleView>
-                        }>
+                        }> */}
                             <TabPane tab="Company" key="1">
                                 <CompanyTable />
                             </TabPane>

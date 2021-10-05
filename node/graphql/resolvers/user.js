@@ -741,6 +741,30 @@ module.exports.get_company_detail = async (parent, args, context, info) => {
     }
 };
 
+exports.get_company_root_detail = async (parent, args, context, info) => {
+    try {
+        let pro_finder={delete: false}
+        if (parent['_id']) {
+            pro_finder['provider_id'] = ObjectId(parent['_id'])
+        }
+        
+        console.log("exports.get_company_root_detail -> pro_finder", pro_finder)
+        let company_result = await CompanyProvider_model.findOne(pro_finder).lean();
+        if(_.size(company_result)){
+            let find_query = { delete: false }
+            if (company_result['company_id']) {
+                find_query['_id'] = ObjectId(company_result['company_id'])
+            }
+            let final_result = await Company_model.findOne(find_query).lean();
+            return final_result
+        }else{
+            return {msg:"error in company detail",status:"failed"}
+        }
+    } catch (error) {
+        return {msg:"error in company detail",status:"failed"}
+    }
+};
+
 module.exports.get_company_provider = async (parent, args, context, info) => {
     try {
         var limit = args.limit || 10;
@@ -777,9 +801,12 @@ module.exports.get_parent_company_provider = async (parent, args, context, info)
         if (args['company_id']) {
             find_query['company_id'] = args['company_id']
         }
-        result = await CompanyProvider_model.find(find_query);
+        console.log("module.exports.get_parent_company_provider -> find_query", find_query)
+        let result = await CompanyProvider_model.find(find_query);
+        console.log("module.exports.get_parent_company_provider -> result", result)
         return result;
     } catch (error) {
+        console.log("module.exports.get_parent_company_provider -> error", error)
         return []
     }
 };

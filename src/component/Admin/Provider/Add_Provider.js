@@ -28,7 +28,7 @@ class Add_Provider extends React.Component {
             modalVisible: false,
             loading: false,
             imageUrl: '',
-            update: 0,
+            update: false,
             update_data: {},
             file: {},
             previewVisible: false,
@@ -101,7 +101,7 @@ class Add_Provider extends React.Component {
                 this.find_address(result.data?.user[0]?.location?.coordinates[0], result.data?.user[0]?.location?.coordinates[1]);
             }
             this.setState({
-                update: 1,
+                update: true,
                 update_data: result.data.user[0],
                 m_no: result.data?.user[0].phone_no,
                 country_code: result.data?.user[0].country_code,
@@ -189,8 +189,10 @@ class Add_Provider extends React.Component {
         form.validateFields(async (err, values) => {
             var datas = {}
             if (values.phone.length > 10) {
-                datas = { role: 2, demo: this.state.demo,
-                     country_code: this.state.country_code, phone_no: this.state.m_no, email: values.email, password: values.password, name: values.provider_name, lat: this.state.lat_lng ? this.state.lat_lng.lat : undefined, lng: this.state.lat_lng ? this.state.lat_lng.lng : undefined, address: this.state.address, provider_subCategoryID: values.category_name, _id: this.props.match.params.id };
+                datas = {
+                    role: 2, demo: this.state.demo,
+                    country_code: this.state.country_code, phone_no: this.state.m_no, email: values.email, password: values.password, name: values.provider_name, lat: this.state.lat_lng ? this.state.lat_lng.lat : undefined, lng: this.state.lat_lng ? this.state.lat_lng.lng : undefined, address: this.state.address, provider_subCategoryID: values.category_name, _id: this.props.match.params.id
+                };
             } else {
                 datas = { role: 2, demo: this.state.demo, email: values.email, password: values.password, name: values.provider_name, lat: this.state.lat_lng ? this.state.lat_lng.lat : undefined, lng: this.state.lat_lng ? this.state.lat_lng.lng : undefined, address: this.state.address, provider_subCategoryID: values.category_name, _id: this.props.match.params.id };
             }
@@ -232,7 +234,14 @@ class Add_Provider extends React.Component {
                     <Content className="main_frame">
                         <Row gutter={[24, 24]}>
                             <Col span={24}>
-                                <Title level={3}>Add Provider</Title>
+                                <div className="d-flex justify-content-between">
+                                    <Title level={3}>Add Provider</Title>
+                                    {this.state.update &&
+                                        <Button type="primary" onClick={() => { this.props.history.push(`/admin-company/add/${this.props.match.params.id}`); }}>
+                                            Add Company
+                                        </Button>
+                                    }
+                                </div>
                             </Col>
                         </Row>
                         <Row>

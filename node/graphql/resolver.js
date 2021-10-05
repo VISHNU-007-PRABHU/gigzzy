@@ -154,7 +154,7 @@ const resolvers = {
 
     Query: {
         testmail: userResolver.testinfmail,
-        delete_all_user:userResolver.delete_all_user,
+        delete_all_user: userResolver.delete_all_user,
         // get data using pagination  
         get_user: userResolver.get_user,
         user_search: userResolver.user_search,
@@ -192,14 +192,14 @@ const resolvers = {
         roles_search: rolesResolver.roles_search,
         // company detail
         get_company_detail: userResolver.get_company_detail,
-        get_contract_files:contractResolver.get_contract_files,
-        get_contracts:contractResolver.get_contracts,
-        get_contracts_pagination:contractResolver.get_contracts_pagination,
-        get_contract_all_files:contractResolver.get_contract_all_files,
-        get_currencys:currencyResolver.get_currencys,
-        get_currency:currencyResolver.get_currency,
-        get_biding_pagination:bidingResolver.get_biding_pagination,
-        GetCategoryCurrency:categoryResolver.GetCategoryCurrency,
+        get_contract_files: contractResolver.get_contract_files,
+        get_contracts: contractResolver.get_contracts,
+        get_contracts_pagination: contractResolver.get_contracts_pagination,
+        get_contract_all_files: contractResolver.get_contract_all_files,
+        get_currencys: currencyResolver.get_currencys,
+        get_currency: currencyResolver.get_currency,
+        get_biding_pagination: bidingResolver.get_biding_pagination,
+        GetCategoryCurrency: categoryResolver.GetCategoryCurrency,
         get_my_appointments: async (parent, args, context, info) => {
             try {
 
@@ -273,10 +273,11 @@ const resolvers = {
     Roles: {
         role_based_permissions_detail: rolesResolver.role_table_based_permissions_detail,
     },
-    Biding:{
+    Biding: {
         get_user: userResolver.available_booking_user,
-        get_biding_all_files:bidingResolver.get_biding_all_files,
+        get_biding_all_files: bidingResolver.get_biding_all_files,
         get_parent_company_provider: userResolver.get_parent_company_provider,
+        get_company_root_detail:userResolver.get_company_root_detail,
     },
     Category: {
         booking_parent_category: categoryResolver.booking_parent_category,
@@ -288,9 +289,9 @@ const resolvers = {
     subCategory: {
         category: categoryResolver.subcategory_category,
         Certificate: certificateResolver.certificate,  //display certificate  based on category
-        get_parent_currency:currencyResolver.get_parent_currency,
-        GetCategoryCurrency:categoryResolver.GetCategoryCurrency,
-        ParentCategoryCurrency:categoryResolver.ParentCategoryCurrency,
+        get_parent_currency: currencyResolver.get_parent_currency,
+        GetCategoryCurrency: categoryResolver.GetCategoryCurrency,
+        ParentCategoryCurrency: categoryResolver.ParentCategoryCurrency,
     },
 
     User: {
@@ -303,8 +304,8 @@ const resolvers = {
         category: categoryResolver.category,
         provider_rating: userResolver.provider_rating,
         provider_rate: userResolver.provider_rate,
-        get_currency:currencyResolver.get_currency,
-
+        get_currency: currencyResolver.get_currency,
+        get_company_root_detail:userResolver.get_company_root_detail,
     },
     Company: {
         get_parent_company_provider: userResolver.get_parent_company_provider,
@@ -312,15 +313,20 @@ const resolvers = {
         get_company_images: userResolver.get_company_images,
         get_company_user_detail: userResolver.available_booking_user,
     },
-    ContractJob:{
-        get_contract_files:contractResolver.get_contract_files,
-        get_contract_category:categoryResolver.available_booking_category,
-        get_contract_all_files:contractResolver.get_contract_all_files,
-        biding_count:bidingResolver.biding_count,
+
+    CompanyProvider: {
+        get_company_detail: userResolver.get_company_detail,
+        get_company_root_detail:userResolver.get_company_root_detail,
     },
-    CompanyImage:{
-        get_contract_files:contractResolver.get_contract_files,
-        get_contract_all_files:contractResolver.get_contract_all_files,
+    ContractJob: {
+        get_contract_files: contractResolver.get_contract_files,
+        get_contract_category: categoryResolver.available_booking_category,
+        get_contract_all_files: contractResolver.get_contract_all_files,
+        biding_count: bidingResolver.biding_count,
+    },
+    CompanyImage: {
+        get_contract_files: contractResolver.get_contract_files,
+        get_contract_all_files: contractResolver.get_contract_all_files,
     },
     Booking: {
         user: userResolver.user,
@@ -346,20 +352,20 @@ const resolvers = {
         adminLogin: adminResolver.adminlogin,
         // contract job
         update_contract: contractResolver.update_contract,
-        update_currency:currencyResolver.update_currency,
-        delete_currency:currencyResolver.delete_currency,
+        update_currency: currencyResolver.update_currency,
+        delete_currency: currencyResolver.delete_currency,
         ContractJobFileUpload: contractResolver.ContractJobFileUpload,
         DeleteContractJobFile: contractResolver.DeleteContractJobFile,
-        update_biding:bidingResolver.update_biding,
-        BidingFileUpload:bidingResolver.BidingFileUpload,
+        update_biding: bidingResolver.update_biding,
+        BidingFileUpload: bidingResolver.BidingFileUpload,
         // company detiail
-        UpdateCategoryCurrency:categoryResolver.UpdateCategoryCurrency,
-        DeleteCategoryCurrency:categoryResolver.DeleteCategoryCurrency,
+        UpdateCategoryCurrency: categoryResolver.UpdateCategoryCurrency,
+        DeleteCategoryCurrency: categoryResolver.DeleteCategoryCurrency,
         update_company_detail: userResolver.update_company_detail,
         CompanyFileUpload: userResolver.CompanyFileUpload,
         deleteCompany: userResolver.deleteCompany,
         deleteCompanyProvider: userResolver.deleteCompanyProvider,
-        addUser:userResolver.addUser,
+        addUser: userResolver.addUser,
         reset_password: userResolver.reset_password,
         admin_add_user: userResolver.admin_add_user,
         admin_update_user: admin_update_user = async (_, args) => {

@@ -140,7 +140,7 @@ class CompanyTable extends React.Component {
                     this.state.dataSource.length >= 1 ? (
                         <span title="...." className="d-flex justify-content-around">
                             <RoleView permission="">
-                                <span className="cursor_point" onClick={() => { this.props.history.push(`/admin-company/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
+                                <span className="cursor_point" onClick={() => { this.props.history.push(`/admin-company/add/${record.user_id}/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
                             </RoleView>
                             <RoleView permission="">
                                 <Popconfirm title="Sure to delete this company ?" onConfirm={() => this.handleDelete(record._id)}>

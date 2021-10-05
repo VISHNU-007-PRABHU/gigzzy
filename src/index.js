@@ -236,8 +236,8 @@ ReactDOM.render(
             <ProviderRoute exact path="/provider_detail" component={provider_detail} />
             <ProviderRoute exact path="/provider_earnings" component={provider_earnings} />
             <ProviderRoute exact path="/provider-booking-detail" component={Booking_Detail} />
-            <PrivateRoute permission="" path="/admin-company/add" component={Add_Company} exact />
-            <PrivateRoute permission="" path="/admin-company/add/:id" component={Add_Company} exact />
+            <PrivateRoute permission="" path="/admin-company/add/:user_id" component={Add_Company} exact />
+            <PrivateRoute permission="" path="/admin-company/add/:user_id/:company_id" component={Add_Company} exact />
             <PrivateRoute exact path="/admin-company" component={Company} />
             <PrivateRoute exact path="/admin-company-worker-detail" component={CompanyWorkerAdmin} />
             <PrivateRoute exact path="/admin-contract/view/:id" component={ContractDetail} />

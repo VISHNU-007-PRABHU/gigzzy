@@ -291,7 +291,8 @@ const typeDefs = gql`
         no_of_people:String
         get_user:[Detail]
         get_biding_all_files(contract_id:ID):[CompanyImage]
-        get_parent_company_provider(user_id:ID,provider_id:ID):CompanyProvider
+        get_company_root_detail(root:Boolean,provider_id:ID):Company
+        get_parent_company_provider(user_id:ID,provider_id:ID):[CompanyProvider]
     }
 
     type BidingImages{
@@ -384,6 +385,7 @@ const typeDefs = gql`
         register_status:String
         register_link_status:String
         provider_id:ID
+        company_id:ID
         provider_detail:[Detail]
         created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         data: JSON 
@@ -391,6 +393,9 @@ const typeDefs = gql`
         status:String
         currency_code:String
         location_code:String
+        get_company_root_detail(root:Boolean):Company
+        get_company_detail(root:Boolean,data:JSON,provider_search:JSON,search:JSON,_id:ID,page:Int,limit:Int,company_id:ID,user_id:ID,provider_id:ID):CompanyConnection
+
     }
     type CompanyImage{
         _id:ID
@@ -606,6 +611,7 @@ const typeDefs = gql`
         currency_id:ID
         location_code:String
         get_currency(location_code:String,country_code:String,_id:ID,user_id:ID):Currency
+        get_company_root_detail(root:Boolean,provider_id:ID):Company
     }
     
     type Account{
