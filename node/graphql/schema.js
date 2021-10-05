@@ -25,6 +25,11 @@ const typeDefs = gql`
         test(online:String):User
         proof_status(_id:ID,role:Int,):Detail
         demo_account(_id:ID):Detail
+
+        get_my_contracts(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[ContractJob]
+        get_my_biding(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[Biding]
+        get_my_milestone(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[Milestone]
+        accept_biding(biding_id:ID,online:Int,location_code:String):Biding
     }
     type Query {
         testmail:Detail
@@ -289,8 +294,12 @@ const typeDefs = gql`
         description:String
         experience:String
         no_of_people:String
+        service_fee:String
+        payment_type:String
+        payment_option(code:String):String @paymentOption
+        total:String
         get_user:[Detail]
-        get_biding_all_files(contract_id:ID):[CompanyImage]
+        get_biding_all_files(contract_id:ID,root:Boolean):[CompanyImage]
         get_company_root_detail(root:Boolean,provider_id:ID):Company
         get_parent_company_provider(user_id:ID,provider_id:ID):[CompanyProvider]
     }
@@ -307,6 +316,15 @@ const typeDefs = gql`
     type Milestone{
         _id:ID
         data: JSON 
+        milestone_ref:String,
+        start_date: String,
+        end_date: String,
+        title:String,
+        description:String,
+        budget:String,
+        timeline: String,
+        timeline_type: String,
+        delete:Boolean,
     }
     type Currency{
         _id:ID,
@@ -340,13 +358,16 @@ const typeDefs = gql`
         lat:Float
         lng:Float
         contract_status:String
+        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         category_id:ID
         category_type:Int
         contract_ref:String
         biding_count:Int
         get_contract_category(contract_id:ID,_id:ID,category_type:Int):[Category]
         get_contract_files(contract_id:ID):[CompanyImage]
-        get_contract_all_files(contract_id:ID):[CompanyImage]
+        get_contract_all_files(contract_id:ID,limit:Int):[CompanyImage]
+        get_company_root_detail(root:Boolean):Company
+        get_user:[Detail]
         currency_code:String
         location_code:String
         current_page:String
@@ -1031,6 +1052,15 @@ const typeDefs = gql`
         ):Biding
         BidingFileUpload(_id:ID,contract_id:ID,category:String,image_tag:String,data:[JSON],file:[Upload]):CompanyImage
 
+        update_milestone(
+            option:String  
+            _id:ID
+            user_id: String
+            provider_id:ID
+            biding_id:ID
+            file:[Upload]
+            milestone_data:[JSON]
+        ):Milestone
         UpdateCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
         DeleteCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
     }

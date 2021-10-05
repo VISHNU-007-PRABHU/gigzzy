@@ -46,21 +46,6 @@ module.exports.get_biding_detail = async (root, args) => {
     return result;
 }
 
-
-module.exports.get_biding_milestone_detail = async (root, args) => {
-    //console.log(args);
-    let fetch_query = {
-    }
-    if (args['_id']) {
-        _id: args['_id']
-    }
-    if (args['bid_id']) {
-        bid_id: args['bid_id']
-    }
-    var result = await BidingMilestone_model.findOne(fetch_query);
-    return result;
-}
-
 module.exports.DeleteContractJobFile = async (root, args) => {
     try {
         let { _id } = args;
@@ -190,6 +175,7 @@ module.exports.get_contract_all_files = async (root, args) => {
         let match = {
             delete: false
         }
+        let limit = args.limit || 0
         if (args['contract_id']) {
             match['contract_id'] = ObjectId(args['contract_id'])
         }
@@ -197,6 +183,7 @@ module.exports.get_contract_all_files = async (root, args) => {
             {
                 $match: match
             },
+            {$limit : limit }
         ]
 
         let grouped_images = await ContractJobImage_model.aggregate(pipeline)
@@ -331,32 +318,6 @@ exports.find_provider = async (contract_data) => {
     }
 }
 
-
-
-module.exports.update_biding_milestone = async (root, args) => {
-    try {
-        let milestone_detail = args['milestone_detail'][0][0]
-        if (args['_id']) {
-            let find_query = {
-                _id: args["_id"]
-            }
-            let update_milestone = await BidingMilestone_model.updateOne(find_query, milestone_detail).exec()
-            let fetch_milestone = await BidingMilestone_model.findOne(find_query).lean()
-            fetch_milestone['status'] = "success";
-            fetch_milestone['msg'] = "Biding update success"
-            return added_bid
-
-        } else {
-            let add_milestone = new BidingMilestone_model(biding_detail)
-            let added_milestone = await add_milestone.save()
-            added_milestone['status'] = "success";
-            added_milestone['msg'] = "Biding added success"
-            return added_milestone
-        }
-    } catch (error) {
-        return { status: "failed", msg: "Biding added failed" }
-    }
-}
 
 
 module.exports.user_accept_biding = async (root, args) => {

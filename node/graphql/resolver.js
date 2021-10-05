@@ -319,6 +319,7 @@ const resolvers = {
         get_company_root_detail:userResolver.get_company_root_detail,
     },
     ContractJob: {
+        get_user: userResolver.available_booking_user,
         get_contract_files: contractResolver.get_contract_files,
         get_contract_category: categoryResolver.available_booking_category,
         get_contract_all_files: contractResolver.get_contract_all_files,

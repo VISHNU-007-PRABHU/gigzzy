@@ -24,5 +24,7 @@ module.exports = {
     BidingImage: require('./model/booking/bidingImage'),
     contract_job_images: require('./model/booking/ContractJobImage'),
     currency: require('./model/Admin/currency'),
-    CategoryCurrency:require('./model/category/CategoryCurrency')
+    CategoryCurrency:require('./model/category/CategoryCurrency'),
+    Milestone:require('./model/booking/milestone'),
+    MilestoneImage:require('./model/booking/milestoneImage'),
 }

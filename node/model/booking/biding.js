@@ -24,7 +24,7 @@ var bidingSchema = new Schema({
   category_type: { type: Number },  // 1-parent category , 2-sub category
   biding_ref: { type: String, 'default': shortid.generate },
   booked: { type: String },
-  budget: { type: String, default: 0.00 },
+  budget: { type: Number, default: 0.00 },
   timeline: String,
   timeline_type: String,
   cover_letter: String,
@@ -32,7 +32,7 @@ var bidingSchema = new Schema({
   experience: String,
   no_of_people: String,
   add_to_shortlist:Boolean,
-
+  
   location: {
     type: { type: String },
     coordinates: []

@@ -386,10 +386,8 @@ mongoose.connect(process.env.DB_LINK).then(() => {
 });
 
 
-// const httpHost = process.env.HTT0P_HOST || 'localhost';
-const PORT = 8559;
-
-
+// const httpHost = process.env.HTTP_HOST || 'localhost';
+const PORT = process.env.HTTP_PORT || 8990 ;
 
 // const httpServer = https.createServer(
 //   {
