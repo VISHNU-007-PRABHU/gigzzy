@@ -60,9 +60,7 @@ module.exports.biding_count = async (root, args) => {
 }
 
 module.exports.get_biding_detail = async (root, args) => {
-    //console.log(args);
     try {
-
         let fetch_query = {}
         if (args['_id']) {
             fetch_query['_id'] = args['_id']
@@ -70,7 +68,7 @@ module.exports.get_biding_detail = async (root, args) => {
         if (args['contract_id']) {
             fetch_query['contract_id'] = args['contract_id']
         }
-        var final_output = await Biding_model.findOne(fetch_query);
+        var final_output = await Biding_model.findOne(fetch_query).lean();
         return final_output;
     } catch (error) {
         console.log("module.exports.get_biding_detail -> error", error)
