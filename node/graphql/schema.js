@@ -108,6 +108,8 @@ const typeDefs = gql`
         get_biding_all_files(contract_id:ID):[CompanyImage]
         get_biding_detail(location_code:String,contract_id:ID):Biding
         GetCategoryCurrency(pagination:Boolean,data:JSON,_id:ID,category_id:ID,country_code:String,country_id:ID):SubCategoryConnection
+        get_biding_milestone_detail(_id:ID,contract_id:ID,biding_id:ID):Milestone
+        get_biding_milestone(_id:ID,contract_id:ID,biding_id:ID):[Milestone]
     }
 
     # sub category pagination data  

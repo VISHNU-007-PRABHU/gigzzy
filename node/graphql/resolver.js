@@ -200,6 +200,8 @@ const resolvers = {
         get_currency: currencyResolver.get_currency,
         get_biding_pagination: bidingResolver.get_biding_pagination,
         get_biding_detail:bidingResolver.get_biding_detail,
+        get_biding_milestone_detail:bidingResolver.get_biding_milestone_detail,
+        get_biding_milestone:bidingResolver.get_biding_milestone,
         GetCategoryCurrency: categoryResolver.GetCategoryCurrency,
         get_my_appointments: async (parent, args, context, info) => {
             try {
