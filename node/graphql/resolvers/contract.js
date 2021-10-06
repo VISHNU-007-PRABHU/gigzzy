@@ -401,7 +401,6 @@ exports.manage_contract_booking = async (root, args) => {
 
         let preview_contract_data = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
         let preview_biding_data = await Biding_model.findOne({ _id: args.biding_id }).lean()
-        console.log("exports.manage_contract_booking -> preview_biding_data", preview_biding_data)
 
         if (args.booking_status === 10 && preview_contract_data.booking_status === 9) {
             let base_amount = preview_biding_data.budget;
@@ -417,12 +416,15 @@ exports.manage_contract_booking = async (root, args) => {
                 findBooking['user_parent'] = true;
                 findBooking['msg'] = "user accept the contract";
                 findBooking['status'] = 'success';
-                return [findBooking]
+                return findBooking
             } else {
                 return { msg: "Contract Payment failed", status: 'failed' }
             }
+        }else{
+            return { msg: "Contract Payment failed", status: 'failed' }
         }
     } catch (error) {
+        console.log("exports.manage_contract_booking -> error", error)
         return { msg: "Contract Payment failed", status: 'failed' }
     }
 }

@@ -5,6 +5,7 @@ var Jimp = require('jimp');
 var ObjectId = require('mongodb').ObjectID;
 var CronJob = require('cron').CronJob;
 var commonHelper = require('../commonHelper');
+const { createWriteStream, existsSync, mkdirSync } = require("fs");
 var Biding_model = model.Biding;
 var BidingImage_model = model.BidingImage;
 var BidingMilestone_model = model.Milestone;

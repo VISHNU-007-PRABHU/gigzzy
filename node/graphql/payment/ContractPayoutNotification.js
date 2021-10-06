@@ -118,11 +118,11 @@ exports.accept_payout_notification = async (contract_data) => {
 
             } else {
                 // send sms for accept booking
-                await commonHelper.send_sms(user_detail.country_code, user_detail.phone_no, "job_assign", {})
-                await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_placed", {})
+                // await commonHelper.send_sms(user_detail.country_code || 0, user_detail.phone_no, "job_assign", {})
+                // await commonHelper.send_sms(app_user_detail.country_code || 0, app_user_detail.phone_no, "job_placed", {})
 
                 //send my appoinment
-                const result = await Booking_model.find({ provider_id: booking_detail.provider_id, booking_status: 10 }).sort({ created_at: -1 });
+                // const result = await Booking_model.find({ provider_id: booking_detail.provider_id, booking_status: 10 }).sort({ created_at: -1 });
                 // await global.pubsub.publish("APPOINTMENTS", { get_my_appointments: result });
 
                 //send current booking data using subcription
