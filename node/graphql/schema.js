@@ -106,6 +106,7 @@ const typeDefs = gql`
         get_currency(_id:ID,country_code:String,location_code:String):Currency
         get_biding_pagination(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int,contract_id:ID):BidingConnection
         get_biding_all_files(contract_id:ID):[CompanyImage]
+        get_biding_detail(contract_id:ID):Biding
         GetCategoryCurrency(pagination:Boolean,data:JSON,_id:ID,category_id:ID,country_code:String,country_id:ID):SubCategoryConnection
     }
 
