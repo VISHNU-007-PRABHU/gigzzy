@@ -11,7 +11,8 @@ var subCategory_model = model.sub_category;
 var Detail_model = model.detail;
 var ContractJob_model = model.contract_job;
 var ContractJobImage_model = model.contract_job_images;
-var Address_model = model.address
+var Address_model = model.address   
+var Biding_model = model.Biding   
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 const path = require("path");
 var fs = require('fs');
@@ -301,6 +302,7 @@ module.exports.update_contract = async (root, args) => {
             fetch_bid['msg'] = "contract job update success"
             return fetch_bid
         } else {
+            contract_detail['booking_status'] = 9
             let add_contract_job = new ContractJob_model(contract_detail)
             let added_contract_job = await add_contract_job.save()
             added_contract_job['status'] = "success";
@@ -343,12 +345,12 @@ exports.find_provider = async (contract_data) => {
 
 module.exports.user_accept_biding = async (root, args) => {
     try {
-        let user_biding_detail = args['user_biding_detail'][0][0]
+        let user_biding_detail = args['user_biding_detail'][0]
         if (args['_id']) {
             let find_query = {
                 _id: args["_id"]
             }
-            let biding_detail = args['user_biding_detail'][0][0]
+            let biding_detail = args['user_biding_detail'][0]
             let update_bid = await UserAcceptBiding_model.updateOne(find_query, biding_detail).exec()
             let fetch_bid = await UserAcceptBiding_model.findOne(find_query).lean()
             fetch_bid['status'] = "success";
@@ -386,3 +388,34 @@ module.exports.delete_biding = async (root, args) => {
     }
 }
 
+
+/**
+ * 
+ * @param {*} root 
+ * @param {*} args  {contract_id,user_id,biding_id,booking_status,payment_option,payment_type}
+ * @param {*} args  {location_code}
+ */
+exports.manage_contract_booking=async(root,args)=>{
+    let preview_contract_data = await ContractJob_model.find({_id:args.contract_id}).lean()
+    let preview_biding_data = await Biding_model.find({_id:args.biding_id}).lean()
+
+    if(args.booking_status === 10 && preview_contract_data.booking_status === 9){  
+        let base_amount = preview_biding_data.budget;
+        let category_service_fee = 20;
+        let service_fee = (category_service_fee / 100) * base_amount;             
+        args['amount'] = service_fee;
+     
+        console.log("exports.manage_contract_booking -> args", args)
+        let payment_data = await payment_choose.choose_contract_payment(args, preview_contract_data,preview_biding_data)
+        console.log("payment_data", payment_data)
+        if (payment_data.status) {
+            var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
+            findBooking['user_parent'] = true;
+            findBooking['msg'] = "user accept the contract";
+            findBooking['status'] = 'success';
+            return [findBooking]
+        } else {
+            return [{ msg: "Booking Payment failed", status: 'failed' }]
+        }
+    }
+}

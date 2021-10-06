@@ -18,6 +18,8 @@ var payoutSchema = new Schema({
   amount: { type: String, default: 0.00 },
   status: { type: Number, default: 1 },
   booking_status:{type:Number,default:0},
+  job_type:String,
+  contract_id:String,
   created_at:{type:Date}
 }, schemaOptions);
 

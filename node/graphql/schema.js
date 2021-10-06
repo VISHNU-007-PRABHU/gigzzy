@@ -296,6 +296,7 @@ const typeDefs = gql`
         experience:String
         no_of_people:String
         service_fee:String
+        add_to_shortlist:Boolean
         payment_type:String
         payment_option(code:String):String @paymentOption
         total:String
@@ -373,6 +374,7 @@ const typeDefs = gql`
         currency_code:String
         location_code:String
         current_page:String
+        service_fee:String
     }
     type Company{
         _id:ID
@@ -1065,6 +1067,31 @@ const typeDefs = gql`
         ):Milestone
         UpdateCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
         DeleteCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
+        manage_contract_booking(
+            location_code:String,
+            role:Int,
+            booking_id:ID,
+            contract_id:ID,
+            biding_id:ID,
+            user_id:ID,
+            provider_id:ID,
+            category_id:String,
+            lat:Float,
+            lng:Float,
+            weekday:JSON,
+            hours:String,
+            description:String,
+            booking_status:Int,
+            category_type:Int,
+            stripe_token:String,
+            payment_option:String,
+            payment_type:String
+            ,phone_number:String,
+            extra_fare:String,
+            extra_fare_reason:String,
+            option:Int,
+            extra_fare_id:ID
+        ):ContractJob
     }
 `;
 module.exports.typeDefs = typeDefs;

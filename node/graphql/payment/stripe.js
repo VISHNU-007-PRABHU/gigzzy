@@ -22,6 +22,12 @@ const stripe_country_code =[{
     stripe_code:"usd"
 }]
 
+/**
+ * 
+ * @param {*} args {stripe_token,amount,location_code} 
+ * @param {*} booking_detail 
+ * @returns 
+ */
 exports.stripe_payment = async (args, booking_detail) => {
     return new Promise(async function (resolve, reject) {
         try {

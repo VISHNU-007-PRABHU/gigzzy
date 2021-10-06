@@ -28,12 +28,14 @@ var contractSchema = new Schema({
     provider_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
     category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'category', unique: false },
     address_id: { type: mongoose.Schema.Types.ObjectId, ref: 'address' },
+    biding_id:String,
     category_type: { type: Number },  // 1-parent category , 2-sub category
     contract_ref: { type: String, 'default': shortid.generate },
     location: {
         type: { type: String },
         coordinates: []
     },
+    booking_status: { type: Number },  // 12.booking,11.user_cancel,8.provider_accept,no_provider],10.user_accept,4.start,13.end,14.completed,15.not available
     booked: { type: String },
     location_code:{ type: String, },
     currency_code:{ type: String, },

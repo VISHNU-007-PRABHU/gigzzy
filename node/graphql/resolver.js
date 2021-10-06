@@ -603,6 +603,7 @@ const resolvers = {
             return [{ id: add_booking._id, location: args.location, description: args.description, provider: find_provider, hours: args.hours, user_image_url: new_data.user_image_url }];
         },
         //change the status in job booking 
+        manage_contract_booking:contractResolver.manage_contract_booking,
         manage_booking: async (parent, args) => {
             //console.log("m_b");
             //console.log(args);
