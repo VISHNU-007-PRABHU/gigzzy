@@ -11,6 +11,7 @@ var fs = require('fs');
 var Biding_model = model.Biding;
 var BidingImage_model = model.BidingImage;
 var BidingMilestone_model = model.Milestone;
+var MilestoneImage_model = model.MilestoneImage
 
 module.exports.get_biding_pagination = async (root, args) => {
     console.log(args);
@@ -194,20 +195,23 @@ module.exports.update_biding = async (root, args) => {
 
 
 module.exports.get_biding_milestone_detail = async (root, args) => {
-    //console.log(args);
-    let fetch_query = {
+    try {
+        let fetch_query = {}
+        if (args['_id']) {
+            fetch_query['_id'] = args['_id']
+        }
+        if (args['biding_id']) {
+            fetch_query['biding_id'] = args['biding_id']
+        }
+        if (args['contract_id']) {
+            fetch_query['contract_id'] = args['contract_id']
+        }
+        var final_result = await BidingMilestone_model.findOne(fetch_query).lean();
+        return final_result
+    } catch (err) {
+        return { msg: "fecth error", status: "failed" };
     }
-    if (args['_id']) {
-        _id: args['_id']
-    }
-    if (args['bid_id']) {
-        bid_id: args['bid_id']
-    }
-    var { } = await BidingMilestone_model.findOne(fetch_query);
-    return {};
 }
-
-
 
 module.exports.get_biding_milestone = async (root, args) => {
     //console.log(args);
@@ -216,10 +220,13 @@ module.exports.get_biding_milestone = async (root, args) => {
         let fetch_query = {
         }
         if (args['_id']) {
-            _id: args['_id']
+            fetch_query['_id'] = args['_id']
         }
-        if (args['bid_id']) {
-            biding_id: args['biding_id']
+        if (args['biding_id']) {
+            fetch_query['biding_id'] = args['biding_id']
+        }
+        if (args['contract_id']) {
+            fetch_query['contract_id'] = args['contract_id']
         }
         var data = await BidingMilestone_model.find(fetch_query);
         return data;
@@ -230,32 +237,88 @@ module.exports.get_biding_milestone = async (root, args) => {
 }
 
 
+
+exports.uploading_milestone_files = async (files, args) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            _.forEach(files, async (file, i) => {
+                if (file) {
+                    const { createReadStream, filename } = await file;
+                    var extension = filename.split('.').pop();
+                    var file_name = `${args['milestone_id']}_${moment().valueOf()}_${filename}`;
+                    var small_file_name = `${args['milestone_id']}_${moment().valueOf()}_${filename}_small.jpg`;
+                    await new Promise(res =>
+                        createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/milestone", file_name))).on("close", res)
+                    );
+                    args['image'] = file_name;
+                    var file_resize = await Jimp.read(path.join(__dirname, "../../images/milestone", file_name))
+                        .then(image => {
+                            image.resize(260, Jimp.AUTO)
+                                .quality(30)
+                                .write(path.join(__dirname, "../../images/milestone", small_file_name));
+                        })
+                        .catch(err => {
+                        });
+
+                    /**
+                     * @info add biding info after file update
+                     */
+                    let img_data = {
+                        biding_id: args['milestone_id'],
+                        small_image: small_file_name,
+                        large_image: file_name,
+                        // image_tag: args['image_tag'] || "",
+                        doc_type: extension || "",
+                        // doc_category: args['category'] || "others",
+                    }
+                    let add_biding_image_job = new MilestoneImage_model(img_data)
+                    await add_biding_image_job.save()
+                }
+                if (_.size(files) === i + 1) {
+                    return resolve(true)
+                }
+            })
+        } catch (error) {
+            reject(false)
+        }
+    })
+}
+
+
 module.exports.update_milestone = async (root, args) => {
     try {
-        let milestone_detail = args['milestone_detail']
-
+        let files = args['file']
+        let biding_detail = args['milestone_data'][0]
         if (args['_id']) {
             let find_query = {
                 _id: args["_id"]
             }
-            let update_milestone = await BidingMilestone_model.updateOne(find_query, milestone_detail[0]).exec()
-            let fetch_milestone = await BidingMilestone_model.find(find_query)
-            return fetch_milestone
+            let update_bid = await BidingMilestone_model.updateOne(find_query, biding_detail).exec()
+            if (files && _.size(files)) {
+                args['milestone_id'] = args['_id']
+                let filesUpload = await this.uploading_milestone_files(files, args)
+            }
+            let fetch_bid = await BidingMilestone_model.findOne(find_query).lean()
+            fetch_bid['status'] = "success";
+            fetch_bid['msg'] = "Milestone update success"
+            return fetch_bid
 
         } else {
-            let inputdata = _.size(milestone_detail)
-            for (let i = 0; i < inputdata; i++) {
-                let add_milestone = new BidingMilestone_model(milestone_detail[i])
-                await add_milestone.save()
+            console.log("module.exports.update_biding -> biding_detail", biding_detail)
+            biding_detail['service_fee'] = "20"
+            let add_bid = new BidingMilestone_model(biding_detail)
+            let added_bid = await add_bid.save()
+            if (files && _.size(files)) {
+                args['milestone_id'] = added_bid['_id']
+                let filesUpload = await this.uploading_milestone_files(files, args)
             }
-            let find_query = {
-                biding_id: args['_id']
-            }
-            let fetch_milestone = await BidingMilestone_model.find(find_query)
-            return fetch_milestone
+            added_bid['status'] = "success";
+            added_bid['msg'] = "Milestone added success"
+            return added_bid
         }
     } catch (error) {
-        return { status: "failed", msg: "Biding added failed" }
+        console.log("module.exports.update_biding -> error", error)
+        return { status: "failed", msg: "Milestone added failed" }
     }
 }
 

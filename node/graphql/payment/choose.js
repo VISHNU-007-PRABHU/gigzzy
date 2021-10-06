@@ -50,18 +50,18 @@ exports.choose_contract_payment = async (args,contract_detail,biding_detail) => 
                         await ContractPayoutNotificationModule.update_contract_after_payment(args, stripe_charge.charge)
                         await ContractPayoutNotificationModule.update_provider_payout(contract_detail)
                         await ContractPayoutNotificationModule.accept_payout_notification(contract_detail)
-                        return resolve({ msg: "stripe payment success", status: true, data: booking_detail })
+                        return resolve({ msg: "stripe payment success", status: true, data: contract_detail })
                     } else {
-                        await ContractPayoutNotificationModule.error_payout_notification(booking_detail);
+                        await ContractPayoutNotificationModule.error_payout_notification(contract_detail);
                         return reject({ msg: "stripe payment failed", status: false, data: {} })
                     }
                 case 'mpesa':
-                    let mpesa_charge = await mpesaModule.mpesa_payment(args, booking_detail)
+                    let mpesa_charge = await mpesaModule.mpesa_payment(args, contract_detail)
                     if (mpesa_charge.charge.status == true) {
                         await ContractPayoutNotificationModule.update_booking_after_payment(args, mpesa_charge.charge)
-                        return resolve({ msg: "mpesa payment success", status: true, data: booking_detail })
+                        return resolve({ msg: "mpesa payment success", status: true, data: contract_detail })
                     } else {
-                        await ContractPayoutNotificationModule.error_payout_notification(booking_detail);
+                        await ContractPayoutNotificationModule.error_payout_notification(contract_detail);
                         return reject({ msg: "mpesa payment failed", status: false, data: {} })
                     }
                 default:

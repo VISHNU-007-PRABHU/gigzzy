@@ -104,9 +104,9 @@ const typeDefs = gql`
         get_contract_all_files(contract_id:ID):[CompanyImage]
         get_currencys(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,pagination:Boolean,page:Int,limit:Int):CurrencyConnection
         get_currency(_id:ID,country_code:String,location_code:String):Currency
-        get_biding_pagination(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int,contract_id:ID):BidingConnection
+        get_biding_pagination(location_code:String,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int,contract_id:ID):BidingConnection
         get_biding_all_files(contract_id:ID):[CompanyImage]
-        get_biding_detail(contract_id:ID):Biding
+        get_biding_detail(location_code:String,contract_id:ID):Biding
         GetCategoryCurrency(pagination:Boolean,data:JSON,_id:ID,category_id:ID,country_code:String,country_id:ID):SubCategoryConnection
     }
 
@@ -371,6 +371,7 @@ const typeDefs = gql`
         get_company_root_detail(root:Boolean):Company
         get_contract_address_detail(root:Boolean):UserAddress
         get_user:[Detail]
+        get_provider_user:[Detail]
         currency_code:String
         location_code:String
         current_page:String
@@ -1062,6 +1063,7 @@ const typeDefs = gql`
             user_id: String
             provider_id:ID
             biding_id:ID
+            contract_id:ID
             file:[Upload]
             milestone_data:JSON
         ):Milestone

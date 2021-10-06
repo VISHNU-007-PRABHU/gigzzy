@@ -321,6 +321,7 @@ const resolvers = {
     },
     ContractJob: {
         get_user: userResolver.available_booking_user,
+        get_provider_user:userResolver.find_payout_provider,
         get_contract_files: contractResolver.get_contract_files,
         get_contract_category: categoryResolver.available_booking_category,
         get_contract_all_files: contractResolver.get_contract_all_files,
@@ -361,6 +362,7 @@ const resolvers = {
         DeleteContractJobFile: contractResolver.DeleteContractJobFile,
         update_biding: bidingResolver.update_biding,
         BidingFileUpload: bidingResolver.BidingFileUpload,
+        update_milestone:bidingResolver.update_milestone,
         // company detiail
         UpdateCategoryCurrency: categoryResolver.UpdateCategoryCurrency,
         DeleteCategoryCurrency: categoryResolver.DeleteCategoryCurrency,
