@@ -53,6 +53,7 @@ const Email_Login = React.lazy(() => import("./component/User/Login/Email_Login"
 const Request = React.lazy(() => import("./component/Admin/Request/Request"));
 const Booking_Details = React.lazy(() => import("./component/Admin/Booking/Booking_Details"));
 const Invoice = React.lazy(() => import('./component/Admin/Booking/invoice'));
+const ContractInvoice = React.lazy(() => import('./component/Admin/Booking/ContractInvoice'));
 
 const NotFound = React.lazy(() => import('./component/Comman/NotFound'));
 const NotAccess = React.lazy(() => import('./component/Comman/NotAccess'));
@@ -108,13 +109,7 @@ function PrivateRoute({ permission, component: Component, ...rest }) {
   );
 }
 
-function UserRoute({ component: Component, ...rest }) {
-
-  const location = useLocation();
-  let url_path = location.pathname.split('/')[1] || ""
-  let non_footer = ['description']
-  let footer_boolean = non_footer.includes(url_path)
-  console.log("url_path", footer_boolean)
+function UserRoute({ component: Component,isFooter, ...rest }) {
   return (
     <Route
       {...rest}
@@ -127,7 +122,7 @@ function UserRoute({ component: Component, ...rest }) {
                   <UserHeader />
                 </Suspense>
                 <Component {...props} />
-                {!footer_boolean &&
+                {isFooter &&
                   <Suspense fallback={<Skeleton active />}>
                     <UserFooter />
                   </Suspense>
@@ -251,6 +246,7 @@ ReactDOM.render(
             <PrivateRoute exact path="/contract/view/:id" component={ContractUserDetail} />
 
             <UnAuthRoute path="/admin-booking-invoice/:id" component={Invoice} exact />
+            <UnAuthRoute path="/admin-contract-invoice/:id" component={ContractInvoice} exact />
             <UnAuthRoute exact path="/admin" component={LoginPage} />
             <UnAuthRoute isHeader={true} isFooter={true} exact path="/" component={HomePage} />
             <UnAuthRoute exact path="/login" component={User_Login} />
@@ -264,9 +260,10 @@ ReactDOM.render(
             <UnAuthRoute exact path="/notaccess" component={NotAccess} />
 
             <UserRoute exact path="/profile" component={Profile_Page} />
-            <UserRoute exact path="/description/:id" component={Description_Page} />
-            <UserRoute exact path="/bookings" component={Bookings_Page} />
-
+            <UserRoute isFooter={false} exact path="/description/:id" component={Description_Page} />
+            <UserRoute isFooter={false} exact path="/bookings" component={Bookings_Page} />
+            <UserRoute exact path="/contract_booking/:id" component={ContractBooking} />
+            <UserRoute isHeader={true} exact path="/contract/user_view/:id" component={ContractUserDetail} />
           </Suspense>
           <Route component={NotFound} />
         </Switch >

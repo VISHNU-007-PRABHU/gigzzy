@@ -77,11 +77,11 @@ class Invoice extends React.Component {
             this.current_booking_status(this.props.match.params.id)
             this.setState({
                 booking: result.data.booking,
-                booking_category: result.data.booking[0].booking_category,
-                booking_user: result.data.booking[0].booking_user,
-                booking_provider: result.data.booking[0].booking_provider,
-                message: result.data.booking[0].get_booking_message,
-                booking_status: result.data.booking[0].booking_status,
+                booking_category: result.data.booking[0]?.booking_category,
+                booking_user: result.data.booking[0]?.booking_user,
+                booking_provider: result.data.booking[0]?.booking_provider,
+                message: result.data.booking[0]?.get_booking_message,
+                booking_status: result.data.booking[0]?.booking_status,
                 payment_type: result.data.booking[0]?.payment_type || "",
                 base_price: result.data.booking[0]?.base_price || "",
                 extra_price: result.data.booking[0]?.extra_price || "",
@@ -156,7 +156,7 @@ class Invoice extends React.Component {
                         </Suspense>
                     </div>
                     <div className="user_batch mx-3">
-                        <p><b>{booking_user[0] ? booking_user[0].name : ""}</b></p>
+                        <p><b>{booking_user[0] ? booking_user[0]?.name : ""}</b></p>
                         <p>Thanks for using gigzzy.</p>
                     </div>
                     <div className="total_fare">

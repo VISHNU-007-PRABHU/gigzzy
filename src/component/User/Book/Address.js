@@ -169,7 +169,7 @@ const Address = (props) => {
         } else {
             updateTodo({ variables: data }).then(results => {
                 if (results.data.modified_address.status === 'success') {
-                    let url_value=['/profile', '/contract_booking','/admin-company','/login']
+                    let url_value=['/profile','/login']
                     if (!includes(url_value,location.pathname.split('/')[1])) {
                         value.location_change(data);
                     }

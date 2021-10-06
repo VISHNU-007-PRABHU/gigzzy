@@ -381,34 +381,34 @@ class Bookings extends React.Component {
                         </Suspense>
                     </Col>
                     <Col lg={{ span: 4 }}>
-                        <Card className="booking_view_showdow">
-                            <Card.Grid className='w-100 cursor_point' onClick={() => { this.handleModeChange("10") }}>
+                        <Card className="normal_font_size">
+                            <Card.Grid  className={this.state.mode_state === 'Pending' ? 'bg-gradient-primary w-100 cursor_point':'w-100 cursor_point'} onClick={() => { this.handleModeChange("10") }}>
                                 <Row>
                                     <Col span={20}>
-                                        <span className={this.state.mode_state === 'Pending' ? "primary_color bold" : "bold"}>Incoming</span>
+                                        <span className={this.state.mode_state === 'Pending' ? "text-white bold" : "bold"}>Incoming</span>
                                     </Col>
                                     <Col span={4}>
-                                        <span className={this.state.mode_state === 'Pending' ? "primary_color float-right" : "float-right"}> <Icon type="hourglass" /> </span>
+                                        <span className={this.state.mode_state === 'Pending' ? "text-white float-right" : "float-right"}> <Icon type="hourglass" /> </span>
                                     </Col>
                                 </Row>
                             </Card.Grid>
-                            <Card.Grid className='w-100 cursor_point' onClick={() => { this.handleModeChange("4") }}>
+                            <Card.Grid  className={this.state.mode_state === 'OnGoing' ? 'bg-gradient-primary w-100 cursor_point':'w-100 cursor_point'} onClick={() => { this.handleModeChange("4") }}>
                                 <Row>
                                     <Col span={20}>
-                                        <span className={this.state.mode_state === 'OnGoing' ? "primary_color bold" : "bold"}>On Going</span>
+                                        <span className={this.state.mode_state === 'OnGoing' ? "text-white bold" : "bold"}>On Going</span>
                                     </Col>
                                     <Col span={4}>
-                                        <span className={this.state.mode_state === 'OnGoing' ? "primary_color float-right" : "float-right"}> <Icon type="fire" /> </span>
+                                        <span className={this.state.mode_state === 'OnGoing' ? "text-white float-right" : "float-right"}> <Icon type="fire" /> </span>
                                     </Col>
                                 </Row>
                             </Card.Grid>
-                            <Card.Grid className='w-100 cursor_point' onClick={() => { this.handleModeChange("14") }}>
+                            <Card.Grid  className={this.state.mode_state === 'Completed' ? 'bg-gradient-primary w-100 cursor_point':'w-100 cursor_point'} onClick={() => { this.handleModeChange("14") }}>
                                 <Row >
                                     <Col span={20}>
-                                        <span className={this.state.mode_state === 'Completed' ? "primary_color bold" : "bold"}>Completed</span>
+                                        <span className={this.state.mode_state === 'Completed' ? "text-white bold" : "bold"}>Completed</span>
                                     </Col>
                                     <Col span={4}>
-                                        <span className={this.state.mode_state === 'Completed' ? "primary_color float-right" : "float-right"}> <Icon type="carry-out" /> </span>
+                                        <span className={this.state.mode_state === 'Completed' ? "text-white float-right" : "float-right"}> <Icon type="carry-out" /> </span>
                                     </Col>
                                 </Row>
                             </Card.Grid>

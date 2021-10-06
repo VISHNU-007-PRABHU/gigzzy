@@ -171,6 +171,37 @@ mutation AcceptJobMutation($role: Int
   }
 }`
 
+export const MANAGE_CONTRACT = gql`
+mutation MANAGECONTRACT($role: Int
+  $contract_id: ID
+  $provider_id: ID
+  $biding_id:ID
+  $user_id:ID
+  $booking_status:Int
+  $phone_number:String
+  $payment_type:String
+  $payment_option:String
+  $location_code:String
+  $stripe_token:String
+){
+  manage_contract_booking(
+    role:$role
+    contract_id: $contract_id
+    biding_id:$biding_id
+    provider_id: $provider_id
+    user_id:$user_id
+    booking_status: $booking_status
+    phone_number : $phone_number
+    payment_type:$payment_type
+    payment_option:$payment_option
+    location_code:$location_code
+    stripe_token:$stripe_token
+  ){
+    status
+    msg
+  }
+}`
+
 
 export const MY_CONTRACT_APPOINTMENTS = gql`
     query MY_CONTRACT_APPOINTMENTS($user_id:ID,$role:Int,$limit:Int,$page:Int){
@@ -184,7 +215,15 @@ export const MY_CONTRACT_APPOINTMENTS = gql`
           name
           contract_ref
           budget
-          # created_at
+          created_at
+          get_contract_category {
+            category_type
+            subCategory_name
+            category_name
+          }
+          get_contract_all_files(limit:1){
+              small_image
+            }
         }
     }
 }`

@@ -1,8 +1,8 @@
 $primarycolor: #99d332;
-$secondarycolor:#84cb07;
-$optioncolor:#3504eb;
-$light_black:#474747;
-$primaryBlueColor:#170b59;
+$secondarycolor: #84cb07;
+$optioncolor: #3504eb;
+$light_black: #474747;
+$primaryBlueColor: #170b59;
 $bdr-color: #dfdfdf;
 $screen-sm-min: 767px;
 $screen-md-min: 1000px;
@@ -14,7 +14,7 @@ $zero: 0px;
     background: linear-gradient(87deg, hsl(90, 58%, 35%), $primarycolor) !important;
     // background: white;
 }
-.br_10{
+.br_10 {
     border-radius: 10px;
 }
 .ant-menu-item {
@@ -23,7 +23,7 @@ $zero: 0px;
     font-size: 15px !important;
 }
 .ant-checkbox-checked .ant-checkbox-inner {
-    background-color:$primarycolor !important;
+    background-color: $primarycolor !important;
     border-color: $primarycolor !important;
 }
 .ant-menu.ant-menu-dark .ant-menu-item-selected,
@@ -41,7 +41,7 @@ $zero: 0px;
     background-color: white !important;
 }
 
-.option_blue{
+.option_blue {
     color: $optioncolor !important;
 }
 .logo {
@@ -142,7 +142,7 @@ $zero: 0px;
 }
 
 a,
-.ant-menu-dark .ant-menu-item-selected>a:hover {
+.ant-menu-dark .ant-menu-item-selected > a:hover {
     color: $primarycolor !important;
 }
 
@@ -284,7 +284,7 @@ html {
     padding: 1em !important;
 }
 
-.h_18_em{
+.h_18_em {
     height: 18em;
 }
 
@@ -339,8 +339,8 @@ html {
 }
 
 .banner_center {
-    position:absolute;
-    top:100px;
+    position: absolute;
+    top: 100px;
     color: #fff !important;
 }
 
@@ -355,7 +355,7 @@ html {
 .h-50x {
     height: 50px !important;
 }
-.h_200x{
+.h_200x {
     height: 200px !important;
 }
 
@@ -645,7 +645,7 @@ html {
     transform: rotate(-90deg);
     position: relative;
     top: 9px;
-    fill:$primarycolor;
+    fill: $primarycolor;
 }
 
 .new_modal .ant-collapse-arrow svg {
@@ -1137,7 +1137,7 @@ html {
 .history_ul li:before {
     background: #fff;
     border: 4px solid $primarycolor;
-    content: '';
+    content: "";
     position: absolute;
     width: 0px;
     height: 0px;
@@ -1501,10 +1501,25 @@ p.ant-scroll-number-only-unit.current {
     border-radius: 25px;
 }
 
-.d_none{
+.d_none {
     display: none !important;
 }
 
-.company_detail_modal .ant-modal-close{
+.company_detail_modal .ant-modal-close {
     right: initial !important;
 }
+.box_shadow_none {
+    box-shadow: 0px 0px 0px 0px !important;
+}
+
+.contract_tag {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: $secondarycolor;
+    color: white;
+    width: -webkit-fill-available;
+    justify-content: center;
+    display: flex;
+  }

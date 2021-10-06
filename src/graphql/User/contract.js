@@ -56,6 +56,7 @@ export const GET_CONTRACT = gql`
             terms_condition
             contract_ref
             biding_count
+            created_at
             get_contract_category{
                 category_name
                 subCategory_name
@@ -70,6 +71,40 @@ export const GET_CONTRACT = gql`
                     small_image
                     large_image
                     image_tag
+                }
+            }
+            get_provider_user {
+                img_url
+                first_name
+                email
+                phone_no
+                user_type
+                last_name
+                _id
+                get_company_root_detail(root: true) {
+                    company_name
+                    company_website
+                    company_category
+                    get_company_images {
+                    small_image
+                    }
+                }
+            }
+            get_user {
+                img_url
+                first_name
+                user_type
+                last_name
+                email
+                phone_no
+                _id
+                get_company_root_detail(root: true) {
+                    company_name
+                    company_website
+                    company_category
+                    get_company_images {
+                        small_image
+                    }
                 }
             }
         }

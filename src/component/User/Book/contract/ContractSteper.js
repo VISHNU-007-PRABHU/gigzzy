@@ -64,9 +64,9 @@ function ContractSteper(props) {
         if (localStorage.getItem('current_contract_id')) {
             let finaldata = await contract_detail.refetch({ contract_id: localStorage.getItem('current_contract_id') })
             console.log("ContractSteper -> finaldata", finaldata)
-            if(finaldata.data.get_contracts[0].current_page == 5){
-                history.push({pathname: `/contract/view/${localStorage.getItem('current_contract_id')}`})
-            }else{
+            if (finaldata.data.get_contracts[0].current_page == 5) {
+                history.push({ pathname: `/contract/view/${localStorage.getItem('current_contract_id')}` })
+            } else {
                 set_contract_detail(finaldata.data.get_contracts[0])
                 set_address_id(finaldata.data.get_contracts[0]?.address_id)
                 setCurrent(Number(finaldata.data.get_contracts[0].current_page) + 1)
@@ -108,10 +108,10 @@ function ContractSteper(props) {
                 if (final_data.data.update_contract.status === "success") {
                     if (id === 5) {
                         Modal.success({
-                            footer:(null),
+                            footer: (null),
                             content: (
                                 <Suspense fallback={<Skeleton active />}>
-                                    <PostProjectSuccess id={input_data['_id']}/>
+                                    <PostProjectSuccess id={input_data['_id']} />
                                 </Suspense>
                             ),
                         });
@@ -152,7 +152,7 @@ function ContractSteper(props) {
     }
 
     const on_location_change = (item) => {
-        set_address_id(item._id);
+        set_address_id(item.user_address[0]._id);
     }
 
     return (
@@ -195,7 +195,7 @@ function ContractSteper(props) {
                                 </Button>
                                 <SetAddress user_id={user_id} address_id={address_id} />
                             </LocationContext.Provider>
-                            <Address visible={add_address} />
+                                <Address visible={add_address}  />
                         </div>
                     </Suspense>
                     <div className="steps-action justify-content-between d-flex">

@@ -128,7 +128,7 @@ class BidingList extends React.Component {
                         <div className="d-flex justify-content-between align-items-center">
                           <div className="normal_font_size">{item.get_user[0]?.first_name || ""}{item.get_user[0]?.last_name || ""}</div>
                           <div>
-                            <img alt='' src={false ? green_flag : white_flag} loading="lazy" className="lazyload" />
+                            <img alt='' src={item.add_to_shortlist ? green_flag : white_flag} loading="lazy" className="lazyload" />
                           </div>
                         </div>
                         <div className="d-flex justify-content-between align-items-end mt-1">
