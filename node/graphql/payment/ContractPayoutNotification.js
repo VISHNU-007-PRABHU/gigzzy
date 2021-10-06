@@ -25,7 +25,7 @@ exports.update_provider_payout = async (contract_data) => {
     }
 }
 
-exports.update_contract_after_payment = async (args, charge) => {
+exports.update_contract_after_payment = async (args, charge,biding) => {
     return new Promise(async function (resolve, reject) {
         try {
             let contract_data = {
@@ -35,7 +35,8 @@ exports.update_contract_after_payment = async (args, charge) => {
                 payment_type: args.payment_type,
                 payment_option: args.payment_option,
                 payment_history: charge,
-                biding_id:args['biding_id']
+                biding_id:args['biding_id'],
+                provider_id:biding.user_id
             }
 
             if (args.booking_status === 10) {

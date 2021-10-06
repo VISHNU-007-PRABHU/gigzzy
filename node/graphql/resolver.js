@@ -323,7 +323,7 @@ const resolvers = {
     },
     ContractJob: {
         get_user: userResolver.available_booking_user,
-        get_provider_user:userResolver.find_payout_provider,
+        get_provider_user:userResolver.available_booking_povider,
         get_contract_files: contractResolver.get_contract_files,
         get_contract_category: categoryResolver.available_booking_category,
         get_contract_all_files: contractResolver.get_contract_all_files,
