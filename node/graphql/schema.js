@@ -1052,7 +1052,7 @@ const typeDefs = gql`
             provider_id:ID
             company_id:ID
             file:[Upload]
-            biding_data:[JSON]
+            biding_data:JSON
         ):Biding
         BidingFileUpload(_id:ID,contract_id:ID,category:String,image_tag:String,data:[JSON],file:[Upload]):CompanyImage
 
@@ -1063,7 +1063,7 @@ const typeDefs = gql`
             provider_id:ID
             biding_id:ID
             file:[Upload]
-            milestone_data:[JSON]
+            milestone_data:JSON
         ):Milestone
         UpdateCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
         DeleteCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory

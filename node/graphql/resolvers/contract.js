@@ -11,9 +11,10 @@ var subCategory_model = model.sub_category;
 var Detail_model = model.detail;
 var ContractJob_model = model.contract_job;
 var ContractJobImage_model = model.contract_job_images;
-var Address_model = model.address   
-var Biding_model = model.Biding   
+var Address_model = model.address
+var Biding_model = model.Biding
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
+const payment_choose = require('../payment/choose')
 const path = require("path");
 var fs = require('fs');
 
@@ -185,15 +186,15 @@ module.exports.get_contract_all_files = async (root, args) => {
             {
                 $match: match
             },
-            {$limit : limit }
+            { $limit: limit }
         ]
 
         let grouped_images = await ContractJobImage_model.aggregate(pipeline)
-        if(_.size(grouped_images)){
+        if (_.size(grouped_images)) {
             return grouped_images
-        }else{
+        } else {
             return [{
-                small_image:commonHelper.no_image()
+                small_image: commonHelper.no_image()
             }]
         }
     } catch (error) {
@@ -223,7 +224,7 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
             find_query['user_id'] = ObjectId(args['user_id'])
         }
 
-        if (args.role && args.role == 2  && args['user_id']) {
+        if (args.role && args.role == 2 && args['user_id']) {
             // if (args.booking_status == 12) {
             find_query['available_provider'] = { $ne: [ObjectId(args.user_id)] }
             // } else {
@@ -272,7 +273,7 @@ module.exports.get_contract_address_detail = async (parent, args, context, info)
             find_query['_id'] = root['address_id']
         }
         console.log("module.exports.get_contract_address_detail -> find_query", find_query)
-       let result = await Address_model.findOne(find_query);
+        let result = await Address_model.findOne(find_query);
         return result;
     } catch (error) {
         return {}
@@ -395,27 +396,33 @@ module.exports.delete_biding = async (root, args) => {
  * @param {*} args  {contract_id,user_id,biding_id,booking_status,payment_option,payment_type}
  * @param {*} args  {location_code}
  */
-exports.manage_contract_booking=async(root,args)=>{
-    let preview_contract_data = await ContractJob_model.find({_id:args.contract_id}).lean()
-    let preview_biding_data = await Biding_model.find({_id:args.biding_id}).lean()
+exports.manage_contract_booking = async (root, args) => {
+    try {
 
-    if(args.booking_status === 10 && preview_contract_data.booking_status === 9){  
-        let base_amount = preview_biding_data.budget;
-        let category_service_fee = 20;
-        let service_fee = (category_service_fee / 100) * base_amount;             
-        args['amount'] = service_fee;
-     
-        console.log("exports.manage_contract_booking -> args", args)
-        let payment_data = await payment_choose.choose_contract_payment(args, preview_contract_data,preview_biding_data)
-        console.log("payment_data", payment_data)
-        if (payment_data.status) {
-            var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
-            findBooking['user_parent'] = true;
-            findBooking['msg'] = "user accept the contract";
-            findBooking['status'] = 'success';
-            return [findBooking]
-        } else {
-            return [{ msg: "Booking Payment failed", status: 'failed' }]
+        let preview_contract_data = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
+        let preview_biding_data = await Biding_model.findOne({ _id: args.biding_id }).lean()
+        console.log("exports.manage_contract_booking -> preview_biding_data", preview_biding_data)
+
+        if (args.booking_status === 10 && preview_contract_data.booking_status === 9) {
+            let base_amount = preview_biding_data.budget;
+            let category_service_fee = 20;
+            let service_fee = (category_service_fee / 100) * base_amount;
+            args['amount'] = service_fee;
+
+            console.log("exports.manage_contract_booking -> args", args)
+            let payment_data = await payment_choose.choose_contract_payment(args, preview_contract_data, preview_biding_data)
+            console.log("payment_data", payment_data)
+            if (payment_data.status) {
+                var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
+                findBooking['user_parent'] = true;
+                findBooking['msg'] = "user accept the contract";
+                findBooking['status'] = 'success';
+                return [findBooking]
+            } else {
+                return { msg: "Contract Payment failed", status: 'failed' }
+            }
         }
+    } catch (error) {
+        return { msg: "Contract Payment failed", status: 'failed' }
     }
 }

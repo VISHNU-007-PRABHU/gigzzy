@@ -1,18 +1,7 @@
-const model = require('../../model_data');
 const _ = require('lodash');
-const moment = require("moment");
 const dotenv = require('dotenv');
 var stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 dotenv.config();
-
-var Detail_model = model.detail;
-var Booking_model = model.booking;
-var subCategory_model = model.sub_category;
-var Category_model = model.category;
-var message_model = model.message;
-var Payout_model = model.payout;
-var Extra_fee_model = model.Extra_fee;
-var providerSubcategory_model = model.providerSubcategory_model;
 
 const stripe_country_code =[{
     code:"IN",

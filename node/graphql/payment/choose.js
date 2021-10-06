@@ -10,10 +10,10 @@ exports.choose_payment = async (args, booking_detail) => {
         try {
             switch (args.payment_option) {
                 case 'stripe':
-                    let stripe_charge = await stripeModule.stripe_payment(args, booking_detail)
+                    let stripe_charge = await stripeModule.stripe_payment(args, contract_detail,biding_data)
                     if (stripe_charge.charge.status == "succeeded" && stripe_charge.charge.paid == true) {
                         await payoutNotificationModule.update_booking_after_payment(args, stripe_charge.charge)
-                        await payoutNotificationModule.update_provider_payout(booking_detail)
+                        await payoutNotificationModule.update_provider_payout(contract_detail)
                         await payoutNotificationModule.accept_payout_notification(booking_detail)
                         return resolve({ msg: "stripe payment success", status: true, data: booking_detail })
                     } else {
@@ -39,7 +39,7 @@ exports.choose_payment = async (args, booking_detail) => {
     })
 }
 
-exports.choose_contract_payment = async (args, booking_detail) => {
+exports.choose_contract_payment = async (args,contract_detail,biding_detail) => {
     return new Promise(async function (resolve, reject) {
         try {
             switch (args.payment_option) {
