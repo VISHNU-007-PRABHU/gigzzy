@@ -983,8 +983,9 @@ exports.addUser = async (parent, args) => {
             }
             else {
                 //"otp is change"
+                let otp = String(Math.floor(1000 + Math.random() * 9000));
                 let updatedata = {
-                    otp: String(Math.floor(1000 + Math.random() * 9000)),
+                    otp:otp,
                     last_otp_verification: moment.utc().format()
                 };
                 await Detail_model.updateOne({ phone_no: args.phone_no, role: args.role }, updatedata);
