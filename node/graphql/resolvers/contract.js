@@ -196,9 +196,7 @@ module.exports.get_contract_all_files = async (root, args) => {
                 return grouped_images
             }
         } else {
-            return [{
-                small_image: commonHelper.no_image()
-            }]
+            return []
         }
     } catch (error) {
         console.log("module.exports.get_contract_files -> error", error)
