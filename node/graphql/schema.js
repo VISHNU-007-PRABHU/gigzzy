@@ -327,6 +327,7 @@ const typeDefs = gql`
         delete:Boolean,
         booking_status:String,
         created_at:String,
+        updatedAt:String,
         get_milestone_all_images(milestone_id:ID,_id:ID,root:Boolean):[CompanyImage]
     }
     type Currency{

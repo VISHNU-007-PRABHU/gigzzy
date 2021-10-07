@@ -1326,10 +1326,8 @@ module.exports.confrimation_call = async (body) => {
             update_details['resultcode'] = ResultCode;
             update_details['payment_message'] = body["Body"]["stkCallback"]["ResultDesc"]
 
-            let pre_contract_detail = await Contract_model.findOne({ ctob_billRef }).lean()
-            if (!_.size(pre_contract_detail)) {
-                console.log("module.exports.pre_booking_detail -> error", "null")
-            } else {
+            let pre_contract_detail = await Contract_model.findOne({ CheckoutRequestID }).lean()
+            if (_.size(pre_contract_detail)) {
                 let confirmation_body = {
                     TransID: body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"],
                     TransTime: body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"],
@@ -1536,9 +1534,7 @@ module.exports.c2b_confirmation = async (body) => {
 
 
             let pre_contract_detail = await Contract_model.findOne({ ctob_billRef }).lean()
-            if (!_.size(pre_contract_detail)) {
-                console.log("module.exports.pre_booking_detail -> error", "null")
-            } else {
+            if (_.size(pre_contract_detail)) {
                 let confirmation_body = {
                     TransID: body['TransID'],
                     TransAmount: body['TransAmount'],
