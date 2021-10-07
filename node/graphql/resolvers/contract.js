@@ -229,7 +229,7 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         }
 
         console.log("module.exports.get_contracts_pagination -> offset", offset)
-        console.log("module.exports.get_contracts_pagination -> limit", limit)
+        console.log("module.exports.get_contracts_pagination -> limit", Number(limit))
         total = await ContractJob_model.count(find_query);
         let result = await ContractJob_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(Number(limit));
         var pageInfo = { totalDocs: total, page: args.page }
