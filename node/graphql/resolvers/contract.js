@@ -178,7 +178,7 @@ module.exports.get_contract_all_files = async (root, args) => {
         let match = {
             delete: false
         }
-        let limit = args.limit || 0
+        let limit = args.limit || 1
         if (args['contract_id']) {
             match['contract_id'] = ObjectId(args['contract_id'])
         }
@@ -186,12 +186,15 @@ module.exports.get_contract_all_files = async (root, args) => {
             {
                 $match: match
             },
-            { $limit: limit }
         ]
 
         let grouped_images = await ContractJobImage_model.aggregate(pipeline)
         if (_.size(grouped_images)) {
-            return grouped_images
+            if(args.limit){
+                return _.take(grouped_images,limit)
+            }else{
+                return grouped_images
+            }
         } else {
             return [{
                 small_image: commonHelper.no_image()
