@@ -283,11 +283,20 @@ module.exports.get_contract_address_detail = async (parent, args, context, info)
 module.exports.update_contract = async (root, args) => {
     try {
         console.log("module.exports.update_contract -> args", args)
-        console.log("module.exports.update_contract -> contract_detail", contract_detail)
         let contract_detail = args['contract_data'][0]
+        console.log("module.exports.update_contract -> contract_detail", contract_detail)
         if (args['_id']) {
             let find_query = {
                 _id: args["_id"]
+            }
+            var category_data = {}
+            if(contract_detail.category_type === 1){
+              category_data = await Category_model.findOne({ _id: contract_detail.category_id }).lean()
+            }else if(contract_detail.category_type === 2){
+                category_data = await subCategory_model.findOne({ _id: contract_detail.category_id }).lean()
+            }
+            if(_.size(category_data)){
+                contract_detail['service_fee'] = String(parseFloat(category_data.service_fee || 0).toFixed(2));
             }
             let update_bid = await ContractJob_model.updateOne(find_query, contract_detail).exec()
             let fetch_bid = await ContractJob_model.findOne(find_query).lean()
@@ -312,6 +321,7 @@ module.exports.update_contract = async (root, args) => {
             var default_currency = await Currency_model.findOne({ default_currency: 1, is_delete: false }).lean()
             var local_currency = await Currency_model.findOne({ location: args.local_location_code, is_delete: false }).lean()
             var category_data = {}
+            
             if(contract_detail.category_type === 1){
               category_data = await Category_model.findOne({ _id: contract_detail.category_id }).lean()
             }else if(contract_detail.category_type === 2){
@@ -326,7 +336,9 @@ module.exports.update_contract = async (root, args) => {
             contract_detail['default_currency_rate'] = default_currency.rate;
             contract_detail['currenct_local_rate'] = local_currency.rate;
             contract_detail['location'] = { coordinates: [args.lng, args.lat] }
-            contract_detail['service_fee'] = String(parseFloat(category_data.service_fee || 0).toFixed(2));
+            if(_.size(category_data)){
+                contract_detail['service_fee'] = String(parseFloat(category_data.service_fee || 0).toFixed(2));
+            }
             contract_detail['base_price'] = String(parseFloat(contract_detail.budget).toFixed(2));
             contract_detail['total'] = Number(contract_detail['service_fee']) + Number(contract_detail['base_price'])
             contract_detail['booking_ref'] = String(Math.floor(1000 + Math.random() * 9000));
