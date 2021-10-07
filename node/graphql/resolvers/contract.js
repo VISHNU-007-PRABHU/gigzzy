@@ -236,7 +236,7 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         return { data: result, pageInfo };
     } catch (error) {
         console.log("module.exports.get_contracts_pagination -> error", error)
-        return { data: [], pageInfo:{ totalDocs: 0, page: 1 } };
+        return { data: [], pageInfo: { totalDocs: 0, page: 1 } };
     }
 };
 module.exports.get_contracts = async (root, args) => {
@@ -289,13 +289,23 @@ module.exports.update_contract = async (root, args) => {
             let find_query = {
                 _id: args["_id"]
             }
+
+            var CurrencyDetail = await Currency_model.findOne({ location: args.location_code }).lean()
+            if (!_.size(CurrencyDetail)) {
+                return { msg: "invalid location code", status: "failed" }
+            } else {
+                contract_detail['currency_id'] = CurrencyDetail._id;
+                contract_detail['symbol'] = CurrencyDetail.symbol || "";
+                contract_detail['currency_detail'] = CurrencyDetail;
+            }
+
             var category_data = {}
-            if(contract_detail.category_type === 1){
-              category_data = await Category_model.findOne({ _id: contract_detail.category_id }).lean()
-            }else if(contract_detail.category_type === 2){
+            if (contract_detail.category_type === 1) {
+                category_data = await Category_model.findOne({ _id: contract_detail.category_id }).lean()
+            } else if (contract_detail.category_type === 2) {
                 category_data = await subCategory_model.findOne({ _id: contract_detail.category_id }).lean()
             }
-            if(_.size(category_data)){
+            if (_.size(category_data)) {
                 contract_detail['service_fee'] = String(parseFloat(category_data.service_fee || 0).toFixed(2));
             }
             let update_bid = await ContractJob_model.updateOne(find_query, contract_detail).exec()
@@ -308,35 +318,22 @@ module.exports.update_contract = async (root, args) => {
             return fetch_bid
         } else {
 
-
-            var CurrencyDetail = await Currency_model.findOne({ location: args.location_code }).lean()
-            console.log("CurrencyDetail", CurrencyDetail._id)
-            if (!_.size(CurrencyDetail)) {
-                return {msg:"invalid location code",status:"failed"}
-            }
-            // var categoryCurrency = await CategoryCurrency_model.findOne({ category_id: args.category_id, currency_id: CurrencyDetail._id }).lean()
-            // if (!_.size(categoryCurrency)) {
-            //     return {msg:"invalid category currenct",status:"failed"}
-            // }
             var default_currency = await Currency_model.findOne({ default_currency: 1, is_delete: false }).lean()
             var local_currency = await Currency_model.findOne({ location: args.local_location_code, is_delete: false }).lean()
             var category_data = {}
-            
-            if(contract_detail.category_type === 1){
-              category_data = await Category_model.findOne({ _id: contract_detail.category_id }).lean()
-            }else if(contract_detail.category_type === 2){
+
+            if (contract_detail.category_type === 1) {
+                category_data = await Category_model.findOne({ _id: contract_detail.category_id }).lean()
+            } else if (contract_detail.category_type === 2) {
                 category_data = await subCategory_model.findOne({ _id: contract_detail.category_id }).lean()
             }
             console.log("module.exports.update_contract -> category_data", category_data)
             contract_detail['available_provider'] = [];
-            contract_detail['currency_id'] = CurrencyDetail._id;
-            contract_detail['symbol'] = CurrencyDetail.symbol || "";
-            // contract_detail['current_currency'] = categoryCurrency;
-            contract_detail['currency_detail'] = CurrencyDetail;
+
             contract_detail['default_currency_rate'] = default_currency.rate;
             contract_detail['currenct_local_rate'] = local_currency.rate;
             contract_detail['location'] = { coordinates: [args.lng, args.lat] }
-            if(_.size(category_data)){
+            if (_.size(category_data)) {
                 contract_detail['service_fee'] = String(parseFloat(category_data.service_fee || 0).toFixed(2));
             }
             contract_detail['base_price'] = String(parseFloat(contract_detail.budget).toFixed(2));
@@ -359,22 +356,22 @@ module.exports.update_contract = async (root, args) => {
 }
 
 exports.genrate_random_contract = async () => {
-    try{
-      var random = Math.floor(Math.random() * 90000) + 10000;
-      var chars = "abcdefghijklmnopqrstufwxyzABCDEFGHIJKLMNOPQRSTUFWXYZ1234567890"
-      var random = _.join(_.sampleSize(chars, 20), "")
-      var digit = `${random}`;
-      var check_p_id = await model.contract_job.find({ "ctob_billRef": digit });
-      if (check_p_id.length) {
-          await this.genrate_random_contract()
-      }
-      return digit;
-    }catch(error){
-      console.log("exports.genrate_random_contract -> error", error)
-      return 00000000;
+    try {
+        var random = Math.floor(Math.random() * 90000) + 10000;
+        var chars = "abcdefghijklmnopqrstufwxyzABCDEFGHIJKLMNOPQRSTUFWXYZ1234567890"
+        var random = _.join(_.sampleSize(chars, 20), "")
+        var digit = `${random}`;
+        var check_p_id = await model.contract_job.find({ "ctob_billRef": digit });
+        if (check_p_id.length) {
+            await this.genrate_random_contract()
+        }
+        return digit;
+    } catch (error) {
+        console.log("exports.genrate_random_contract -> error", error)
+        return 00000000;
     }
-  }
-  
+}
+
 exports.find_provider = async (contract_data) => {
     try {
         // get category data
@@ -479,7 +476,7 @@ exports.manage_contract_booking = async (root, args) => {
             } else {
                 return { msg: "Contract Payment failed", status: 'failed' }
             }
-        }else{
+        } else {
             return { msg: "Contract Payment failed", status: 'failed' }
         }
     } catch (error) {
