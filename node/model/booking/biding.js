@@ -17,10 +17,10 @@ var schemaOptions = {
 
 var bidingSchema = new Schema({
 
-  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
-  provider_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
-  category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'category', unique: false },
-  contract_id: { type: mongoose.Schema.Types.ObjectId, ref: 'contract', unique: false },
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', },
+  provider_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user',  },
+  category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'category', },
+  contract_id: { type: mongoose.Schema.Types.ObjectId, ref: 'contract', },
   category_type: { type: Number },  // 1-parent category , 2-sub category
   biding_ref: { type: String, 'default': shortid.generate },
   booked: { type: String },
