@@ -1046,6 +1046,7 @@ const typeDefs = gql`
             location_code:String,
             local_location_code:String,
             category_id:ID,
+            category_type:Int,
             lat:Float,
             lng:Float,
             currency_code:String,

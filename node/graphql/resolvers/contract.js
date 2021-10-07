@@ -205,11 +205,11 @@ module.exports.get_contract_all_files = async (root, args) => {
 
 module.exports.get_contracts_pagination = async (parent, args, context, info) => {
     try {
-        var limit = args.limit || 10;
+        console.log("module.exports.get_contracts_pagination -> args", args)
+        var limit = Number(args.limit) || 10;
         var page = args.page || 1;
         var offset = Number(page - 1) * Number(limit);
         var total = 0;
-        var result = [];
         let find_query = { is_delete: false }
         if (args['search']) {
             find_query = { ...find_query, ...args['search'] }
@@ -225,25 +225,18 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         }
 
         if (args.role && args.role == 2 && args['user_id']) {
-            // if (args.booking_status == 12) {
             find_query['available_provider'] = { $ne: [ObjectId(args.user_id)] }
-            // } else {
-            //     if (args.booking_status == 4) {
-            //         find_query['provider_id'] = args._id;
-            //         find_query['booking_status'] = { $in: [13, 4] }
-            //     } else {
-            //             find_query['provider_id'] = args._id ;
-            //             find_query['booking_status'] = args.booking_status
-            //         }
-            //     }
         }
 
+        console.log("module.exports.get_contracts_pagination -> offset", offset)
+        console.log("module.exports.get_contracts_pagination -> limit", limit)
         total = await ContractJob_model.count(find_query);
-        result = await ContractJob_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
+        let result = await ContractJob_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(Number(limit));
         var pageInfo = { totalDocs: total, page: args.page }
         return { data: result, pageInfo };
     } catch (error) {
-        return []
+        console.log("module.exports.get_contracts_pagination -> error", error)
+        return { data: [], pageInfo:{ totalDocs: 0, page: 1 } };
     }
 };
 module.exports.get_contracts = async (root, args) => {
@@ -310,28 +303,33 @@ module.exports.update_contract = async (root, args) => {
             if (!_.size(CurrencyDetail)) {
                 return {msg:"invalid location code",status:"failed"}
             }
-            var categoryCurrency = await CategoryCurrency_model.findOne({ category_id: args.category_id, currency_id: CurrencyDetail._id }).lean()
-            if (!_.size(categoryCurrency)) {
-                return {msg:"invalid category currenct",status:"failed"}
-            }
+            // var categoryCurrency = await CategoryCurrency_model.findOne({ category_id: args.category_id, currency_id: CurrencyDetail._id }).lean()
+            // if (!_.size(categoryCurrency)) {
+            //     return {msg:"invalid category currenct",status:"failed"}
+            // }
             var default_currency = await Currency_model.findOne({ default_currency: 1, is_delete: false }).lean()
             var local_currency = await Currency_model.findOne({ location: args.local_location_code, is_delete: false }).lean()
-         
+            var category_data = {}
+            if(contract_detail.category_type === 1){
+              category_data = await Category_model.findOne({ _id: contract_detail.category_id }).lean()
+            }else if(contract_detail.category_type === 2){
+                category_data = await subCategory_model.findOne({ _id: contract_detail.category_id }).lean()
+            }
+            console.log("module.exports.update_contract -> category_data", category_data)
             contract_detail['available_provider'] = [];
             contract_detail['currency_id'] = CurrencyDetail._id;
             contract_detail['symbol'] = CurrencyDetail.symbol || "";
-            contract_detail['current_currency'] = categoryCurrency;
+            // contract_detail['current_currency'] = categoryCurrency;
             contract_detail['currency_detail'] = CurrencyDetail;
             contract_detail['default_currency_rate'] = default_currency.rate;
             contract_detail['currenct_local_rate'] = local_currency.rate;
             contract_detail['location'] = { coordinates: [args.lng, args.lat] }
-            contract_detail['service_fee'] = String(parseFloat(20).toFixed(2));
+            contract_detail['service_fee'] = String(parseFloat(category_data.service_fee || 0).toFixed(2));
             contract_detail['base_price'] = String(parseFloat(contract_detail.budget).toFixed(2));
             contract_detail['total'] = Number(contract_detail['service_fee']) + Number(contract_detail['base_price'])
-            contract_detail['price_type'] = categoryCurrency.price_type;
             contract_detail['booking_ref'] = String(Math.floor(1000 + Math.random() * 9000));
             contract_detail['ctob_shotcode'] = process.env.MPESA_SHORT_CODE;
-            contract_detail['ctob_billRef'] = await commonHelper.genrate_random_contract();
+            contract_detail['ctob_billRef'] = await this.genrate_random_contract();
             contract_detail['job_status'] = 12;
             contract_detail['booking_status'] = 9
             let add_contract_job = new ContractJob_model(contract_detail)
@@ -346,6 +344,23 @@ module.exports.update_contract = async (root, args) => {
     }
 }
 
+exports.genrate_random_contract = async () => {
+    try{
+      var random = Math.floor(Math.random() * 90000) + 10000;
+      var chars = "abcdefghijklmnopqrstufwxyzABCDEFGHIJKLMNOPQRSTUFWXYZ1234567890"
+      var random = _.join(_.sampleSize(chars, 20), "")
+      var digit = `${random}`;
+      var check_p_id = await model.contract_job.find({ "ctob_billRef": digit });
+      if (check_p_id.length) {
+          await this.genrate_random_contract()
+      }
+      return digit;
+    }catch(error){
+      console.log("exports.genrate_random_contract -> error", error)
+      return 00000000;
+    }
+  }
+  
 exports.find_provider = async (contract_data) => {
     try {
         // get category data
