@@ -25,6 +25,7 @@ const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
 const payment_choose = require('./payment/choose')
+const MpesaCallback = require('./payment/MpesaCallback')
 dotenv.config();
 
 var Company_model = model.company;
@@ -198,9 +199,9 @@ const resolvers = {
         get_currencys: currencyResolver.get_currencys,
         get_currency: currencyResolver.get_currency,
         get_biding_pagination: bidingResolver.get_biding_pagination,
-        get_biding_detail:bidingResolver.get_biding_detail,
-        get_biding_milestone_detail:bidingResolver.get_biding_milestone_detail,
-        get_biding_milestone:bidingResolver.get_biding_milestone,
+        get_biding_detail: bidingResolver.get_biding_detail,
+        get_biding_milestone_detail: bidingResolver.get_biding_milestone_detail,
+        get_biding_milestone: bidingResolver.get_biding_milestone,
         GetCategoryCurrency: categoryResolver.GetCategoryCurrency,
         get_my_appointments: async (parent, args, context, info) => {
             try {
@@ -279,10 +280,10 @@ const resolvers = {
         get_user: userResolver.available_booking_user,
         get_biding_all_files: bidingResolver.get_biding_all_files,
         get_parent_company_provider: userResolver.get_parent_company_provider,
-        get_company_root_detail:userResolver.get_company_root_detail,
+        get_company_root_detail: userResolver.get_company_root_detail,
     },
-    Milestone:{
-        get_milestone_all_images:bidingResolver.get_milestone_all_images,
+    Milestone: {
+        get_milestone_all_images: bidingResolver.get_milestone_all_images,
     },
     Category: {
         booking_parent_category: categoryResolver.booking_parent_category,
@@ -310,7 +311,7 @@ const resolvers = {
         provider_rating: userResolver.provider_rating,
         provider_rate: userResolver.provider_rate,
         get_currency: currencyResolver.get_currency,
-        get_company_root_detail:userResolver.get_company_root_detail,
+        get_company_root_detail: userResolver.get_company_root_detail,
     },
     Company: {
         get_parent_company_provider: userResolver.get_parent_company_provider,
@@ -321,16 +322,16 @@ const resolvers = {
 
     CompanyProvider: {
         get_company_detail: userResolver.get_company_detail,
-        get_company_root_detail:userResolver.get_company_root_detail,
+        get_company_root_detail: userResolver.get_company_root_detail,
     },
     ContractJob: {
         get_user: userResolver.available_booking_user,
-        get_provider_user:userResolver.available_booking_povider,
+        get_provider_user: userResolver.available_booking_povider,
         get_contract_files: contractResolver.get_contract_files,
         get_contract_category: categoryResolver.available_booking_category,
         get_contract_all_files: contractResolver.get_contract_all_files,
         biding_count: bidingResolver.biding_count,
-        get_contract_address_detail:contractResolver.get_contract_address_detail,
+        get_contract_address_detail: contractResolver.get_contract_address_detail,
     },
     CompanyImage: {
         get_contract_files: contractResolver.get_contract_files,
@@ -366,7 +367,7 @@ const resolvers = {
         DeleteContractJobFile: contractResolver.DeleteContractJobFile,
         update_biding: bidingResolver.update_biding,
         BidingFileUpload: bidingResolver.BidingFileUpload,
-        update_milestone:bidingResolver.update_milestone,
+        update_milestone: bidingResolver.update_milestone,
         // company detiail
         UpdateCategoryCurrency: categoryResolver.UpdateCategoryCurrency,
         DeleteCategoryCurrency: categoryResolver.DeleteCategoryCurrency,
@@ -609,7 +610,7 @@ const resolvers = {
             return [{ id: add_booking._id, location: args.location, description: args.description, provider: find_provider, hours: args.hours, user_image_url: new_data.user_image_url }];
         },
         //change the status in job booking 
-        manage_contract_booking:contractResolver.manage_contract_booking,
+        manage_contract_booking: contractResolver.manage_contract_booking,
         manage_booking: async (parent, args) => {
             //console.log("m_b");
             //console.log(args);
@@ -1325,6 +1326,23 @@ module.exports.confrimation_call = async (body) => {
             update_details['resultcode'] = ResultCode;
             update_details['payment_message'] = body["Body"]["stkCallback"]["ResultDesc"]
 
+            let pre_contract_detail = await Contract_model.findOne({ ctob_billRef }).lean()
+            if (!_.size(pre_contract_detail)) {
+                console.log("module.exports.pre_booking_detail -> error", "null")
+            } else {
+                let confirmation_body = {
+                    TransID: body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"],
+                    TransTime: body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"],
+                    TransAmount: body['TransAmount'],
+                    CheckoutRequestID: CheckoutRequestID,
+                    payment_type: "mpesa",
+                    ResultCode: ResultCode,
+                    payment_message: payment_message
+                }
+                await MpesaCallback.c2b_contract_confiramtion(confirmation_body);
+                return resolve({ status: true, msg: "Payment Is success !", data })
+            }
+
             let pre_booking_detail = await Booking_model.findOne({ CheckoutRequestID }).lean()
             if (ResultCode != 0) {
 
@@ -1515,6 +1533,26 @@ module.exports.c2b_confirmation = async (body) => {
             }
             update_details['resultcode'] = ResultCode;
             update_details['payment_message'] = "ctob payment sucess"
+
+
+            let pre_contract_detail = await Contract_model.findOne({ ctob_billRef }).lean()
+            if (!_.size(pre_contract_detail)) {
+                console.log("module.exports.pre_booking_detail -> error", "null")
+            } else {
+                let confirmation_body = {
+                    TransID: body['TransID'],
+                    TransAmount: body['TransAmount'],
+                    TransTime: body['TransTime'],
+                    ResultCode: ResultCode,
+                    ctob_billRef: ctob_billRef,
+                    payment_type: "c2b",
+                    payment_message: payment_message
+                }
+                await MpesaCallback.c2b_contract_confiramtion(confirmation_body);
+                return resolve({ status: true, msg: "Payment Is success !", data })
+            }
+
+            // check to next phase (vishnu)
 
             let pre_booking_detail = await Booking_model.findOne({ ctob_billRef }).lean()
             if (!_.size(pre_booking_detail)) {
