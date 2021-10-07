@@ -289,16 +289,17 @@ module.exports.update_contract = async (root, args) => {
             let find_query = {
                 _id: args["_id"]
             }
-
-            var CurrencyDetail = await Currency_model.findOne({ location: args.location_code }).lean()
-            if (!_.size(CurrencyDetail)) {
-                return { msg: "invalid location code", status: "failed" }
-            } else {
-                contract_detail['currency_id'] = CurrencyDetail._id;
-                contract_detail['symbol'] = CurrencyDetail.symbol || "";
-                contract_detail['currency_detail'] = CurrencyDetail;
+            if( args.location_code){
+                var CurrencyDetail = await Currency_model.findOne({ location: args.location_code }).lean()
+                if (!_.size(CurrencyDetail)) {
+                    return { msg: "invalid location code", status: "failed" }
+                } else {
+                    contract_detail['currency_id'] = CurrencyDetail._id;
+                    contract_detail['symbol'] = CurrencyDetail.symbol || "";
+                    contract_detail['currency_detail'] = CurrencyDetail;
+                }
             }
-
+            
             var category_data = {}
             if (contract_detail.category_type === 1) {
                 category_data = await Category_model.findOne({ _id: contract_detail.category_id }).lean()
