@@ -285,6 +285,30 @@ exports.uploading_milestone_files = async (files, args) => {
 }
 
 
+exports.get_milestone_all_images = async (root, args) => {
+    try {
+        let match = {
+            delete: false
+        }
+
+        if (args.root) {
+            if (root['_id']) {
+                match['milestone_id'] = ObjectId(root['_id'])
+            }
+        }
+        let pipeline = [
+            {
+                $match: match
+            },
+        ]
+
+        let grouped_images = await MilestoneImage_model.aggregate(pipeline)
+        return grouped_images
+    } catch (error) {
+        console.log("module.exports.get_biding_files -> error", error)
+        return []
+    }
+}
 module.exports.update_milestone = async (root, args) => {
     try {
         let files = args['file']

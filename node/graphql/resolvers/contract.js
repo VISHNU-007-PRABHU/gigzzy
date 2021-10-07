@@ -5,7 +5,10 @@ var Jimp = require('jimp');
 var ObjectId = require('mongodb').ObjectID;
 var CronJob = require('cron').CronJob;
 var commonHelper = require('../commonHelper');
-const message = require('../../model/booking/message');
+const { createWriteStream, existsSync, mkdirSync } = require("fs");
+const payment_choose = require('../payment/choose')
+const path = require("path");
+var fs = require('fs');
 var Category_model = model.category;
 var subCategory_model = model.sub_category;
 var Detail_model = model.detail;
@@ -13,11 +16,8 @@ var ContractJob_model = model.contract_job;
 var ContractJobImage_model = model.contract_job_images;
 var Address_model = model.address
 var Biding_model = model.Biding
-const { createWriteStream, existsSync, mkdirSync } = require("fs");
-const payment_choose = require('../payment/choose')
-const path = require("path");
-var fs = require('fs');
-
+var CategoryCurrency_model = model.CategoryCurrency;
+var Currency_model = model.currency;
 module.exports.get_my_biding = async (root, args) => {
     //console.log(args);
     var limits = args.limit || 10;
@@ -303,6 +303,36 @@ module.exports.update_contract = async (root, args) => {
             fetch_bid['msg'] = "contract job update success"
             return fetch_bid
         } else {
+
+
+            var CurrencyDetail = await Currency_model.findOne({ location: args.location_code }).lean()
+            console.log("CurrencyDetail", CurrencyDetail._id)
+            if (!_.size(CurrencyDetail)) {
+                return {msg:"invalid location code",status:"failed"}
+            }
+            var categoryCurrency = await CategoryCurrency_model.findOne({ category_id: args.category_id, currency_id: CurrencyDetail._id }).lean()
+            if (!_.size(categoryCurrency)) {
+                return {msg:"invalid category currenct",status:"failed"}
+            }
+            var default_currency = await Currency_model.findOne({ default_currency: 1, is_delete: false }).lean()
+            var local_currency = await Currency_model.findOne({ location: args.local_location_code, is_delete: false }).lean()
+         
+            contract_detail['available_provider'] = [];
+            contract_detail['currency_id'] = CurrencyDetail._id;
+            contract_detail['symbol'] = CurrencyDetail.symbol || "";
+            contract_detail['current_currency'] = categoryCurrency;
+            contract_detail['currency_detail'] = CurrencyDetail;
+            contract_detail['default_currency_rate'] = default_currency.rate;
+            contract_detail['currenct_local_rate'] = local_currency.rate;
+            contract_detail['location'] = { coordinates: [args.lng, args.lat] }
+            contract_detail['service_fee'] = String(parseFloat(20).toFixed(2));
+            contract_detail['base_price'] = String(parseFloat(contract_detail.budget).toFixed(2));
+            contract_detail['total'] = Number(contract_detail['service_fee']) + Number(contract_detail['base_price'])
+            contract_detail['price_type'] = categoryCurrency.price_type;
+            contract_detail['booking_ref'] = String(Math.floor(1000 + Math.random() * 9000));
+            contract_detail['ctob_shotcode'] = process.env.MPESA_SHORT_CODE;
+            contract_detail['ctob_billRef'] = await commonHelper.genrate_random_contract();
+            contract_detail['job_status'] = 12;
             contract_detail['booking_status'] = 9
             let add_contract_job = new ContractJob_model(contract_detail)
             let added_contract_job = await add_contract_job.save()

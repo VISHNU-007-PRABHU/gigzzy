@@ -290,7 +290,7 @@ const typeDefs = gql`
         created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         data: JSON 
         biding_ref:String
-        budget:String
+        budget(code: String): String @currency
         timeline:String
         timeline_type:String
         cover_letter:String
@@ -301,7 +301,7 @@ const typeDefs = gql`
         add_to_shortlist:Boolean
         payment_type:String
         payment_option(code:String):String @paymentOption
-        total:String
+        total(code: String): String @currency
         get_user:[Detail]
         get_biding_all_files(contract_id:ID,root:Boolean):[CompanyImage]
         get_company_root_detail(root:Boolean,provider_id:ID):Company
@@ -312,11 +312,7 @@ const typeDefs = gql`
         _id:ID
         data: JSON 
     }
-      # milestone schema
-    type MilestoneImages{
-        _id:ID
-        data: JSON 
-    }
+     
     type Milestone{
         _id:ID
         data: JSON 
@@ -325,10 +321,13 @@ const typeDefs = gql`
         end_date: String,
         title:String,
         description:String,
-        budget:String,
-        timeline: String,
+        budget(code: String): String @currency,
+        timeline: String,       
         timeline_type: String,
         delete:Boolean,
+        booking_status:String,
+        created_at:String,
+        get_milestone_all_images(milestone_id:ID,_id:ID,root:Boolean):[CompanyImage]
     }
     type Currency{
         _id:ID,
@@ -355,7 +354,7 @@ const typeDefs = gql`
         address:String
         address_id:ID
         description:String
-        budget:String, 
+        budget(code: String): String @currency, 
         timeline:String
         timeline_type:String 
         terms_condition: String 
@@ -377,7 +376,8 @@ const typeDefs = gql`
         currency_code:String
         location_code:String
         current_page:String
-        service_fee:String
+        service_fee(code: String): String @currency
+        total(code: String): String @currency
     }
     type Company{
         _id:ID
@@ -1042,7 +1042,17 @@ const typeDefs = gql`
             profile_file:Upload
         ):Company
         # contract jobs
-        update_contract(currency_code:String,_id:ID,contract_data:JSON,search_data:JSON):ContractJob
+        update_contract(
+            location_code:String,
+            local_location_code:String,
+            category_id:ID,
+            lat:Float,
+            lng:Float,
+            currency_code:String,
+            _id:ID,
+            contract_data:JSON,
+            search_data:JSON
+        ):ContractJob
         update_currency(_id:ID,currency_data:JSON):Currency
         delete_currency(_id:ID,currency_data:JSON):Currency
         ContractJobFileUpload(_id:ID,contract_id:ID,category:String,image_tag:String,data:[JSON],file:[Upload]):CompanyImage

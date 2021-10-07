@@ -181,7 +181,6 @@ module.exports.available_booking_user = async (parent, args, context, info) => {
 
 // find provider (based on data)
 module.exports.available_booking_povider = async (parent, args, context, info) => {
-    //console.log('booking_provider');
     //console.log(parent);
     var result;
     result = await Detail_model.find({ _id: parent.provider_id });

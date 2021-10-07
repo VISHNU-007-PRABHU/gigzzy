@@ -4,6 +4,8 @@ var FCM = require("fcm-node");
 var nodemailer = require("nodemailer");
 var sesTransport = require("nodemailer-ses-transport");
 const dotenv = require('dotenv');
+const _ = require('lodash')
+const model = require('../model_data');
 dotenv.config();
 const smtpEndpoint = process.env.smtpEndpoint;
 const port = process.env.AWS_PORT;
@@ -21,6 +23,8 @@ const africa = require("africastalking")({
 const sms = africa.SMS;
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+var Booking_model = model.booking;
+var Contract_model = model.contract_job;
 
 const transporter = nodemailer.createTransport({
   host: smtpEndpoint,
@@ -243,3 +247,26 @@ module.exports.send_mail_sendgrid = async (email, type, datas) => {
   }
 }
 
+
+exports.genrate_random = async () => {
+  var random = Math.floor(Math.random() * 90000) + 10000;
+  var chars = "abcdefghijklmnopqrstufwxyzABCDEFGHIJKLMNOPQRSTUFWXYZ1234567890"
+  var random = _.join(_.sampleSize(chars, 20), "")
+  var digit = `${random}`
+  var check_p_id = await Booking_model.find({ "ctob_billRef": digit });
+  if (check_p_id.length) {
+      await this.genrate_random()
+  }
+  return digit;
+}
+exports.genrate_random_contract = async () => {
+  var random = Math.floor(Math.random() * 90000) + 10000;
+  var chars = "abcdefghijklmnopqrstufwxyzABCDEFGHIJKLMNOPQRSTUFWXYZ1234567890"
+  var random = _.join(_.sampleSize(chars, 20), "")
+  var digit = `${random}`
+  var check_p_id = await Contract_model.find({ "ctob_billRef": digit });
+  if (check_p_id.length) {
+      await this.genrate_random()
+  }
+  return digit;
+}

@@ -26,6 +26,7 @@ var milestoneSchema = new Schema({
   timeline: String,
   timeline_type: String,
   delete: { type: Boolean,default: false },
+  booking_status:{type:Number}
 }, schemaOptions);
 
 milestoneSchema.virtual('uid').get(function () {

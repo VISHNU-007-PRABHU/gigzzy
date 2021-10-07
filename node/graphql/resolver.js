@@ -37,7 +37,6 @@ var Payout_model = model.payout;
 var Extra_fee_model = model.Extra_fee;
 var CategoryCurrency_model = model.CategoryCurrency;
 var Currency_model = model.currency;
-var providerSubcategory_model = model.providerSubcategory_model;
 
 const MESSAGE_CREATED = 'MESSAGE_CREATED';
 const ACCEPT_MSG = 'ACCEPT_MSG';
@@ -281,6 +280,9 @@ const resolvers = {
         get_biding_all_files: bidingResolver.get_biding_all_files,
         get_parent_company_provider: userResolver.get_parent_company_provider,
         get_company_root_detail:userResolver.get_company_root_detail,
+    },
+    Milestone:{
+        get_milestone_all_images:bidingResolver.get_milestone_all_images,
     },
     Category: {
         booking_parent_category: categoryResolver.booking_parent_category,
@@ -571,7 +573,7 @@ const resolvers = {
 
             args['booking_ref'] = String(Math.floor(1000 + Math.random() * 9000));
             args['ctob_shotcode'] = process.env.MPESA_SHORT_CODE;
-            args['ctob_billRef'] = await genrate_random();
+            args['ctob_billRef'] = await commonHelper.genrate_random();
             args['job_status'] = 12;
             let add_booking = new Booking_model(args);
             let booking = await add_booking.save();
@@ -1667,18 +1669,6 @@ module.exports.c2b_confirmation = async (body) => {
     })
 }
 
-
-genrate_random = async () => {
-    var random = Math.floor(Math.random() * 90000) + 10000;
-    var chars = "abcdefghijklmnopqrstufwxyzABCDEFGHIJKLMNOPQRSTUFWXYZ1234567890"
-    var random = _.join(_.sampleSize(chars, 20), "")
-    var digit = `${random}`
-    var check_p_id = await Booking_model.find({ "ctob_billRef": digit });
-    if (check_p_id.length) {
-        await genrate_random()
-    }
-    return digit;
-}
 
 remove_demo_acount.start();
 
