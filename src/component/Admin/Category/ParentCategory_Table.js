@@ -165,7 +165,7 @@ class ParentCategoryTable extends React.Component {
                 className: RoleViewFunction('edit_category') || RoleViewFunction('delete_category') ? '' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
-                        <span title="...." className="d-flex d-sm-inline justify-content-around">
+                        <span title="...." className="d-inline d-md-flex justify-content-around">
                             <RoleView permission="edit_category">
                                 <span className="cursor_point" onClick={() => { this.props.history.push(`/admin-category/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
                             </RoleView>

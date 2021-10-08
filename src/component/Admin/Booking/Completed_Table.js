@@ -232,7 +232,7 @@ class CompletedTable extends React.Component {
                 className: RoleViewFunction('view_booking_detail') ? '' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
-                        <span title="...." className="d-flex d-sm-inline justify-content-around">
+                        <span title="...." className="d-inline d-md-flex justify-content-around">
                             <RoleView permission="view_booking_detail">
                                 <span className='cursor_point' onClick={() => { this.props.history.push({ pathname: '/admin-booking-detail', state: { _id: record._id } }) }}><Icon type="eye" theme="twoTone" twoToneColor="#52c41a" className='f_25' /></span>
                             </RoleView>

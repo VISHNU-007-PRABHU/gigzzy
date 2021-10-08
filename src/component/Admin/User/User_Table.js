@@ -139,7 +139,7 @@ class UserTable extends React.Component {
                 className: RoleViewFunction('edit_user') || RoleViewFunction('delete_user') ? '':'d-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
-                    <span title="...." className="d-flex d-sm-inline justify-content-around">
+                    <span title="...." className="d-inline d-md-flex justify-content-around">
                         <RoleView permission="edit_user">
                             <span className='cursor_point' onClick={() => { this.props.history.push(`/admin-user/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
                         </RoleView>

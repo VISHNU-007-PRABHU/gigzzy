@@ -119,7 +119,7 @@ class ProviderComponent extends React.Component {
                 className: RoleViewFunction('approve_provider') || RoleViewFunction('edit_provider') || RoleViewFunction('delete_provider') ? '' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
-                        <span title="...." className="d-flex d-sm-inline justify-content-around">
+                        <span title="...." className="d-inline d-md-flex justify-content-around">
                             <RoleView permission="approve_provider">
                                 <span className="cursor_point" onClick={() => { this.props.history.push(`/admin-provider/view/${record._id}`); }}><Icon type="eye" theme="twoTone" twoToneColor="#52c41a" className='mr-2 f_25' /></span>
                             </RoleView>

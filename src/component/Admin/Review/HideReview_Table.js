@@ -145,7 +145,7 @@ class HideReview_Table extends React.Component {
                 width: '10%',
                 dataIndex: 'operation',
                 render: (text, record) => {
-                    return <span title="...." className="d-flex d-sm-inline justify-content-around">
+                    return <span title="...." className="d-inline d-md-flex justify-content-around">
                         <Switch checkedChildren="View" unCheckedChildren="Hide" checked={record.user_comments_status} onChange={(value) => { this.update_comments_status(record._id, value) }} />
                     </span>
                 }

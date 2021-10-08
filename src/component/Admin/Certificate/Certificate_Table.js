@@ -143,7 +143,7 @@ class CertificateTable extends React.Component {
                 className: RoleViewFunction('edit_certificate') || RoleViewFunction('delete_certificate') ? '' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
-                        <span title="...." className="d-flex d-sm-inline justify-content-around">
+                        <span title="...." className="d-inline d-md-flex justify-content-around">
                             <RoleView permission="edit_certificate">
                                 <span className="cursor_point" onClick={() => this.find_certificate(record._id)}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
                             </RoleView>
