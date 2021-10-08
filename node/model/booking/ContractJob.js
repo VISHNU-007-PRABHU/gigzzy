@@ -40,7 +40,7 @@ var contractSchema = new Schema({
     location_code: { type: String, },
     currency_code: { type: String, },
     current_page: { type: String, },
-    contract_status: { type: String, default: "c1" },  // c1.pending,c2.job posted,c3.admin-approved,c4
+    contract_status: { type: Number},  // c1.pending,c2.job posted,c3.admin-approved,c4
     availability: [],
     hours: { type: String },
     contract_date: Date,

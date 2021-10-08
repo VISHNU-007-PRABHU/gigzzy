@@ -345,6 +345,7 @@ module.exports.update_contract = async (root, args) => {
             contract_detail['ctob_billRef'] = await this.genrate_random_contract();
             contract_detail['job_status'] = 12;
             contract_detail['booking_status'] = 9
+            contract_detail['contract_status'] = 9
             let add_contract_job = new ContractJob_model(contract_detail)
             let added_contract_job = await add_contract_job.save()
             added_contract_job['status'] = "success";
