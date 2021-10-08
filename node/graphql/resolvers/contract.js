@@ -260,7 +260,7 @@ module.exports.get_contracts = async (root, args) => {
 }
 
 
-module.exports.get_contract_address_detail = async (parent, args, context, info) => {
+module.exports.get_contract_address_detail = async (root, args, context, info) => {
     try {
         let find_query = {}
         if (root['address_id']) {
@@ -290,8 +290,8 @@ module.exports.update_contract = async (root, args) => {
             let find_query = {
                 _id: args["_id"]
             }
-            if( args.location_code){
-                var CurrencyDetail = await Currency_model.findOne({ location: args.location_code }).lean()
+            if( args.local_location_code){
+                var CurrencyDetail = await Currency_model.findOne({ location: args.local_location_code }).lean()
                 if (!_.size(CurrencyDetail)) {
                     return { msg: "invalid location code", status: "failed" }
                 } else {
