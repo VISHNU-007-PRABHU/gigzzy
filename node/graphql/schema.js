@@ -100,7 +100,7 @@ const typeDefs = gql`
         get_parent_company_provider(provider_search:JSON,provider_id:Boolean,user_id:Boolean,company_id:ID):[CompanyProvider]
         get_contract_files(company_id:ID,user_id:ID,provider_id:ID,contract_id:ID):[CompanyImage]
         get_contracts(company_id:ID,contract_id:ID,provider_id:ID,user_id:ID):[ContractJob]
-        get_contracts_pagination( booking_status:String,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
+        get_contracts_pagination( booking_status:Int,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
         get_contract_all_files(contract_id:ID):[CompanyImage]
         get_currencys(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,pagination:Boolean,page:Int,limit:Int):CurrencyConnection
         get_currency(_id:ID,country_code:String,location_code:String):Currency
@@ -325,7 +325,7 @@ const typeDefs = gql`
         timeline: String,       
         timeline_type: String,
         delete:Boolean,
-        booking_status:String,
+        booking_status:Int,
         created_at:String,
         updatedAt:String,
         get_milestone_all_images(milestone_id:ID,_id:ID,root:Boolean):[CompanyImage]
@@ -365,7 +365,7 @@ const typeDefs = gql`
         created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         category_id:ID
         biding_id:ID
-        booking_status:String
+        booking_status:Int
         category_type:Int
         contract_ref:String
         biding_count:Int
@@ -1059,7 +1059,7 @@ const typeDefs = gql`
             _id:ID,
             contract_data:JSON,
             search_data:JSON
-            booking_status:String
+            booking_status:Int
         ):ContractJob
         update_currency(_id:ID,currency_data:JSON):Currency
         delete_currency(_id:ID,currency_data:JSON):Currency
