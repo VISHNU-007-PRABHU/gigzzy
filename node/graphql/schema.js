@@ -379,6 +379,9 @@ const typeDefs = gql`
         current_page:String
         service_fee(code: String): String @currency
         total(code: String): String @currency
+        ctob:Boolean @payment
+        ctob_shotcode:String
+        ctob_billRef:String
     }
     type Company{
         _id:ID
