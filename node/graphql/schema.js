@@ -364,6 +364,7 @@ const typeDefs = gql`
         contract_status:String
         created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         category_id:ID
+        biding_id:ID
         category_type:Int
         contract_ref:String
         biding_count:Int
