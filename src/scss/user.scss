@@ -532,3 +532,11 @@ span.ant-form-item-children.d-block {
 .multi_currency_panel .ant-collapse-extra{
     margin-top: -20px;
 }
+
+.booking_tab_sticky .ant-tabs-bar{
+    top: 0px;
+    padding-top: 5px;
+    background-color: white;
+    z-index: 100;
+    position: sticky !important;
+}

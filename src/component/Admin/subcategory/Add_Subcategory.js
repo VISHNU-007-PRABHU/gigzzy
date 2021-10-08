@@ -1,6 +1,6 @@
-import React,{Suspense} from 'react'
+import React, { Suspense } from 'react'
 import { withRouter } from "react-router-dom";
-import { Layout, Icon, Form, Input, Button, message, Typography, Row, Col, Select, Upload, Radio } from 'antd';
+import { Layout, Icon, Form, Input, Button, message, Typography, Row, Col, Select, Upload, InputNumber } from 'antd';
 import { ADD_SUBCATEGORY, CATEGORY_NAME, FIND_SUBCATEGORY, UPDATE_SUBCATEGORY } from '../../../graphql/Admin/sub_category';
 import AdminSider from '../Layout/AdminSider';
 import AdminHeader from '../Layout/AdminHeader';
@@ -126,7 +126,7 @@ class Add_Subcategory extends React.Component {
                 await client.mutate({
                     mutation: ADD_SUBCATEGORY,
                     variables: {
-                        subCategory_name: values.subCategory_name, base_price: values.base_price, hour_limit: values.hour_limit, hour_price: values.hour_price, service_fee: values.service_fee, certificates: values.certificates,
+                        subCategory_name: values.subCategory_name, base_price: values.base_price, hour_limit: values.hour_limit, hour_price: values.hour_price, service_fee: String(values.service_fee), certificates: values.certificates,
                         category_id: values.category_name, description: values.description, file: this.state.file, price_type: this.state.price_type, day_price: values.day_price, day_limit: values.day_limi
                     },
                 }).then((result, loading, error) => {
@@ -146,7 +146,7 @@ class Add_Subcategory extends React.Component {
                 await client.mutate({
                     mutation: UPDATE_SUBCATEGORY,
                     variables: {
-                        subCategory_name: values.subCategory_name, base_price: values.base_price, hour_limit: values.hour_limit, hour_price: values.hour_price, service_fee: values.service_fee, certificates: values.certificates,
+                        subCategory_name: values.subCategory_name, base_price: values.base_price, hour_limit: values.hour_limit, hour_price: values.hour_price, service_fee: String(values.service_fee), certificates: values.certificates,
                         category_id: values.category_name, description: values.description, file: this.state.file, _id: this.props.match.params.id, price_type: this.state.price_type, day_price: values.day_price, day_limit: values.day_limit,
                     },
                 }).then((result, loading, error) => {
@@ -226,15 +226,17 @@ class Add_Subcategory extends React.Component {
                                     </Row>
                                     <Row>
                                         <Col span={24}>
-                                            <Form.Item label="Certificates">
-                                                {form.getFieldDecorator("certificates", {
-                                                    initialValue: this.state.update_data.certificates,
+                                            <Form.Item label="Contract Service Fee">
+                                                {form.getFieldDecorator("service_fee", {
+                                                    initialValue: this.state.update_data.service_fee,
                                                     rules: [{ required: true }]
-                                                })(<Select mode="tags" style={{ width: '100%' }} placeholder="Certificate" onChange={(value) => { console.log(value); }}>
-                                                    {this.state.certificate && this.state.certificate.map(data =>
-                                                        <Option key={data._id}>{data.certificate_name}</Option>
-                                                    )}
-                                                </Select>)}
+                                                })(<Input
+                                                    type="number"
+                                                    className="w-50"
+                                                    min={0}
+                                                    max={100}
+                                                    addonAfter="%"
+                                                />)}
                                             </Form.Item>
 
                                         </Col>
@@ -269,7 +271,7 @@ class Add_Subcategory extends React.Component {
                                                 beforeUpload={this.beforeUpload}
                                                 onChange={this.handleChange}
                                             >
-                                                {imageUrl ? <img src={imageUrl}  alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+                                                {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
                                             </Upload>
 
                                         )}
@@ -277,6 +279,7 @@ class Add_Subcategory extends React.Component {
                                 </Col>
                             </Form>
                         </Row>
+
                         <Row className="jumbotron p-1">
                             <Col>
                                 <Suspense fallback={<div>.......</div>}>

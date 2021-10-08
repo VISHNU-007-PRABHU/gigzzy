@@ -47,11 +47,14 @@ const BannerSlider = (props) => {
     return (
         <div className="">
             <Carousel className="h-100" effect="fade" dots={true}>
-                {fileList.map(data => (
-                    <>
-                        <img alt='' src={data?.small_image} loading="lazy" className="h_18_em w-100 br_14 img-fluid lazyload" />
-                    </>
-                ))}
+                {fileList.map(data => {
+                console.log("BannerSlider -> data", data)
+                    return (
+                        <>
+                            <img key={data?.small_image} alt='' src={data?.small_image} loading="lazy" className="h_18_em w-100 br_14 img_cover lazyload" />
+                        </>
+                    )
+                })}
             </Carousel>
         </div>
     )

@@ -13,6 +13,7 @@ import Button from 'antd/lib/button';
 import Card from 'antd/lib/card';
 import Avatar from 'antd/lib/avatar';
 import Skeleton from 'antd/lib/skeleton';
+import Affix from 'antd/lib/affix';
 import Rate from 'antd/lib/rate';
 import Timeline from 'antd/lib/timeline';
 import GoogleMapReact from 'google-map-react';
@@ -171,9 +172,9 @@ class Bookings extends React.Component {
         // console.log(option, id);
         if (option === true) {
             this.setState({ call_msg_sub: 1 });
-            let inputdata = { _id: id}
-            if(localStorage.getItem("currency")){
-                inputdata['location_code'] = JSON.parse(localStorage.getItem("currency")).location 
+            let inputdata = { _id: id }
+            if (localStorage.getItem("currency")) {
+                inputdata['location_code'] = JSON.parse(localStorage.getItem("currency")).location
             }
             await client.query({
                 query: GET_PARTICULAR_BOOKING,
@@ -380,39 +381,42 @@ class Bookings extends React.Component {
                                 view_booking={this.view_booking} />
                         </Suspense>
                     </Col>
+
                     <Col lg={{ span: 4 }}>
-                        <Card className="normal_font_size">
-                            <Card.Grid  className={this.state.mode_state === 'Pending' ? 'bg-gradient-primary w-100 cursor_point':'w-100 cursor_point'} onClick={() => { this.handleModeChange("10") }}>
-                                <Row>
-                                    <Col span={20}>
-                                        <span className={this.state.mode_state === 'Pending' ? "text-white bold" : "bold"}>Incoming</span>
-                                    </Col>
-                                    <Col span={4}>
-                                        <span className={this.state.mode_state === 'Pending' ? "text-white float-right" : "float-right"}> <Icon type="hourglass" /> </span>
-                                    </Col>
-                                </Row>
-                            </Card.Grid>
-                            <Card.Grid  className={this.state.mode_state === 'OnGoing' ? 'bg-gradient-primary w-100 cursor_point':'w-100 cursor_point'} onClick={() => { this.handleModeChange("4") }}>
-                                <Row>
-                                    <Col span={20}>
-                                        <span className={this.state.mode_state === 'OnGoing' ? "text-white bold" : "bold"}>On Going</span>
-                                    </Col>
-                                    <Col span={4}>
-                                        <span className={this.state.mode_state === 'OnGoing' ? "text-white float-right" : "float-right"}> <Icon type="fire" /> </span>
-                                    </Col>
-                                </Row>
-                            </Card.Grid>
-                            <Card.Grid  className={this.state.mode_state === 'Completed' ? 'bg-gradient-primary w-100 cursor_point':'w-100 cursor_point'} onClick={() => { this.handleModeChange("14") }}>
-                                <Row >
-                                    <Col span={20}>
-                                        <span className={this.state.mode_state === 'Completed' ? "text-white bold" : "bold"}>Completed</span>
-                                    </Col>
-                                    <Col span={4}>
-                                        <span className={this.state.mode_state === 'Completed' ? "text-white float-right" : "float-right"}> <Icon type="carry-out" /> </span>
-                                    </Col>
-                                </Row>
-                            </Card.Grid>
-                        </Card>
+                        <Affix offsetTop={10}>
+                            <Card className="normal_font_size">
+                                <Card.Grid className={this.state.mode_state === 'Pending' ? 'bg-gradient-primary w-100 cursor_point' : 'w-100 cursor_point'} onClick={() => { this.handleModeChange("10") }}>
+                                    <Row>
+                                        <Col span={20}>
+                                            <span className={this.state.mode_state === 'Pending' ? "text-white bold" : "bold"}>Incoming</span>
+                                        </Col>
+                                        <Col span={4}>
+                                            <span className={this.state.mode_state === 'Pending' ? "text-white float-right" : "float-right"}> <Icon type="hourglass" /> </span>
+                                        </Col>
+                                    </Row>
+                                </Card.Grid>
+                                <Card.Grid className={this.state.mode_state === 'OnGoing' ? 'bg-gradient-primary w-100 cursor_point' : 'w-100 cursor_point'} onClick={() => { this.handleModeChange("4") }}>
+                                    <Row>
+                                        <Col span={20}>
+                                            <span className={this.state.mode_state === 'OnGoing' ? "text-white bold" : "bold"}>On Going</span>
+                                        </Col>
+                                        <Col span={4}>
+                                            <span className={this.state.mode_state === 'OnGoing' ? "text-white float-right" : "float-right"}> <Icon type="fire" /> </span>
+                                        </Col>
+                                    </Row>
+                                </Card.Grid>
+                                <Card.Grid className={this.state.mode_state === 'Completed' ? 'bg-gradient-primary w-100 cursor_point' : 'w-100 cursor_point'} onClick={() => { this.handleModeChange("14") }}>
+                                    <Row >
+                                        <Col span={20}>
+                                            <span className={this.state.mode_state === 'Completed' ? "text-white bold" : "bold"}>Completed</span>
+                                        </Col>
+                                        <Col span={4}>
+                                            <span className={this.state.mode_state === 'Completed' ? "text-white float-right" : "float-right"}> <Icon type="carry-out" /> </span>
+                                        </Col>
+                                    </Row>
+                                </Card.Grid>
+                            </Card>
+                        </Affix>
                     </Col>
                 </Row>
                 <Suspense fallback={<Skeleton active />}>

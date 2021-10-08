@@ -98,9 +98,9 @@ const typeDefs = gql`
         # company detail
         get_company_detail(data:JSON,provider_search:JSON,search:JSON,_id:ID,page:Int,limit:Int,company_id:ID,user_id:ID,provider_id:ID):CompanyConnection
         get_parent_company_provider(provider_search:JSON,provider_id:Boolean,user_id:Boolean,company_id:ID):[CompanyProvider]
-        get_contract_files(company_id:ID,user_id:ID,provider_id:ID,contract_id:ID):[CompanyImage]
-        get_contracts(company_id:ID,contract_id:ID,provider_id:ID,user_id:ID):[ContractJob]
-        get_contracts_pagination( booking_status:Int,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
+        get_contract_files(location_code:String,company_id:ID,user_id:ID,provider_id:ID,contract_id:ID):[CompanyImage]
+        get_contracts(location_code:String,company_id:ID,contract_id:ID,provider_id:ID,user_id:ID):[ContractJob]
+        get_contracts_pagination(location_code:String,booking_status:Int,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
         get_contract_all_files(contract_id:ID):[CompanyImage]
         get_currencys(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,pagination:Boolean,page:Int,limit:Int):CurrencyConnection
         get_currency(_id:ID,country_code:String,location_code:String):Currency
@@ -108,8 +108,8 @@ const typeDefs = gql`
         get_biding_all_files(contract_id:ID):[CompanyImage]
         get_biding_detail(location_code:String,contract_id:ID):Biding
         GetCategoryCurrency(pagination:Boolean,data:JSON,_id:ID,category_id:ID,country_code:String,country_id:ID):SubCategoryConnection
-        get_biding_milestone_detail(_id:ID,contract_id:ID,biding_id:ID):Milestone
-        get_biding_milestone(_id:ID,contract_id:ID,biding_id:ID):[Milestone]
+        get_biding_milestone_detail(location_code:String,_id:ID,contract_id:ID,biding_id:ID):Milestone
+        get_biding_milestone(location_code:String,_id:ID,contract_id:ID,biding_id:ID):[Milestone]
     }
 
     # sub category pagination data  
