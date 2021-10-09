@@ -298,11 +298,17 @@ const typeDefs = gql`
         description:String
         experience:String
         no_of_people:String
-        service_fee:String
         add_to_shortlist:Boolean
         payment_type:String
         payment_option(code:String):String @paymentOption
+        currency_code:String
+        location_code:String
+        current_page:String
+        service_fee(code: String): String @currency
         total(code: String): String @currency
+        ctob:Boolean @payment
+        ctob_shotcode:String
+        ctob_billRef:String
         get_user(root_parent:Boolean):[Detail]
         get_biding_all_files(contract_id:ID,root:Boolean):[CompanyImage]
         get_company_root_detail(root:Boolean,provider_id:ID):Company

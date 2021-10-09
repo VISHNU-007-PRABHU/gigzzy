@@ -163,12 +163,6 @@ module.exports.update_biding = async (root, args) => {
             let find_query = {
                 _id: args["_id"]
             }
-
-            let get_current_user_currency = await contractResolver.get_current_user_currency(args);
-            console.log("module.exports.update_biding -> get_current_user_currency", get_current_user_currency)
-            if(_.size(get_current_user_currency) && get_current_user_currency.status){
-                update_detail = {...update_detail,...get_current_user_currency}
-            }
             let update_bid = await Biding_model.updateOne(find_query, update_detail).exec()
             if (files && _.size(files)) {
                 args['biding_id'] = args['_id']
@@ -180,10 +174,31 @@ module.exports.update_biding = async (root, args) => {
             return fetch_bid
 
         } else {
-            update_detail['service_fee'] = "20"
-            let contract_id = update_detail['contract_id'] 
+            let contract_id = update_detail['contract_id']
             let contract_data = await this.fetch_contract_detail(contract_id)
-            update_detail['category_id'] =  contract_data['category_id']
+            update_detail['category_id'] = contract_data['category_id']
+            /**
+             * get admin fee based on catgeory contract service fee
+             */
+            let get_admin_fees = await this.get_admin_fee(update_detail);
+            if (_.size(get_admin_fees) && get_admin_fees.status) {
+                update_detail = { ...update_detail, ...get_admin_fees }
+            }
+            /**
+             * get currenct user currency formate
+             */
+            let get_current_user_currency = await contractResolver.get_current_user_currency(args);
+            if (_.size(get_current_user_currency) && get_current_user_currency.status) {
+                update_detail = { ...update_detail, ...get_current_user_currency }
+            }
+            /**
+             * add default mpesa bill ref
+             */
+            let get_mpesa_reference = await contractResolver.genrate_mpesa_ref(args);
+            if (_.size(get_mpesa_reference) && get_mpesa_reference.status) {
+                update_detail = { ...update_detail, ...get_mpesa_reference }
+            }
+
             let add_bid = new Biding_model(update_detail)
             let added_bid = await add_bid.save()
             if (files && _.size(files)) {
@@ -200,7 +215,7 @@ module.exports.update_biding = async (root, args) => {
     }
 }
 
-exports.fetch_contract_detail=async(_id,option)=>{
+exports.fetch_contract_detail = async (_id, option) => {
     var get_biding = await ContractJob_model.findOne({ _id }).lean();
     return get_biding
 }

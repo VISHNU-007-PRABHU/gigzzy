@@ -290,17 +290,6 @@ module.exports.update_contract = async (root, args) => {
             let find_query = {
                 _id: args["_id"]
             }
-
-
-            var category_data = {}
-            if (contract_detail.category_type === 1) {
-                category_data = await Category_model.findOne({ _id: contract_detail.category_id }).lean()
-            } else if (contract_detail.category_type === 2) {
-                category_data = await subCategory_model.findOne({ _id: contract_detail.category_id }).lean()
-            }
-            if (_.size(category_data)) {
-                contract_detail['service_fee'] = String(parseFloat(category_data.service_fee || 0).toFixed(2));
-            }
             let get_current_user_currency = await this.get_current_user_currency(args);
             if (_.size(get_current_user_currency) && get_current_user_currency.status) {
                 contract_detail = { ...contract_detail, ...get_current_user_currency }
@@ -310,36 +299,13 @@ module.exports.update_contract = async (root, args) => {
             if (args['booking_status'] === 9) {
                 // await PushNotification.create_push_notification_msg()
             }
-
             fetch_bid['status'] = "success";
             fetch_bid['msg'] = "contract job update success"
             return fetch_bid
         } else {
-
-            var category_data = {}
-            if (contract_detail.category_type === 1) {
-                category_data = await Category_model.findOne({ _id: contract_detail.category_id }).lean()
-            } else if (contract_detail.category_type === 2) {
-                category_data = await subCategory_model.findOne({ _id: contract_detail.category_id }).lean()
-            }
-            console.log("module.exports.update_contract -> category_data", category_data)
-            contract_detail['available_provider'] = [];
-
             contract_detail['location'] = { coordinates: [args.lng, args.lat] }
-            let service_fee = 0;
-            if (_.size(category_data)) {
-                if (contract_detail['service_fee']) {
-                    service_fee = (category_data.service_fee / 100) * contract_detail['budget'];
-                } else {
-                    service_fee = (15 / 100) * contract_detail['budget'];
-                }
-            }
-            contract_detail['admin_fee'] = String(parseFloat(service_fee || 0).toFixed(2));
-            contract_detail['base_price'] = String(parseFloat(contract_detail.budget).toFixed(2));
-            contract_detail['total'] = Number(contract_detail['service_fee']) + Number(contract_detail['base_price'])
             contract_detail['booking_ref'] = String(Math.floor(1000 + Math.random() * 9000));
-            contract_detail['ctob_shotcode'] = process.env.MPESA_SHORT_CODE;
-            contract_detail['ctob_billRef'] = await this.genrate_random_contract();
+            contract_detail['base_price'] = String(parseFloat(contract_detail.budget).toFixed(2));
             contract_detail['job_status'] = 12;
             contract_detail['booking_status'] = 9
             contract_detail['contract_status'] = 9
@@ -355,6 +321,32 @@ module.exports.update_contract = async (root, args) => {
     }
 }
 
+exports.get_admin_fee = async (detail) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            let response = {
+                status: true
+            }
+            var category_data = {}
+            if (detail.category_type === 1) {
+                category_data = await Category_model.findOne({ _id: detail.category_id }).lean()
+            } else if (detail.category_type === 2) {
+                category_data = await subCategory_model.findOne({ _id: detail.category_id }).lean()
+            }
+            let admin_fee = 0;
+            let service_fee = 15;
+            if (_.size(category_data) && category_data['service_fee']) {
+                service_fee = category_data['service_fee']
+            }
+            admin_fee = (service_fee / 100) * detail['budget'];
+            response['admin_fee'] = String(parseFloat(admin_fee || 0).toFixed(2));
+            response['service_fee'] = String(parseFloat(service_fee || 0).toFixed(2));
+            return resolve(response)
+        } catch (error) {
+            return reject({ status: false })
+        }
+    })
+}
 exports.get_current_user_currency = async (args) => {
     return new Promise(async function (resolve, reject) {
         try {
@@ -381,23 +373,28 @@ exports.get_current_user_currency = async (args) => {
             return reject({ status: false })
         }
     })
-
 }
 
-exports.genrate_random_contract = async () => {
+
+exports.genrate_mpesa_ref = async (args) => {
     try {
+        let mpesa_detail ={status: true}
         var random = Math.floor(Math.random() * 90000) + 10000;
         var chars = "abcdefghijklmnopqrstufwxyzABCDEFGHIJKLMNOPQRSTUFWXYZ1234567890"
         var random = _.join(_.sampleSize(chars, 20), "")
         var digit = `${random}`;
         var check_p_id = await model.contract_job.find({ "ctob_billRef": digit });
         if (check_p_id.length) {
-            await this.genrate_random_contract()
+            await this.genrate_mpesa_ref()
         }
-        return digit;
+        mpesa_detail['ctob_shotcode'] = process.env.MPESA_SHORT_CODE;
+        mpesa_detail['ctob_billRef'] = digit
+        return mpesa_detail
     } catch (error) {
-        console.log("exports.genrate_random_contract -> error", error)
-        return 00000000;
+        let error_mpesa_detail ={status: false}
+        error_mpesa_detail['ctob_shotcode'] = process.env.MPESA_SHORT_CODE;
+        error_mpesa_detail['ctob_billRef'] = "00000000000"
+        return error_mpesa_detail
     }
 }
 
