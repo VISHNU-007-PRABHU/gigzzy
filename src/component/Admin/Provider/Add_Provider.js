@@ -166,7 +166,8 @@ class Add_Provider extends React.Component {
                         phone_no: this.state.m_no,
                         email: values.email,
                         password: values.password,
-                        name: values.provider_name,
+                        first_name: values.provider_first_name,
+                        last_name: values.provider_last_name,
                         lat: this.state.lat_lng.lat,
                         lng: this.state.lat_lng.lng,
                         address: this.state.address,
@@ -187,17 +188,23 @@ class Add_Provider extends React.Component {
     update_provider = () => {
         const { form, history } = this.props;
         form.validateFields(async (err, values) => {
-            var datas = {}
+            var datas =  {
+                role: 2,
+                email: values.email,
+                password: values.password,
+                first_name: values.provider_first_name,
+                last_name: values.provider_last_name,
+                lat: this.state.lat_lng ? this.state.lat_lng.lat : undefined,
+                lng: this.state.lat_lng ? this.state.lat_lng.lng : undefined,
+                address: this.state.address,
+                provider_subCategoryID: values.category_name,
+                _id: this.props.match.params.id
+            };
             if (values.phone.length > 10) {
-                datas = {
-                    role: 2, demo: this.state.demo,
-                    country_code: this.state.country_code, phone_no: this.state.m_no, email: values.email, password: values.password, name: values.provider_name, lat: this.state.lat_lng ? this.state.lat_lng.lat : undefined, lng: this.state.lat_lng ? this.state.lat_lng.lng : undefined, address: this.state.address, provider_subCategoryID: values.category_name, _id: this.props.match.params.id
-                };
-            } else {
-                datas = { role: 2, demo: this.state.demo, email: values.email, password: values.password, name: values.provider_name, lat: this.state.lat_lng ? this.state.lat_lng.lat : undefined, lng: this.state.lat_lng ? this.state.lat_lng.lng : undefined, address: this.state.address, provider_subCategoryID: values.category_name, _id: this.props.match.params.id };
-            }
+                datas['country_code'] = this.state.country_code;
+                datas['phone_no'] = this.state.m_no;
+            } 
             if (!err) {
-                console.log(this.state.lat_lng);
                 await client.mutate({
                     mutation: UPDATE_USER,
                     variables: datas
@@ -260,10 +267,18 @@ class Add_Provider extends React.Component {
                                                 </Select>)}
                                             </Form.Item>
                                         </Col>
-                                        <Col span={12}>
-                                            <Form.Item label="Provider Name">
-                                                {form.getFieldDecorator("provider_name", {
-                                                    initialValue: this.state.update_data.name,
+                                        <Col span={6}>
+                                            <Form.Item label="Provider First Name">
+                                                {form.getFieldDecorator("provider_first_name", {
+                                                    initialValue: this.state.update_data.first_name,
+                                                    rules: [{ required: true }]
+                                                })(<Input placeholder="Name" />)}
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={6}>
+                                            <Form.Item label="Provider Last Name">
+                                                {form.getFieldDecorator("provider_last_name", {
+                                                    initialValue: this.state.update_data.last_name,
                                                     rules: [{ required: true }]
                                                 })(<Input placeholder="Name" />)}
                                             </Form.Item>

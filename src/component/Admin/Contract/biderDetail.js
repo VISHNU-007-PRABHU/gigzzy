@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useReactRouter from 'use-react-router';
 import { Icon } from 'antd';
+import Tooltip from 'antd/lib/tooltip'
 import size from 'lodash'
 import { UPDATE_BIDING } from '../../../graphql/User/biding'
 import { Alert_msg } from '../../Comman/alert_msg';
@@ -65,7 +66,7 @@ function BiderDetail(props) {
                                 </Title>
                                 <div>
                                     <Rate count={1} value={1} className="mr-2" />
-                                    {user_data?.rating || "0"}
+                                    {data?.provider_rating_by_category?.rating || "0"}
                                 </div>
                             </div>
                             {user_data.user_type && user_data.user_type === "company" ?
@@ -174,16 +175,19 @@ function BiderDetail(props) {
                 <Row gutter={[12, 24]}>
                     <Col span={24}>
                         <div className="d-flex normal_font_size justify-content-between">
-                            <div className="">
+                            <div className="align-items-center d-flex">
                                 Service Fee
+                                <Tooltip placement="right" title={`Service fee has been apiled ${data?.service_fee}`}>
+                                    <Icon type="question-circle" className="px-2" />
+                                </Tooltip>
                             </div>
                             <div >
-                                {data?.service_fee}
+                                {data?.admin_fee}
                             </div>
                         </div>
                     </Col>
                 </Row>
-               
+
                 {!isStripePayment && <><div className="">
                     <StripePayout data={data} booking_type={"contract"} current_booking_status={10} />
                 </div></>

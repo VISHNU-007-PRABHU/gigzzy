@@ -44,11 +44,11 @@ class ContractUserDetail extends React.Component {
                                     <BidingList contract_id={this.state.contract_id}></BidingList>
                                 </Suspense>
                             </Card>
-                            {this.state.booking_status === "booked" &&
+                            {/* {this.state.booking_status === 10 && */}
                                 <Suspense fallback={<Skeleton active />}>
                                     <Milestone contract_id={this.state.contract_id}></Milestone>
                                 </Suspense>
-                            }
+                            {/* } */}
                         </Card>
                     </Col>
                     <Col lg={6} md={24}>

@@ -72,7 +72,7 @@ class PendingPovider extends React.Component {
 
     onFilter = async (value) => {
         console.log(value.target.value);
-        var datas = { delete: 0, role: 2, proof_status: 0, $or: [{ 'name': { $regex: '.*' + value.target.value + '.*', $options: 'i' } }, { 'email': { $regex: '.*' + value.target.value + '.*', $options: 'i' } }, { 'phone_no': { $regex: '.*' + value.target.value + '.*', $options: 'i' } }] }
+        var datas = { delete: 0, role: 2, proof_status: 0, $or: [{ 'first_name': { $regex: '.*' + value.target.value + '.*', $options: 'i' } }, { 'email': { $regex: '.*' + value.target.value + '.*', $options: 'i' } }, { 'phone_no': { $regex: '.*' + value.target.value + '.*', $options: 'i' } }] }
         await client.query({
             query: USER_EMAIL_QUERY,
             variables: { data: datas },
@@ -86,10 +86,17 @@ class PendingPovider extends React.Component {
 
         const columns = [
             {
-                title: 'Name',
+                title: 'First Name',
                 width: '20%',
                 render: (text, record) => {
-                    return <span title="Name">{record.name}</span>;
+                    return <span title="First Name">{record.first_name}</span>;
+                }
+            },
+            {
+                title: 'Last Name',
+                width: '20%',
+                render: (text, record) => {
+                    return <span title="Last Name">{record.last_name}</span>;
                 }
             },
             {

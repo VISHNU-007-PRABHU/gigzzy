@@ -5,7 +5,7 @@ import { client } from "../../../apollo";
 import { Table, Button, Icon, Popconfirm } from 'antd';
 import { Alert_msg } from '../../Comman/alert_msg';
 import Search from "antd/lib/input/Search";
-import RoleView,{RoleViewFunction} from '../../Comman/roles_permission_view'
+import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 class UserTable extends React.Component {
     constructor(props) {
         super(props);
@@ -86,12 +86,18 @@ class UserTable extends React.Component {
         const { dataSource } = this.state;
         const columns = [
             {
-                title: "Name",
+                title: 'First Name',
                 width: '20%',
                 render: (text, record) => {
-                    return <span title="Name">{record.name}</span>;
+                    return <span title="First Name">{record.first_name}</span>;
                 }
-
+            },
+            {
+                title: 'Last Name',
+                width: '20%',
+                render: (text, record) => {
+                    return <span title="Last Name">{record.last_name}</span>;
+                }
             },
             {
                 title: () => {
@@ -136,20 +142,20 @@ class UserTable extends React.Component {
             {
                 title: "Action",
                 dataIndex: 'operation',
-                className: RoleViewFunction('edit_user') || RoleViewFunction('delete_user') ? '':'d-none',
+                className: RoleViewFunction('edit_user') || RoleViewFunction('delete_user') ? '' : 'd-none',
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
-                    <span title="...." className="d-inline d-md-flex justify-content-around">
-                        <RoleView permission="edit_user">
-                            <span className='cursor_point' onClick={() => { this.props.history.push(`/admin-user/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
-                        </RoleView>
-                        <RoleView permission="delete_user">
-                            <Popconfirm title="Sure to delete the user ?" onConfirm={() => this.handleDelete(record._id)}>
-                                <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
-                            </Popconfirm>
-                        </RoleView>
-                    </span>
-                ) : null,
+                        <span title="...." className="d-inline d-md-flex justify-content-around">
+                            <RoleView permission="edit_user">
+                                <span className='cursor_point' onClick={() => { this.props.history.push(`/admin-user/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
+                            </RoleView>
+                            <RoleView permission="delete_user">
+                                <Popconfirm title="Sure to delete the user ?" onConfirm={() => this.handleDelete(record._id)}>
+                                    <Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' />
+                                </Popconfirm>
+                            </RoleView>
+                        </span>
+                    ) : null,
             },
         ];
 

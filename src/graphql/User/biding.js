@@ -9,7 +9,9 @@ export const GET_BIDING_PAGINATION = gql`
             }
             data{
                 _id
-                budget
+                budget(code:$location_code)
+                service_fee
+                admin_fee(code:$location_code)
                 ref: biding_ref
                 created_at
                 user_id
@@ -20,10 +22,13 @@ export const GET_BIDING_PAGINATION = gql`
                 timeline_type
                 payment_option(code:$location_code)
                 add_to_shortlist
+                provider_rating_by_category(root: true) {
+                    rating
+                }
                 get_biding_all_files {
                     small_image
                 }
-                get_user {
+                get_user(root_parent:true) {
                     img_url
                     first_name
                     user_type

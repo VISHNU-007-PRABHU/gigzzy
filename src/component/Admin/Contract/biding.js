@@ -22,9 +22,19 @@ class Biding extends React.Component {
 
     getData = async () => {
         this.setState({ loading: true, });
+        let input_data = { contract_id: this.props.match.params.id }
+        console.log("Biding -> getData -> localStorage.getItem('currency')", localStorage.getItem('currency'))
+        if(localStorage.getItem('currency')){
+        console.log("Biding -> getData -> currency", )
+            
+        }else{
+            input_data['location_code'] = "IN"
+        }
+        
+        console.log("Biding -> getData -> input_data", input_data)
         client.query({
             query: GET_CONTRACT,
-            variables: { contract_id: this.props.match.params.id },
+            variables: input_data,
             fetchPolicy: 'no-cache',
         }).then(result => {
             console.log("Biding -> getData -> result", result.data.get_contracts)
@@ -60,7 +70,7 @@ class Biding extends React.Component {
                         <Title level={4}>{data?.name}</Title>
                         <Title level={4} className="font-weight-light m-0 mb-1">{data?.company_name}</Title>
                         <Suspense fallback={<Skeleton active />}>
-                            <ShowCategory parent_catgeory={catgeory} custom_font={4} custom_class="font-weight-light m-0 text-success"/>
+                            <ShowCategory parent_catgeory={catgeory} custom_font={4} custom_class="font-weight-light m-0 text-success" />
                         </Suspense>
                     </Col>
                 </Row>

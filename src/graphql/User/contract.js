@@ -44,13 +44,13 @@ export const GET_CONTRACT_FILES = gql`
 `
 
 export const GET_CONTRACT = gql`
-    query GETCONTRACT($contract_id:ID){
-        get_contracts(contract_id:$contract_id){
+    query GETCONTRACT($contract_id:ID,$location_code:String){
+        get_contracts(contract_id:$contract_id,location_code:$location_code){
             name
             description
             current_page
             address_id
-            budget
+            budget(code:$location_code)
             timeline
             timeline_type
             terms_condition

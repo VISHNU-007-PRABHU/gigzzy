@@ -355,8 +355,6 @@ module.exports.update_milestone = async (root, args) => {
             return fetch_bid
 
         } else {
-            console.log("module.exports.update_biding -> biding_detail", biding_detail)
-            biding_detail['service_fee'] = "20"
             let add_bid = new BidingMilestone_model(biding_detail)
             let added_bid = await add_bid.save()
             if (files && _.size(files)) {

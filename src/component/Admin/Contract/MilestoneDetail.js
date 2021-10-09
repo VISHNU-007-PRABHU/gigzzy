@@ -1,34 +1,85 @@
-import React, { useState, Suspense } from 'react'
-import { Icon, Tag, message, Steps, Form, Skeleton, Badge } from 'antd';
-import step0 from '../../../image/step0.png';
-import findIndex from 'lodash/findIndex';
-import size from 'lodash/size';
-const { Step } = Steps;
-
+import React, { useState, useEffect, Suspense } from 'react'
+import { Row, Col, Form, Skeleton, Typography } from 'antd';
+const { Title, Paragraph } = Typography;
+const ShowCategory = React.lazy(() => import('../../Comman/ShowCategory'));
+const BannerSlider = React.lazy(() => import('../../Comman/BannerSlider'));
+const bill_data = [
+    {
+        title: "Billing details",
+        data_view: true,
+        data: "bill_detail"
+    },
+    {
+        title: "Bill no.#",
+        main_class:"border-bottom py-3",
+        data: "ref"
+    },
+    {
+        title: "Milestone",
+        data: "budget"
+    }, {
+        title: "Other Cost",
+        data: "extra_price"
+    }, {
+        title: "Total",
+        class: "py-3",
+        data: "total"
+    }
+]
 function MilestoneDetail(props) {
-    const { form } = props;
-    const [open, setOpen] = useState(false);
-    const [current, setCurrent] = useState(0);
-    const [stepsdetail, setSteps] = useState(original_steps);
+    const [data, set_data] = useState({})
+    const [isStripePayment, set_isStripePayment] = useState(false)
+    useEffect(() => {
+        if (props.data) {
+            set_data(props.data)
+        }
+    }, [])
     return (
         <>
             <Row gutter={[16, 40]}>
                 <Col span={24}>
-                    <div className="normal_font_size primary_color d-flex justify-content-center">{content_data['data1']}</div>
+                    <div className="normal_font_size primary_color d-flex justify-content-center">{data['title']}</div>
                 </Col>
             </Row>
             <Row gutter={[12, 24]}>
                 <Col span={24}>
-                    <img alt='' src={require("../../../image/handyman.jpg")} loading="lazy" className="w-100 br_14 h_18_em lazyload" />
+                    <Suspense fallback={<Skeleton active />}>
+                        <BannerSlider parent_images={data?.get_contract_all_files} />
+                    </Suspense>
                 </Col>
             </Row>
             <Row gutter={[12, 24]}>
-                <Col>
-                    <Title level={4}>{this.state.data.name}</Title>
-                    <Title level={4} className="font-weight-light m-0 mb-1">{this.state.data.company_name}</Title>
-                    <Title level={4} className="font-weight-light m-0 text-success">{"gradening"}</Title>
+                <Col span={24}>
+                    <Title level={4}>{"Project description"}</Title>
+                    <div>
+                        <Paragraph ellipsis={{ rows: 3, expandable: true }}>
+                            {data?.description}
+                        </Paragraph>
+                    </div>
                 </Col>
             </Row>
+
+            {bill_data.map(paydata => {
+                return (
+                    <Row gutter={[12, 24]}>
+                        <Col span={24}>
+                            <div className={`d-flex normal_font_size justify-content-between ${paydata?.main_class}`}>
+                                <div className={`align-items-center d-flex ${paydata.class}`}>
+                                    {paydata.title}
+                                </div>
+                                {paydata['data_view'] && <div >
+                                    {data[paydata['ref']]}
+                                </div>}
+                            </div>
+                        </Col>
+                    </Row>
+                )
+            })}
+
+            {/* {!isStripePayment && <><div className="">
+                <StripePayout data={data} booking_type={"contract"} current_booking_status={10} />
+            </div></>
+            } */}
 
         </>
 
