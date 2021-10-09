@@ -292,6 +292,8 @@ const typeDefs = gql`
         data: JSON 
         biding_ref:String
         budget(code: String): String @currency
+        admin_fee(code: String): String @currency
+        service_fee:String
         timeline:String
         timeline_type:String
         cover_letter:String
@@ -304,7 +306,6 @@ const typeDefs = gql`
         currency_code:String
         location_code:String
         current_page:String
-        service_fee(code: String): String @currency
         total(code: String): String @currency
         ctob:Boolean @payment
         ctob_shotcode:String
