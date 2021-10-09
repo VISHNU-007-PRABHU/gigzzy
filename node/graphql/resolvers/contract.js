@@ -7,6 +7,7 @@ var CronJob = require('cron').CronJob;
 var commonHelper = require('../commonHelper');
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 const payment_choose = require('../payment/choose')
+const PushNotification = require('../notification/PushNotification')
 const path = require("path");
 var fs = require('fs');
 var Category_model = model.category;
@@ -16,6 +17,7 @@ var ContractJob_model = model.contract_job;
 var ContractJobImage_model = model.contract_job_images;
 var Address_model = model.address
 var Biding_model = model.Biding
+var BidingMilestone_model = model.Milestone
 var CategoryCurrency_model = model.CategoryCurrency;
 var Currency_model = model.currency;
 module.exports.get_my_biding = async (root, args) => {
@@ -190,9 +192,9 @@ module.exports.get_contract_all_files = async (root, args) => {
 
         let grouped_images = await ContractJobImage_model.aggregate(pipeline)
         if (_.size(grouped_images)) {
-            if(args.limit){
-                return _.take(grouped_images,limit)
-            }else{
+            if (args.limit) {
+                return _.take(grouped_images, limit)
+            } else {
                 return grouped_images
             }
         } else {
@@ -283,24 +285,13 @@ module.exports.get_contract_address_detail = async (root, args, context, info) =
 
 module.exports.update_contract = async (root, args) => {
     try {
-        console.log("module.exports.update_contract -> args", args)
         let contract_detail = args['contract_data'][0]
-        console.log("module.exports.update_contract -> contract_detail", contract_detail)
         if (args['_id']) {
             let find_query = {
                 _id: args["_id"]
             }
-            if( args.local_location_code){
-                var CurrencyDetail = await Currency_model.findOne({ location: args.local_location_code }).lean()
-                if (!_.size(CurrencyDetail)) {
-                    return { msg: "invalid location code", status: "failed" }
-                } else {
-                    contract_detail['currency_id'] = CurrencyDetail._id;
-                    contract_detail['symbol'] = CurrencyDetail.symbol || "";
-                    contract_detail['currency_detail'] = CurrencyDetail;
-                }
-            }
-            
+
+
             var category_data = {}
             if (contract_detail.category_type === 1) {
                 category_data = await Category_model.findOne({ _id: contract_detail.category_id }).lean()
@@ -310,20 +301,22 @@ module.exports.update_contract = async (root, args) => {
             if (_.size(category_data)) {
                 contract_detail['service_fee'] = String(parseFloat(category_data.service_fee || 0).toFixed(2));
             }
+            let get_current_user_currency = await this.get_current_user_currency(args);
+            if (_.size(get_current_user_currency) && get_current_user_currency.status) {
+                contract_detail = { ...contract_detail, ...get_current_user_currency }
+            }
             let update_bid = await ContractJob_model.updateOne(find_query, contract_detail).exec()
             let fetch_bid = await ContractJob_model.findOne(find_query).lean()
-            if (fetch_bid['contract_status'] === "c2") {
-                // send notification SMS EMAIL
+            if (args['booking_status'] === 9) {
+                // await PushNotification.create_push_notification_msg()
             }
+
             fetch_bid['status'] = "success";
             fetch_bid['msg'] = "contract job update success"
             return fetch_bid
         } else {
 
-            var default_currency = await Currency_model.findOne({ default_currency: 1, is_delete: false }).lean()
-            var local_currency = await Currency_model.findOne({ location: args.local_location_code, is_delete: false }).lean()
             var category_data = {}
-
             if (contract_detail.category_type === 1) {
                 category_data = await Category_model.findOne({ _id: contract_detail.category_id }).lean()
             } else if (contract_detail.category_type === 2) {
@@ -332,12 +325,16 @@ module.exports.update_contract = async (root, args) => {
             console.log("module.exports.update_contract -> category_data", category_data)
             contract_detail['available_provider'] = [];
 
-            contract_detail['default_currency_rate'] = default_currency.rate;
-            contract_detail['currenct_local_rate'] = local_currency.rate;
             contract_detail['location'] = { coordinates: [args.lng, args.lat] }
+            let service_fee = 0;
             if (_.size(category_data)) {
-                contract_detail['service_fee'] = String(parseFloat(category_data.service_fee || 0).toFixed(2));
+                if (contract_detail['service_fee']) {
+                    service_fee = (category_data.service_fee / 100) * contract_detail['budget'];
+                } else {
+                    service_fee = (15 / 100) * contract_detail['budget'];
+                }
             }
+            contract_detail['admin_fee'] = String(parseFloat(service_fee || 0).toFixed(2));
             contract_detail['base_price'] = String(parseFloat(contract_detail.budget).toFixed(2));
             contract_detail['total'] = Number(contract_detail['service_fee']) + Number(contract_detail['base_price'])
             contract_detail['booking_ref'] = String(Math.floor(1000 + Math.random() * 9000));
@@ -356,6 +353,35 @@ module.exports.update_contract = async (root, args) => {
         console.log("module.exports.update_contract -> error", error)
         return { status: "failed", msg: "contract job added failed" }
     }
+}
+
+exports.get_current_user_currency = async (args) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            let comman_currency = {
+                status: true
+            }
+            var default_currency = await Currency_model.findOne({ default_currency: 1, is_delete: false }).lean()
+            comman_currency['default_currency_rate'] = default_currency.rate;
+
+            if (args.local_location_code) {
+                var local_currency = await Currency_model.findOne({ location: args.local_location_code }).lean()
+                if (!_.size(local_currency)) {
+                    return { msg: "invalid location code", status: "failed" }
+                } else {
+                    comman_currency['currency_id'] = local_currency._id;
+                    comman_currency['symbol'] = local_currency.symbol || "";
+                    comman_currency['currency_detail'] = local_currency;
+                    comman_currency['currenct_local_rate'] = local_currency.rate;
+                }
+            }
+            return resolve(comman_currency)
+        } catch (error) {
+            console.log("exports.get_current_user_currency -> error", error)
+            return reject({ status: false })
+        }
+    })
+
 }
 
 exports.genrate_random_contract = async () => {
@@ -457,33 +483,83 @@ module.exports.delete_biding = async (root, args) => {
  */
 exports.manage_contract_booking = async (root, args) => {
     try {
+        if (args['booking_status'] === 10) {
+            let preview_contract_data = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
+            let preview_biding_data = await Biding_model.findOne({ _id: args.biding_id }).lean()
+            if (args.booking_status === 10 && preview_contract_data.booking_status === 9) {
+                let base_amount = preview_biding_data.budget;
+                args['amount'] = preview_contract_data['admin_fee'];
 
-        let preview_contract_data = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
-        let preview_biding_data = await Biding_model.findOne({ _id: args.biding_id }).lean()
-
-        if (args.booking_status === 10 && preview_contract_data.booking_status === 9) {
-            let base_amount = preview_biding_data.budget;
-            let category_service_fee = 20;
-            let service_fee = (category_service_fee / 100) * base_amount;
-            args['amount'] = service_fee;
-
-            console.log("exports.manage_contract_booking -> args", args)
-            let payment_data = await payment_choose.choose_contract_payment(args, preview_contract_data, preview_biding_data)
-            console.log("payment_data", payment_data)
-            if (payment_data.status) {
-                var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
-                findBooking['user_parent'] = true;
-                findBooking['msg'] = "user accept the contract";
-                findBooking['status'] = 'success';
-                return findBooking
+                console.log("exports.manage_contract_booking -> args", args)
+                let payment_data = await payment_choose.choose_contract_payment(args, preview_contract_data, preview_biding_data)
+                console.log("payment_data", payment_data)
+                if (payment_data.status) {
+                    var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
+                    findBooking['user_parent'] = true;
+                    findBooking['msg'] = "user accept the contract";
+                    findBooking['status'] = 'success';
+                    return findBooking
+                } else {
+                    return { msg: "Contract Payment failed", status: 'failed' }
+                }
             } else {
                 return { msg: "Contract Payment failed", status: 'failed' }
             }
-        } else {
-            return { msg: "Contract Payment failed", status: 'failed' }
+        } else if (args['booking_status'] === 4) {
+            let input_data = {
+                booking_status: 4
+            }
+            var update_contract_status = await this.update_contract_status(args, input_data);
+            var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
+            findBooking['user_parent'] = true;
+            findBooking['msg'] = "start the contract";
+            findBooking['status'] = 'success';
+            return findBooking
+        } else if (args['booking_status'] === 13) {
+            let input_data = {
+                booking_status: 13
+            }
+            var update_contract_status = await this.update_contract_status(args, input_data);
+            var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
+            findBooking['user_parent'] = true;
+            findBooking['msg'] = "start the contract";
+            findBooking['status'] = 'success';
+            return findBooking
         }
+
     } catch (error) {
         console.log("exports.manage_contract_booking -> error", error)
         return { msg: "Contract Payment failed", status: 'failed' }
     }
+}
+
+exports.update_contract_status = async (args, data) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            await ContractJob_model.updateOne({ _id: args.contract_id }, data)
+            return resolve(true)
+        } catch (error) {
+            return reject(false)
+        }
+    })
+}
+
+
+exports.manage_milestone_booking = async (root, args) => {
+    try {
+    } catch (error) {
+        console.log("exports.manage_contract_booking -> error", error)
+        return { msg: "Contract Payment failed", status: 'failed' }
+    }
+}
+
+exports.update_milestone_status = async (args, data) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            await BidingMilestone_model.updateOne({ _id: args.milestone_id }, data)
+            return resolve(true)
+        } catch (error) {
+            return reject(false)
+        }
+    })
 }

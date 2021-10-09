@@ -243,7 +243,7 @@ module.exports.send_mail_sendgrid = async (email, type, datas) => {
     let data = await sgMail.send(mail_msg);
     return true
   } catch (error) {
-    console.log("module.exports.send_mail_sendgrid -> error", error.response.body)
+    console.log("module.exports.send_mail_sendgrid -> error", error.response)
     return false
   }
 }

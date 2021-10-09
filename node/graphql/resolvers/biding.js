@@ -5,6 +5,7 @@ var Jimp = require('jimp');
 var ObjectId = require('mongodb').ObjectID;
 var CronJob = require('cron').CronJob;
 var commonHelper = require('../commonHelper');
+var contractResolver = require('../resolvers/contract');
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 const path = require("path");
 var fs = require('fs');
@@ -12,7 +13,7 @@ var Biding_model = model.Biding;
 var BidingImage_model = model.BidingImage;
 var BidingMilestone_model = model.Milestone;
 var MilestoneImage_model = model.MilestoneImage
-
+var ContractJob_model = model.contract_job
 module.exports.get_biding_pagination = async (root, args) => {
     console.log(args);
     try {
@@ -157,12 +158,18 @@ exports.BidingFileUpload = async (id, files) => {
 module.exports.update_biding = async (root, args) => {
     try {
         let files = args['file']
-        let biding_detail = args['biding_data'][0]
+        let update_detail = args['biding_data'][0]
         if (args['_id']) {
             let find_query = {
                 _id: args["_id"]
             }
-            let update_bid = await Biding_model.updateOne(find_query, biding_detail).exec()
+
+            let get_current_user_currency = await contractResolver.get_current_user_currency(args);
+            console.log("module.exports.update_biding -> get_current_user_currency", get_current_user_currency)
+            if(_.size(get_current_user_currency) && get_current_user_currency.status){
+                update_detail = {...update_detail,...get_current_user_currency}
+            }
+            let update_bid = await Biding_model.updateOne(find_query, update_detail).exec()
             if (files && _.size(files)) {
                 args['biding_id'] = args['_id']
                 let filesUpload = await this.uploading_files(files, args)
@@ -173,9 +180,11 @@ module.exports.update_biding = async (root, args) => {
             return fetch_bid
 
         } else {
-            console.log("module.exports.update_biding -> biding_detail", biding_detail)
-            biding_detail['service_fee'] = "20"
-            let add_bid = new Biding_model(biding_detail)
+            update_detail['service_fee'] = "20"
+            let contract_id = update_detail['contract_id'] 
+            let contract_data = await this.fetch_contract_detail(contract_id)
+            update_detail['category_id'] =  contract_data['category_id']
+            let add_bid = new Biding_model(update_detail)
             let added_bid = await add_bid.save()
             if (files && _.size(files)) {
                 args['biding_id'] = added_bid['_id']
@@ -191,7 +200,10 @@ module.exports.update_biding = async (root, args) => {
     }
 }
 
-
+exports.fetch_contract_detail=async(_id,option)=>{
+    var get_biding = await ContractJob_model.findOne({ _id }).lean();
+    return get_biding
+}
 
 
 module.exports.get_biding_milestone_detail = async (root, args) => {

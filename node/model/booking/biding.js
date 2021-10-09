@@ -39,17 +39,10 @@ var bidingSchema = new Schema({
   },
 
   booking_status: { type: String,default:"pending" },  // 12.booking,11.user_cancel,8.provider_accept,no_provider],10.user_accept,4.start,13.end,14.completed,15.not available
-  availability: [],
-  hours: { type: String },
-  booking_date: Date,
-  booking_cron_date: String,
-  booking_time: String,
-  booking_hour: String,
   start_date: String,
   end_date: String,
   description: { type: String },
   created_at: Date,
-  booking_alert: { type: Number, default: 0 },
   end_date: Date,
   accept_date: Date,
   is_reject: { type: Boolean, default: false },
@@ -70,6 +63,12 @@ var bidingSchema = new Schema({
   payment_type: { type: String, default: "" },
   ctob_shotcode: { type: String, default: "" },
   ctob_billRef: { type: String, default: "" },
+  currency_detail:{},
+  symbol:String,
+  current_currency:{},
+  currency_id:String,
+  default_currency_rate:String,
+  currenct_local_rate:String,
 }, schemaOptions);
 
 bidingSchema.virtual('uid').get(function () {

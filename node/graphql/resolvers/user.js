@@ -10,6 +10,8 @@ var CommonFunction = require('../CommonFunction');
 var saf = require('../safaricom');
 const dotenv = require('dotenv');
 var getDistanceBetweenPoints = require('get-distance-between-points');
+const { pipeline } = require('stream');
+const { match } = require('assert');
 dotenv.config();
 
 const files = [];
@@ -119,6 +121,56 @@ module.exports.reset_password = async (parent, args, context, info) => {
     }
 }
 
+
+
+// find provider rating (based on booking data)
+module.exports.provider_rating_by_category = async (parent, args, context, info) => {
+    try {
+
+        let match = {
+            booking_status: 14,
+            user_rating: { $ne: 0 },
+            user_comments_status: 1,
+        };
+        if (args['root']) {
+            match['provider_id'] = parent['provider_id']
+            if (parent['category_id']) {
+                match['category_id'] = ObjectId(parent['category_id'])
+            }
+        } else if (args['_id']) {
+            match['provider_id'] = args['_id']
+        }
+
+        if (args['category_id']) {
+            match['category_id'] = ObjectId(args['category_id'])
+        }
+        console.log("module.exports.provider_rating_by_category -> match", match)
+
+        let pipeline = [
+            {
+                $match: match
+            },
+            {
+                $group: {
+                    _id: "$user_rating",
+                    rating: { $sum: 1 },
+                    totalSaleAmount: { $sum: { $multiply: ["$user_rating", { $sum: 1 }] } },
+                }
+            },
+        ]
+
+        var group_rating = await Booking_model.aggregate(pipeline)
+        let rating_value = _.sumBy(group_rating, 'totalSaleAmount') || 0;
+        let total_count_rating = _.sumBy(group_rating, 'rating') || 0;
+        var rating = rating_value / total_count_rating
+        rating = rating ? parseFloat(rating).toFixed(1).toString() : 0;
+        return { rating };
+    } catch (error) {
+        return 0
+    }
+
+};
+
 // find provider rating (based on booking data)
 module.exports.provider_rating = async (parent, args, context, info) => {
     // console.log(args);
@@ -173,9 +225,13 @@ module.exports.provider_rate = async (parent, args, context, info) => {
 
 // find user (based on data)
 module.exports.available_booking_user = async (parent, args, context, info) => {
-    //console.log('booking_based_user-parent');
-    var result;
-    result = await Detail_model.find({ _id: parent.user_id });
+    let input_data = {}
+    if (args['root_parent']) {
+        input_data['_id'] = parent.provider_id
+    } else {
+        input_data['_id'] = parent.user_id
+    }
+    var result = await Detail_model.find(input_data);
     return result;
 };
 
@@ -281,7 +337,7 @@ module.exports.admin_update_user = async (_, args) => {
         args.demo_end_time = moment.utc().add(4, 'days').format("YYYY-MM-DD");
     }
     var data = await Detail_model.findOne({ _id: args._id });
-    if (args.phone_no != '' && args.phone_no != null && typeof args.phone_no != "undefined") {
+    if (args.phone_no) {
         const find_pn = await Detail_model.find({ delete: 0, phone_no: args.phone_no, role: args.role, _id: { $ne: args._id } });
         if (find_pn.length > 0) {
             return { msg: "mobile no exists", status: 'failed' }
@@ -557,11 +613,7 @@ module.exports.sign_up = async (_, args) => {
         var email_verified_data = await Detail_model.findOne({ _id: email_verification[0]._id });
 
         let msg = {};
-        if (email_verified[0].role == 2 && email_verified[0].Upload_percentage == 50 && (email_verified[0].email_otp_verification == 0)) {
-            email_verified_data.pending_status = 2,
-                email_verified_data.msg = "Email not verified",
-                email_verified_data.status = "success"
-        } else if (email_verified[0].provider_subCategoryID.length == 0 && email_verified[0].role == 2 && email_verified[0].Upload_percentage == 50) {
+        if (email_verified[0].provider_subCategoryID.length == 0 && email_verified[0].role == 2 && email_verified[0].Upload_percentage == 50) {
             email_verified_data.pending_status = 5,
                 email_verified_data.msg = " category not upload",
                 email_verified_data.status = "success"
@@ -742,25 +794,25 @@ module.exports.get_company_detail = async (parent, args, context, info) => {
 
 exports.get_company_root_detail = async (parent, args, context, info) => {
     try {
-        let pro_finder={delete: false}
+        let pro_finder = { delete: false }
         if (parent['_id']) {
             pro_finder['provider_id'] = ObjectId(parent['_id'])
         }
-        
+
         console.log("exports.get_company_root_detail -> pro_finder", pro_finder)
         let company_result = await CompanyProvider_model.findOne(pro_finder).lean();
-        if(_.size(company_result)){
+        if (_.size(company_result)) {
             let find_query = { delete: false }
             if (company_result['company_id']) {
                 find_query['_id'] = ObjectId(company_result['company_id'])
             }
             let final_result = await Company_model.findOne(find_query).lean();
             return final_result
-        }else{
-            return {msg:"error in company detail",status:"failed"}
+        } else {
+            return { msg: "error in company detail", status: "failed" }
         }
     } catch (error) {
-        return {msg:"error in company detail",status:"failed"}
+        return { msg: "error in company detail", status: "failed" }
     }
 };
 
@@ -985,7 +1037,7 @@ exports.addUser = async (parent, args) => {
                 //"otp is change"
                 let otp = String(Math.floor(1000 + Math.random() * 9000));
                 let updatedata = {
-                    otp:otp,
+                    otp: otp,
                     last_otp_verification: moment.utc().format()
                 };
                 await Detail_model.updateOne({ phone_no: args.phone_no, role: args.role }, updatedata);
@@ -1116,7 +1168,7 @@ module.exports.update_company_detail = async (parent, args, context, info) => {
                 company_id: ObjectId(added_detail['_id']),
                 register_link_status: "accepted",
                 register_status: "success",
-                user_type:"Owner"
+                user_type: "Owner"
             }
             let defaul_user = new CompanyProvider_model(update_query)
             await defaul_user.save()

@@ -46,7 +46,7 @@ const typeDefs = gql`
         user_address(user_id:ID):[UserAddress]
         search_category_only(data:JSON):[Category]
         search_sub_category_only(data:JSON):[subCategory]
-        
+        provider_rating_by_category(_id:ID,category_id:ID):Detail
         # find_provider(_id:ID,category_id:ID,online:String):Detail
         checkOtp(_id:ID,otp:String):Detail
         email_checkOtp(_id:ID,email_otp:String):Detail
@@ -286,6 +286,7 @@ const typeDefs = gql`
         status:String
         msg:String
         user_id:ID,
+        category_id:ID
         contract_id:ID
         created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         data: JSON 
@@ -302,10 +303,11 @@ const typeDefs = gql`
         payment_type:String
         payment_option(code:String):String @paymentOption
         total(code: String): String @currency
-        get_user:[Detail]
+        get_user(root_parent:Boolean):[Detail]
         get_biding_all_files(contract_id:ID,root:Boolean):[CompanyImage]
         get_company_root_detail(root:Boolean,provider_id:ID):Company
         get_parent_company_provider(user_id:ID,provider_id:ID):[CompanyProvider]
+        provider_rating_by_category(_id:ID,root:Boolean,category_id:ID):Detail
     }
 
     type BidingImages{
@@ -356,6 +358,7 @@ const typeDefs = gql`
         address_id:ID
         description:String
         budget(code: String): String @currency, 
+        admin_fee(code: String): String @currency, 
         timeline:String
         timeline_type:String 
         terms_condition: String 
@@ -644,8 +647,9 @@ const typeDefs = gql`
         currency_code:String
         currency_id:ID
         location_code:String
-        get_currency(location_code:String,country_code:String,_id:ID,user_id:ID):Currency
+        get_currency(location_code:String,country_code:String,_id:ID,user_id:ID,root_location:Boolean):Currency
         get_company_root_detail(root:Boolean,provider_id:ID):Company
+        provider_rating_by_category(_id:ID,root:Boolean,category_id:ID):Detail
     }
     
     type Account{
@@ -939,8 +943,8 @@ const typeDefs = gql`
         update_certificate(certificate_name:String,_id:ID):Certificate
         add_static(page_name:String,page_code:String,description:String,title:String):Static
         update_static(_id:ID,page_name:String,page_code:String,description:String,title:String):Static
-        admin_add_user(role:Int,demo:Boolean,country_code:String,phone_no:String,email:String,password:String,name:String,provider_subCategoryID:[ID],lat:Float,lng:Float,address:String): User!
-        admin_update_user(_id:ID,demo:Boolean,role:Int,country_code:String,phone_no:String,email:String,password:String,name:String,provider_subCategoryID:[ID],lat:Float,lng:Float,address:String): User!
+        admin_add_user(role:Int,demo:Boolean,first_name:String,last_name:String,location_code:String,country_code:String,phone_no:String,email:String,password:String,name:String,provider_subCategoryID:[ID],lat:Float,lng:Float,address:String): User!
+        admin_update_user(_id:ID,demo:Boolean,role:Int,first_name:String,last_name:String,location_code:String,country_code:String,phone_no:String,email:String,password:String,name:String,provider_subCategoryID:[ID],lat:Float,lng:Float,address:String): User!
         provider_document_verified(_id:ID,proof_status:String):Detail
         online_status(_id:ID,online_status:Int):Detail
         # booking process
@@ -1069,6 +1073,7 @@ const typeDefs = gql`
          update_biding(
             option:String  
             _id:ID
+            local_location_code:String
             user_id: String
             provider_id:ID
             company_id:ID
@@ -1080,6 +1085,7 @@ const typeDefs = gql`
         update_milestone(
             option:String  
             _id:ID
+            local_location_code:String
             user_id: String
             provider_id:ID
             biding_id:ID

@@ -258,6 +258,7 @@ const resolvers = {
         get_cancel_chart: adminResolver.get_cancel_chart,
         get_earnings_chart: adminResolver.get_earnings_chart,
         get_others_chart: adminResolver.get_others_chart,
+        provider_rating_by_category:userResolver.provider_rating_by_category,
     },
 
     // Find sub_query under schema 
@@ -281,6 +282,8 @@ const resolvers = {
         get_biding_all_files: bidingResolver.get_biding_all_files,
         get_parent_company_provider: userResolver.get_parent_company_provider,
         get_company_root_detail: userResolver.get_company_root_detail,
+        provider_rating_by_category:userResolver.provider_rating_by_category,
+
     },
     Milestone: {
         get_milestone_all_images: bidingResolver.get_milestone_all_images,
@@ -309,6 +312,7 @@ const resolvers = {
     Detail: {
         category: categoryResolver.category,
         provider_rating: userResolver.provider_rating,
+        provider_rating_by_category:userResolver.provider_rating_by_category,
         provider_rate: userResolver.provider_rate,
         get_currency: currencyResolver.get_currency,
         get_company_root_detail: userResolver.get_company_root_detail,

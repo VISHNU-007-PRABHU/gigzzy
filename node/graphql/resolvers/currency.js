@@ -60,6 +60,9 @@ module.exports.get_currency = async (root, args) => {
             match['location'] = _.toUpper(args['location_code'])
         }
 
+        if (args['root_location'] && root['location_code']) {
+            match['location'] = _.toUpper(root['location_code'])
+        }
         if (args.user_id) {
             const user_detail = await Detail_model.findOne({ _id: ObjectId(args.user_id) }).lean()
             if (user_detail && user_detail.location_code) {
