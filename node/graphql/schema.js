@@ -101,7 +101,7 @@ const typeDefs = gql`
         get_contract_files(location_code:String,company_id:ID,user_id:ID,provider_id:ID,contract_id:ID):[CompanyImage]
         get_contracts(location_code:String,company_id:ID,contract_id:ID,provider_id:ID,user_id:ID):[ContractJob]
         get_contracts_pagination(location_code:String,booking_status:Int,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
-        get_contract_all_files(contract_id:ID):[CompanyImage]
+        get_contract_all_files(contract_id:ID,limit:Int,image_type:String):[CompanyImage]
         get_currencys(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,pagination:Boolean,page:Int,limit:Int):CurrencyConnection
         get_currency(_id:ID,country_code:String,location_code:String):Currency
         get_biding_pagination(location_code:String,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int,contract_id:ID):BidingConnection
@@ -380,7 +380,7 @@ const typeDefs = gql`
         biding_count:Int
         get_contract_category(contract_id:ID,_id:ID,category_type:Int):[Category]
         get_contract_files(contract_id:ID):[CompanyImage]
-        get_contract_all_files(contract_id:ID,limit:Int):[CompanyImage]
+        get_contract_all_files(contract_id:ID,limit:Int,image_type:String):[CompanyImage]
         get_company_root_detail(root:Boolean):Company
         get_contract_address_detail(root:Boolean):UserAddress
         get_user:[Detail]
@@ -457,7 +457,7 @@ const typeDefs = gql`
         status:String
         images:[CompanyImage]
         get_contract_files(contract_id:ID):[CompanyImage]
-        get_contract_all_files(contract_id:ID):[CompanyImage]
+        get_contract_all_files(contract_id:ID,limit:Int,image_type:String):[CompanyImage]
 
     }
     type Admin{

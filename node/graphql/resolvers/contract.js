@@ -184,6 +184,10 @@ module.exports.get_contract_all_files = async (root, args) => {
         if (args['contract_id']) {
             match['contract_id'] = ObjectId(args['contract_id'])
         }
+        if(args['image_type'] === "image"){
+            match['doc_type'] = {$ne:'pdf'}
+        }
+
         let pipeline = [
             {
                 $match: match
