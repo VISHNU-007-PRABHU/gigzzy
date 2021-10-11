@@ -26,6 +26,7 @@ const typeDefs = gql`
         proof_status(_id:ID,role:Int,):Detail
         demo_account(_id:ID):Detail
 
+        send_contract_jobs_provider(_id:ID,online:Int,location_code:String):ContractJob
         get_my_contracts(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[ContractJob]
         get_my_biding(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[Biding]
         get_my_milestone(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[Milestone]

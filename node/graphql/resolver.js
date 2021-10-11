@@ -48,6 +48,7 @@ const SEND_ACCEPT_MSG = 'SEND_ACCEPT_MSG';
 const APPOINTMENTS = 'APPOINTMENTS';
 const PROOF_STATUS = 'PROOF_STATUS';
 const REMOVE_USER = 'REMOVE_USER';
+const SEND_CONTRACT_JOB_MSG = 'SEND_CONTRACT_JOB_MSG';
 
 const resolvers = {
 
@@ -138,6 +139,19 @@ const resolvers = {
                     }
                 }),
         },
+
+        send_contract_jobs_provider: {
+            subscribe: withFilter(
+                () => pubsub.asyncIterator([SEND_CONTRACT_JOB_MSG]),
+                (payload, variables) => {
+                    for (let i = 0; i <= payload.send_contract_jobs_provider.available_provider.length; i++) {
+                        if (payload.send_contract_jobs_provider.available_provider[i] == variables._id) {
+                            return true;
+                        }
+                    }
+                }),
+        },
+
         booking_details: {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([BOOK_MSG]),
@@ -258,7 +272,7 @@ const resolvers = {
         get_cancel_chart: adminResolver.get_cancel_chart,
         get_earnings_chart: adminResolver.get_earnings_chart,
         get_others_chart: adminResolver.get_others_chart,
-        provider_rating_by_category:userResolver.provider_rating_by_category,
+        provider_rating_by_category: userResolver.provider_rating_by_category,
     },
 
     // Find sub_query under schema 
@@ -282,7 +296,7 @@ const resolvers = {
         get_biding_all_files: bidingResolver.get_biding_all_files,
         get_parent_company_provider: userResolver.get_parent_company_provider,
         get_company_root_detail: userResolver.get_company_root_detail,
-        provider_rating_by_category:userResolver.provider_rating_by_category,
+        provider_rating_by_category: userResolver.provider_rating_by_category,
 
     },
     Milestone: {
@@ -312,7 +326,7 @@ const resolvers = {
     Detail: {
         category: categoryResolver.category,
         provider_rating: userResolver.provider_rating,
-        provider_rating_by_category:userResolver.provider_rating_by_category,
+        provider_rating_by_category: userResolver.provider_rating_by_category,
         provider_rate: userResolver.provider_rate,
         get_currency: currencyResolver.get_currency,
         get_company_root_detail: userResolver.get_company_root_detail,

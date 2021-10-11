@@ -184,8 +184,8 @@ module.exports.get_contract_all_files = async (root, args) => {
         if (args['contract_id']) {
             match['contract_id'] = ObjectId(args['contract_id'])
         }
-        if(args['image_type'] === "image"){
-            match['doc_type'] = {$ne:'pdf'}
+        if (args['image_type'] === "image") {
+            match['doc_type'] = { $ne: 'pdf' }
         }
 
         let pipeline = [
@@ -281,7 +281,6 @@ module.exports.get_contract_address_detail = async (root, args, context, info) =
 };
 /**
  * @info 'add contract job detail's
- * @info global.pubsub.publish('TEST_MSG', { test: { info: { message: "sd", status: "ok" } } });
  * @param {*} root 
  * @param {*} args 
  * @returns 
@@ -298,14 +297,15 @@ module.exports.update_contract = async (root, args) => {
             if (_.size(get_current_user_currency) && get_current_user_currency.status) {
                 contract_detail = { ...contract_detail, ...get_current_user_currency }
             }
-            let update_bid = await ContractJob_model.updateOne(find_query, contract_detail).exec()
-            let fetch_bid = await ContractJob_model.findOne(find_query).lean()
+            await ContractJob_model.updateOne(find_query, contract_detail).exec()
+            let fetch_contract = await ContractJob_model.findOne(find_query).lean()
             if (args['booking_status'] === 9) {
                 // await PushNotification.create_push_notification_msg()
+                await this.find_provider(fetch_contract)
             }
-            fetch_bid['status'] = "success";
-            fetch_bid['msg'] = "contract job update success"
-            return fetch_bid
+            fetch_contract['status'] = "success";
+            fetch_contract['msg'] = "contract job update success"
+            return fetch_contract
         } else {
             contract_detail['location'] = { coordinates: [args.lng, args.lat] }
             contract_detail['booking_ref'] = String(Math.floor(1000 + Math.random() * 9000));
@@ -382,7 +382,7 @@ exports.get_current_user_currency = async (args) => {
 
 exports.genrate_mpesa_ref = async (args) => {
     try {
-        let mpesa_detail ={status: true}
+        let mpesa_detail = { status: true }
         var random = Math.floor(Math.random() * 90000) + 10000;
         var chars = "abcdefghijklmnopqrstufwxyzABCDEFGHIJKLMNOPQRSTUFWXYZ1234567890"
         var random = _.join(_.sampleSize(chars, 20), "")
@@ -395,36 +395,45 @@ exports.genrate_mpesa_ref = async (args) => {
         mpesa_detail['ctob_billRef'] = digit
         return mpesa_detail
     } catch (error) {
-        let error_mpesa_detail ={status: false}
+        let error_mpesa_detail = { status: false }
         error_mpesa_detail['ctob_shotcode'] = process.env.MPESA_SHORT_CODE;
         error_mpesa_detail['ctob_billRef'] = "00000000000"
         return error_mpesa_detail
     }
 }
 
+/**
+ * @info global.pubsub.publish('TEST_MSG', { test: { info: { message: "sd", status: "ok" } } });
+ * @param {*} contract_data 
+ * @returns 
+ */
 exports.find_provider = async (contract_data) => {
     try {
-        // get category data
-        if (contract_data['cat']) {
-            //  send request with in radius
-            var filter = {
-                role: 2,
-                online: 1,
-                delete: 0,
-                proof_status: 1,
-                location: { $near: { $maxDistance: 10000, $geometry: { type: "Point", coordinates: [args.lng, args.lat] } } },
-                provider_subCategoryID: { $in: [args.category_id] },
-            };
-            let find_provider = await Detail_model.find(filter);
-        } else {
-            //  send request with al the location
+        var filter = {
+            role: 2,
+            delete: 0,
+            proof_status: 1,
+            provider_subCategoryID: { $in: [contract_data.category_id] },
+        };
+        let find_provider_data = await Detail_model.find(filter);
+        var available_provider = []
+        let notification_user_data = []
+        for (let i = 0; i < find_provider_data.length; i++) {
+            available_provider.push(find_provider_data[i]._id);
+            notification_user_data.push({
+                user_id: find_provider_data[i]._id,
+                booking_id: contract_data._id,
+                booking_status: 9
+            })
         }
-        let response = {}
-        response['status'] = "success";
-        response['msg'] = "Job sent nearest user"
-        return response
+        await PushNotification.create_push_notification_msg(notification_user_data);
+        contract_data['available_provider'] = available_provider;
+        contract_data['user_parent'] = true;
+        global.pubsub.publish('SEND_CONTRACT_JOB_MSG', { send_contract_jobs_provider: contract_data });
+        return { status: "success", msg: "Job socket notification sent success" }
     } catch (error) {
-        return { status: "failed", msg: "Job failed to send user" }
+        console.log("exports.find_provider -> error", error)
+        return { status: "failed", msg: "Job socket notification sent failed" }
     }
 }
 
