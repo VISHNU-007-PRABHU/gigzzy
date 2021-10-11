@@ -32,7 +32,6 @@ var bidingSchema = new Schema({
   experience: String,
   no_of_people: String,
   add_to_shortlist:Boolean,
-  
   location: {
     type: { type: String },
     coordinates: []
@@ -69,6 +68,8 @@ var bidingSchema = new Schema({
   currency_id:String,
   default_currency_rate:String,
   currenct_local_rate:String,
+  current_milestone_id:String,
+  milestone_status:String,
 }, schemaOptions);
 
 bidingSchema.virtual('uid').get(function () {

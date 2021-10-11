@@ -311,6 +311,7 @@ const typeDefs = gql`
         ctob:Boolean @payment
         ctob_shotcode:String
         ctob_billRef:String
+        get_contract_category(contract_id:ID,_id:ID,category_type:Int):[Category]
         get_user(root_parent:Boolean):[Detail]
         get_biding_all_files(contract_id:ID,root:Boolean):[CompanyImage]
         get_company_root_detail(root:Boolean,provider_id:ID):Company

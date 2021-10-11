@@ -230,11 +230,7 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         if (args.role && args.role == 1 && args['user_id']) {
             find_query['user_id'] = ObjectId(args['user_id'])
         }
-
-        // if (args.role && args.role == 2 && args['user_id']) {
-        //     find_query['available_provider'] = { $ne: [ObjectId(args.user_id)] }
-        // }
-
+     
         console.log("module.exports.get_contracts_pagination -> offset", offset, Number(limit))
         total = await ContractJob_model.count(find_query);
         let result = await ContractJob_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(Number(limit));

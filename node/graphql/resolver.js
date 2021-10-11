@@ -21,6 +21,7 @@ var rolesResolver = require('./resolvers/roles');
 var contractResolver = require('./resolvers/contract');
 var currencyResolver = require('./resolvers/currency');
 var bidingResolver = require('./resolvers/biding');
+var milestoneResolver = require('./resolvers/milestone');
 const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
@@ -214,8 +215,8 @@ const resolvers = {
         get_currency: currencyResolver.get_currency,
         get_biding_pagination: bidingResolver.get_biding_pagination,
         get_biding_detail: bidingResolver.get_biding_detail,
-        get_biding_milestone_detail: bidingResolver.get_biding_milestone_detail,
-        get_biding_milestone: bidingResolver.get_biding_milestone,
+        get_biding_milestone_detail: milestoneResolver.get_biding_milestone_detail,
+        get_biding_milestone: milestoneResolver.get_biding_milestone,
         GetCategoryCurrency: categoryResolver.GetCategoryCurrency,
         get_my_appointments: async (parent, args, context, info) => {
             try {
@@ -297,10 +298,11 @@ const resolvers = {
         get_parent_company_provider: userResolver.get_parent_company_provider,
         get_company_root_detail: userResolver.get_company_root_detail,
         provider_rating_by_category: userResolver.provider_rating_by_category,
+        get_contract_category: categoryResolver.available_booking_category,
 
     },
     Milestone: {
-        get_milestone_all_images: bidingResolver.get_milestone_all_images,
+        get_milestone_all_images: milestoneResolver.get_milestone_all_images,
     },
     Category: {
         booking_parent_category: categoryResolver.booking_parent_category,
@@ -385,7 +387,7 @@ const resolvers = {
         DeleteContractJobFile: contractResolver.DeleteContractJobFile,
         update_biding: bidingResolver.update_biding,
         BidingFileUpload: bidingResolver.BidingFileUpload,
-        update_milestone: bidingResolver.update_milestone,
+        update_milestone: milestoneResolver.update_milestone,
         // company detiail
         UpdateCategoryCurrency: categoryResolver.UpdateCategoryCurrency,
         DeleteCategoryCurrency: categoryResolver.DeleteCategoryCurrency,
