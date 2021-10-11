@@ -338,6 +338,8 @@ const typeDefs = gql`
         created_at:String,
         updatedAt:String,
         get_milestone_all_images(milestone_id:ID,_id:ID,root:Boolean):[CompanyImage]
+        msg:String
+        status:String
     }
     type Currency{
         _id:ID,
