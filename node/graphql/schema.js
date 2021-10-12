@@ -337,8 +337,14 @@ const typeDefs = gql`
         timeline_type: String,
         delete:Boolean,
         booking_status:Int,
-        created_at:String,
         updatedAt:String,
+        lat:Float
+        lng:Float
+        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
+        category_id:ID
+        biding_id:ID
+        category_type:Int
+        milestone_status:String
         get_milestone_all_images(milestone_id:ID,_id:ID,root:Boolean):[CompanyImage]
         msg:String
         status:String
@@ -1084,12 +1090,14 @@ const typeDefs = gql`
          update_biding(
             option:String  
             _id:ID
-            local_location_code:String
             user_id: String
             provider_id:ID
             company_id:ID
             file:[Upload]
+            booking_status:Int
             biding_data:JSON
+            location_code:String,
+            local_location_code:String,
         ):Biding
         BidingFileUpload(_id:ID,contract_id:ID,category:String,image_tag:String,data:[JSON],file:[Upload]):CompanyImage
 
@@ -1102,7 +1110,10 @@ const typeDefs = gql`
             biding_id:ID
             contract_id:ID
             file:[Upload]
+            booking_status:Int
             milestone_data:JSON
+            location_code:String,
+            local_location_code:String,
         ):Milestone
         UpdateCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
         DeleteCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory

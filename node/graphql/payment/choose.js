@@ -5,6 +5,7 @@ const stripeModule = require('./stripe');
 const mpesaModule = require('./mpesa');
 const payoutNotificationModule = require('./payout_notification')
 const ContractPayoutNotificationModule = require('./ContractPayoutNotification')
+const MilestonePayoutNotificationModule = require('./MilestonePayoutNotification')
 
 exports.choose_payment = async (args, booking_detail) => {
     return new Promise(async function (resolve, reject) {
@@ -82,21 +83,21 @@ exports.choose_milestone_payment = async (args,milestone_detail) => {
                 case 'stripe':
                     let stripe_charge = await stripeModule.stripe_payment(args, milestone_detail )
                     if (stripe_charge.charge.status == "succeeded" && stripe_charge.charge.paid == true) {
-                        await ContractPayoutNotificationModule.update_coact_after_payment(args, stripe_charge.charge,biding_detail)
-                        await ContractPayoutNotificationModule.update_provider_payout(contract_detail)
-                        await ContractPayoutNotificationModule.accept_payout_notification(contract_detail)
-                        return resolve({ msg: "stripe payment success", status: true, data: contract_detail })
+                        await MilestonePayoutNotificationModule.update_milestone_after_payment(args, stripe_charge.charge,milestone_detail)
+                        await MilestonePayoutNotificationModule.update_milestone_provider_payout(milestone_detail)
+                        await MilestonePayoutNotificationModule.accept_milestone_payout_notification(milestone_detail)
+                        return resolve({ msg: "stripe payment success", status: true, data: milestone_detail })
                     } else {
-                        await ContractPayoutNotificationModule.error_payout_notification(contract_detail);
+                        await MilestonePayoutNotificationModule.error_payout_notification(milestone_detail);
                         return reject({ msg: "stripe payment failed", status: false, data: {} })
                     }
                 case 'mpesa':
-                    let mpesa_charge = await mpesaModule.mpesa_payment(args, contract_detail)
+                    let mpesa_charge = await mpesaModule.mpesa_payment(args, milestone_detail)
                     if (mpesa_charge.charge.status == true) {
-                        await ContractPayoutNotificationModule.update_contract_after_payment(args, mpesa_charge.charge,biding_detail)
+                        await MilestonePayoutNotificationModule.update_milestone_after_payment(args, mpesa_charge.charge,milestone_detail)
                         return resolve({ msg: "mpesa payment success", status: true, data: contract_detail })
                     } else {
-                        await ContractPayoutNotificationModule.error_payout_notification(contract_detail);
+                        await MilestonePayoutNotificationModule.error_payout_notification(milestone_detail);
                         return reject({ msg: "mpesa payment failed", status: false, data: {} })
                     }
                 default:

@@ -4,26 +4,10 @@ const _ = require('lodash');
 const moment = require("moment");
 const commonHelper = require('../commonHelper')
 var Detail_model = model.detail;
-var Booking_model = model.booking;
 var Payout_model = model.payout;
 var Contract_model = model.contract_job
 var Biding_model = model.Biding
-
-exports.update_provider_payout = async (contract_data) => {
-    let booking_detail = await Contract_model.findOne({ _id: contract_data._id }).lean()
-    if (booking_detail.booking_status === "base_paid") {
-        let update_provider_data = {
-            provider_id: booking_detail.provider_id,
-            amount: String(booking_detail.service_fee),
-            booking_status: booking_detail.booking_status || 10,
-            job_type: "contract",
-            contract_id: "contract_data._id",
-        };
-        const update_provider_payout = new Payout_model(update_provider_data);
-        const save = await update_provider_payout.save();
-        return save
-    }
-}
+var BidingMilestone_model = model.Milestone;
 
 exports.update_milestone_provider_payout = async (detail) => {
     let update_provider_data = {
@@ -40,18 +24,15 @@ exports.update_milestone_provider_payout = async (detail) => {
     return save
 }
 
-exports.update_contract_after_payment = async (args, charge, biding) => {
+exports.update_milestone_after_payment = async (args, charge, biding) => {
     return new Promise(async function (resolve, reject) {
         try {
-            let contract_data = {
-                service_fee: String(parseFloat(args.amount).toFixed(2)),
+            let milestone_data = {
                 provider_fee: String(parseFloat(args.amount).toFixed(2)),
                 phone_number: args.phone_number,
                 payment_type: args.payment_type,
                 payment_option: args.payment_option,
                 payment_history: charge,
-                biding_id: args['biding_id'],
-                provider_id: biding.user_id
             }
 
             if (args.booking_status === 10) {
@@ -59,32 +40,32 @@ exports.update_contract_after_payment = async (args, charge, biding) => {
                 if (args.payment_option === "mpesa") {
                     contract_data['booking_status'] = 50;
                 } else {
-                    contract_data['booking_status'] = 10;
-                    contract_data['job_status'] = 10;
-                    contract_data['payment_status'] = 1;
+                    milestone_data['booking_status'] = 10;
+                    milestone_data['job_status'] = 10;
+                    milestone_data['payment_status'] = 1;
                 }
             } else {
-                contract_data['end_date'] = moment.utc().format();
+                milestone_data['end_date'] = moment.utc().format();
                 if (args.payment_option === "mpesa") {
-                    contract_data['mpeas_payment_callback'] = true
+                    milestone_data['mpeas_payment_callback'] = true
                     if (args.payment_type !== "c2b") {
-                        contract_data['MerchantRequestID'] = charge.data.MerchantRequestID || 0;
-                        contract_data['CheckoutRequestID'] = charge.data.CheckoutRequestID || 0;
+                        milestone_data['MerchantRequestID'] = charge.data.MerchantRequestID || 0;
+                        milestone_data['CheckoutRequestID'] = charge.data.CheckoutRequestID || 0;
                     }
                 } else {
-                    contract_data['booking_status'] = 14;
-                    contract_data['extra_payment_callback'] = false;
-                    contract_data['payment_status'] = 5;
-                    contract_data['job_status'] = 14;
+                    milestone_data['booking_status'] = 14;
+                    milestone_data['extra_payment_callback'] = false;
+                    milestone_data['payment_status'] = 5;
+                    milestone_data['job_status'] = 14;
                 }
             }
 
-            let biding_data = {
-                booking_status: 10,
-                payment_status: "paid"
+            let contract_data = {
+                milestone_status: 10,
+                currenct_milestone_id: args['_id']
             }
             await Contract_model.updateOne({ _id: args.contract_id }, contract_data, { new: true });
-            await Biding_model.updateOne({ _id: args.biding_id }, biding_data, { new: true });
+            await BidingMilestone_model.updateOne({ _id: args._id }, milestone_data, { new: true });
             return resolve({ msg: "update success", status: true });
         } catch (error) {
             console.log("exports.update_booking_after_payment -> error", error)
@@ -93,7 +74,7 @@ exports.update_contract_after_payment = async (args, charge, biding) => {
     })
 }
 
-exports.accept_payout_notification = async (contract_data) => {
+exports.accept_milestone_payout_notification = async (milestone_data) => {
     return new Promise(async function (resolve, reject) {
         try {
             let booking_detail = await Contract_model.findOne({ _id: contract_data._id }).lean()
@@ -161,43 +142,4 @@ exports.accept_payout_notification = async (contract_data) => {
 }
 
 
-exports.error_payout_notification = async (booking_data) => {
-    return new Promise(async function (resolve, reject) {
-        try {
-            let update_details = {
-                payment_message: "",
-                resultcode: "001",
-                payment_message: "stripe payment error"
-            }
-
-            update_details['job_status'] = 11;
-            update_details['booking_status'] = 11;
-            await Booking_model.updateOne({ _id: booking_data._id }, update_details)
-            const error_result = await Booking_model.find({ provider_id: booking_data.provider_id }).sort({ created_at: -1 });
-            let error_booking_detail = await Booking_model.findOne({ CheckoutRequestID }).lean()
-            let data = {
-                user_parent: true,
-                ...error_booking_detail,
-                msg: update_details['payment_message'],
-                status: 'failed',
-                msg_status: 'to_provider'
-            }
-            await global.pubsub.publish(APPOINTMENTS, { get_my_appointments: error_result });
-            await global.pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
-            // to user
-            let error_invoice_user_data = {
-                user_parent: true,
-                ...error_booking_detail,
-                msg: update_details['payment_message'],
-                status: 'failed',
-                msg_status: 'to_user'
-            }
-            let error_payment_issues = await global.pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: error_invoice_user_data });
-            return resolve({ status: true, msg: "Mpesa Payment failed !" })
-
-        } catch (error) {
-            reject({ msg: "Error in payment notification", status: false })
-        }
-    })
-}
 
