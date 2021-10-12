@@ -5,6 +5,7 @@ var Jimp = require('jimp');
 var ObjectId = require('mongodb').ObjectID;
 
 var MainCategory_model = model.MainCategory;
+var MainCategoryQuestion_model = model.MainCategoryQuestion
 var MainCategoryImage_model = model.MainCategoryImage
 var Category_model = model.category;
 var subCategory_model = model.sub_category;
@@ -13,7 +14,6 @@ var Currency_model = model.currency;
 
 exports.get_main_category_pagination = async (parent, args, context, info) => {
     try {
-
         var limit = args.limit || 10;
         var page = args.page || 1;
         let options = {
@@ -21,10 +21,9 @@ exports.get_main_category_pagination = async (parent, args, context, info) => {
             limit
         };
         var search_data = { delete: false };
-
         if (args['search']) {
             let search_text = `.*${args['search']}`
-            search_data['category_name'] =  { $regex:search_text, $options: "i" } 
+            search_data['category_name'] = { $regex: search_text, $options: "i" }
         } else {
             if (args['parent']) {
                 search_data['parent'] = args['parent']
@@ -32,13 +31,12 @@ exports.get_main_category_pagination = async (parent, args, context, info) => {
                 search_data['parent'] = "is_parent"
             }
         }
-
         var result = await MainCategory_model.paginate(search_data, options);
         var pageInfo = { totalDocs: result['totalDocs'], page: result['page'], hasNextPage: result['hasNextPage'] }
         return { data: result.docs, pageInfo };
     } catch (error) {
         console.log("exports.get_main_category_pagination -> error", error)
-        return { data: [], pageInfo: {page:1,totalDocs:0} };
+        return { data: [], pageInfo: { page: 1, totalDocs: 0 } };
     }
 }
 
@@ -116,4 +114,41 @@ exports.update_main_category_files = async (files, args) => {
             reject(false)
         }
     })
+}
+
+
+exports.get_category_question = async (parent, args, context, info) => {
+    try {
+        let search_data = {}
+        if (args['category_id']) {
+            search_data['category_id'] = args['category_id']
+        }
+        var result = await MainCategoryQuestion_model.find(search_data);
+        return result;
+    } catch (error) {
+        console.log("exports.get_category_question -> error", error)
+        return [];
+    }
+}
+
+
+exports.update_category_question = async (parent, args, context, info) => {
+    try {
+        let update_data = args['question_data']
+        if (args['_id']) {
+            let find_query = { _id: args['_id'] }
+            await MainCategoryQuestion_model.updateOne(find_query, update_data);
+            var result = await MainCategoryQuestion_model.findOne(find_query).lean();
+            result["msg"] = "update process success"
+            result['status'] = 'success'
+            return result
+        } else {
+            const add_main_tegory = new MainCategoryQuestion_model(update_data);
+            const save = await add_main_tegory.save();
+            return { msg: "Ondemand Question update success", status: "success" }
+        }
+    } catch (error) {
+        console.log("exports.get_category_question -> error", error)
+        return [];
+    }
 }

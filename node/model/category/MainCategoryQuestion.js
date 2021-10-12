@@ -28,6 +28,7 @@ const MainCategorQuestionySchema = mongoose.Schema({
     multiple_option:[],
     single_option:String,
     option_type:String,
+    is_skip:{type:Boolean,default:false}
 }, schemaOptions);
 
 MainCategorQuestionySchema.pre('save', function (next) {
