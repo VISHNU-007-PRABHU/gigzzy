@@ -290,6 +290,7 @@ const resolvers = {
         get_earnings_chart: adminResolver.get_earnings_chart,
         get_others_chart: adminResolver.get_others_chart,
         provider_rating_by_category: userResolver.provider_rating_by_category,
+        get_main_category_pagination:main_categoryResolver.get_main_category_pagination,
     },
 
     // Find sub_query under schema 
@@ -397,7 +398,7 @@ const resolvers = {
 
     Mutation: {
         adminLogin: adminResolver.adminlogin,
-        add_bulk:main_categoryResolver.add_bulk,
+        update_main_category:main_categoryResolver.update_main_category,
         // contract job
         update_contract: contractResolver.update_contract,
         update_currency: currencyResolver.update_currency,

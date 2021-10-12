@@ -11,21 +11,42 @@ var subCategory_model = model.sub_category;
 var CategoryCurrency_model = model.CategoryCurrency;
 var Currency_model = model.currency;
 
-exports.add_bulk = async () => {
+exports.get_main_category_pagination = async (parent, args, context, info) => {
     try {
 
-        let data_save = await new MainCategory_model({ category_name: "Databases", parent: "" })
-        data_save.save()
-        return [{ msg: 'add success' }]
+        var limit = args.limit || 10;
+        var page = args.page || 1;
+        let options = {
+            page,
+            limit
+        };
+        var search_data = { delete: false };
+
+        if (args['search']) {
+            let search_text = `.*${args['search']}`
+            search_data['category_name'] =  { $regex:search_text, $options: "i" } 
+        } else {
+            if (args['parent']) {
+                search_data['parent'] = args['parent']
+            } else {
+                search_data['parent'] = "is_parent"
+            }
+        }
+
+        console.log("exports.get_main_category_pagination -> search_data", search_data)
+
+
+        var result = await MainCategory_model.paginate(search_data, options);
+        console.log("module.exports.get_main_category -> result", result)
+        var pageInfo = { totalDocs: result['totalDocs'], page: result['page'], hasNextPage: result['hasNextPage'] }
+        return { data: result.docs, pageInfo };
     } catch (error) {
-        return [{ msg: 'add success' }]
+        console.log("exports.get_main_category_pagination -> error", error)
+        return { data: [], pageInfo: {page:1,totalDocs:0} };
     }
 }
-// { category_name: "MongoDB", parent: "" },
-//         { category_name: "dbm", parent: "Databases" },
-//         { category_name: "Languages", parent: "Programming" },
-//         { category_name: "Programming", parent: "Books" },
-//         { category_name: "Books", parent: null }
+
+
 /**
  * 
  * @param {*} parent 
@@ -34,7 +55,7 @@ exports.add_bulk = async () => {
  */
 exports.update_main_category = async (parent, args) => {
     try {
-        let update_data = args['categroy_data'][0]
+        let update_data = args['category_data']
 
         if (args['_id']) {
             let find_query = { _id: args['_id'] }
@@ -47,7 +68,8 @@ exports.update_main_category = async (parent, args) => {
             result['status'] = 'success'
             return result
         } else {
-            const add_main_tegory = new MainCategory_model(args);
+            console.log("exports.update_main_category -> update_data", update_data)
+            const add_main_tegory = new MainCategory_model(update_data);
             const save = await add_main_tegory.save();
             if (args['files'] && _.size(args['files'])) {
                 await this.update_main_category_files(args['files'], save)

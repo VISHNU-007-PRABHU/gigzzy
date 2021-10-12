@@ -19,6 +19,7 @@ function url_path(data){
     return commonHelper.url_path('category',data)
  }
 
+
 const MainCategorQuestionySchema = mongoose.Schema({
     category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'MainCategory' },
     delete: { type: Boolean, default: false },

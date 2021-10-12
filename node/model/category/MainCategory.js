@@ -16,7 +16,7 @@ var schemaOptions = {
 var MainCategorySchema = new mongoose.Schema({
   category_name: { type: String, },
   description: { type: String },
-  parent: String,
+  parent: {type:String,default:"is_parent"},
   child:[],
   child_name:[],
   image: { type: String },
@@ -29,7 +29,7 @@ var MainCategorySchema = new mongoose.Schema({
   is_future: { type: Boolean, default: false },       // 1 == future , 2 == not future
   is_block: { type: Boolean, default: false },       // 1 == show , 2 == not show
   category_type: { type: Number, default: 1 },     // 1 is category ,2 is subcategory
-  delete: { type: Number, default: 0 },
+  delete: { type: Boolean, default: false },
 }, schemaOptions);
 
 

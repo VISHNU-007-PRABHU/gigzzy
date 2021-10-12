@@ -287,6 +287,7 @@ const typeDefs = gql`
         status:String
         msg:String
         user_id:ID,
+        provider_id:ID
         category_id:ID
         contract_id:ID
         created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
