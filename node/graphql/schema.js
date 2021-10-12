@@ -317,6 +317,7 @@ const typeDefs = gql`
         get_company_root_detail(root:Boolean,provider_id:ID):Company
         get_parent_company_provider(user_id:ID,provider_id:ID):[CompanyProvider]
         provider_rating_by_category(_id:ID,root:Boolean,category_id:ID):Detail
+        find_kilometer(root:Boolean,lat:Float,lng:Float):Detail
     }
 
     type BidingImages{
@@ -406,6 +407,7 @@ const typeDefs = gql`
         ctob:Boolean @payment
         ctob_shotcode:String
         ctob_billRef:String
+        find_kilometer(lat:Float,lng:Float,root:Boolean):Detail
     }
     type Company{
         _id:ID

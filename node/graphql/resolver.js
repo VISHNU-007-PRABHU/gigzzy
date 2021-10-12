@@ -312,6 +312,7 @@ const resolvers = {
         get_biding_all_files: bidingResolver.get_biding_all_files,
         get_parent_company_provider: userResolver.get_parent_company_provider,
         get_company_root_detail: userResolver.get_company_root_detail,
+        find_kilometer: bidingResolver.find_kilometer,
         provider_rating_by_category: userResolver.provider_rating_by_category,
         get_contract_category: categoryResolver.available_booking_category,
 
@@ -367,6 +368,7 @@ const resolvers = {
         get_contract_all_files: contractResolver.get_contract_all_files,
         biding_count: bidingResolver.biding_count,
         get_contract_address_detail: contractResolver.get_contract_address_detail,
+        find_kilometer: contractResolver.find_kilometer,
     },
     CompanyImage: {
         get_contract_files: contractResolver.get_contract_files,

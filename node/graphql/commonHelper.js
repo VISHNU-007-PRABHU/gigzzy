@@ -37,6 +37,19 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+
+// let bookink_status={
+//   PROVIDER_ROLE = 2,
+//   START = 4,
+//   END = 13,
+//   CANCEL = 8,
+//   BOOKING = 12,
+//   PENDING = 10,
+//   ONGOING = 4,
+//   COMPLETE = 14,
+//   ACCEPT = 9,
+// }  
+
 module.exports.home = 0;
 module.exports.pending = 1;
 module.exports.on_going = 2;

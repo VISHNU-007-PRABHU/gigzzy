@@ -8,6 +8,7 @@ var commonHelper = require('../commonHelper');
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 const payment_choose = require('../payment/choose')
 const PushNotification = require('../notification/PushNotification')
+var getDistanceBetweenPoints = require('get-distance-between-points');
 const path = require("path");
 var fs = require('fs');
 var Category_model = model.category;
@@ -230,7 +231,7 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         if (args.role && args.role == 1 && args['user_id']) {
             find_query['user_id'] = ObjectId(args['user_id'])
         }
-     
+
         console.log("module.exports.get_contracts_pagination -> offset", offset, Number(limit))
         total = await ContractJob_model.count(find_query);
         let result = await ContractJob_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(Number(limit));
@@ -568,4 +569,34 @@ exports.update_milestone_status = async (args, data) => {
             return reject(false)
         }
     })
+}
+
+exports.find_kilometer = async (parent, args) => {
+    try {
+        var result = await ContractJob_model.findOne({ _id: parent._id });
+        var address = await Address_model.findOne({ _id: result['address_id'] });
+
+        if (_.size(address) && address.lat && address.lng && args.lat && args.lng) {
+            if (args.lat == address['lat'] && args.lng == address['lng']) {
+                return { kilometre: 0 };
+            } else {
+
+                var distanceInMeters = getDistanceBetweenPoints.getDistanceBetweenPoints(
+                    address.lat,address.lng, // Lat, Long of point A
+                    args.lat, args.lng// Lat, Long of point B
+                );
+                if (distanceInMeters) {
+                    return { kilometre: String(parseFloat(distanceInMeters * 0.001).toFixed(2)) };
+                } else {
+                    return { kilometre: 0 }
+                }
+            }
+        } else {
+            return { kilometre: 0 };
+        }
+
+    } catch (error) {
+        console.log("module.exports.kilometer -> error", error)
+        return { kilometre: 0 };
+    }
 }

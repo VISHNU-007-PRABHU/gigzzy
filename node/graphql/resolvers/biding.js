@@ -7,9 +7,11 @@ var CronJob = require('cron').CronJob;
 var commonHelper = require('../commonHelper');
 var contractResolver = require('../resolvers/contract');
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
+var getDistanceBetweenPoints = require('get-distance-between-points');
 const path = require("path");
 var fs = require('fs');
 var Biding_model = model.Biding;
+var Address_model = model.address
 var BidingImage_model = model.BidingImage;
 var BidingMilestone_model = model.Milestone;
 var MilestoneImage_model = model.MilestoneImage
@@ -306,5 +308,39 @@ module.exports.get_biding_all_files = async (root, args) => {
     } catch (error) {
         console.log("module.exports.get_biding_files -> error", error)
         return []
+    }
+}
+
+
+
+exports.find_kilometer = async (parent, args) => {
+    try {
+        var result = await ContractJob_model.findOne({ _id: parent.contract_id });
+
+        var contract_address = await Address_model.findOne({ _id: result['address_id'] });
+        var pro_address = await Address_model.findOne({ user_id: parent.provider_id });
+
+        if (_.size(contract_address) && _.size(pro_address) && contract_address.lat && address.lng && pro_address.lat && pro_address.lng) {
+            if (pro_address.lat == address['lat'] && pro_address.lng == address['lng']) {
+                return { kilometre: 0 };
+            } else {
+
+                var distanceInMeters = getDistanceBetweenPoints.getDistanceBetweenPoints(
+                    contract_address.lat,contract_address.lng, // Lat, Long of point A
+                    pro_address.lat, pro_address.lng// Lat, Long of point B
+                );
+                if (distanceInMeters) {
+                    return { kilometre: String(parseFloat(distanceInMeters * 0.001).toFixed(2)) };
+                } else {
+                    return { kilometre: 0 }
+                }
+            }
+        } else {
+            return { kilometre: 0 };
+        }
+
+    } catch (error) {
+        console.log("module.exports.kilometer -> error", error)
+        return { kilometre: 0 };
     }
 }
