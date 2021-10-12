@@ -31,7 +31,7 @@ exports.update_milestone_provider_payout = async (detail) => {
         amount: String(detail.amount),
         booking_status: 10,
         job_type: "contract",
-        pay_type:"milestone",
+        pay_type: "milestone",
         contract_id: detail['contract_id'],
         milestone_id: detail['_id'],
     };
@@ -97,49 +97,32 @@ exports.accept_payout_notification = async (contract_data) => {
     return new Promise(async function (resolve, reject) {
         try {
             let booking_detail = await Contract_model.findOne({ _id: contract_data._id }).lean()
-            let app_user_detail = await Detail_model.findOne({ _id: contract_data.user_id });
-            let user_detail = await Detail_model.findOne({ _id: contract_data.provider_id });
+            let app_user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
+            let provider_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
 
-            // send push notification to provider
-            if (user_detail && user_detail.device_id) {
-                let notification = {}
-                if (booking_detail.booking_status === 13) {
-                    notification = {
-                        title: 'Complete',
-                        body: "User Complete the job",
-                        click_action: ".activities.HomeActivity",
-                    }
-                } else {
-                    notification = {
-                        title: 'Accept',
-                        body: "User Accept The Job",
-                        click_action: ".activities.HomeActivity",
-                    }
-                }
-                var message = {
-                    to: user_detail.device_id,
-                    notification: notification,
-                    data: {
-                        my_key: commonHelper.pending,
-                        my_another_key: commonHelper.pending,
-                        booking_id: booking_detail.booking_id
-                    }
-                };
-            }
-            await commonHelper.push_notifiy(message);
+            let notification_user_data = [{
+                user_id: provider_detail.device_id,
+                booking_status: booking_detail.booking_status,
+                booking_id: booking_detail._id
+            }]
+
+            await PushNotification.create_push_notification_msg(notification_user_data);
 
             if (booking_detail.booking_status === 13) {
                 await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_finished", {})
                 return resolve({ job_status: 14, msg: "job is completed successfully", status: 'success' });
-
             } else {
                 // send sms for accept booking
-                // await commonHelper.send_sms(user_detail.country_code || 0, user_detail.phone_no, "job_assign", {})
+                // await commonHelper.send_sms(provider_detail.country_code || 0, provider_detail.phone_no, "job_assign", {})
                 // await commonHelper.send_sms(app_user_detail.country_code || 0, app_user_detail.phone_no, "job_placed", {})
 
                 //send my appoinment
-                // const result = await Booking_model.find({ provider_id: booking_detail.provider_id, booking_status: 10 }).sort({ created_at: -1 });
-                // await global.pubsub.publish("APPOINTMENTS", { get_my_appointments: result });
+                let find_socket_result = {
+                    provider_id: booking_detail.provider_id,
+                    booking_status: booking_detail.booking_status
+                }
+                const result = await Contract_model.find(find_socket_result).sort({ created_at: -1 });
+                await global.pubsub.publish("GET_MY_CONTRACTS", { get_my_contracts: result });
 
                 //send current booking data using subcription
                 booking_detail['user_parent'] = true;

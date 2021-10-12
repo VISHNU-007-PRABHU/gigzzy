@@ -50,6 +50,7 @@ const APPOINTMENTS = 'APPOINTMENTS';
 const PROOF_STATUS = 'PROOF_STATUS';
 const REMOVE_USER = 'REMOVE_USER';
 const SEND_CONTRACT_JOB_MSG = 'SEND_CONTRACT_JOB_MSG';
+const GET_MY_CONTRACTS = "GET_MY_CONTRACTS"
 
 const resolvers = {
 
@@ -148,6 +149,20 @@ const resolvers = {
                     for (let i = 0; i <= payload.send_contract_jobs_provider.available_provider.length; i++) {
                         if (payload.send_contract_jobs_provider.available_provider[i] == variables._id) {
                             return true;
+                        }
+                    }
+                }),
+        },
+
+        get_my_contracts: {
+            subscribe: withFilter(
+                () => pubsub.asyncIterator([GET_MY_CONTRACTS]),
+                (payload, variables) => {
+                    for (let i = 0; i <= payload.get_my_contracts.length; i++) {
+                        if (payload.get_my_contracts[i].provider_id == variables._id) {
+                            if (variables.booking_status === 10) {
+                                return true;
+                            }
                         }
                     }
                 }),
