@@ -37,6 +37,11 @@ module.exports.testinfmail = async (parent, args, context, info) => {
             convert_code: 'INR',
             amount: "500"
         }
+        const ContractPayoutNotificationModule = require('../payment/ContractPayoutNotification')
+
+       let  contract_data={_id:"6164360ccf243632f2547145"}
+        ContractPayoutNotificationModule.accept_payout_notification(contract_data)
+       console.log("module.exports.testinfmail -> contract_data", contract_data)
         //    let result = await CommonFunction.currency_calculation(data)
         //    console.log("module.exports.testinfmail -> result", result)
         // let user_detail ={

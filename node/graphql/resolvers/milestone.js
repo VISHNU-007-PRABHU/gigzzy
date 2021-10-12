@@ -52,7 +52,12 @@ module.exports.get_biding_milestone = async (root, args) => {
         if (args['contract_id']) {
             fetch_query['contract_id'] = args['contract_id']
         }
-        var data = await BidingMilestone_model.find(fetch_query);
+
+        let sort = {
+            order: 1,
+            created_at: 1
+        }
+        var data = await BidingMilestone_model.find(fetch_query).sort(sort);
         return data;
     } catch (error) {
         return []
@@ -92,10 +97,13 @@ module.exports.update_milestone = async (root, args) => {
             let find_query = {
                 _id: args["_id"]
             }
-            let update_bid = await BidingMilestone_model.updateOne(find_query, update_detail).exec()
+            await BidingMilestone_model.updateOne(find_query, update_detail).exec()
             if (files && _.size(files)) {
                 args['milestone_id'] = args['_id']
                 await this.uploading_milestone_files(files, args)
+            }
+            if (args['booking_status'] === 9 && update_detail['biding_id']) {
+                await Biding_model.updateOne({ _id: update_detail['biding_id'] }, { milestone_status: 9, current_milestone_id: args['_id'] }).exec()
             }
             let fetch_bid = await BidingMilestone_model.findOne(find_query).lean()
             fetch_bid['status'] = "success";
@@ -103,21 +111,22 @@ module.exports.update_milestone = async (root, args) => {
             return fetch_bid
 
         } else {
+            let get_current_user_currency = await contractResolver.get_current_user_currency(args);
+            if (_.size(get_current_user_currency) && get_current_user_currency.status) {
+                update_detail = { ...update_detail, ...get_current_user_currency }
+            }
             let get_mpesa_reference = await contractResolver.genrate_mpesa_ref(args);
             if (_.size(get_mpesa_reference) && get_mpesa_reference.status) {
                 update_detail = { ...update_detail, ...get_mpesa_reference }
             }
-            update_detail['title'] = "Started"
             let add_bid = new BidingMilestone_model(update_detail)
             let added_bid = await add_bid.save()
             if (files && _.size(files)) {
                 args['milestone_id'] = added_bid['_id']
-                let filesUpload = await this.uploading_milestone_files(files, args)
+                await this.uploading_milestone_files(files, args)
             }
-            if (args['booking_status'] === 9) {
-                if (update_detail['biding_id']) {
-                    await Biding_model.updateOne({ _id: update_detail['biding_id'] }, { milestone_status: 9, current_milestone_id: added_bid['_id'] }).exec()
-                }
+            if (args['booking_status'] === 9 && update_detail['biding_id']) {
+                await Biding_model.updateOne({ _id: update_detail['biding_id'] }, { milestone_status: 9, current_milestone_id: added_bid['_id'] }).exec()
             }
             added_bid['status'] = "success";
             added_bid['msg'] = "Milestone added success"
@@ -156,7 +165,7 @@ exports.uploading_milestone_files = async (files, args) => {
                      * @info add biding info after file update
                      */
                     let img_data = {
-                        biding_id: args['milestone_id'],
+                        milestone_id: args['milestone_id'],
                         small_image: small_file_name,
                         large_image: file_name,
                         // image_tag: args['image_tag'] || "",
@@ -183,21 +192,29 @@ exports.uploading_milestone_files = async (files, args) => {
  * @param {*} args  {contract_id,user_id,biding_id,booking_status,payment_option,payment_type}
  * @param {*} args  {location_code}
  */
- exports.manage_contract_booking = async (root, args) => {
+exports.manage_milestone_booking = async (root, args) => {
     try {
         let preview_milestone_data = await BidingMilestone_model.findOne({ _id: args._id }).lean()
         if (args.booking_status === 10 && preview_milestone_data.booking_status === 9) {
-            args['amount'] = preview_milestone_data['budget'];
-
-            let payment_data = await payment_choose.choose_milestone_payment(args, preview_milestone_data)
-            if (payment_data.status) {
+            if (!preview_milestone_data.pay_option) {
+                await BidingMilestone_model.updateOne({ _id: args._id }, { booking_status: 14,end_date:moment.utc().format() }).exec()
                 var findBooking = await BidingMilestone_model.findOne({ _id: args._id }).lean();
                 findBooking['user_parent'] = true;
                 findBooking['msg'] = "user paid the milestone";
                 findBooking['status'] = 'success';
                 return findBooking
             } else {
-                return { msg: "Milestone Payment failed", status: 'failed' }
+                args['amount'] = preview_milestone_data['budget'];
+                let payment_data = await payment_choose.choose_milestone_payment(args, preview_milestone_data)
+                if (payment_data.status) {
+                    var findBooking = await BidingMilestone_model.findOne({ _id: args._id }).lean();
+                    findBooking['user_parent'] = true;
+                    findBooking['msg'] = "user paid the milestone";
+                    findBooking['status'] = 'success';
+                    return findBooking
+                } else {
+                    return { msg: "Milestone Payment failed", status: 'failed' }
+                }
             }
         } else {
             return { msg: "Milestone Payment failed", status: 'failed' }

@@ -338,6 +338,7 @@ const typeDefs = gql`
         delete:Boolean,
         booking_status:Int,
         updatedAt:String,
+        order:Int
         lat:Float
         lng:Float
         created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
@@ -389,6 +390,7 @@ const typeDefs = gql`
         category_type:Int
         contract_ref:String
         biding_count:Int
+        get_contracts_pagination(location_code:String,booking_status:Int,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
         get_contract_category(contract_id:ID,_id:ID,category_type:Int):[Category]
         get_contract_files(contract_id:ID):[CompanyImage]
         get_contract_all_files(contract_id:ID,limit:Int,image_type:String):[CompanyImage]
@@ -1117,6 +1119,33 @@ const typeDefs = gql`
         ):Milestone
         UpdateCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
         DeleteCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
+        manage_milestone_booking(
+            location_code:String,
+            role:Int,
+            contract_status:String
+            _id:ID
+            booking_id:ID,
+            contract_id:ID,
+            biding_id:ID,
+            user_id:ID,
+            provider_id:ID,
+            category_id:String,
+            lat:Float,
+            lng:Float,
+            weekday:JSON,
+            hours:String,
+            description:String,
+            booking_status:Int,
+            category_type:Int,
+            stripe_token:String,
+            payment_option:String,
+            payment_type:String
+            ,phone_number:String,
+            extra_fare:String,
+            extra_fare_reason:String,
+            option:Int,
+            extra_fare_id:ID
+        ):Milestone
         manage_contract_booking(
             location_code:String,
             role:Int,

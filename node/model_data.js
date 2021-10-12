@@ -1,6 +1,8 @@
 module.exports = {
     user: require('./model/userDetail/user'),
     payout: require('./model/userDetail/payout'),
+    MainCategory: require('./model/category/MainCategory'),
+    MainCategoryImage:require('./model/category/MainCategory'),
     category: require('./model/category/category'),
     sub_category: require('./model/category/sub_category'),
     status: require('./model/userDetail/status'),
