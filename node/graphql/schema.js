@@ -1,5 +1,4 @@
-const { gql, SchemaDirectiveVisitor } = require('apollo-server');
-const { defaultFieldResolver } = require('graphql');
+const { gql } = require('apollo-server');
 
 const typeDefs = gql`
     scalar Date

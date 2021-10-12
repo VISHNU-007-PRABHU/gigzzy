@@ -33,11 +33,7 @@ exports.get_main_category_pagination = async (parent, args, context, info) => {
             }
         }
 
-        console.log("exports.get_main_category_pagination -> search_data", search_data)
-
-
         var result = await MainCategory_model.paginate(search_data, options);
-        console.log("module.exports.get_main_category -> result", result)
         var pageInfo = { totalDocs: result['totalDocs'], page: result['page'], hasNextPage: result['hasNextPage'] }
         return { data: result.docs, pageInfo };
     } catch (error) {
