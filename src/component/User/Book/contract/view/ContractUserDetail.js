@@ -2,9 +2,9 @@ import React, { Suspense } from "react";
 import { withRouter } from "react-router";
 import { Layout, BackTop, Affix, Form, Card, Avatar, Row, Col, Rate, Skeleton } from 'antd';
 import 'antd/dist/antd.css';
-const { Content } = Layout;
 
 const Milestone = React.lazy(() => import('../../../../Admin/Contract/Milestone'));
+const CreateMilestone = React.lazy(() => import('../../milestone/update/CreateMilestone'));
 const Biding = React.lazy(() => import('../../../../Admin/Contract/biding'));
 const BidingList = React.lazy(() => import('../../../../Admin/Contract/BidingList'));
 const UserHeader = React.lazy(() => import('../../../Layout/UserHeader'));
@@ -45,6 +45,9 @@ class ContractUserDetail extends React.Component {
                                 </Suspense>
                             </Card>
                             {/* {this.state.booking_status === 10 && */}
+                                <Suspense fallback={<Skeleton active />}>
+                                    <CreateMilestone contract_id={this.state.contract_id}></CreateMilestone>
+                                </Suspense>
                                 <Suspense fallback={<Skeleton active />}>
                                     <Milestone contract_id={this.state.contract_id}></Milestone>
                                 </Suspense>

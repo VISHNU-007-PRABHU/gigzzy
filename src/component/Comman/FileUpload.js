@@ -32,6 +32,12 @@ const FileUpload = (props) => {
         if (props['custom_sub_content']) {
             setsubcontent(props['custom_sub_content'])
         }
+        if(props['set_show_images']){
+            set_set_show_images(props['set_show_images'])
+        }
+        if(props['fileList_status']){
+            setfileList_status(props['fileList_status'])
+        }
     }, [props])
     const getBase64 = (img, callback) => {
         const reader = new FileReader();
@@ -63,13 +69,15 @@ const FileUpload = (props) => {
         if (info.file.status) {
             let category_data = props?.custom_category ||  "others"
             props.onFileUpload(info.file.originFileObj,category_data)
+            if(fileList_status){
+                set_fileList(info.fileList)
+            }
             getBase64(info.file.originFileObj, imageUrl => {
                 if(set_show_images){
                     setimg_url(imageUrl)
                 }
                 setloading(false)
-            }
-            );
+            });
         }
     };
 
@@ -94,7 +102,7 @@ const FileUpload = (props) => {
                 action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                 showUploadList={true}
                 beforeUpload={beforeUpload}
-                onChange={handleChange}
+                onChange={(e)=>{handleChange(e)}}
             >
                 {img_url ? <img src={img_url} alt="avatar" style={{ width: '50%' }} /> : uploadButton}
             </Upload>
