@@ -16,7 +16,7 @@ var schemaOptions = {
 var MainCategorySchema = new mongoose.Schema({
   category_name: { type: String, },
   description: { type: String },
-  parent: { type: mongoose.Schema.Types.ObjectId, ref: 'MainCategory' },
+  parent: String,
   child:[],
   child_name:[],
   image: { type: String },

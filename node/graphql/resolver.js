@@ -9,6 +9,7 @@ global.pubsub = pubsub;
 const { createWriteStream } = require("fs");
 var userResolver = require('./resolvers/user');
 var categoryResolver = require('./resolvers/category');
+var main_categoryResolver = require('./resolvers/main_category');
 var statusResolver = require('./resolvers/status');
 var staticResolver = require('./resolvers/static');
 var bookingResolver = require('./resolvers/booking');
@@ -396,6 +397,7 @@ const resolvers = {
 
     Mutation: {
         adminLogin: adminResolver.adminlogin,
+        add_bulk:main_categoryResolver.add_bulk,
         // contract job
         update_contract: contractResolver.update_contract,
         update_currency: currencyResolver.update_currency,

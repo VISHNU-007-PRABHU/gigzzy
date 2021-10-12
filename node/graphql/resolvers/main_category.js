@@ -11,7 +11,21 @@ var subCategory_model = model.sub_category;
 var CategoryCurrency_model = model.CategoryCurrency;
 var Currency_model = model.currency;
 
+exports.add_bulk = async () => {
+    try {
 
+        let data_save = await new MainCategory_model({ category_name: "Databases", parent: "" })
+        data_save.save()
+        return [{ msg: 'add success' }]
+    } catch (error) {
+        return [{ msg: 'add success' }]
+    }
+}
+// { category_name: "MongoDB", parent: "" },
+//         { category_name: "dbm", parent: "Databases" },
+//         { category_name: "Languages", parent: "Programming" },
+//         { category_name: "Programming", parent: "Books" },
+//         { category_name: "Books", parent: null }
 /**
  * 
  * @param {*} parent 
@@ -21,13 +35,13 @@ var Currency_model = model.currency;
 exports.update_main_category = async (parent, args) => {
     try {
         let update_data = args['categroy_data'][0]
-      
+
         if (args['_id']) {
             let find_query = { _id: args['_id'] }
             await MainCategory_model.updateOne({ _id: args._id }, update_data);
             if (args['files'] && _.size(args['files'])) {
                 await this.update_main_category_files(args['files'], args)
-            } 
+            }
             var result = await MainCategory_model.findOne(find_query).lean();
             result["msg"] = "update process success"
             result['status'] = 'success'
@@ -37,7 +51,7 @@ exports.update_main_category = async (parent, args) => {
             const save = await add_main_tegory.save();
             if (args['files'] && _.size(args['files'])) {
                 await this.update_main_category_files(args['files'], save)
-            } 
+            }
             return { msg: "category update success", status: "success" }
         }
     } catch (error) {
