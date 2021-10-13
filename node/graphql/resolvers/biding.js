@@ -186,7 +186,7 @@ module.exports.update_biding = async (root, args) => {
             /**
              * get admin fee based on catgeory contract service fee
              */
-            let get_admin_fees = await this.get_admin_fee(update_detail);
+            let get_admin_fees = await contractResolver.get_admin_fee(update_detail);
             if (_.size(get_admin_fees) && get_admin_fees.status) {
                 update_detail = { ...update_detail, ...get_admin_fees }
             }
