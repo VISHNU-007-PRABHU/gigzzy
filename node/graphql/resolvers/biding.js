@@ -181,6 +181,7 @@ module.exports.update_biding = async (root, args) => {
             let contract_data = await this.fetch_contract_detail(contract_id)
             update_detail['category_id'] = contract_data['category_id']
             update_detail['category_type'] = contract_data['category_type']
+            update_detail['user_id'] = contract_data['user_id'];
 
             /**
              * get admin fee based on catgeory contract service fee
@@ -208,6 +209,7 @@ module.exports.update_biding = async (root, args) => {
             let added_bid = await add_bid.save()
             if (files && _.size(files)) {
                 args['biding_id'] = added_bid['_id']
+
                 let filesUpload = await this.uploading_files(files, args)
             }
             if (args['booking_status'] === "9") {
