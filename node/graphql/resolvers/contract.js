@@ -231,6 +231,9 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         if (args.role && args.role == 1 && args['user_id']) {
             find_query['user_id'] = ObjectId(args['user_id'])
         }
+        if (args['booking_status']) {
+            find_query['booking_status'] = ObjectId(args['booking_status'])
+        }
 
         console.log("module.exports.get_contracts_pagination -> offset", offset, Number(limit))
         total = await ContractJob_model.count(find_query);
