@@ -499,7 +499,7 @@ exports.manage_contract_booking = async (root, args) => {
             let preview_biding_data = await Biding_model.findOne({ _id: args.biding_id }).lean()
             if (args.booking_status === 10 && preview_contract_data.booking_status === 9) {
                 let base_amount = preview_biding_data.budget;
-                args['amount'] = preview_contract_data['admin_fee'];
+                args['amount'] = preview_biding_data['admin_fee'];
                 let payment_data = await payment_choose.choose_contract_payment(args, preview_contract_data, preview_biding_data)
                 if (payment_data.status) {
                     var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
