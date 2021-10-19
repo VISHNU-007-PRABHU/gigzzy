@@ -31,7 +31,7 @@ var bidingSchema = new Schema({
   description: String,
   experience: String,
   no_of_people: String,
-  add_to_shortlist:Boolean,
+  add_to_shortlist:{type:Boolean,default:false},
   location: {
     type: { type: String },
     coordinates: []
