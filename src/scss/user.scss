@@ -1,7 +1,4 @@
 @import "~react-image-gallery/styles/scss/image-gallery.scss";
-body {
-    font-family: "BalooTamma2", cursive !important;
-}
 $primarycolor: #99d332;
 $light_grey: #e6e6e6;
 $drak_grey:gray;
@@ -395,10 +392,10 @@ span.ant-form-item-children.d-block {
     } @else {
         $steper_color: $primarycolor;
     }
-    padding: 3px 7px;
+    padding: 10px;
     border-radius: 25px;
-    background-color: $steper_color !important;
-    border: 1px solid $steper_color !important;
+    background-color: $steper_color;
+    border: 1px solid $steper_color;
     &:before {
         content: "";
         position: absolute;
@@ -414,18 +411,88 @@ span.ant-form-item-children.d-block {
 }
 
 .contract_steper {
+    
+    .ant-steps-item-content
+    {
+        width: 130px !important;
+    }
+    .ant-steps-label-vertical .ant-steps-item-icon
+    {
+        margin-left: 40px !important;
+    }
     .ant-steps-item-wait {
         .ant-steps-icon {
             @include custom_setper($light: true);
+        }
+    }
+    .ant-steps-item-process {
+        .ant-steps-icon {
+            @include custom_setper($light: true);
+        }
+        .ant-steps-icon
+        {
+            background-color: $primaryBlueColor !important;
+            border: 1px solid $primaryBlueColor !important;
+        }
+        .ant-steps-item-title
+        {
+            color: $primaryBlueColor !important;
+            font-weight: bold;
+        }
+        .ant-steps-icon:before
+        {
+            border: 1px solid $primaryBlueColor !important;
         }
     }
     .ant-steps-item-finish {
         .ant-steps-icon {
             @include custom_setper($light: false);
         }
+        .ant-steps-icon
+        {
+            background-color: $primarycolor !important;
+            border: 1px solid $primarycolor !important;
+        }
+        .ant-steps-item-title
+        {
+            color: $primarycolor !important;
+        }
+    }
+    .ant-steps-item-active.ant-steps-item-finish 
+    {
+        .ant-steps-item-title
+        {
+            font-weight: bold;
+        }
+    }
+    .ant-steps-item-active.ant-steps-item-wait 
+    {
+        .ant-steps-item-title
+        {
+            color: $primarycolor !important;
+            font-weight: bold;
+        }
+        .ant-steps-icon:before
+        {
+            border: 1px solid $primarycolor !important;
+        }
+    }
+    .ant-steps-item-active.ant-steps-item-finish .ant-steps-icon:before
+    {
+        border: 1px solid $primarycolor !important;
     }
     .ant-steps-item-tail::after {
         background-color: $light_grey !important;
+    }
+    .ant-steps-item-custom .ant-steps-item-icon > .ant-steps-icon
+    {
+        font-size:15px !important;
+        img
+        {
+            height:20px;
+            width:20px;
+            object-fit:contain;
+        }
     }
 }
 
@@ -539,4 +606,33 @@ span.ant-form-item-children.d-block {
     background-color: white;
     z-index: 100;
     position: sticky !important;
+}
+.contract_actions
+{
+    height: 50px !important;
+    border-radius: 10px !important;
+    span
+    {
+        text-transform: uppercase;
+        font-size: 1.2em;
+    }
+}
+.contract_actions.ant-btn-background-ghost
+{
+    span
+    {
+        color:$primarycolor;
+    }
+}
+.extra_radius_input 
+{
+    border-radius: 10px !important;
+}
+.h-50x
+{
+    height: 50px !important;
+}
+.ant-btn-primary
+{
+    text-shadow: none !important;
 }

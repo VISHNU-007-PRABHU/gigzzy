@@ -29,8 +29,7 @@ function AppointmentDetail(props) {
     });
 
     useEffect(() => {
-        console.log(get_contracts_pagination)
-        if (!localStorage.getItem('user')) {
+        if (localStorage.getItem('user')) {
             set_user_id(JSON.parse(localStorage.getItem("user"))._id)
         } else {
             set_user_id("61306d9257602fcea82c5fb3")

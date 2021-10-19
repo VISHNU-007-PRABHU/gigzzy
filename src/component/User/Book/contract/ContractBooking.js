@@ -23,21 +23,13 @@ function ContractBooking(props) {
     const [current, setCurrent] = useState(1);
     return (
         <>
-            <Layout className="white">
-                <Suspense fallback={<Skeleton active />}>
-                    <UserHeader />
-                </Suspense>
-
-                <Content className="px-1 container user_select">
-                    <Row>
-                        <Col lg={{ span: 20, offset: 2 }}>
-                            <Suspense fallback={<Skeleton active />}>
-                                <ContractSteper></ContractSteper>
-                            </Suspense>
-                        </Col>
-                    </Row>
-                </Content>
-            </Layout>
+            <Row>
+                <Col lg={{ span: 18, offset: 3 }} className="pt-5">
+                    <Suspense fallback={<Skeleton active />}>
+                        <ContractSteper></ContractSteper>
+                    </Suspense>
+                </Col>
+            </Row>
         </>
 
     )
