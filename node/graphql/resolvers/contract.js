@@ -232,9 +232,6 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         }
         if (args['booking_status']) {
             find_query['booking_status'] = ObjectId(args['booking_status'])
-            if (args['booking_status'] === commonHelper.bookink_status.CANCEL && args['user_id']) {
-                find_query['available_provider'] = { $in: [args.user_id] }
-            }
         }
 
         total = await ContractJob_model.count(find_query);
