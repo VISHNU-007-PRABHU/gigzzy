@@ -156,7 +156,7 @@ class PayoutsTable extends React.Component {
                 render: (text, record) =>
                     this.state.dataSource.length >= 1 ? (
                         <RoleView permission="view_payout">
-                            <span title="...." className="d-flex d-sm-inline justify-content-around">
+                            <span title="...." className="d-inline d-md-flex justify-content-around">
                                 <span className='cursor_point' onClick={() => { this.payout_detail(record._id, record?.total_amount) }}><Icon type="eye" theme="twoTone" twoToneColor="#52c41a" className='f_25' /></span>
                             </span>
                         </RoleView>

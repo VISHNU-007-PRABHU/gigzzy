@@ -1,20 +1,26 @@
-import React, { Suspense, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import useReactRouter from 'use-react-router';
-import { client } from "../../../apollo";
-import test_image from "../../../image/test.png";
 import { Icon } from 'antd';
+import Tooltip from 'antd/lib/tooltip'
 import size from 'lodash'
+import { UPDATE_BIDING } from '../../../graphql/User/biding'
+import { Alert_msg } from '../../Comman/alert_msg';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import { Modal, Avatar, Button, Skeleton, Col, Tag, Row, Typography, Rate } from 'antd';
+import StripePayout from "../../User/Book/payment/stripe_payment";
 const { Title, Paragraph } = Typography;
 const { confirm } = Modal;
 
 function BiderDetail(props) {
     const { history } = useReactRouter();
     const [loading, set_loading] = useState(false);
+    const [isStripePayment, setisStripePayment] = useState(false);
     const [price_visible, set_price_visible] = useState(false);
     const [company_visible, set_company_visible] = useState(false);
     const [data, set_data] = useState({});
     const [user_data, set_user_data] = useState({});
+    const [update_biding] = useMutation(UPDATE_BIDING);
+
 
     useEffect(() => {
         if (props.current_data) {
@@ -27,6 +33,17 @@ function BiderDetail(props) {
 
     const gotoPage = () => {
         set_price_visible(!price_visible)
+    }
+
+    const update_biding_data = async () => {
+        let input_data = {
+            _id: data._id,
+            biding_data: [{ add_to_shortlist: !data?.add_to_shortlist }]
+        }
+        let final_data = await update_biding({ variables: input_data });
+        Alert_msg(final_data.data.update_biding)
+        if (final_data.data.update_biding.status === "success") {
+        }
     }
 
     return (
@@ -44,30 +61,21 @@ function BiderDetail(props) {
                                         {user_data?.first_name || ""}{user_data?.last_name || ""}
                                     </div>
                                     <div className="font-weight-light figure-caption">
-                                        {"XYZ pvt"}
+                                        {user_data.user_type && user_data.user_type === "company" ? user_data?.get_company_root_detail?.company_name : "Individual User"}
                                     </div>
                                 </Title>
                                 <div>
                                     <Rate count={1} value={1} className="mr-2" />
-                                    {user_data?.rating || "0"}
+                                    {data?.provider_rating_by_category?.rating || "0"}
                                 </div>
                             </div>
-                            <div>
-                                <Paragraph ellipsis={{ rows: 3, expandable: true }}>
-                                    Ant Design, a design language for background applications, is refined by Ant UED Team. Ant
-                                    Design, a design language for background applications, is refined by Ant UED Team. Ant Design,
-                                    a design language for background applications, is refined by Ant UED Team. Ant Design, a
-                                    design language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                    language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                    language for background applications, is refined by Ant UED Team.
-                                    Ant Design, a design language for background applications, is refined by Ant UED Team. Ant
-                                    Design, a design language for background applications, is refined by Ant UED Team. Ant Design,
-                                    a design language for background applications, is refined by Ant UED Team. Ant Design, a
-                                    design language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                    language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                    language for background applications, is refined by Ant UED Team.
-                                </Paragraph>
-                            </div>
+                            {user_data.user_type && user_data.user_type === "company" ?
+                                <div>
+                                    <Paragraph ellipsis={{ rows: 3, expandable: true }}>
+                                        {user_data?.get_company_root_detail?.about_company}
+                                    </Paragraph>
+                                </div>
+                                : <></>}
                             <div className={user_data?.user_type === "company" ? "" : "d-none"}>
                                 <Button type="primary" onClick={() => { set_company_visible(!company_visible) }}> Company Detail</Button>
                             </div>
@@ -114,22 +122,23 @@ function BiderDetail(props) {
                     <Title level={4} className="font-weight-normal">Experience : {data?.experience || 0}</Title>
                 </Col>
             </Row>
-            <Row gutter={[12, 24]}>
-                <Col>
-                    <Title level={4} className="font-weight-normal">Company Legal Document</Title>
-                    <img loading="lazy" alt="example" className="h_200x w-100" src={test_image} />
-                </Col>
-            </Row>
-            <Row gutter={[12, 32]}>
-                <Col>
-                    <Title level={4} className="font-weight-normal">Company Legal License</Title>
-                    <img loading="lazy" alt="example" className="h_200x w-100" src={test_image} />
-                </Col>
-            </Row>
+            {user_data.get_biding_all_files && user_data.get_biding_all_files.map((data, i) => {
+                return (
+                    <Row gutter={[12, 24]}>
+                        <Col>
+                            <Title level={4} className="font-weight-normal">{i}Biding Documents:</Title>
+                            <img loading="lazy" alt="example" className="h_200x w-100" src={data.small_image} />
+                        </Col>
+                    </Row>
+                )
+            })}
+
             <Row gutter={[12, 24]}>
                 <Col span={24}>
                     <div className="d-flex justify-content-around mt-4">
-                        <Button type="primary" > Add to shortlist</Button>
+                        <Button type="primary" onClick={() => { update_biding_data() }}>
+                            {data?.add_to_shortlist ? "Remove from shortlist" : "Add to shortlist"}
+                        </Button>
                     </div>
                 </Col>
             </Row>
@@ -158,26 +167,31 @@ function BiderDetail(props) {
                                 Project Budget
                             </div>
                             <div >
-                                10.00 ksh
+                                {data?.budget}
+                            </div>
+                        </div>
+                    </Col>
+                </Row>
+                <Row gutter={[12, 24]}>
+                    <Col span={24}>
+                        <div className="d-flex normal_font_size justify-content-between">
+                            <div className="align-items-center d-flex">
+                                Service Fee
+                                <Tooltip placement="right" title={`Service fee has been apiled ${data?.service_fee}`}>
+                                    <Icon type="question-circle" className="px-2" />
+                                </Tooltip>
+                            </div>
+                            <div >
+                                {data?.admin_fee}
                             </div>
                         </div>
                     </Col>
                 </Row>
 
-                <Row gutter={[12, 24]}>
-                    <Col span={24}>
-                        <Tag color={'#99d332'} className="w-100" onClick={() => { gotoPage() }}>
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div className="d-flex flex-column">
-                                    <div> Service fees</div>
-                                    <div className="normal_font_size"> 1.05 Ksh</div>
-                                </div>
-                                <div className="normal_font_size" I> Pay Now</div>
-                            </div>
-                        </Tag>
-                    </Col>
-
-                </Row>
+                {!isStripePayment && <><div className="">
+                    <StripePayout data={data} booking_type={"contract"} current_booking_status={10} />
+                </div></>
+                }
             </Modal>
             <Modal
                 visible={company_visible}
@@ -191,16 +205,16 @@ function BiderDetail(props) {
                         <div className="d-flex normal_font_size justify-content-between align-items-center">
                             <div>
                                 <div className="bold">
-                                    XYZ PRIVATE LT
+                                    {user_data?.get_company_root_detail?.company_name}
                                 </div>
                                 <div >
-                                    WWW.test.com
+                                    {user_data?.get_company_root_detail?.company_website}
                                 </div>
                             </div>
-                            <div>
-                                <Avatar className="biding_avatar" size={64} src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-                            </div>
+
+                            <Avatar className="biding_avatar" size={64} src={user_data?.img_url} />
                         </div>
+
                     </Col>
                 </Row>
 
@@ -208,23 +222,23 @@ function BiderDetail(props) {
                     <Col>
                         <div>
                             <Paragraph ellipsis={{ rows: 3, expandable: true }}>
-                                Ant Design, a design language for background applications, is refined by Ant UED Team. Ant
-                                Design, a design language for background applications, is refined by Ant UED Team. Ant Design,
-                                a design language for background applications, is refined by Ant UED Team. Ant Design, a
-                                design language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                language for background applications, is refined by Ant UED Team.
-                                Ant Design, a design language for background applications, is refined by Ant UED Team. Ant
-                                Design, a design language for background applications, is refined by Ant UED Team. Ant Design,
-                                a design language for background applications, is refined by Ant UED Team. Ant Design, a
-                                design language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                language for background applications, is refined by Ant UED Team. Ant Design, a design
-                                language for background applications, is refined by Ant UED Team.
+                                {user_data?.get_company_root_detail?.about_company}
                             </Paragraph>
                         </div>
                     </Col>
                 </Row>
 
+                {user_data?.get_company_root_detail?.get_company_images && user_data?.get_company_root_detail.get_company_images.map(data => {
+                    return (
+
+                        <Row gutter={[12, 24]}>
+                            <Col>
+                                <Title level={4} className="font-weight-normal">Company Legal Document</Title>
+                                <img loading="lazy" alt="example" className="h_200x w-100" src={data?.small_image} />
+                            </Col>
+                        </Row>
+                    )
+                })}
                 <Row gutter={[12, 24]}>
                     <Col span={24}>
                         <div>

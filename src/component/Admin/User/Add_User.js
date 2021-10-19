@@ -85,8 +85,8 @@ class Add_User extends React.Component {
             this.setState({
                 update: 1,
                 update_data: result.data?.user[0],
-                m_no:result.data?.user[0].phone_no,
-                country_code:result.data?.user[0].country_code,
+                m_no: result.data?.user[0].phone_no,
+                country_code: result.data?.user[0].country_code,
                 _phone: `+${result.data?.user[0].country_code} ${result.data?.user[0].phone_no}`,
                 address: result.data?.user[0]?.address, demo: result.data?.user[0]?.demo
             });
@@ -147,7 +147,8 @@ class Add_User extends React.Component {
                         phone_no: this.state.m_no,
                         email: values.email,
                         password: values.password,
-                        name: values.user_name,
+                        first_name: values.user_first_name,
+                        last_name: values.user_last_name,
                         lat: this.state.lat_lng.lat,
                         lng: this.state.lat_lng.lng,
                         address: this.state.address,
@@ -166,32 +167,20 @@ class Add_User extends React.Component {
     update_user = () => {
         const { form, history } = this.props;
         form.validateFields(async (err, values) => {
-            var datas = {};
-            console.log(values.phone.length)
+            var datas = datas = {
+                _id: this.props.match.params.id,
+                demo: this.state.demo,
+                email: values.email,
+                password: values.password,
+                first_name: values.user_first_name,
+                last_name: values.user_last_name,
+                lat: this.state.lat_lng.lat,
+                lng: this.state.lat_lng.lng,
+                address: this.state.address
+            };
             if (values.phone.length > 10) {
-                datas = {
-                    _id: this.props.match.params.id,
-                    demo: this.state.demo,
-                    country_code: this.state.country_code,
-                    phone_no: this.state.m_no,
-                    email: values.email,
-                    password: values.password,
-                    name: values.user_name,
-                    lat: this.state.lat_lng.lat,
-                    lng: this.state.lat_lng.lng,
-                    address: this.state.address
-                };
-            } else {
-                datas = {
-                    _id: this.props.match.params.id,
-                    demo: this.state.demo,
-                    email: values.email,
-                    password: values.password,
-                    name: values.user_name,
-                    lat: this.state.lat_lng.lat,
-                    lng: this.state.lat_lng.lng,
-                    address: this.state.address
-                };
+                datas['country_code'] = this.state.country_code;
+                datas['phone_no'] = this.state.m_no;
             }
 
             if (!err) {
@@ -238,10 +227,18 @@ class Add_User extends React.Component {
                             <Form>
                                 <Col span={24}>
                                     <Row gutter={12}>
-                                        <Col span={12}>
-                                            <Form.Item label="User Name">
-                                                {form.getFieldDecorator("user_name", {
-                                                    initialValue: this.state.update_data.name,
+                                        <Col span={6}>
+                                            <Form.Item label="User First Name">
+                                                {form.getFieldDecorator("user_first_name", {
+                                                    initialValue: this.state.update_data.first_name,
+                                                    rules: [{ required: true }]
+                                                })(<Input placeholder="Name" />)}
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={6}>
+                                            <Form.Item label="User Last Name">
+                                                {form.getFieldDecorator("user_last_name", {
+                                                    initialValue: this.state.update_data.last_name,
                                                     rules: [{ required: true }]
                                                 })(<Input placeholder="Name" />)}
                                             </Form.Item>

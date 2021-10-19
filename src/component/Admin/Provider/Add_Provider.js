@@ -28,7 +28,7 @@ class Add_Provider extends React.Component {
             modalVisible: false,
             loading: false,
             imageUrl: '',
-            update: 0,
+            update: false,
             update_data: {},
             file: {},
             previewVisible: false,
@@ -101,7 +101,7 @@ class Add_Provider extends React.Component {
                 this.find_address(result.data?.user[0]?.location?.coordinates[0], result.data?.user[0]?.location?.coordinates[1]);
             }
             this.setState({
-                update: 1,
+                update: true,
                 update_data: result.data.user[0],
                 m_no: result.data?.user[0].phone_no,
                 country_code: result.data?.user[0].country_code,
@@ -166,7 +166,8 @@ class Add_Provider extends React.Component {
                         phone_no: this.state.m_no,
                         email: values.email,
                         password: values.password,
-                        name: values.provider_name,
+                        first_name: values.provider_first_name,
+                        last_name: values.provider_last_name,
                         lat: this.state.lat_lng.lat,
                         lng: this.state.lat_lng.lng,
                         address: this.state.address,
@@ -187,15 +188,23 @@ class Add_Provider extends React.Component {
     update_provider = () => {
         const { form, history } = this.props;
         form.validateFields(async (err, values) => {
-            var datas = {}
+            var datas =  {
+                role: 2,
+                email: values.email,
+                password: values.password,
+                first_name: values.provider_first_name,
+                last_name: values.provider_last_name,
+                lat: this.state.lat_lng ? this.state.lat_lng.lat : undefined,
+                lng: this.state.lat_lng ? this.state.lat_lng.lng : undefined,
+                address: this.state.address,
+                provider_subCategoryID: values.category_name,
+                _id: this.props.match.params.id
+            };
             if (values.phone.length > 10) {
-                datas = { role: 2, demo: this.state.demo,
-                     country_code: this.state.country_code, phone_no: this.state.m_no, email: values.email, password: values.password, name: values.provider_name, lat: this.state.lat_lng ? this.state.lat_lng.lat : undefined, lng: this.state.lat_lng ? this.state.lat_lng.lng : undefined, address: this.state.address, provider_subCategoryID: values.category_name, _id: this.props.match.params.id };
-            } else {
-                datas = { role: 2, demo: this.state.demo, email: values.email, password: values.password, name: values.provider_name, lat: this.state.lat_lng ? this.state.lat_lng.lat : undefined, lng: this.state.lat_lng ? this.state.lat_lng.lng : undefined, address: this.state.address, provider_subCategoryID: values.category_name, _id: this.props.match.params.id };
-            }
+                datas['country_code'] = this.state.country_code;
+                datas['phone_no'] = this.state.m_no;
+            } 
             if (!err) {
-                console.log(this.state.lat_lng);
                 await client.mutate({
                     mutation: UPDATE_USER,
                     variables: datas
@@ -232,7 +241,14 @@ class Add_Provider extends React.Component {
                     <Content className="main_frame">
                         <Row gutter={[24, 24]}>
                             <Col span={24}>
-                                <Title level={3}>Add Provider</Title>
+                                <div className="d-flex justify-content-between">
+                                    <Title level={3}>Add Provider</Title>
+                                    {this.state.update &&
+                                        <Button type="primary" onClick={() => { this.props.history.push(`/admin-company/add/${this.props.match.params.id}`); }}>
+                                            Add Company
+                                        </Button>
+                                    }
+                                </div>
                             </Col>
                         </Row>
                         <Row>
@@ -251,10 +267,18 @@ class Add_Provider extends React.Component {
                                                 </Select>)}
                                             </Form.Item>
                                         </Col>
-                                        <Col span={12}>
-                                            <Form.Item label="Provider Name">
-                                                {form.getFieldDecorator("provider_name", {
-                                                    initialValue: this.state.update_data.name,
+                                        <Col span={6}>
+                                            <Form.Item label="Provider First Name">
+                                                {form.getFieldDecorator("provider_first_name", {
+                                                    initialValue: this.state.update_data.first_name,
+                                                    rules: [{ required: true }]
+                                                })(<Input placeholder="Name" />)}
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={6}>
+                                            <Form.Item label="Provider Last Name">
+                                                {form.getFieldDecorator("provider_last_name", {
+                                                    initialValue: this.state.update_data.last_name,
                                                     rules: [{ required: true }]
                                                 })(<Input placeholder="Name" />)}
                                             </Form.Item>

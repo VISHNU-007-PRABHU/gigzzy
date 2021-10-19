@@ -9,6 +9,7 @@ global.pubsub = pubsub;
 const { createWriteStream } = require("fs");
 var userResolver = require('./resolvers/user');
 var categoryResolver = require('./resolvers/category');
+var main_categoryResolver = require('./resolvers/main_category');
 var statusResolver = require('./resolvers/status');
 var staticResolver = require('./resolvers/static');
 var bookingResolver = require('./resolvers/booking');
@@ -21,10 +22,12 @@ var rolesResolver = require('./resolvers/roles');
 var contractResolver = require('./resolvers/contract');
 var currencyResolver = require('./resolvers/currency');
 var bidingResolver = require('./resolvers/biding');
+var milestoneResolver = require('./resolvers/milestone');
 const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
 const payment_choose = require('./payment/choose')
+const MpesaCallback = require('./payment/MpesaCallback')
 dotenv.config();
 
 var Company_model = model.company;
@@ -37,7 +40,6 @@ var Payout_model = model.payout;
 var Extra_fee_model = model.Extra_fee;
 var CategoryCurrency_model = model.CategoryCurrency;
 var Currency_model = model.currency;
-var providerSubcategory_model = model.providerSubcategory_model;
 
 const MESSAGE_CREATED = 'MESSAGE_CREATED';
 const ACCEPT_MSG = 'ACCEPT_MSG';
@@ -48,6 +50,8 @@ const SEND_ACCEPT_MSG = 'SEND_ACCEPT_MSG';
 const APPOINTMENTS = 'APPOINTMENTS';
 const PROOF_STATUS = 'PROOF_STATUS';
 const REMOVE_USER = 'REMOVE_USER';
+const SEND_CONTRACT_JOB_MSG = 'SEND_CONTRACT_JOB_MSG';
+const GET_MY_CONTRACTS = "GET_MY_CONTRACTS"
 
 const resolvers = {
 
@@ -138,6 +142,33 @@ const resolvers = {
                     }
                 }),
         },
+
+        send_contract_jobs_provider: {
+            subscribe: withFilter(
+                () => pubsub.asyncIterator([SEND_CONTRACT_JOB_MSG]),
+                (payload, variables) => {
+                    for (let i = 0; i <= payload.send_contract_jobs_provider.available_provider.length; i++) {
+                        if (payload.send_contract_jobs_provider.available_provider[i] == variables._id) {
+                            return true;
+                        }
+                    }
+                }),
+        },
+
+        get_my_contracts: {
+            subscribe: withFilter(
+                () => pubsub.asyncIterator([GET_MY_CONTRACTS]),
+                (payload, variables) => {
+                    for (let i = 0; i <= payload.get_my_contracts.length; i++) {
+                        if (payload.get_my_contracts[i].provider_id == variables._id) {
+                            if (variables.booking_status === 10) {
+                                return true;
+                            }
+                        }
+                    }
+                }),
+        },
+
         booking_details: {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([BOOK_MSG]),
@@ -154,7 +185,7 @@ const resolvers = {
 
     Query: {
         testmail: userResolver.testinfmail,
-        delete_all_user:userResolver.delete_all_user,
+        delete_all_user: userResolver.delete_all_user,
         // get data using pagination  
         get_user: userResolver.get_user,
         user_search: userResolver.user_search,
@@ -192,14 +223,17 @@ const resolvers = {
         roles_search: rolesResolver.roles_search,
         // company detail
         get_company_detail: userResolver.get_company_detail,
-        get_contract_files:contractResolver.get_contract_files,
-        get_contracts:contractResolver.get_contracts,
-        get_contracts_pagination:contractResolver.get_contracts_pagination,
-        get_contract_all_files:contractResolver.get_contract_all_files,
-        get_currencys:currencyResolver.get_currencys,
-        get_currency:currencyResolver.get_currency,
-        get_biding_pagination:bidingResolver.get_biding_pagination,
-        GetCategoryCurrency:categoryResolver.GetCategoryCurrency,
+        get_contract_files: contractResolver.get_contract_files,
+        get_contracts: contractResolver.get_contracts,
+        get_contracts_pagination: contractResolver.get_contracts_pagination,
+        get_contract_all_files: contractResolver.get_contract_all_files,
+        get_currencys: currencyResolver.get_currencys,
+        get_currency: currencyResolver.get_currency,
+        get_biding_pagination: bidingResolver.get_biding_pagination,
+        get_biding_detail: bidingResolver.get_biding_detail,
+        get_biding_milestone_detail: milestoneResolver.get_biding_milestone_detail,
+        get_biding_milestone: milestoneResolver.get_biding_milestone,
+        GetCategoryCurrency: categoryResolver.GetCategoryCurrency,
         get_my_appointments: async (parent, args, context, info) => {
             try {
 
@@ -255,6 +289,9 @@ const resolvers = {
         get_cancel_chart: adminResolver.get_cancel_chart,
         get_earnings_chart: adminResolver.get_earnings_chart,
         get_others_chart: adminResolver.get_others_chart,
+        provider_rating_by_category: userResolver.provider_rating_by_category,
+        get_main_category_pagination:main_categoryResolver.get_main_category_pagination,
+        get_category_question:main_categoryResolver.get_category_question,
     },
 
     // Find sub_query under schema 
@@ -273,9 +310,18 @@ const resolvers = {
     Roles: {
         role_based_permissions_detail: rolesResolver.role_table_based_permissions_detail,
     },
-    Biding:{
+    Biding: {
         get_user: userResolver.available_booking_user,
-        get_biding_all_files:bidingResolver.get_biding_all_files,
+        get_biding_all_files: bidingResolver.get_biding_all_files,
+        get_parent_company_provider: userResolver.get_parent_company_provider,
+        get_company_root_detail: userResolver.get_company_root_detail,
+        find_kilometer: bidingResolver.find_kilometer,
+        provider_rating_by_category: userResolver.provider_rating_by_category,
+        get_contract_category: categoryResolver.available_booking_category,
+
+    },
+    Milestone: {
+        get_milestone_all_images: milestoneResolver.get_milestone_all_images,
     },
     Category: {
         booking_parent_category: categoryResolver.booking_parent_category,
@@ -287,9 +333,9 @@ const resolvers = {
     subCategory: {
         category: categoryResolver.subcategory_category,
         Certificate: certificateResolver.certificate,  //display certificate  based on category
-        get_parent_currency:currencyResolver.get_parent_currency,
-        GetCategoryCurrency:categoryResolver.GetCategoryCurrency,
-        ParentCategoryCurrency:categoryResolver.ParentCategoryCurrency,
+        get_parent_currency: currencyResolver.get_parent_currency,
+        GetCategoryCurrency: categoryResolver.GetCategoryCurrency,
+        ParentCategoryCurrency: categoryResolver.ParentCategoryCurrency,
     },
 
     User: {
@@ -301,9 +347,10 @@ const resolvers = {
     Detail: {
         category: categoryResolver.category,
         provider_rating: userResolver.provider_rating,
+        provider_rating_by_category: userResolver.provider_rating_by_category,
         provider_rate: userResolver.provider_rate,
-        get_currency:currencyResolver.get_currency,
-
+        get_currency: currencyResolver.get_currency,
+        get_company_root_detail: userResolver.get_company_root_detail,
     },
     Company: {
         get_parent_company_provider: userResolver.get_parent_company_provider,
@@ -311,15 +358,24 @@ const resolvers = {
         get_company_images: userResolver.get_company_images,
         get_company_user_detail: userResolver.available_booking_user,
     },
-    ContractJob:{
-        get_contract_files:contractResolver.get_contract_files,
-        get_contract_category:categoryResolver.available_booking_category,
-        get_contract_all_files:contractResolver.get_contract_all_files,
-        biding_count:bidingResolver.biding_count,
+
+    CompanyProvider: {
+        get_company_detail: userResolver.get_company_detail,
+        get_company_root_detail: userResolver.get_company_root_detail,
     },
-    CompanyImage:{
-        get_contract_files:contractResolver.get_contract_files,
-        get_contract_all_files:contractResolver.get_contract_all_files,
+    ContractJob: {
+        get_user: userResolver.available_booking_user,
+        get_provider_user: userResolver.available_booking_povider,
+        get_contract_files: contractResolver.get_contract_files,
+        get_contract_category: categoryResolver.available_booking_category,
+        get_contract_all_files: contractResolver.get_contract_all_files,
+        biding_count: bidingResolver.biding_count,
+        get_contract_address_detail: contractResolver.get_contract_address_detail,
+        find_kilometer: contractResolver.find_kilometer,
+    },
+    CompanyImage: {
+        get_contract_files: contractResolver.get_contract_files,
+        get_contract_all_files: contractResolver.get_contract_all_files,
     },
     Booking: {
         user: userResolver.user,
@@ -343,22 +399,25 @@ const resolvers = {
 
     Mutation: {
         adminLogin: adminResolver.adminlogin,
+        update_main_category:main_categoryResolver.update_main_category,
+        update_category_question:main_categoryResolver.update_category_question,
         // contract job
         update_contract: contractResolver.update_contract,
-        update_currency:currencyResolver.update_currency,
-        delete_currency:currencyResolver.delete_currency,
+        update_currency: currencyResolver.update_currency,
+        delete_currency: currencyResolver.delete_currency,
         ContractJobFileUpload: contractResolver.ContractJobFileUpload,
         DeleteContractJobFile: contractResolver.DeleteContractJobFile,
-        update_biding:bidingResolver.update_biding,
-        BidingFileUpload:bidingResolver.BidingFileUpload,
+        update_biding: bidingResolver.update_biding,
+        BidingFileUpload: bidingResolver.BidingFileUpload,
+        update_milestone: milestoneResolver.update_milestone,
         // company detiail
-        UpdateCategoryCurrency:categoryResolver.UpdateCategoryCurrency,
-        DeleteCategoryCurrency:categoryResolver.DeleteCategoryCurrency,
+        UpdateCategoryCurrency: categoryResolver.UpdateCategoryCurrency,
+        DeleteCategoryCurrency: categoryResolver.DeleteCategoryCurrency,
         update_company_detail: userResolver.update_company_detail,
         CompanyFileUpload: userResolver.CompanyFileUpload,
         deleteCompany: userResolver.deleteCompany,
         deleteCompanyProvider: userResolver.deleteCompanyProvider,
-        addUser:userResolver.addUser,
+        addUser: userResolver.addUser,
         reset_password: userResolver.reset_password,
         admin_add_user: userResolver.admin_add_user,
         admin_update_user: admin_update_user = async (_, args) => {
@@ -558,7 +617,7 @@ const resolvers = {
 
             args['booking_ref'] = String(Math.floor(1000 + Math.random() * 9000));
             args['ctob_shotcode'] = process.env.MPESA_SHORT_CODE;
-            args['ctob_billRef'] = await genrate_random();
+            args['ctob_billRef'] = await commonHelper.genrate_random();
             args['job_status'] = 12;
             let add_booking = new Booking_model(args);
             let booking = await add_booking.save();
@@ -594,6 +653,8 @@ const resolvers = {
             return [{ id: add_booking._id, location: args.location, description: args.description, provider: find_provider, hours: args.hours, user_image_url: new_data.user_image_url }];
         },
         //change the status in job booking 
+        manage_milestone_booking:milestoneResolver.manage_milestone_booking,
+        manage_contract_booking: contractResolver.manage_contract_booking,
         manage_booking: async (parent, args) => {
             //console.log("m_b");
             //console.log(args);
@@ -1309,6 +1370,21 @@ module.exports.confrimation_call = async (body) => {
             update_details['resultcode'] = ResultCode;
             update_details['payment_message'] = body["Body"]["stkCallback"]["ResultDesc"]
 
+            let pre_contract_detail = await Contract_model.findOne({ CheckoutRequestID }).lean()
+            if (_.size(pre_contract_detail)) {
+                let confirmation_body = {
+                    TransID: body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"],
+                    TransTime: body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"],
+                    TransAmount: body['TransAmount'],
+                    CheckoutRequestID: CheckoutRequestID,
+                    payment_type: "mpesa",
+                    ResultCode: ResultCode,
+                    payment_message: payment_message
+                }
+                await MpesaCallback.c2b_contract_confiramtion(confirmation_body);
+                return resolve({ status: true, msg: "Payment Is success !", data })
+            }
+
             let pre_booking_detail = await Booking_model.findOne({ CheckoutRequestID }).lean()
             if (ResultCode != 0) {
 
@@ -1500,6 +1576,24 @@ module.exports.c2b_confirmation = async (body) => {
             update_details['resultcode'] = ResultCode;
             update_details['payment_message'] = "ctob payment sucess"
 
+
+            let pre_contract_detail = await Contract_model.findOne({ ctob_billRef }).lean()
+            if (_.size(pre_contract_detail)) {
+                let confirmation_body = {
+                    TransID: body['TransID'],
+                    TransAmount: body['TransAmount'],
+                    TransTime: body['TransTime'],
+                    ResultCode: ResultCode,
+                    ctob_billRef: ctob_billRef,
+                    payment_type: "c2b",
+                    payment_message: payment_message
+                }
+                await MpesaCallback.c2b_contract_confiramtion(confirmation_body);
+                return resolve({ status: true, msg: "Payment Is success !", data })
+            }
+
+            // check to next phase (vishnu)
+
             let pre_booking_detail = await Booking_model.findOne({ ctob_billRef }).lean()
             if (!_.size(pre_booking_detail)) {
                 console.log("module.exports.pre_booking_detail -> error", "null")
@@ -1653,18 +1747,6 @@ module.exports.c2b_confirmation = async (body) => {
     })
 }
 
-
-genrate_random = async () => {
-    var random = Math.floor(Math.random() * 90000) + 10000;
-    var chars = "abcdefghijklmnopqrstufwxyzABCDEFGHIJKLMNOPQRSTUFWXYZ1234567890"
-    var random = _.join(_.sampleSize(chars, 20), "")
-    var digit = `${random}`
-    var check_p_id = await Booking_model.find({ "ctob_billRef": digit });
-    if (check_p_id.length) {
-        await genrate_random()
-    }
-    return digit;
-}
 
 remove_demo_acount.start();
 

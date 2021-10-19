@@ -1,6 +1,9 @@
 module.exports = {
     user: require('./model/userDetail/user'),
     payout: require('./model/userDetail/payout'),
+    MainCategory: require('./model/category/MainCategory'),
+    MainCategoryImage:require('./model/category/MainCategory'),
+    MainCategoryQuestion:require('./model/category/MainCategoryQuestion'),
     category: require('./model/category/category'),
     sub_category: require('./model/category/sub_category'),
     status: require('./model/userDetail/status'),
@@ -24,5 +27,7 @@ module.exports = {
     BidingImage: require('./model/booking/bidingImage'),
     contract_job_images: require('./model/booking/ContractJobImage'),
     currency: require('./model/Admin/currency'),
-    CategoryCurrency:require('./model/category/CategoryCurrency')
+    CategoryCurrency:require('./model/category/CategoryCurrency'),
+    Milestone:require('./model/booking/milestone'),
+    MilestoneImage:require('./model/booking/milestoneImage'),
 }

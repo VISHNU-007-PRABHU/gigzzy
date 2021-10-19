@@ -438,7 +438,11 @@ span.ant-form-item-children.d-block {
             background-color: $light_grey !important;
         }
         .ant-steps-icon-dot {
-            background-color: $light_grey !important;
+            background-color: $light_grey !important;    .ant-steps-item-wait {
+                .ant-steps-icon {
+                    @include custom_setper($light: true);
+                }
+            }
         }
     }
     .ant-steps-item-finish {
@@ -531,4 +535,12 @@ span.ant-form-item-children.d-block {
 
 .multi_currency_panel .ant-collapse-extra{
     margin-top: -20px;
+}
+
+.booking_tab_sticky .ant-tabs-bar{
+    top: 0px;
+    padding-top: 5px;
+    background-color: white;
+    z-index: 100;
+    position: sticky !important;
 }

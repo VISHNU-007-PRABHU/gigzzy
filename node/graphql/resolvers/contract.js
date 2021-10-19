@@ -5,16 +5,22 @@ var Jimp = require('jimp');
 var ObjectId = require('mongodb').ObjectID;
 var CronJob = require('cron').CronJob;
 var commonHelper = require('../commonHelper');
-const message = require('../../model/booking/message');
+const { createWriteStream, existsSync, mkdirSync } = require("fs");
+const payment_choose = require('../payment/choose')
+const PushNotification = require('../notification/PushNotification')
+var getDistanceBetweenPoints = require('get-distance-between-points');
+const path = require("path");
+var fs = require('fs');
 var Category_model = model.category;
 var subCategory_model = model.sub_category;
 var Detail_model = model.detail;
 var ContractJob_model = model.contract_job;
 var ContractJobImage_model = model.contract_job_images;
-const { createWriteStream, existsSync, mkdirSync } = require("fs");
-const path = require("path");
-var fs = require('fs');
-
+var Address_model = model.address
+var Biding_model = model.Biding
+var BidingMilestone_model = model.Milestone
+var CategoryCurrency_model = model.CategoryCurrency;
+var Currency_model = model.currency;
 module.exports.get_my_biding = async (root, args) => {
     //console.log(args);
     var limits = args.limit || 10;
@@ -46,21 +52,6 @@ module.exports.get_biding_detail = async (root, args) => {
     return result;
 }
 
-
-module.exports.get_biding_milestone_detail = async (root, args) => {
-    //console.log(args);
-    let fetch_query = {
-    }
-    if (args['_id']) {
-        _id: args['_id']
-    }
-    if (args['bid_id']) {
-        bid_id: args['bid_id']
-    }
-    var result = await BidingMilestone_model.findOne(fetch_query);
-    return result;
-}
-
 module.exports.DeleteContractJobFile = async (root, args) => {
     try {
         let { _id } = args;
@@ -85,7 +76,6 @@ module.exports.DeleteContractJobFile = async (root, args) => {
 }
 
 exports.uploading_files = async (files, args) => {
-    console.log("exports.uploading_files -> files, args", files, args)
     return new Promise(async function (resolve, reject) {
         try {
             _.forEach(files, async (file, i) => {
@@ -190,9 +180,14 @@ module.exports.get_contract_all_files = async (root, args) => {
         let match = {
             delete: false
         }
+        let limit = args.limit || 1
         if (args['contract_id']) {
             match['contract_id'] = ObjectId(args['contract_id'])
         }
+        if (args['image_type'] === "image") {
+            match['doc_type'] = { $ne: 'pdf' }
+        }
+
         let pipeline = [
             {
                 $match: match
@@ -200,7 +195,15 @@ module.exports.get_contract_all_files = async (root, args) => {
         ]
 
         let grouped_images = await ContractJobImage_model.aggregate(pipeline)
-        return grouped_images
+        if (_.size(grouped_images)) {
+            if (args.limit) {
+                return _.take(grouped_images, limit)
+            } else {
+                return grouped_images
+            }
+        } else {
+            return []
+        }
     } catch (error) {
         console.log("module.exports.get_contract_files -> error", error)
         return []
@@ -209,11 +212,10 @@ module.exports.get_contract_all_files = async (root, args) => {
 
 module.exports.get_contracts_pagination = async (parent, args, context, info) => {
     try {
-        var limit = args.limit || 10;
+        var limit = Number(args.limit) || 10;
         var page = args.page || 1;
         var offset = Number(page - 1) * Number(limit);
         var total = 0;
-        var result = [];
         let find_query = { is_delete: false }
         if (args['search']) {
             find_query = { ...find_query, ...args['search'] }
@@ -227,27 +229,20 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         if (args.role && args.role == 1 && args['user_id']) {
             find_query['user_id'] = ObjectId(args['user_id'])
         }
-
-        if (args.role && args.role == 2  && args['user_id']) {
-            // if (args.booking_status == 12) {
-            find_query['available_provider'] = { $ne: [ObjectId(args.user_id)] }
-            // } else {
-            //     if (args.booking_status == 4) {
-            //         find_query['provider_id'] = args._id;
-            //         find_query['booking_status'] = { $in: [13, 4] }
-            //     } else {
-            //             find_query['provider_id'] = args._id ;
-            //             find_query['booking_status'] = args.booking_status
-            //         }
-            //     }
+        if (args.role && args.role == 2 && args['provider_id']) {
+            find_query['provider_id'] = ObjectId(args['provider_id'])
+        }
+        if (args['booking_status']) {
+            find_query['booking_status'] = args['booking_status']
         }
 
         total = await ContractJob_model.count(find_query);
-        result = await ContractJob_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
+        let result = await ContractJob_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(Number(limit));
         var pageInfo = { totalDocs: total, page: args.page }
         return { data: result, pageInfo };
     } catch (error) {
-        return []
+        console.log("module.exports.get_contracts_pagination -> error", error)
+        return { data: [], pageInfo: { totalDocs: 0, page: 1 } };
     }
 };
 module.exports.get_contracts = async (root, args) => {
@@ -269,9 +264,21 @@ module.exports.get_contracts = async (root, args) => {
     }
 }
 
+
+module.exports.get_contract_address_detail = async (root, args, context, info) => {
+    try {
+        let find_query = {}
+        if (root['address_id']) {
+            find_query['_id'] = root['address_id']
+        }
+        let result = await Address_model.findOne(find_query);
+        return result;
+    } catch (error) {
+        return {}
+    }
+};
 /**
  * @info 'add contract job detail's
- * @info global.pubsub.publish('TEST_MSG', { test: { info: { message: "sd", status: "ok" } } });
  * @param {*} root 
  * @param {*} args 
  * @returns 
@@ -284,15 +291,25 @@ module.exports.update_contract = async (root, args) => {
             let find_query = {
                 _id: args["_id"]
             }
-            let update_bid = await ContractJob_model.updateOne(find_query, contract_detail).exec()
-            let fetch_bid = await ContractJob_model.findOne(find_query).lean()
-            if (fetch_bid['contract_status'] === "c2") {
-                // send notification SMS EMAIL
+            let get_current_user_currency = await this.get_current_user_currency(args);
+            if (_.size(get_current_user_currency) && get_current_user_currency.status) {
+                contract_detail = { ...contract_detail, ...get_current_user_currency }
             }
-            fetch_bid['status'] = "success";
-            fetch_bid['msg'] = "contract job update success"
-            return fetch_bid
+            await ContractJob_model.updateOne(find_query, contract_detail).exec()
+            let fetch_contract = await ContractJob_model.findOne(find_query).lean()
+            if (args['booking_status'] === 9) {
+                await this.find_provider(fetch_contract)
+            }
+            fetch_contract['status'] = "success";
+            fetch_contract['msg'] = "contract job update success"
+            return fetch_contract
         } else {
+            contract_detail['location'] = { coordinates: [args.lng, args.lat] }
+            contract_detail['booking_ref'] = String(Math.floor(1000 + Math.random() * 9000));
+            contract_detail['base_price'] = String(parseFloat(contract_detail.budget).toFixed(2));
+            contract_detail['job_status'] = 12;
+            contract_detail['booking_status'] = 9
+            contract_detail['contract_status'] = 9
             let add_contract_job = new ContractJob_model(contract_detail)
             let added_contract_job = await add_contract_job.save()
             added_contract_job['status'] = "success";
@@ -305,68 +322,132 @@ module.exports.update_contract = async (root, args) => {
     }
 }
 
+exports.get_admin_fee = async (detail) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            let response = {
+                status: true
+            }
+            var category_data = {}
+            if (detail.category_type === 1) {
+                category_data = await Category_model.findOne({ _id: detail.category_id }).lean()
+            } else if (detail.category_type === 2) {
+                category_data = await subCategory_model.findOne({ _id: detail.category_id }).lean()
+            }
+            let admin_fee = 0;
+            let service_fee = 15;
+            if (_.size(category_data) && category_data['service_fee']) {
+                service_fee = category_data['service_fee']
+            }
+            admin_fee = (service_fee / 100) * detail['budget'];
+            if(admin_fee < 1){
+                admin_fee = 1
+            }
+            response['admin_fee'] = String(parseFloat(admin_fee || 0).toFixed(2));
+            response['service_fee'] = String(parseFloat(service_fee || 0).toFixed(2));
+            return resolve(response)
+        } catch (error) {
+            return reject({ status: false })
+        }
+    })
+}
+exports.get_current_user_currency = async (args) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            let comman_currency = {
+                status: true
+            }
+            var default_currency = await Currency_model.findOne({ default_currency: 1, is_delete: false }).lean()
+            comman_currency['default_currency_rate'] = default_currency.rate;
+
+            if (args.local_location_code) {
+                var local_currency = await Currency_model.findOne({ location: args.local_location_code }).lean()
+                if (!_.size(local_currency)) {
+                    return { msg: "invalid location code", status: "failed" }
+                } else {
+                    comman_currency['currency_id'] = local_currency._id;
+                    comman_currency['symbol'] = local_currency.symbol || "";
+                    comman_currency['currency_detail'] = local_currency;
+                    comman_currency['currenct_local_rate'] = local_currency.rate;
+                }
+            }
+            return resolve(comman_currency)
+        } catch (error) {
+            console.log("exports.get_current_user_currency -> error", error)
+            return reject({ status: false })
+        }
+    })
+}
+
+
+exports.genrate_mpesa_ref = async (args) => {
+    try {
+        let mpesa_detail = { status: true }
+        var random = Math.floor(Math.random() * 90000) + 10000;
+        var chars = "abcdefghijklmnopqrstufwxyzABCDEFGHIJKLMNOPQRSTUFWXYZ1234567890"
+        var random = _.join(_.sampleSize(chars, 20), "")
+        var digit = `${random}`;
+        var check_p_id = await model.contract_job.find({ "ctob_billRef": digit });
+        if (check_p_id.length) {
+            await this.genrate_mpesa_ref()
+        }
+        mpesa_detail['ctob_shotcode'] = process.env.MPESA_SHORT_CODE;
+        mpesa_detail['ctob_billRef'] = digit
+        return mpesa_detail
+    } catch (error) {
+        let error_mpesa_detail = { status: false }
+        error_mpesa_detail['ctob_shotcode'] = process.env.MPESA_SHORT_CODE;
+        error_mpesa_detail['ctob_billRef'] = "00000000000"
+        return error_mpesa_detail
+    }
+}
+
+/**
+ * @info global.pubsub.publish('TEST_MSG', { test: { info: { message: "sd", status: "ok" } } });
+ * @param {*} contract_data 
+ * @returns 
+ */
 exports.find_provider = async (contract_data) => {
     try {
-        // get category data
-        if (contract_data['cat']) {
-            //  send request with in radius
-            var filter = {
-                role: 2,
-                online: 1,
-                delete: 0,
-                proof_status: 1,
-                location: { $near: { $maxDistance: 10000, $geometry: { type: "Point", coordinates: [args.lng, args.lat] } } },
-                provider_subCategoryID: { $in: [args.category_id] },
-            };
-            let find_provider = await Detail_model.find(filter);
-        } else {
-            //  send request with al the location
+        var filter = {
+            role: 2,
+            delete: 0,
+            proof_status: 1,
+            provider_subCategoryID: { $in: [contract_data.category_id] },
+        };
+        let find_provider_data = await Detail_model.find(filter);
+        var available_provider = []
+        let notification_user_data = []
+        for (let i = 0; i < find_provider_data.length; i++) {
+            available_provider.push(find_provider_data[i]._id);
+            notification_user_data.push({
+                user_id: find_provider_data[i]._id,
+                booking_id: contract_data._id,
+                booking_status: 9
+            })
         }
-        let response = {}
-        response['status'] = "success";
-        response['msg'] = "Job sent nearest user"
-        return response
+        await PushNotification.create_push_notification_msg(notification_user_data);
+        contract_data['available_provider'] = available_provider;
+        contract_data['user_parent'] = true;
+        await ContractJob_model.updateOne({ _id: contract_data['_id'] }, { available_provider }).exec()
+        global.pubsub.publish('SEND_CONTRACT_JOB_MSG', { send_contract_jobs_provider: contract_data });
+        return { status: "success", msg: "Job socket notification sent success" }
     } catch (error) {
-        return { status: "failed", msg: "Job failed to send user" }
+        console.log("exports.find_provider -> error", error)
+        return { status: "failed", msg: "Job socket notification sent failed" }
     }
 }
 
-
-
-module.exports.update_biding_milestone = async (root, args) => {
-    try {
-        let milestone_detail = args['milestone_detail'][0][0]
-        if (args['_id']) {
-            let find_query = {
-                _id: args["_id"]
-            }
-            let update_milestone = await BidingMilestone_model.updateOne(find_query, milestone_detail).exec()
-            let fetch_milestone = await BidingMilestone_model.findOne(find_query).lean()
-            fetch_milestone['status'] = "success";
-            fetch_milestone['msg'] = "Biding update success"
-            return added_bid
-
-        } else {
-            let add_milestone = new BidingMilestone_model(biding_detail)
-            let added_milestone = await add_milestone.save()
-            added_milestone['status'] = "success";
-            added_milestone['msg'] = "Biding added success"
-            return added_milestone
-        }
-    } catch (error) {
-        return { status: "failed", msg: "Biding added failed" }
-    }
-}
 
 
 module.exports.user_accept_biding = async (root, args) => {
     try {
-        let user_biding_detail = args['user_biding_detail'][0][0]
+        let user_biding_detail = args['user_biding_detail'][0]
         if (args['_id']) {
             let find_query = {
                 _id: args["_id"]
             }
-            let biding_detail = args['user_biding_detail'][0][0]
+            let biding_detail = args['user_biding_detail'][0]
             let update_bid = await UserAcceptBiding_model.updateOne(find_query, biding_detail).exec()
             let fetch_bid = await UserAcceptBiding_model.findOne(find_query).lean()
             fetch_bid['status'] = "success";
@@ -404,3 +485,122 @@ module.exports.delete_biding = async (root, args) => {
     }
 }
 
+
+/**
+ * 
+ * @param {*} root 
+ * @param {*} args  {contract_id,user_id,biding_id,booking_status,payment_option,payment_type}
+ * @param {*} args  {location_code}
+ */
+exports.manage_contract_booking = async (root, args) => {
+    try {
+        if (args['booking_status'] === commonHelper.bookink_status.CANCEL) {
+            await ContractJob_model.remove({ available_provider: { $in: [args.contract_id] } });
+            return { msg: "Contract rejected success", status: 'failed' }
+        } else if (args['booking_status'] === 10) {
+            let preview_contract_data = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
+            let preview_biding_data = await Biding_model.findOne({ _id: args.biding_id }).lean()
+            if (args.booking_status === 10 && preview_contract_data.booking_status === 9) {
+                let base_amount = preview_biding_data.budget;
+                args['amount'] = preview_biding_data['admin_fee'];
+                let payment_data = await payment_choose.choose_contract_payment(args, preview_contract_data, preview_biding_data)
+                if (payment_data.status) {
+                    var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
+                    findBooking['user_parent'] = true;
+                    findBooking['msg'] = "user accept the contract";
+                    findBooking['status'] = 'success';
+                    return findBooking
+                } else {
+                    return { msg: "Contract Payment failed", status: 'failed' }
+                }
+            } else {
+                return { msg: "Contract Payment failed", status: 'failed' }
+            }
+        } else if (args['booking_status'] === 4) {
+            let input_data = {
+                booking_status: 4
+            }
+            var update_contract_status = await this.update_contract_status(args, input_data);
+            var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
+            findBooking['user_parent'] = true;
+            findBooking['msg'] = "start the contract";
+            findBooking['status'] = 'success';
+            return findBooking
+        } else if (args['booking_status'] === 13) {
+            let input_data = {
+                booking_status: 13
+            }
+            var update_contract_status = await this.update_contract_status(args, input_data);
+            var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
+            findBooking['user_parent'] = true;
+            findBooking['msg'] = "start the contract";
+            findBooking['status'] = 'success';
+            return findBooking
+        }
+
+    } catch (error) {
+        console.log("exports.manage_contract_booking -> error", error)
+        return { msg: "Contract update process failed", status: 'failed' }
+    }
+}
+
+exports.update_contract_status = async (args, data) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            await ContractJob_model.updateOne({ _id: args.contract_id }, data)
+            return resolve(true)
+        } catch (error) {
+            return reject(false)
+        }
+    })
+}
+
+
+exports.manage_milestone_booking = async (root, args) => {
+    try {
+    } catch (error) {
+        console.log("exports.manage_contract_booking -> error", error)
+        return { msg: "Contract Payment failed", status: 'failed' }
+    }
+}
+
+exports.update_milestone_status = async (args, data) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            await BidingMilestone_model.updateOne({ _id: args.milestone_id }, data)
+            return resolve(true)
+        } catch (error) {
+            return reject(false)
+        }
+    })
+}
+
+exports.find_kilometer = async (parent, args) => {
+    try {
+        var result = await ContractJob_model.findOne({ _id: parent._id });
+        var address = await Address_model.findOne({ _id: result['address_id'] });
+
+        if (_.size(address) && address.lat && address.lng && args.lat && args.lng) {
+            if (args.lat == address['lat'] && args.lng == address['lng']) {
+                return { kilometre: 0 };
+            } else {
+
+                var distanceInMeters = getDistanceBetweenPoints.getDistanceBetweenPoints(
+                    address.lat, address.lng, // Lat, Long of point A
+                    args.lat, args.lng// Lat, Long of point B
+                );
+                if (distanceInMeters) {
+                    return { kilometre: String(parseFloat(distanceInMeters * 0.001).toFixed(2)) };
+                } else {
+                    return { kilometre: 0 }
+                }
+            }
+        } else {
+            return { kilometre: 0 };
+        }
+
+    } catch (error) {
+        console.log("module.exports.kilometer -> error", error)
+        return { kilometre: 0 };
+    }
+}

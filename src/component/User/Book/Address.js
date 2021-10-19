@@ -40,6 +40,7 @@ query ADDRESS($user_id: ID) {
 const Address = (props) => {
     let location = useLocation();
     const [user_id, setuser_id] = useState("");
+    const [address_id, setaddress_id] = useState("");
     const [service_modal, setservice_modal] = useState(false);
     const [draggable, setdraggable] = useState(true);
     const [zoom, setzoom] = useState(15);
@@ -64,6 +65,9 @@ const Address = (props) => {
             setuser_id(props.user_id)
         } else if (local_user_id) {
             setuser_id(local_user_id)
+        }
+        if(props.address_id){
+            setaddress_id(props.address_id) 
         }
     }, [props])
     const [updateTodo] = useMutation(ADD_ADDRESS, {
@@ -164,8 +168,8 @@ const Address = (props) => {
         } else {
             updateTodo({ variables: data }).then(results => {
                 if (results.data.modified_address.status === 'success') {
-                    let url_value=['/profile', '/contract_booking','/login']
-                    if (!includes(url_value,location.pathname)) {
+                    let url_value=['/profile','/login']
+                    if (!includes(url_value,location.pathname.split('/')[1])) {
                         value.location_change(data);
                     }
                     Alert_msg({ msg: "Address saved", status: "success" });
@@ -335,7 +339,7 @@ const Address = (props) => {
                                     }
                                 >
                                     {add === false ? <div className="d-block map_modal">
-                                        <SetAddress user_id={user_id}/>
+                                        <SetAddress user_id={user_id} address_id={address_id}/>
                                     </div> :
                                         <div className="d-block maps_modal">
                                             <div style={{ height: '30vh', width: '100%' }}>

@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { withRouter } from "react-router";
 import { client } from "../../../apollo";
-import { Col, Tag, Row, Typography, Skeleton } from 'antd';
+import { Col, Tag, Row, Typography, Skeleton, Button } from 'antd';
 import { GET_CONTRACT } from '../../../graphql/User/contract';
 const ShowCategory = React.lazy(() => import('../../Comman/ShowCategory'));
 const BannerSlider = React.lazy(() => import('../../Comman/BannerSlider'));
@@ -22,9 +22,17 @@ class Biding extends React.Component {
 
     getData = async () => {
         this.setState({ loading: true, });
+        let input_data = { contract_id: this.props.match.params.id }
+        if (localStorage.getItem('currency')) {
+            console.log("Biding -> getData -> currency",)
+
+        } else {
+            input_data['location_code'] = "IN"
+        }
+
         client.query({
             query: GET_CONTRACT,
-            variables: { contract_id: this.props.match.params.id },
+            variables: input_data,
             fetchPolicy: 'no-cache',
         }).then(result => {
             console.log("Biding -> getData -> result", result.data.get_contracts)
@@ -36,6 +44,10 @@ class Biding extends React.Component {
         })
     };
 
+    ViewInvoice = () => {
+        let paths = { pathname: `/admin-booking-invoice/contract/${this.props.match.params.id}`, state: { invoice_type: "contract" } }
+        this.props.history.push(paths)
+    }
     render() {
         const { data, catgeory } = this.state
         return (
@@ -44,7 +56,12 @@ class Biding extends React.Component {
                     <Col span={24}>
                         <div className="d-flex flex-column flex-md-row justify-content-between normal_font_size">
                             <div>Contract Detail</div>
-                            <div>Contract Ref : {data?.contract_ref}</div>
+                            <div className="d-flex align-items-center">
+                                <div>
+                                    <Button className="normal_font_size primary_color" type="link" onClick={() => { this.ViewInvoice() }}>View Invoice</Button>
+                                </div>
+                                <div>Contract Ref : <span className="small">{data?.contract_ref}</span></div>
+                            </div>
                         </div>
                     </Col>
                 </Row>
@@ -60,7 +77,7 @@ class Biding extends React.Component {
                         <Title level={4}>{data?.name}</Title>
                         <Title level={4} className="font-weight-light m-0 mb-1">{data?.company_name}</Title>
                         <Suspense fallback={<Skeleton active />}>
-                            <ShowCategory parent_catgeory={catgeory} custom_font={4} custom_class="font-weight-light m-0 text-success"/>
+                            <ShowCategory parent_catgeory={catgeory} custom_font={4} custom_class="font-weight-light m-0 text-success" />
                         </Suspense>
                     </Col>
                 </Row>

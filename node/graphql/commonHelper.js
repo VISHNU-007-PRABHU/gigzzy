@@ -4,6 +4,8 @@ var FCM = require("fcm-node");
 var nodemailer = require("nodemailer");
 var sesTransport = require("nodemailer-ses-transport");
 const dotenv = require('dotenv');
+const _ = require('lodash')
+const model = require('../model_data');
 dotenv.config();
 const smtpEndpoint = process.env.smtpEndpoint;
 const port = process.env.AWS_PORT;
@@ -21,6 +23,8 @@ const africa = require("africastalking")({
 const sms = africa.SMS;
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+var Contract_model = model.contract_job;
+var Booking_model = model.booking;
 
 const transporter = nodemailer.createTransport({
   host: smtpEndpoint,
@@ -31,6 +35,19 @@ const transporter = nodemailer.createTransport({
     pass: smtpPassword
   }
 });
+
+
+exports.bookink_status = {
+  PROVIDER_ROLE : 2,
+  START : 4,
+  END : 13,
+  CANCEL : 8,
+  BOOKING : 12,
+  PENDING : 10,
+  ONGOING : 4,
+  COMPLETE : 14,
+  ACCEPT : 9,
+}
 
 module.exports.home = 0;
 module.exports.pending = 1;
@@ -87,6 +104,7 @@ module.exports.prepareUploadFolder = (path) => {
 module.exports.push_notifiy = async (message) => {
   return await fcm.send(message, function (err, response) {
     if (err) {
+      console.log("module.exports.push_notifiy -> err", err)
     } else {
       console.log("Successfully sent with response: ", response);
     }
@@ -238,8 +256,21 @@ module.exports.send_mail_sendgrid = async (email, type, datas) => {
     let data = await sgMail.send(mail_msg);
     return true
   } catch (error) {
-    console.log("module.exports.send_mail_sendgrid -> error", error.response.body)
+    console.log("module.exports.send_mail_sendgrid -> error", error.response)
     return false
   }
+}
+
+
+exports.genrate_random = async () => {
+  var random = Math.floor(Math.random() * 90000) + 10000;
+  var chars = "abcdefghijklmnopqrstufwxyzABCDEFGHIJKLMNOPQRSTUFWXYZ1234567890"
+  var random = _.join(_.sampleSize(chars, 20), "")
+  var digit = `${random}`
+  var check_p_id = await Booking_model.find({ "ctob_billRef": digit });
+  if (check_p_id.length) {
+    await this.genrate_random()
+  }
+  return digit;
 }
 

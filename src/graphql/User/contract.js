@@ -44,18 +44,21 @@ export const GET_CONTRACT_FILES = gql`
 `
 
 export const GET_CONTRACT = gql`
-    query GETCONTRACT($contract_id:ID){
-        get_contracts(contract_id:$contract_id){
+    query GETCONTRACT($contract_id:ID,$location_code:String){
+        get_contracts(contract_id:$contract_id,location_code:$location_code){
             name
             description
             current_page
             address_id
-            budget
+            booking_status
+            budget(code:$location_code)
             timeline
+            biding_id
             timeline_type
             terms_condition
             contract_ref
             biding_count
+            created_at
             get_contract_category{
                 category_name
                 subCategory_name
@@ -70,6 +73,40 @@ export const GET_CONTRACT = gql`
                     small_image
                     large_image
                     image_tag
+                }
+            }
+            get_provider_user {
+                img_url
+                first_name
+                email
+                phone_no
+                user_type
+                last_name
+                _id
+                get_company_root_detail(root: true) {
+                    company_name
+                    company_website
+                    company_category
+                    get_company_images {
+                    small_image
+                    }
+                }
+            }
+            get_user {
+                img_url
+                first_name
+                user_type
+                last_name
+                email
+                phone_no
+                _id
+                get_company_root_detail(root: true) {
+                    company_name
+                    company_website
+                    company_category
+                    get_company_images {
+                        small_image
+                    }
                 }
             }
         }

@@ -10,6 +10,8 @@ var CommonFunction = require('../CommonFunction');
 var saf = require('../safaricom');
 const dotenv = require('dotenv');
 var getDistanceBetweenPoints = require('get-distance-between-points');
+const { pipeline } = require('stream');
+const { match } = require('assert');
 dotenv.config();
 
 const files = [];
@@ -30,13 +32,18 @@ module.exports.testmail = async (parent, args, context, info) => {
 module.exports.testinfmail = async (parent, args, context, info) => {
     try {
         // let data = await saf.safaricom_ctob_register();
-        let data ={
-            currency_code:'EUR',
-            convert_code:'INR',
-            amount:"500"
+        let data = {
+            currency_code: 'EUR',
+            convert_code: 'INR',
+            amount: "500"
         }
-    //    let result = await CommonFunction.currency_calculation(data)
-    //    console.log("module.exports.testinfmail -> result", result)
+        const ContractPayoutNotificationModule = require('../payment/ContractPayoutNotification')
+
+       let  contract_data={_id:"6164360ccf243632f2547145"}
+        ContractPayoutNotificationModule.accept_payout_notification(contract_data)
+       console.log("module.exports.testinfmail -> contract_data", contract_data)
+        //    let result = await CommonFunction.currency_calculation(data)
+        //    console.log("module.exports.testinfmail -> result", result)
         // let user_detail ={
         //     country_code:91,
         //     phone_no:9894177165
@@ -53,7 +60,7 @@ module.exports.testinfmail = async (parent, args, context, info) => {
 
         // let chargePayment = await commonHelper.send_sms("254","705924459","otp",{otp:9213})
         // console.log("module.exports.testinfmail -> chargePayment", chargePayment)
-        return {price:"500"};
+        return { price: "500" };
     } catch (error) {
         // console.log("module.exports.testinfmail -> error", error)
         return { msg: error.msg };
@@ -77,7 +84,7 @@ module.exports.user = async (parent, args, context, info) => {
 module.exports.delete_all_user = async (parent, args, context, info) => {
 
     await Detail_model.remove({});
-    return {status:"false",msg:"ops"};
+    return { status: "false", msg: "ops" };
 };
 
 
@@ -118,6 +125,56 @@ module.exports.reset_password = async (parent, args, context, info) => {
         return { msg: "This link is expired", status: "failed" };
     }
 }
+
+
+
+// find provider rating (based on booking data)
+module.exports.provider_rating_by_category = async (parent, args, context, info) => {
+    try {
+
+        let match = {
+            booking_status: 14,
+            user_rating: { $ne: 0 },
+            user_comments_status: 1,
+        };
+        if (args['root']) {
+            match['provider_id'] = parent['provider_id']
+            if (parent['category_id']) {
+                match['category_id'] = ObjectId(parent['category_id'])
+            }
+        } else if (args['_id']) {
+            match['provider_id'] = args['_id']
+        }
+
+        if (args['category_id']) {
+            match['category_id'] = ObjectId(args['category_id'])
+        }
+        console.log("module.exports.provider_rating_by_category -> match", match)
+
+        let pipeline = [
+            {
+                $match: match
+            },
+            {
+                $group: {
+                    _id: "$user_rating",
+                    rating: { $sum: 1 },
+                    totalSaleAmount: { $sum: { $multiply: ["$user_rating", { $sum: 1 }] } },
+                }
+            },
+        ]
+
+        var group_rating = await Booking_model.aggregate(pipeline)
+        let rating_value = _.sumBy(group_rating, 'totalSaleAmount') || 0;
+        let total_count_rating = _.sumBy(group_rating, 'rating') || 0;
+        var rating = rating_value / total_count_rating
+        rating = rating ? parseFloat(rating).toFixed(1).toString() : 0;
+        return { rating };
+    } catch (error) {
+        return 0
+    }
+
+};
 
 // find provider rating (based on booking data)
 module.exports.provider_rating = async (parent, args, context, info) => {
@@ -173,15 +230,18 @@ module.exports.provider_rate = async (parent, args, context, info) => {
 
 // find user (based on data)
 module.exports.available_booking_user = async (parent, args, context, info) => {
-    //console.log('booking_based_user-parent');
-    var result;
-    result = await Detail_model.find({ _id: parent.user_id });
+    let input_data = {}
+    if (args['root_parent']) {
+        input_data['_id'] = parent.provider_id
+    } else {
+        input_data['_id'] = parent.user_id
+    }
+    var result = await Detail_model.find(input_data);
     return result;
 };
 
 // find provider (based on data)
 module.exports.available_booking_povider = async (parent, args, context, info) => {
-    //console.log('booking_provider');
     //console.log(parent);
     var result;
     result = await Detail_model.find({ _id: parent.provider_id });
@@ -282,7 +342,7 @@ module.exports.admin_update_user = async (_, args) => {
         args.demo_end_time = moment.utc().add(4, 'days').format("YYYY-MM-DD");
     }
     var data = await Detail_model.findOne({ _id: args._id });
-    if (args.phone_no != '' && args.phone_no != null && typeof args.phone_no != "undefined") {
+    if (args.phone_no) {
         const find_pn = await Detail_model.find({ delete: 0, phone_no: args.phone_no, role: args.role, _id: { $ne: args._id } });
         if (find_pn.length > 0) {
             return { msg: "mobile no exists", status: 'failed' }
@@ -558,11 +618,7 @@ module.exports.sign_up = async (_, args) => {
         var email_verified_data = await Detail_model.findOne({ _id: email_verification[0]._id });
 
         let msg = {};
-        if (email_verified[0].role == 2 && email_verified[0].Upload_percentage == 50 && (email_verified[0].email_otp_verification == 0)) {
-            email_verified_data.pending_status = 2,
-                email_verified_data.msg = "Email not verified",
-                email_verified_data.status = "success"
-        } else if (email_verified[0].provider_subCategoryID.length == 0 && email_verified[0].role == 2 && email_verified[0].Upload_percentage == 50) {
+        if (email_verified[0].provider_subCategoryID.length == 0 && email_verified[0].role == 2 && email_verified[0].Upload_percentage == 50) {
             email_verified_data.pending_status = 5,
                 email_verified_data.msg = " category not upload",
                 email_verified_data.status = "success"
@@ -687,7 +743,7 @@ module.exports.user_search = async (parent, args, context, info) => {
     } else {
         if (args.email) {
             find_data['email'] = { "$regex": `.*${args.email}.*`, "$options": "i" }
-        }else{
+        } else {
             return []
         }
         if (args.role) {
@@ -698,7 +754,7 @@ module.exports.user_search = async (parent, args, context, info) => {
         }
         return await Detail_model.find(find_data);
     }
- 
+
 }
 
 module.exports.forget_password = async (parent, args, context, info) => {
@@ -741,6 +797,29 @@ module.exports.get_company_detail = async (parent, args, context, info) => {
     }
 };
 
+exports.get_company_root_detail = async (parent, args, context, info) => {
+    try {
+        let pro_finder = { delete: false }
+        if (parent['_id']) {
+            pro_finder['provider_id'] = ObjectId(parent['_id'])
+        }
+
+        let company_result = await CompanyProvider_model.findOne(pro_finder).lean();
+        if (_.size(company_result)) {
+            let find_query = { delete: false }
+            if (company_result['company_id']) {
+                find_query['_id'] = ObjectId(company_result['company_id'])
+            }
+            let final_result = await Company_model.findOne(find_query).lean();
+            return final_result
+        } else {
+            return { msg: "error in company detail", status: "failed" }
+        }
+    } catch (error) {
+        return { msg: "error in company detail", status: "failed" }
+    }
+};
+
 module.exports.get_company_provider = async (parent, args, context, info) => {
     try {
         var limit = args.limit || 10;
@@ -777,9 +856,12 @@ module.exports.get_parent_company_provider = async (parent, args, context, info)
         if (args['company_id']) {
             find_query['company_id'] = args['company_id']
         }
-        result = await CompanyProvider_model.find(find_query);
+        console.log("module.exports.get_parent_company_provider -> find_query", find_query)
+        let result = await CompanyProvider_model.find(find_query);
+        console.log("module.exports.get_parent_company_provider -> result", result)
         return result;
     } catch (error) {
+        console.log("module.exports.get_parent_company_provider -> error", error)
         return []
     }
 };
@@ -815,7 +897,6 @@ module.exports.get_company_images = async (parent, args, context, info) => {
         if (args['image_tag']) {
             find_query['image_tag'] = args['image_tag']
         }
-        console.log("module.exports.get_company_images -> find_query", find_query)
         result = await CompanyImage_model.find(find_query);
         return result;
     } catch (error) {
@@ -829,16 +910,16 @@ exports.addUser = async (parent, args) => {
         console.log("exports.addUser -> args", args)
         const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
         //add new user 
-        if(_.size(user) || args._id){
-            let comman_update ={}
-            if(args.location_code){
+        if (_.size(user) || args._id) {
+            let comman_update = {}
+            if (args.location_code) {
                 comman_update['location_code'] = args.location_code
             }
-            if(args.device_id){
+            if (args.device_id) {
                 comman_update['device_id'] = args.device_id
             }
-            let _id =  args._id || user[0]._id 
-            if(_.size(comman_update)){
+            let _id = args._id || user[0]._id
+            if (_.size(comman_update)) {
                 await Detail_model.updateOne({ _id }, comman_update);
             }
         }
@@ -933,7 +1014,7 @@ exports.addUser = async (parent, args) => {
             const add_user = new Detail_model(args);
             await add_user.save();
             var data = await Detail_model.findOne({ role: args.role, phone_no: args.phone_no, delete: 0 });
-         
+
             await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp })
             data.msg = "New User";
             data.status = "success";
@@ -1021,7 +1102,6 @@ module.exports.deleteCompanyProvider = async (parent, args, context, info) => {
 
 module.exports.CompanyFileUpload = async (parent, args, context, info) => {
     try {
-        console.log("module.exports.CompanyFileUpload -> args", args)
         if (!args['_id']) {
             return { msg: "Invalid ID", status: "failed" }
         }
@@ -1084,6 +1164,17 @@ module.exports.update_company_detail = async (parent, args, context, info) => {
         } else {
             let add_company_detail = new Company_model(company_data)
             let added_detail = await add_company_detail.save()
+
+            let update_query = {
+                email: "",
+                provider_id: ObjectId(company_data['user_id']),
+                company_id: ObjectId(added_detail['_id']),
+                register_link_status: "accepted",
+                register_status: "success",
+                user_type: "Owner"
+            }
+            let defaul_user = new CompanyProvider_model(update_query)
+            await defaul_user.save()
             if (company_data['provider_email'] && _.size(company_data['provider_email'])) {
                 let CompanyProviderDetail = await this.SendCompanyProviders(added_detail['_id'], company_data['provider_email'])
             }

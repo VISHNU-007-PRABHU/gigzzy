@@ -10,6 +10,8 @@ var ObjectId = require('mongodb').ObjectID;
 const { ApolloServer, gql, SchemaDirectiveVisitor } = require('apollo-server-express');
 const { defaultFieldResolver, GraphQLString } = require('graphql');
 const { typeDefs } = require('./node/graphql/schema');
+const categoryTypeDefs = require('./node/graphql/schema/categoryTypeDefs');
+
 const { resolvers, confrimation_call, c2b_confirmation, c2b_validation } = require('./node/graphql/resolver');
 const { confrimation_company_worker } = require('./node/graphql/resolvers/user')
 const moment = require('moment');
@@ -96,13 +98,13 @@ class UrlDirective extends SchemaDirectiveVisitor {
     const { resolve = defaultFieldResolver } = field;
     const { format } = this.args;
     field.resolve = async function (...args) {
-       const file_type =  args[0].doc_type || "png"
+      const file_type = args[0].doc_type || "png"
       const img = await resolve.apply(this, args);
       if (img && file_type && file_type !== "pdf") {
         return `${commonHelper.getBaseurl()}/images/${format}/${img}`;
-      } else if(file_type && file_type === "pdf") {
+      } else if (file_type && file_type === "pdf") {
         return `${commonHelper.no_image('pdf')}`;
-      }else{
+      } else {
         return `${commonHelper.no_image()}`;
       }
     };
@@ -130,13 +132,13 @@ class paymentDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
     const { defaultFormat } = this.args;
-    field.args.push({ name: 'format', type: GraphQLString});
-    field.resolve = async function (source,{ format, ...otherArgs },context, info, ) {
+    field.args.push({ name: 'format', type: GraphQLString });
+    field.resolve = async function (source, { format, ...otherArgs }, context, info,) {
       const date = await resolve.call(this, source, otherArgs, context, info);
       let code = otherArgs.code
       if (code === "KE") {
         return "mpesa"
-      }else{
+      } else {
         return "stripe"
       }
     };
@@ -148,18 +150,18 @@ class currencyDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
     const { defaultFormat } = this.args;
-    
+
     field.args.push({
       name: 'format',
       type: GraphQLString
     });
-    
+
     field.resolve = async function (
       source,
       { format, ...otherArgs },
       context,
       info,
-      ) {
+    ) {
       const date = await resolve.call(this, source, otherArgs, context, info);
       let code = otherArgs.code
       if (code === "symbol") {
@@ -199,7 +201,7 @@ class currencyDirective extends SchemaDirectiveVisitor {
         }
         let final_value = await CommonFunction.currency_calculation(inputdata)
         return final_value
-      }else{
+      } else {
         return date
       }
     };
@@ -214,11 +216,11 @@ const server = new ApolloServer({
     origin: '*',			// <- allow request from all domains
     credentials: true
   },
-  typeDefs,
+  typeDefs: [typeDefs,categoryTypeDefs],
   resolvers: [resolvers],
   schemaDirectives: {
     currency: currencyDirective,
-    paymentOption:paymentDirective,
+    paymentOption: paymentDirective,
     ref: refDirective,
     date: DateFormatDirective,
     upper: UpperCaseDirective,
@@ -273,6 +275,8 @@ existsSync(path.join(__dirname, "./node/images/category")) || mkdirSync(path.joi
 existsSync(path.join(__dirname, "./node/images/subcategory")) || mkdirSync(path.join(__dirname, "./node/images/subcategory"));
 existsSync(path.join(__dirname, "./node/images/contract")) || mkdirSync(path.join(__dirname, "./node/images/contract"));
 existsSync(path.join(__dirname, "./node/images/company")) || mkdirSync(path.join(__dirname, "./node/images/company"));
+existsSync(path.join(__dirname, "./node/images/biding")) || mkdirSync(path.join(__dirname, "./node/images/biding"));
+existsSync(path.join(__dirname, "./node/images/milestone")) || mkdirSync(path.join(__dirname, "./node/images/milestone"));
 
 app.use("/images", express.static(path.join(__dirname, "./node/images")));
 app.use("/document", express.static(path.join(__dirname, "./node/document")));
@@ -387,9 +391,7 @@ mongoose.connect(process.env.DB_LINK).then(() => {
 
 
 // const httpHost = process.env.HTTP_HOST || 'localhost';
-const PORT = 8990;
-
-
+const PORT = process.env.HTTP_PORT || 8990;
 
 // const httpServer = https.createServer(
 //   {
