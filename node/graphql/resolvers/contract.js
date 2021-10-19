@@ -232,7 +232,7 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         }
         if (args['booking_status']) {
             find_query['booking_status'] = ObjectId(args['booking_status'])
-            if (args['booking_status'] === 9) {
+            if (args['booking_status'] === commonHelper.bookink_status.CANCEL && args['user_id']) {
                 find_query['available_provider'] = { $in: [args.user_id] }
             }
         }
@@ -495,7 +495,7 @@ module.exports.delete_biding = async (root, args) => {
  */
 exports.manage_contract_booking = async (root, args) => {
     try {
-        if (args['booking_status'] === commonHelper.bookink_status.cancel) {
+        if (args['booking_status'] === commonHelper.bookink_status.CANCEL) {
             await ContractJob_model.remove({ available_provider: { $in: [args.contract_id] } });
             return { msg: "Contract rejected success", status: 'failed' }
         } else if (args['booking_status'] === 10) {
