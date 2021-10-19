@@ -352,6 +352,12 @@ const typeDefs = gql`
         get_milestone_all_images(milestone_id:ID,_id:ID,root:Boolean):[CompanyImage]
         msg:String
         status:String
+        total(code: String): String @currency
+        ctob:Boolean @payment
+        ctob_shotcode:String
+        ctob_billRef:String
+        payment_type:String
+        payment_option(code:String):String @paymentOption
     }
     type Currency{
         _id:ID,
