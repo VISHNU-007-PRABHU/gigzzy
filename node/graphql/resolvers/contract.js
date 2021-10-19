@@ -76,7 +76,6 @@ module.exports.DeleteContractJobFile = async (root, args) => {
 }
 
 exports.uploading_files = async (files, args) => {
-    console.log("exports.uploading_files -> files, args", files, args)
     return new Promise(async function (resolve, reject) {
         try {
             _.forEach(files, async (file, i) => {
@@ -256,7 +255,6 @@ module.exports.get_contracts = async (root, args) => {
             find_query['user_id'] = args['user_id']
         }
         let grouped_images = await ContractJob_model.find(find_query)
-        console.log("module.exports.get_contracts -> grouped_images", grouped_images)
         return grouped_images
     } catch (error) {
         return []
@@ -270,7 +268,6 @@ module.exports.get_contract_address_detail = async (root, args, context, info) =
         if (root['address_id']) {
             find_query['_id'] = root['address_id']
         }
-        console.log("module.exports.get_contract_address_detail -> find_query", find_query)
         let result = await Address_model.findOne(find_query);
         return result;
     } catch (error) {

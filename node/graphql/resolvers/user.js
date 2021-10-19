@@ -898,7 +898,6 @@ module.exports.get_company_images = async (parent, args, context, info) => {
         if (args['image_tag']) {
             find_query['image_tag'] = args['image_tag']
         }
-        console.log("module.exports.get_company_images -> find_query", find_query)
         result = await CompanyImage_model.find(find_query);
         return result;
     } catch (error) {
@@ -1103,7 +1102,6 @@ module.exports.deleteCompanyProvider = async (parent, args, context, info) => {
 
 module.exports.CompanyFileUpload = async (parent, args, context, info) => {
     try {
-        console.log("module.exports.CompanyFileUpload -> args", args)
         if (!args['_id']) {
             return { msg: "Invalid ID", status: "failed" }
         }
