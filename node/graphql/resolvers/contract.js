@@ -229,8 +229,11 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         if (args.role && args.role == 1 && args['user_id']) {
             find_query['user_id'] = ObjectId(args['user_id'])
         }
+        if (args.role && args.role == 2 && args['provider_id']) {
+            find_query['provider_id'] = ObjectId(args['provider_id'])
+        }
         if (args['booking_status']) {
-            find_query['booking_status'] = ObjectId(args['booking_status'])
+            find_query['booking_status'] = args['booking_status']
         }
 
         total = await ContractJob_model.count(find_query);

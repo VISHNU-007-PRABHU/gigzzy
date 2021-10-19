@@ -39,7 +39,7 @@ var bidingSchema = new Schema({
     coordinates: []
   },
 
-  booking_status: { type: String,default:"pending" },  // 12.booking,11.user_cancel,8.provider_accept,no_provider],10.user_accept,4.start,13.end,14.completed,15.not available
+  booking_status: { type: Number },  // 12.booking,11.user_cancel,8.provider_accept,no_provider],10.user_accept,4.start,13.end,14.completed,15.not available
   start_date: String,
   end_date: String,
   description: { type: String },
