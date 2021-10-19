@@ -340,6 +340,9 @@ exports.get_admin_fee = async (detail) => {
                 service_fee = category_data['service_fee']
             }
             admin_fee = (service_fee / 100) * detail['budget'];
+            if(admin_fee < 1){
+                admin_fee = 1
+            }
             response['admin_fee'] = String(parseFloat(admin_fee || 0).toFixed(2));
             response['service_fee'] = String(parseFloat(service_fee || 0).toFixed(2));
             return resolve(response)
