@@ -529,7 +529,7 @@ class Bookings extends React.Component {
                                 <div className="price_section px-3 d-flex align-items-center">
                                     <p className="m-0 normal_font_size ">Billing Details</p>
                                     <label class="ml-auto">
-                                        <Button className="primary_color p-0" type="link" target="=_blank" onClick={() => { this.props.history.push({ pathname: `/admin-booking-invoice/${this.state.particular_booking[0]._id}` }) }}>View Invoice</Button>
+                                        <Button className="primary_color p-0" type="link" target="=_blank" onClick={() => { this.props.history.push({ pathname: `/admin-booking-invoice/ondemand/${this.state.particular_booking[0]._id}` }) }}>View Invoice</Button>
                                     </label>
                                 </div>
                                 <div className="price_section px-3 d-flex">

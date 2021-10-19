@@ -132,7 +132,7 @@ class BookingDetails extends React.Component {
                                         </Col>
                                         <Col span={12}>
                                             <div className="in_card justify-content-end d-flex">
-                                                <Button type="link" target="=_blank" onClick={() => { this.props.history.push({ pathname: `/admin-booking-invoice/${booking[0] ? booking[0]._id : ''}` }) }}>Print Invoice</Button>
+                                                <Button type="link" target="=_blank" onClick={() => { this.props.history.push({ pathname: `/admin-booking-invoice/ondemand/${booking[0] ? booking[0]._id : ''}`,state:{invoice_type:"ondemand"} }) }}>Print Invoice</Button>
                                             </div>
                                         </Col>
                                     </Row>

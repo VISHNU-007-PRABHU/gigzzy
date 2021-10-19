@@ -50,8 +50,10 @@ export const GET_CONTRACT = gql`
             description
             current_page
             address_id
+            booking_status
             budget(code:$location_code)
             timeline
+            biding_id
             timeline_type
             terms_condition
             contract_ref
