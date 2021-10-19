@@ -25,6 +25,8 @@ var bidingSchema = new Schema({
   biding_ref: { type: String, 'default': shortid.generate },
   booked: { type: String },
   budget: { type: Number, default: 0.00 },
+  admin_fee: { type: Number, default: 0.00 },
+  service_fee: { type: Number, default: 0.00 },
   timeline: String,
   timeline_type: String,
   cover_letter: String,

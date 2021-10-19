@@ -332,6 +332,8 @@ const typeDefs = gql`
         start_date: String,
         end_date: String,
         title:String,
+        user_id:ID
+        contract_id:ID
         description:String,
         budget(code: String): String @currency,
         timeline: String,       

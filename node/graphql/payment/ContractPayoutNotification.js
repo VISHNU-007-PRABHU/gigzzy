@@ -81,6 +81,7 @@ exports.update_contract_after_payment = async (args, charge, biding) => {
 
             let biding_data = {
                 booking_status: 10,
+                service_fee: String(parseFloat(args.amount).toFixed(2)),
                 payment_status: "paid"
             }
             await Contract_model.updateOne({ _id: args.contract_id }, contract_data, { new: true });
