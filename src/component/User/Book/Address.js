@@ -92,22 +92,21 @@ const Address = (props) => {
     const skip = () => { setadd(false) }
     const handleChange1 = address => { setaddress(address); };
     const handleSelect = address => {
+        console.log("skip -> address", address)
         setaddress(address);
         geocodeByAddress(address)
-            .then(results => {
+            .then(async results => {
                 if (results[0]) {
                     results[0].address_components.map(data => {
                         if (data.types.includes("country")) {
                             set_country_code(data.short_name)
                         }
                     })
+                    let latLng = await getLatLng(results[0])
+                    setlat(latLng.lat);
+                    setlng(latLng.lng);
+                    setcenter([latLng.lat, latLng.lng])
                 }
-                getLatLng(results[0])
-            })
-            .then(latLng => {
-                setlat(latLng.lat);
-                setlng(latLng.lng);
-                setcenter([latLng.lat, latLng.lng])
             })
             .catch(error => console.error('Error', error));
     };
@@ -157,7 +156,7 @@ const Address = (props) => {
             address: address,
             lat: String(lat),
             lng: String(lng),
-            location_code:country_code
+            location_code: country_code
         };
         console.log(data)
         if(props.company){
@@ -191,7 +190,7 @@ const Address = (props) => {
             address: address,
             lat: String(lat),
             lng: String(lng),
-            location_code:country_code
+            location_code: country_code
         };
         console.log(data)
         if(props.company){

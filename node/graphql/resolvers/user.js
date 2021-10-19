@@ -907,6 +907,7 @@ module.exports.get_company_images = async (parent, args, context, info) => {
 
 exports.addUser = async (parent, args) => {
     try {
+        console.log("exports.addUser -> args", args)
         const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
         //add new user 
         if (_.size(user) || args._id) {
@@ -989,7 +990,7 @@ exports.addUser = async (parent, args) => {
                         };
                         await commonHelper.push_notifiy(message);
                         // ================= push_notifiy ================== //  
-                        var send_verification = await commonHelper.send_mail_sendgrid(user.email, "admin_approved", { msg });
+                        var send_verification = await commonHelper.send_mail_sendgrid(get_role.email, "admin_approved", { msg });
                         await commonHelper.send_sms(get_role.country_code, get_role.phone_no, "admin_apporved", {})
                         await global.pubsub.publish("PROOF_STATUS", { proof_status: 0, _id: args._id });
                         break;
