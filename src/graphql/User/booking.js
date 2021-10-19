@@ -8,9 +8,14 @@ subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
       description
       booking_ref
       booking_date
+      booking_status
+      payment_type
+      mpeas_payment_callback
       base_price(code:"symbol")
+      extra_price(code:"symbol")
+      ctob_shotcode
+      ctob_billRef
       ctob
-      extra_price
       msg_date
       msg_time
       booking_provider {
@@ -23,6 +28,7 @@ subscription SENDACCEPTMSG($_id:ID,$booking_id:ID){
       }
     }
 }`
+
 
 export const PENDING_DATA = gql`
 subscription getPendingDataSubscription($_id: ID

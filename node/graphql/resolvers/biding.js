@@ -304,7 +304,6 @@ module.exports.get_biding_all_files = async (root, args) => {
             },
         ]
 
-        console.log("module.exports.get_biding_all_files -> pipeline", pipeline)
         let grouped_images = await BidingImage_model.aggregate(pipeline)
         return grouped_images
     } catch (error) {

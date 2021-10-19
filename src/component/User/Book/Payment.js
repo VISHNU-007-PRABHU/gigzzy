@@ -47,7 +47,7 @@ class _CardForm extends Component {
             this.setState({ loading: false });
             if (result.data.manage_booking[0].status === "success") {
                 Alert_msg({ msg: "Waiting for your payment confirmation", status: "success" });
-                this.props.history.push(`/admin-booking-invoice/${this.props.data._id}`)
+                this.props.history.push(`/admin-booking-invoice/ondemand/${this.props.data._id}`)
             } else {
                 Alert_msg({ msg: "Job Booking Cancel Failed", status: "failed" });
             }
@@ -65,7 +65,7 @@ class _CardForm extends Component {
             this.setState({ loading: false });
             if (result.data.manage_booking && result.data.manage_booking[0].status === "success") {
                 Alert_msg({ msg: "Waiting for your payment confirmation", status: "success" });
-                this.props.history.push(`/admin-booking-invoice/${this.props.data._id}`)
+                this.props.history.push(`/admin-booking-invoice/omdemand/${this.props.data._id}`)
             } else {
                 Alert_msg({ msg: "Job Booking Cancel Failed", status: "failed" });
             }

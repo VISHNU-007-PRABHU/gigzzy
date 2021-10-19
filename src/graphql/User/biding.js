@@ -52,7 +52,9 @@ export const GET_BIDING_DETAIL = gql`
     query GETBIDINGDETAIL($_id:ID){
         get_biding_detail(_id:$_id){
             _id
-                budget
+                budget(code:"IN")
+                admin_fee(code:"IN")
+                service_fee
                 ref: biding_ref
                 created_at
                 user_id
@@ -94,3 +96,5 @@ mutation UPDATEBIDING($_id:ID,$biding_data:[JSON]){
     status
   }
 }`
+
+

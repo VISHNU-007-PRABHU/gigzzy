@@ -3,6 +3,7 @@ const model = require('../../model_data');
 const _ = require('lodash');
 const moment = require("moment");
 const commonHelper = require('../commonHelper')
+const PushNotification = require('../notification/PushNotification') 
 var Detail_model = model.detail;
 var Booking_model = model.booking;
 var Payout_model = model.payout;
@@ -81,6 +82,7 @@ exports.update_contract_after_payment = async (args, charge, biding) => {
 
             let biding_data = {
                 booking_status: 10,
+                service_fee: String(parseFloat(args.amount).toFixed(2)),
                 payment_status: "paid"
             }
             await Contract_model.updateOne({ _id: args.contract_id }, contract_data, { new: true });

@@ -25,19 +25,21 @@ var bidingSchema = new Schema({
   biding_ref: { type: String, 'default': shortid.generate },
   booked: { type: String },
   budget: { type: Number, default: 0.00 },
+  admin_fee: { type: Number, default: 0.00 },
+  service_fee: { type: Number, default: 0.00 },
   timeline: String,
   timeline_type: String,
   cover_letter: String,
   description: String,
   experience: String,
   no_of_people: String,
-  add_to_shortlist:Boolean,
+  add_to_shortlist:{type:Boolean,default:false},
   location: {
     type: { type: String },
     coordinates: []
   },
 
-  booking_status: { type: String,default:"pending" },  // 12.booking,11.user_cancel,8.provider_accept,no_provider],10.user_accept,4.start,13.end,14.completed,15.not available
+  booking_status: { type: Number },  // 12.booking,11.user_cancel,8.provider_accept,no_provider],10.user_accept,4.start,13.end,14.completed,15.not available
   start_date: String,
   end_date: String,
   description: { type: String },

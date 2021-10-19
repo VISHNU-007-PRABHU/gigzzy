@@ -20,14 +20,12 @@ class ContractUserDetail extends React.Component {
     }
 
     componentDidMount() {
-        console.log("ContractUserDetail -> componentDidMount -> this.props.match.params.id", this.props.match.params.id)
         if (this.props.match.params.id) {
             this.setState({ contract_id: this.props.match.params.id });
         }
     }
 
     render() {
-        console.log("ContractUserDetail -> render -> this.state.booking_status ", this.state.booking_status)
 
         return (
             <>

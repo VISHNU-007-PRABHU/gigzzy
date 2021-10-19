@@ -545,7 +545,8 @@ const resolvers = {
                 online: 1,
                 delete: 0,
                 proof_status: 1,
-                location: { $near: { $maxDistance: 10000, $geometry: { type: "Point", coordinates: [args.lng, args.lat] } } },
+                // 81 km is set to that booking
+                location: { $near: { $maxDistance: 81 * 1000, $geometry: { type: "Point", coordinates: [args.lng, args.lat] } } },
                 provider_subCategoryID: { $in: [args.category_id] },
             };
             let find_provider = await Detail_model.find(filter);

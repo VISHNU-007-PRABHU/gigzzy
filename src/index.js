@@ -15,66 +15,64 @@ import { client } from "./apollo";
 import { ApolloProvider } from "react-apollo";
 import { ApolloProvider as ApolloProviderHooks } from "@apollo/react-hooks";
 import RoleView, { RoleViewFunction } from './component/Comman/roles_permission_view'
+
+
+
+import Category from './component/Admin/Category/Category';
+import Add_Category from './component/Admin/Category/Add_Category';
+import Subcategory from './component/Admin/subcategory/Subcategory';
+import Add_Subcategory from './component/Admin/subcategory/Add_Subcategory';
+import Booking from './component/Admin/Booking/Booking';
+import Provider from './component/Admin/Provider/Provider';
+import Add_Provider from './component/Admin/Provider/Add_Provider';
+import Provider_Verified from './component/Admin/Provider/Provider_Verified';
+import Certificate from './component/Admin/Certificate/Certificate';
+import User from './component/Admin/User/User';
+import Add_User from './component/Admin/User/Add_User';
+import Static from './component/Admin/Static/Static';
+import Add_Static from './component/Admin/Static/Add_static';
+import Contract from './component/Admin/Contract/Contract';
+import ContractDetail from './component/Admin/Contract/ContractDetail';
+import Roles from './component/Admin/Roles/Roles';
+import Add_Admin from './component/Admin/Roles/Add_Admin';
+import AdminRoles from './component/Admin/Roles/Add_Roles';
+import Company from './component/Admin/Company/Company';
+import Add_Company from './component/Admin/Company/Add_Company';
+import CompanyWorkerAdmin from './component/Admin/Company/CompanyWorkerAdmin';
+import ContractBooking from './component/User/Book/contract/ContractBooking';
+import ContractUserDetail from './component/User/Book/contract/view/ContractUserDetail';
+import User_Login from './component/User/Login/User_Login';
+import HomePage from './component/User/HomePage/HomePage';
+import Profile_Page from './component/User/Profile/Profile';
+import Bookings_Page from './component/User/Book/Bookings';
+import Description_Page from './component/User/Book/Description';
+import Payouts from './component/Admin/Payouts/Payouts';
+import Review from './component/Admin/Review/Review';
+import Settings from './component/Admin/Setting/Setting';
+import Email_Login from "./component/User/Login/Email_Login";
+import Request from "./component/Admin/Request/Request";
+import Booking_Details from "./component/Admin/Booking/Booking_Details";
+import Invoice from './component/Admin/Booking/invoice';
+import NotFound from './component/Comman/NotFound';
+import NotAccess from './component/Comman/NotAccess';
+
+import provider_detail from './component/User/Provider/Provider_Details';
+import provider_earnings from './component/User/Provider/Provider_Earns';
+import Booking_Detail from './component/User/Provider/Booking_Detail';
+import Provider_Email_Login from './component/User/Login/Provider_Email_Login';
+import Provider_Login from './component/User/Login/Provider_Login';
+import { ConfrimPassword } from './component/User/Login/ConfrimPassword';
+import StaticPage from './component/Comman/static_page';
+import FAQ from './component/User/About/Faq';
+import HowLearnMore from './component/User/About/HowLearnMore';
+import UserHeader from './component/User/Layout/UserHeader';
+import UserFooter from './component/User/Layout/UserFooter';
+import Currency from './component/Admin/Currency/Currency';
+import AddCurrency from './component/Admin/Currency/AddCurrency';
+import LoginPage from './component/Admin/Layout/LoginPage';
+import Dashboard from './component/Admin/Dashboard/Dashboard';
+
 const { Content } = Layout;
-
-
-const Category = React.lazy(() => import('./component/Admin/Category/Category'));
-const Add_Category = React.lazy(() => import('./component/Admin/Category/Add_Category'));
-const Subcategory = React.lazy(() => import('./component/Admin/subcategory/Subcategory'));
-const Add_Subcategory = React.lazy(() => import('./component/Admin/subcategory/Add_Subcategory'));
-const Booking = React.lazy(() => import('./component/Admin/Booking/Booking'));
-const Provider = React.lazy(() => import('./component/Admin/Provider/Provider'));
-const Add_Provider = React.lazy(() => import('./component/Admin/Provider/Add_Provider'));
-const Provider_Verified = React.lazy(() => import('./component/Admin/Provider/Provider_Verified'));
-const Certificate = React.lazy(() => import('./component/Admin/Certificate/Certificate'));
-const User = React.lazy(() => import('./component/Admin/User/User'));
-const Add_User = React.lazy(() => import('./component/Admin/User/Add_User'));
-const Static = React.lazy(() => import('./component/Admin/Static/Static'));
-const Add_Static = React.lazy(() => import('./component/Admin/Static/Add_static'));
-const Contract = React.lazy(() => import('./component/Admin/Contract/Contract'));
-const ContractDetail = React.lazy(() => import('./component/Admin/Contract/ContractDetail'));
-const Roles = React.lazy(() => import('./component/Admin/Roles/Roles'));
-const Add_Admin = React.lazy(() => import('./component/Admin/Roles/Add_Admin'));
-const AdminRoles = React.lazy(() => import('./component/Admin/Roles/Add_Roles'));
-const Company = React.lazy(() => import('./component/Admin/Company/Company'));
-const Add_Company = React.lazy(() => import('./component/Admin/Company/Add_Company'));
-const CompanyWorkerAdmin = React.lazy(() => import('./component/Admin/Company/CompanyWorkerAdmin'));
-const ContractBooking = React.lazy(() => import('./component/User/Book/contract/ContractBooking'));
-const ContractUserDetail = React.lazy(() => import('./component/User/Book/contract/view/ContractUserDetail'));
-const User_Login = React.lazy(() => import('./component/User/Login/User_Login'));
-const HomePage = React.lazy(() => import('./component/User/HomePage/HomePage'));
-const Profile_Page = React.lazy(() => import('./component/User/Profile/Profile'));
-const Bookings_Page = React.lazy(() => import('./component/User/Book/Bookings'));
-const Description_Page = React.lazy(() => import('./component/User/Book/Description'));
-const Payouts = React.lazy(() => import('./component/Admin/Payouts/Payouts'));
-const Review = React.lazy(() => import('./component/Admin/Review/Review'));
-const Settings = React.lazy(() => import('./component/Admin/Setting/Setting'));
-const Email_Login = React.lazy(() => import("./component/User/Login/Email_Login"));
-const Request = React.lazy(() => import("./component/Admin/Request/Request"));
-const Booking_Details = React.lazy(() => import("./component/Admin/Booking/Booking_Details"));
-const Invoice = React.lazy(() => import('./component/Admin/Booking/invoice'));
-const ContractInvoice = React.lazy(() => import('./component/Admin/Booking/ContractInvoice'));
-
-const NotFound = React.lazy(() => import('./component/Comman/NotFound'));
-const NotAccess = React.lazy(() => import('./component/Comman/NotAccess'));
-
-const provider_detail = React.lazy(() => import('./component/User/Provider/Provider_Details'));
-const provider_earnings = React.lazy(() => import('./component/User/Provider/Provider_Earns'));
-const Booking_Detail = React.lazy(() => import('./component/User/Provider/Booking_Detail'));
-const Provider_Email_Login = React.lazy(() => import('./component/User/Login/Provider_Email_Login'));
-const Provider_Login = React.lazy(() => import('./component/User/Login/Provider_Login'));
-const { ConfrimPassword } = React.lazy(() => import('./component/User/Login/ConfrimPassword'));
-const StaticPage = React.lazy(() => import('./component/Comman/static_page'));
-const FAQ = React.lazy(() => import('./component/User/About/Faq'));
-const HowLearnMore = React.lazy(() => import('./component/User/About/HowLearnMore'));
-const UserHeader = React.lazy(() => import('./component/User/Layout/UserHeader'));
-const UserFooter = React.lazy(() => import('./component/User/Layout/UserFooter'));
-const Currency = React.lazy(() => import('./component/Admin/Currency/Currency'));
-const AddCurrency = React.lazy(() => import('./component/Admin/Currency/AddCurrency'));
-const LoginPage = React.lazy(() => import('./component/Admin/Layout/LoginPage'));
-const Dashboard = React.lazy(() => import('./component/Admin/Dashboard/Dashboard'));
-
-
 function PrivateRoute({ permission, component: Component, ...rest }) {
   console.log("PrivateRoute -> permission", permission)
   let permission_condition = true
@@ -194,13 +192,6 @@ ReactDOM.render(
     <ApolloProvider client={client}>
       <ApolloProviderHooks client={client}>
         <Switch>
-          <Suspense fallback={<>
-            {/* <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "30px" }}></p>
-            <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "100px" }}></p>
-            <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "100px" }}></p>
-            <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "100px" }}></p>
-            <p className="container mt-2" style={{ backgroundColor: "#eae5e5", width: '100%', height: "100px" }}></p> */}
-          </>}>
             <PrivateRoute path="/admin-dashboard" component={Dashboard} />
             <PrivateRoute exact path="/admin-category/add" component={Add_Category} />
             <PrivateRoute exact path="/admin-category/add/:id" component={Add_Category} />
@@ -245,8 +236,7 @@ ReactDOM.render(
             {/* <PrivateRoute exact path="/contract_booking/:id" component={ContractBooking} /> */}
             <PrivateRoute exact path="/contract/view/:id" component={ContractUserDetail} />
 
-            <UnAuthRoute path="/admin-booking-invoice/:id" component={Invoice} exact />
-            <UnAuthRoute path="/admin-contract-invoice/:id" component={ContractInvoice} exact />
+            <UnAuthRoute path="/admin-booking-invoice/:type/:id" component={Invoice} exact />
             <UnAuthRoute exact path="/admin" component={LoginPage} />
             <UnAuthRoute isHeader={true} isFooter={true} exact path="/" component={HomePage} />
             <UnAuthRoute exact path="/login" component={User_Login} />
@@ -264,7 +254,6 @@ ReactDOM.render(
             <UserRoute isFooter={false} exact path="/bookings" component={Bookings_Page} />
             <UserRoute exact path="/contract_booking/:id" component={ContractBooking} />
             <UserRoute isHeader={true} exact path="/contract/user_view/:id" component={ContractUserDetail} />
-          </Suspense>
           <Route component={NotFound} />
         </Switch >
       </ApolloProviderHooks >

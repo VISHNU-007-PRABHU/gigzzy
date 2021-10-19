@@ -44,7 +44,7 @@ const CheckoutForm = (props) => {
             set_loading(false);
             if (result.data.manage_booking && result.data.manage_booking[0].status === "success") {
                 Alert_msg({ msg: "Waiting for your payment confirmation", status: "success" });
-                history.push(`/admin-booking-invoice/${props.data._id}`)
+                history.push(`/admin-booking-invoice/contract/${props.data._id}`)
             } else {
                 Alert_msg({ msg: "payment failed", status: "success" });
             }

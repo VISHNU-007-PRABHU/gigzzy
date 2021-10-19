@@ -804,7 +804,6 @@ exports.get_company_root_detail = async (parent, args, context, info) => {
             pro_finder['provider_id'] = ObjectId(parent['_id'])
         }
 
-        console.log("exports.get_company_root_detail -> pro_finder", pro_finder)
         let company_result = await CompanyProvider_model.findOne(pro_finder).lean();
         if (_.size(company_result)) {
             let find_query = { delete: false }
@@ -898,7 +897,6 @@ module.exports.get_company_images = async (parent, args, context, info) => {
         if (args['image_tag']) {
             find_query['image_tag'] = args['image_tag']
         }
-        console.log("module.exports.get_company_images -> find_query", find_query)
         result = await CompanyImage_model.find(find_query);
         return result;
     } catch (error) {
@@ -909,6 +907,7 @@ module.exports.get_company_images = async (parent, args, context, info) => {
 
 exports.addUser = async (parent, args) => {
     try {
+        console.log("exports.addUser -> args", args)
         const user = await Detail_model.find({ role: args.role, phone_no: args.phone_no, delete: 0 });
         //add new user 
         if (_.size(user) || args._id) {
@@ -991,7 +990,7 @@ exports.addUser = async (parent, args) => {
                         };
                         await commonHelper.push_notifiy(message);
                         // ================= push_notifiy ================== //  
-                        var send_verification = await commonHelper.send_mail_sendgrid(user.email, "admin_approved", { msg });
+                        var send_verification = await commonHelper.send_mail_sendgrid(get_role.email, "admin_approved", { msg });
                         await commonHelper.send_sms(get_role.country_code, get_role.phone_no, "admin_apporved", {})
                         await global.pubsub.publish("PROOF_STATUS", { proof_status: 0, _id: args._id });
                         break;
@@ -1103,7 +1102,6 @@ module.exports.deleteCompanyProvider = async (parent, args, context, info) => {
 
 module.exports.CompanyFileUpload = async (parent, args, context, info) => {
     try {
-        console.log("module.exports.CompanyFileUpload -> args", args)
         if (!args['_id']) {
             return { msg: "Invalid ID", status: "failed" }
         }
