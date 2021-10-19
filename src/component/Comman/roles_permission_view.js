@@ -34,19 +34,23 @@ export default RoleView;
 
 
 export const RoleViewFunction = (permission) => {
-    let data = localStorage.getItem('hokjighsasd')
-    const user = JSON.parse(window.atob(data))
-    let func_data = false
-    let GizzyDeveloper = user['GizzyDeveloper'] || false
-
-    if (user && user['full_permission_list'] && permission) {
-        let data = find(user['full_permission_list'], { key: permission })
-        if (size(data) || GizzyDeveloper) {
+    try {
+        let data = localStorage.getItem('hokjighsasd')
+        const user = JSON.parse(window.atob(data))
+        let func_data = false
+        let GizzyDeveloper = user['GizzyDeveloper'] || false
+    
+        if (user && user['full_permission_list'] && permission) {
+            let data = find(user['full_permission_list'], { key: permission })
+            if (size(data) || GizzyDeveloper) {
+                func_data = true
+            }
+        }
+        else {
             func_data = true
         }
+        return true   
+    } catch (error) {
+        return true
     }
-    else {
-        func_data = true
-    }
-    return true
 };

@@ -233,7 +233,7 @@ ReactDOM.render(
             <PrivateRoute permission="edit_roles" path="/admin-roles/add/:id" component={AdminRoles} exact />
             <PrivateRoute permission="add_admin" path="/admin-admin/add" component={Add_Admin} exact />
             <PrivateRoute permission="edit_admin" path="/admin-admin/add/:id" component={Add_Admin} exact />
-            <PrivateRoute exact path="/contract_booking/:id" component={ContractBooking} />
+            {/* <PrivateRoute exact path="/contract_booking/:id" component={ContractBooking} /> */}
             <PrivateRoute exact path="/contract/view/:id" component={ContractUserDetail} />
 
             <UnAuthRoute path="/admin-booking-invoice/:type/:id" component={Invoice} exact />

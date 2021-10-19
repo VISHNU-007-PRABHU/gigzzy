@@ -1,12 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+Tamma+2&display=swap');
 body {
   margin: 0;
-  font-family: "BalooTamma2", cursive !important;
-  -webkit-font-smoothing: "BalooTamma2", cursive !important;
-  -moz-osx-font-smoothing: "BalooTamma2", cursive !important;
+  font-family: 'Baloo Tamma 2', cursive;
 }
 
 code {
-  font-family: "BalooTamma2" !important;
+  font-family: 'Baloo Tamma 2', cursive;
 }
 
 .ant-btn-primary {
