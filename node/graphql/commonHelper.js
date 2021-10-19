@@ -26,7 +26,6 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 var Contract_model = model.contract_job;
 var Booking_model = model.booking;
 
-
 const transporter = nodemailer.createTransport({
   host: smtpEndpoint,
   port: port,
@@ -38,17 +37,17 @@ const transporter = nodemailer.createTransport({
 });
 
 
-// let bookink_status={
-//   PROVIDER_ROLE = 2,
-//   START = 4,
-//   END = 13,
-//   CANCEL = 8,
-//   BOOKING = 12,
-//   PENDING = 10,
-//   ONGOING = 4,
-//   COMPLETE = 14,
-//   ACCEPT = 9,
-// }  
+exports.bookink_status = {
+  PROVIDER_ROLE : 2,
+  START : 4,
+  END : 13,
+  CANCEL : 8,
+  BOOKING : 12,
+  PENDING : 10,
+  ONGOING : 4,
+  COMPLETE : 14,
+  ACCEPT : 9,
+}
 
 module.exports.home = 0;
 module.exports.pending = 1;
@@ -105,7 +104,7 @@ module.exports.prepareUploadFolder = (path) => {
 module.exports.push_notifiy = async (message) => {
   return await fcm.send(message, function (err, response) {
     if (err) {
-    console.log("module.exports.push_notifiy -> err", err)
+      console.log("module.exports.push_notifiy -> err", err)
     } else {
       console.log("Successfully sent with response: ", response);
     }
@@ -270,7 +269,7 @@ exports.genrate_random = async () => {
   var digit = `${random}`
   var check_p_id = await Booking_model.find({ "ctob_billRef": digit });
   if (check_p_id.length) {
-      await this.genrate_random()
+    await this.genrate_random()
   }
   return digit;
 }

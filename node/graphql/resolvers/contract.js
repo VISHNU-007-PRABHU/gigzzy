@@ -213,7 +213,6 @@ module.exports.get_contract_all_files = async (root, args) => {
 
 module.exports.get_contracts_pagination = async (parent, args, context, info) => {
     try {
-        console.log("module.exports.get_contracts_pagination -> args", args)
         var limit = Number(args.limit) || 10;
         var page = args.page || 1;
         var offset = Number(page - 1) * Number(limit);
@@ -233,9 +232,11 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         }
         if (args['booking_status']) {
             find_query['booking_status'] = ObjectId(args['booking_status'])
+            if (args['booking_status'] === 9) {
+                find_query['available_provider'] = { $in: [args.user_id] }
+            }
         }
 
-        console.log("module.exports.get_contracts_pagination -> offset", offset, Number(limit))
         total = await ContractJob_model.count(find_query);
         let result = await ContractJob_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(Number(limit));
         var pageInfo = { totalDocs: total, page: args.page }
@@ -429,6 +430,7 @@ exports.find_provider = async (contract_data) => {
         await PushNotification.create_push_notification_msg(notification_user_data);
         contract_data['available_provider'] = available_provider;
         contract_data['user_parent'] = true;
+        await ContractJob_model.updateOne({ _id: contract_data['_id'] }, { available_provider }).exec()
         global.pubsub.publish('SEND_CONTRACT_JOB_MSG', { send_contract_jobs_provider: contract_data });
         return { status: "success", msg: "Job socket notification sent success" }
     } catch (error) {
@@ -493,16 +495,16 @@ module.exports.delete_biding = async (root, args) => {
  */
 exports.manage_contract_booking = async (root, args) => {
     try {
-        if (args['booking_status'] === 10) {
+        if (args['booking_status'] === commonHelper.bookink_status.cancel) {
+            await ContractJob_model.remove({ available_provider: { $in: [args.contract_id] } });
+            return { msg: "Contract rejected success", status: 'failed' }
+        } else if (args['booking_status'] === 10) {
             let preview_contract_data = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
             let preview_biding_data = await Biding_model.findOne({ _id: args.biding_id }).lean()
             if (args.booking_status === 10 && preview_contract_data.booking_status === 9) {
                 let base_amount = preview_biding_data.budget;
                 args['amount'] = preview_contract_data['admin_fee'];
-
-                console.log("exports.manage_contract_booking -> args", args)
                 let payment_data = await payment_choose.choose_contract_payment(args, preview_contract_data, preview_biding_data)
-                console.log("payment_data", payment_data)
                 if (payment_data.status) {
                     var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
                     findBooking['user_parent'] = true;
@@ -539,7 +541,7 @@ exports.manage_contract_booking = async (root, args) => {
 
     } catch (error) {
         console.log("exports.manage_contract_booking -> error", error)
-        return { msg: "Contract Payment failed", status: 'failed' }
+        return { msg: "Contract update process failed", status: 'failed' }
     }
 }
 
@@ -585,7 +587,7 @@ exports.find_kilometer = async (parent, args) => {
             } else {
 
                 var distanceInMeters = getDistanceBetweenPoints.getDistanceBetweenPoints(
-                    address.lat,address.lng, // Lat, Long of point A
+                    address.lat, address.lng, // Lat, Long of point A
                     args.lat, args.lng// Lat, Long of point B
                 );
                 if (distanceInMeters) {
