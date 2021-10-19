@@ -298,7 +298,6 @@ module.exports.update_contract = async (root, args) => {
             await ContractJob_model.updateOne(find_query, contract_detail).exec()
             let fetch_contract = await ContractJob_model.findOne(find_query).lean()
             if (args['booking_status'] === 9) {
-                // await PushNotification.create_push_notification_msg()
                 await this.find_provider(fetch_contract)
             }
             fetch_contract['status'] = "success";
