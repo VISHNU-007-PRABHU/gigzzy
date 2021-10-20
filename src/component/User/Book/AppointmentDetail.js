@@ -1,13 +1,11 @@
 import React, { Suspense, useState, useEffect } from 'react'
-import { My_APPOINTMENTS, MY_CONTRACT_APPOINTMENTS } from '../../../graphql/User/booking';
+import {  MY_CONTRACT_APPOINTMENTS } from '../../../graphql/User/booking';
 import Card from 'antd/lib/card';
-import { useMutation, useQuery } from '@apollo/react-hooks';
-import Skeleton from 'antd/lib/skeleton';
+import {  useQuery } from '@apollo/react-hooks';
 import Spin from 'antd/lib/spin';
 import useReactRouter from 'use-react-router';
 import InfiniteScroll from 'react-infinite-scroller';
-
-import timer_icon from '../../../image/bookLater.png';
+import size from 'lodash/size'
 const AppiontmentsEmpty = React.lazy(() => import('./AppiontmentsEmpty'));
 function AppointmentDetail(props) {
     const { history, match } = useReactRouter();
@@ -18,40 +16,39 @@ function AppointmentDetail(props) {
     const [hasMore, set_hasMore] = useState(false)
     const [loading, set_loading] = useState(false)
     const [appointment_data, set_appointment_data] = useState([]);
+    const [booking_status, set_booking_status] = useState(9);
 
-    const get_contracts_pagination = useQuery(MY_CONTRACT_APPOINTMENTS, {
-        variables: {
-            limit,
-            page: page,
-            user_id,
-            role: 1,
-        }
-    });
+    const get_contracts_pagination = useQuery(MY_CONTRACT_APPOINTMENTS);
 
     useEffect(() => {
         if (localStorage.getItem('user')) {
             set_user_id(JSON.parse(localStorage.getItem("user"))._id)
-        } else {
-            set_user_id("61306d9257602fcea82c5fb3")
         }
         fetch_data()
-    }, [localStorage.getItem('user')])
+    }, [props])
 
     const fetch_data = async () => {
         set_loading(true)
         let input_data = {
             limit,
             page: page,
+            booking_status:Number(props.parent_data.status),
             user_id,
             role: 1,
         }
         let finaldata = await get_contracts_pagination.refetch(input_data)
+        set_loading(false)
         if (finaldata.data && finaldata.data.get_contracts_pagination) {
             let tem_total = finaldata.data.get_contracts_pagination.pageInfo.totalDocs
-            let appointment_datas = [...appointment_data, ...finaldata.data.get_contracts_pagination.data];
-            set_appointment_data(appointment_datas.reverse());
+            console.log("fetch_data -> booking_status", booking_status)
+            if(booking_status === props.parent_data.status){
+                let appointment_datas = [...appointment_data, ...finaldata.data.get_contracts_pagination.data];
+                set_appointment_data(appointment_datas.reverse());
+            }else{
+                set_appointment_data(finaldata.data.get_contracts_pagination.data)
+            }
+            set_booking_status(props.parent_data.status)
             set_totalDocs(tem_total)
-            set_loading(false)
             if (tem_total && tem_total > (page * limit)) {
                 set_page(page + 1)
                 set_hasMore(true)
@@ -74,7 +71,7 @@ function AppointmentDetail(props) {
 
     return (
         < div className="booking_infinite_container" >
-            {!appointment_data &&
+            {!appointment_data.length &&
                 <Suspense>
                     <AppiontmentsEmpty />
                 </Suspense>

@@ -12,10 +12,10 @@ function Appointments(props) {
             <Tabs defaultActiveKey="1" className="border">
                 <TabPane tab="Contract Job" key="1" className='p-3'>
                     <Suspense fallback={<Skeleton />}>
-                        <AppointmentDetail />
+                        <AppointmentDetail parent_data ={props}/>
                     </Suspense>
                 </TabPane>
-                <TabPane tab="On Demand job" key="2">
+                {/* <TabPane tab="On Demand job" key="2">
                     <Suspense fallback={<Skeleton />}>
                         <AppointmentDetail />
                     </Suspense>
@@ -24,7 +24,7 @@ function Appointments(props) {
                     <Suspense fallback={<Skeleton />}>
                         <AppointmentDetail />
                     </Suspense>
-                </TabPane>
+                </TabPane> */}
             </Tabs>
         </>
     );
