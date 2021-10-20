@@ -107,6 +107,8 @@ var contractSchema = new Schema({
     currency_id: String,
     default_currency_rate: String,
     currenct_local_rate: String,
+    currenct_milestone_status:Number,
+    currenct_milestone_id:String,
 
 }, schemaOptions);
 

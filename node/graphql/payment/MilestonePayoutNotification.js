@@ -61,7 +61,7 @@ exports.update_milestone_after_payment = async (args, charge, biding) => {
             }
 
             let contract_data = {
-                milestone_status: 10,
+                currenct_milestone_status: 10,
                 currenct_milestone_id: args['_id']
             }
             await Contract_model.updateOne({ _id: args.contract_id }, contract_data, { new: true });

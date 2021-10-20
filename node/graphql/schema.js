@@ -341,6 +341,7 @@ const typeDefs = gql`
         delete:Boolean,
         booking_status:Int,
         updatedAt:String,
+        pay_option:Boolean
         order:Int
         lat:Float
         lng:Float
@@ -415,6 +416,8 @@ const typeDefs = gql`
         ctob:Boolean @payment
         ctob_shotcode:String
         ctob_billRef:String
+        currenct_milestone_id:ID,
+        currenct_milestone_status:Int
         find_kilometer(lat:Float,lng:Float,root:Boolean):Detail
     }
     type Company{

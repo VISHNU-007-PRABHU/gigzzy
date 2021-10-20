@@ -195,8 +195,20 @@ exports.uploading_milestone_files = async (files, args) => {
 exports.manage_milestone_booking = async (root, args) => {
     try {
         let preview_milestone_data = await BidingMilestone_model.findOne({ _id: args._id }).lean()
-        if (args.booking_status === 9) {
-            
+        
+        if(args.booking_status === 9){
+            let update_detail ={
+                title:"start",
+                booking_status:14,
+            }
+            let add_start_milestone = new BidingMilestone_model(update_detail)
+            await add_start_milestone.save()
+            await ContractJob_model.updateOne({_id:args['contract_id']}, {booking_status:commonHelper.bookink_status.START}).exec()
+            //send notification
+            let findBooking ={}
+            findBooking['msg'] = "contract has been started";
+            findBooking['status'] = 'success';
+            return findBooking
         }
         if (args.booking_status === 10 && preview_milestone_data.booking_status === 9) {
             if (!preview_milestone_data.pay_option) {
