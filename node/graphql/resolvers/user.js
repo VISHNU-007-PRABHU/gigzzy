@@ -1008,6 +1008,20 @@ exports.addUser = async (parent, args) => {
 
             await Detail_model.updateOne({ _id: args._id }, args);
             var data = await Detail_model.findOne({ _id: args._id });
+            if (args['user_type'] && args['user_type'] === "company") {
+                let company_data = await Company_model.findOne({ user_id: data['_id'] }, { _id: 1 })
+                if ( _.size(company_data)) {
+                    data['company_id'] = company_data['_id'] 
+                } else {
+                    let company_data = {
+                        user_id: data['_id']
+                    }
+                    let add_company_detail = new Company_model(company_data)
+                    var added_com_detail = await add_company_detail.save()
+                    data['company_id'] = added_com_detail['_id']
+                    console.log(" data['company_id']",  data['company_id'])
+                }
+            }
             data.msg = "User Detail Sucessfully Updated";
             data.status = "success";
             return data
