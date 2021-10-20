@@ -375,7 +375,6 @@ class Bookings extends React.Component {
                         <Suspense fallback={<Skeleton />}>
                             <Appointments
                                 handleInfiniteOnLoad={this.handleInfiniteOnLoad}
-                                page={this.state.pagination.current}
                                 status={this.state.mode}
                                 heading={this.state.mode_state}
                                 view_booking={this.view_booking} />
@@ -630,7 +629,7 @@ class Bookings extends React.Component {
                             <div style={{ marginTop: "25%" }}><div className="d-flex justify-content-center"><Empty description={false} /></div></div>}
                     </div>
                 </Modal>
-
+{/* 
                 <Modal
                     className="new_modal rating"
                     title="Review"
@@ -656,10 +655,9 @@ class Bookings extends React.Component {
                                 placeholder="Write Something..."
                                 onChange={(e) => { this.setState({ comment: e.target.value }) }} />
 
-                            {/* <TextArea rows={4} value={this.state.particular_booking[0] ? this.state.particular_booking[0].user_comments : "dsd"} placeholder="Write Something..." onChange={(e) => { this.setState({ comment: e.target.value }) }} /> */}
                         </div>
                     </div>
-                </Modal>
+                </Modal> */}
             </>
         );
     }
