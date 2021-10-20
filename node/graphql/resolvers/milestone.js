@@ -42,6 +42,7 @@ module.exports.get_biding_milestone = async (root, args) => {
     try {
 
         let fetch_query = {
+            is_delete:false
         }
         if (args['_id']) {
             fetch_query['_id'] = args['_id']
@@ -63,6 +64,21 @@ module.exports.get_biding_milestone = async (root, args) => {
         return []
     }
 
+}
+
+module.exports.delete_milestone = async (root, args) => {
+    try {
+        let find_query = {
+            _id: args["_id"]
+        }
+        let update_detail = {
+            is_delete: true
+        }
+        await BidingMilestone_model.updateOne(find_query, update_detail).exec()
+        return { status: "success", msg: "Milestone removed success" }
+    } catch (error) {
+        return { status: "failed", msg: "Milestone removed failed" }
+    }
 }
 
 exports.get_milestone_all_images = async (root, args) => {
@@ -195,29 +211,29 @@ exports.uploading_milestone_files = async (files, args) => {
 exports.manage_milestone_booking = async (root, args) => {
     try {
         let preview_milestone_data = await BidingMilestone_model.findOne({ _id: args._id }).lean()
-        
-        if(args.milestones_status === 9){
-            await ContractJob_model.updateOne({_id:args['contract_id']}, {booking_status:commonHelper.bookink_status.ACCEPT}).exec()
-            let findBooking ={}
+
+        if (args.milestones_status === 9) {
+            await ContractJob_model.updateOne({ _id: args['contract_id'] }, { booking_status: commonHelper.bookink_status.ACCEPT }).exec()
+            let findBooking = {}
             findBooking['msg'] = "contract milestone updated has been started";
             findBooking['status'] = 'success';
             return findBookin
-        }else if(args.booking_status === 9){
-            let update_detail ={
-                title:"start",
-                booking_status:14,
+        } else if (args.booking_status === 9) {
+            let update_detail = {
+                title: "start",
+                booking_status: 14,
             }
             let add_start_milestone = new BidingMilestone_model(update_detail)
             await add_start_milestone.save()
-            await ContractJob_model.updateOne({_id:args['contract_id']}, {booking_status:commonHelper.bookink_status.START}).exec()
+            await ContractJob_model.updateOne({ _id: args['contract_id'] }, { booking_status: commonHelper.bookink_status.START }).exec()
             //send notification
-            let findBooking ={}
+            let findBooking = {}
             findBooking['msg'] = "contract has been started";
             findBooking['status'] = 'success';
             return findBooking
-        }else if (args.booking_status === 10 && preview_milestone_data.booking_status === 9) {
+        } else if (args.booking_status === 10 && preview_milestone_data.booking_status === 9) {
             if (!preview_milestone_data.pay_option) {
-                await BidingMilestone_model.updateOne({ _id: args._id }, { booking_status: 14,end_date:moment.utc().format() }).exec()
+                await BidingMilestone_model.updateOne({ _id: args._id }, { booking_status: 14, end_date: moment.utc().format() }).exec()
                 var findBooking = await BidingMilestone_model.findOne({ _id: args._id }).lean();
                 findBooking['user_parent'] = true;
                 findBooking['msg'] = "user paid the milestone";
@@ -236,16 +252,16 @@ exports.manage_milestone_booking = async (root, args) => {
                     return { msg: "Milestone Payment failed", status: 'failed' }
                 }
             }
-        }else if(args.booking_status === 14){
-            let update_detail ={
-                title:"Complete",
-                booking_status:14,
+        } else if (args.booking_status === 14) {
+            let update_detail = {
+                title: "Complete",
+                booking_status: 14,
             }
             let add_start_milestone = new BidingMilestone_model(update_detail)
             await add_start_milestone.save()
-            await ContractJob_model.updateOne({_id:args['contract_id']}, {booking_status:commonHelper.bookink_status.COMPLETE}).exec()
+            await ContractJob_model.updateOne({ _id: args['contract_id'] }, { booking_status: commonHelper.bookink_status.COMPLETE }).exec()
             //send notification
-            let findBooking ={}
+            let findBooking = {}
             findBooking['msg'] = "contract has been started";
             findBooking['status'] = 'success';
         } else {

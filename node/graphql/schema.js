@@ -1188,6 +1188,7 @@ const typeDefs = gql`
             option:Int,
             extra_fare_id:ID
         ):ContractJob
+        delete_milestone(_id:ID,option:Int):Milestone
     }
 `;
 module.exports.typeDefs = typeDefs;

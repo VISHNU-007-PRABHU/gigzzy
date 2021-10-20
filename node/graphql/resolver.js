@@ -27,7 +27,8 @@ const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
 const payment_choose = require('./payment/choose')
-const MpesaCallback = require('./payment/MpesaCallback')
+const MpesaCallback = require('./payment/MpesaCallback');
+const milestone = require('../model/booking/milestone');
 dotenv.config();
 
 var Company_model = model.company;
@@ -420,7 +421,7 @@ const resolvers = {
         update_biding: bidingResolver.update_biding,
         BidingFileUpload: bidingResolver.BidingFileUpload,
         update_milestone: milestoneResolver.update_milestone,
-        // company detiail
+        delete_milestone:milestoneResolver.delete_milestone,
         UpdateCategoryCurrency: categoryResolver.UpdateCategoryCurrency,
         DeleteCategoryCurrency: categoryResolver.DeleteCategoryCurrency,
         update_company_detail: userResolver.update_company_detail,
