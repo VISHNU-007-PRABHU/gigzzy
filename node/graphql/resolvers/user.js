@@ -584,14 +584,21 @@ module.exports.checkOtp = async (parent, args) => {
             return { ...result._doc, ...message };
         } else {
             let message = {}
-            if (result.provider_subCategoryID.length == 0 && result.role == 2 && result.Upload_percentage == 50) {
-                message = { pending_status: 5, msg: " category not upload", status: "success" };
-            } else if (result.role == 2 && result.Upload_percentage == 50 && (result.personal_document == undefined || result.personal_document == '')) {
-                message = { pending_status: 6, msg: "personal_document not upload", status: "success" };
-            } else if (result.role == 2 && result.Upload_percentage == 50 && (result.professional_document == undefined || result.personal_document == '')) {
-                message = { pending_status: 7, msg: "professional_document not upload", status: "success" };
-            } else { message = { pending_status: 0, msg: "OTP verified", status: "success" } };
-            result = { ...result._doc, ...message };
+            if(result.role == 2){
+                if (result.provider_subCategoryID.length == 0 && result.role == 2 && result.Upload_percentage == 50) {
+                    message = { pending_status: 5, msg: " category not upload", status: "success" };
+                } else if (result.role == 2 && result.Upload_percentage == 50 && (result.personal_document == undefined || result.personal_document == '')) {
+                    message = { pending_status: 6, msg: "personal_document not upload", status: "success" };
+                } else if (result.role == 2 && result.Upload_percentage == 50 && (result.professional_document == undefined || result.personal_document == '')) {
+                    message = { pending_status: 7, msg: "professional_document not upload", status: "success" };
+                } else { message = { pending_status: 0, msg: "OTP verified", status: "success" } };
+                result = { ...result._doc, ...message };
+            }else{
+                if (result.email) {
+                    message = { pending_status: 1, msg: "Go to registration page", status: "success" };
+                } 
+                result = { ...result._doc, ...message };
+            }
         }
 
     } else {
@@ -1056,7 +1063,6 @@ exports.addUser = async (parent, args) => {
             }
         }
     } catch (error) {
-        console.log("exports.addUser -> error", error)
         return {
             msg: "User Detail Update  Process Failed",
             status: "failed"
