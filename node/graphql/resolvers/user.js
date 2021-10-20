@@ -1054,7 +1054,7 @@ exports.addUser = async (parent, args) => {
                 if (data.Upload_percentage == 25) {
                     data.msg = "New User"; data.status = 'success';
                 } else {
-                    data.msg = "otp no change", data.status = 'failed';
+                    data.msg = "otp no change", data.status = 'success';
                 }
                 await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp: data.otp })
                 return data;
