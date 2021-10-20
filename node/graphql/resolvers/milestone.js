@@ -102,9 +102,9 @@ module.exports.update_milestone = async (root, args) => {
                 args['milestone_id'] = args['_id']
                 await this.uploading_milestone_files(files, args)
             }
-            if (args['booking_status'] === 9 && update_detail['biding_id']) {
-                await Biding_model.updateOne({ _id: update_detail['biding_id'] }, { milestone_status: 9, current_milestone_id: args['_id'] }).exec()
-            }
+            // if (args['booking_status'] === 9 && update_detail['biding_id']) {
+            //     await Biding_model.updateOne({ _id: update_detail['biding_id'] }, { milestone_status: 9, current_milestone_id: args['_id'] }).exec()
+            // }
             let fetch_bid = await BidingMilestone_model.findOne(find_query).lean()
             fetch_bid['status'] = "success";
             fetch_bid['msg'] = "Milestone update success"
@@ -125,9 +125,9 @@ module.exports.update_milestone = async (root, args) => {
                 args['milestone_id'] = added_bid['_id']
                 await this.uploading_milestone_files(files, args)
             }
-            if (args['booking_status'] === 9 && update_detail['biding_id']) {
-                await Biding_model.updateOne({ _id: update_detail['biding_id'] }, { milestone_status: 9, current_milestone_id: added_bid['_id'] }).exec()
-            }
+            // if (args['booking_status'] === 9 && update_detail['biding_id']) {
+            //     await Biding_model.updateOne({ _id: update_detail['biding_id'] }, { milestone_status: 9, current_milestone_id: added_bid['_id'] }).exec()
+            // }
             added_bid['status'] = "success";
             added_bid['msg'] = "Milestone added success"
             return added_bid
@@ -195,6 +195,9 @@ exports.uploading_milestone_files = async (files, args) => {
 exports.manage_milestone_booking = async (root, args) => {
     try {
         let preview_milestone_data = await BidingMilestone_model.findOne({ _id: args._id }).lean()
+        if (args.booking_status === 9) {
+            
+        }
         if (args.booking_status === 10 && preview_milestone_data.booking_status === 9) {
             if (!preview_milestone_data.pay_option) {
                 await BidingMilestone_model.updateOne({ _id: args._id }, { booking_status: 14,end_date:moment.utc().format() }).exec()
