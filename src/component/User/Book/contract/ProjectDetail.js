@@ -18,7 +18,7 @@ const ProjectDetail = (props) => {
         <>
             <Row>
                 <Col span={24}>
-                    <label class="d-flex w-100">
+                    <label className="d-flex w-100">
                         <span className="ant-form-item-required font-weight-bold">Project Name</span>
                         <span className="ml-auto text-black-50">{project_name_length?.length}/50</span>
                     </label>
@@ -32,7 +32,7 @@ const ProjectDetail = (props) => {
             </Row>
             <Row>
                 <Col span={24}>
-                    <label class="d-flex w-100">
+                    <label className="d-flex w-100">
                         <span className="ant-form-item-required font-weight-bold">Project Description</span>
                     </label>
                     <Form.Item>

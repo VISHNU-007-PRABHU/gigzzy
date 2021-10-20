@@ -86,13 +86,16 @@ const Address = (props) => {
     });
 
 
-    const add_new = () => {
-        setadd(true);
-        setedit(false);
-        setflat_no("");
-        settitle('Others');
-        setlandmark('');
-        setaddress("");
+    const add_new = (data=[]) => {
+        if(!data.length)
+        {
+            setadd(true);
+            setedit(false);
+            setflat_no("");
+            settitle('Others');
+            setlandmark('');
+            setaddress("");   
+        }
     }
     const skip = () => { setadd(false) }
     const handleChange1 = address => { setaddress(address); };
@@ -151,7 +154,6 @@ const Address = (props) => {
     };
 
     const add_data = (value) => {
-        console.log(value);
         var data = {
             option: 1,
             user_id: JSON.parse(localStorage.getItem('user'))._id,
@@ -163,7 +165,6 @@ const Address = (props) => {
             lng: String(lng),
             location_code: country_code
         };
-        console.log(data)
         if(props.company){
             data['company_id'] = localStorage.getItem('user_company_id')
         }
@@ -218,7 +219,13 @@ const Address = (props) => {
             Alert_msg({ msg: "Please add mandatory field", status: 'failed' })
         }
     }
-
+    const address_popup_close = (value) =>{
+        setservice_modal(false);
+        if(value.popup_closed_option)
+        {
+            value.popup_closed()
+        }
+    }
     const edit_location = (item) => {
         console.log(item);
         set_id(item._id);
@@ -247,8 +254,8 @@ const Address = (props) => {
                                     className="new_modal maping"
                                     centered
                                     visible={service_modal}
-                                    onOk={() => {setservice_modal(false);value.popup_closed()}}
-                                    onCancel={() => {setservice_modal(false);value.popup_closed()}}
+                                    onOk={()=>{address_popup_close(value)}}
+                                    onCancel={() => {address_popup_close(value)}}
                                     footer={
                                         add === false ?
                                             <Button value="large" type="dashed" onClick={add_new} className="w-100" style={{ borderRadius: '17px' }}>

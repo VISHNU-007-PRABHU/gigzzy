@@ -74,10 +74,11 @@ const ProjectImages = (props) => {
                             <FileUpload
                                 custom_content="Upload document"
                                 onFileUpload={onFileUpload}
-                                custom_sub_content="eg Documents, Pictures"
+                                custom_sub_content="Upload your documents and site images etc..,"
                                 custom_class="avatar-uploader d-flex justify-content-center px_view"> </FileUpload>
                         )}
                     </Form.Item>
+                    <small>Supported File Formats : JPG, PNG</small>
                 </Col>
             </Row>
             <Row gutter={[16, 40]}>
@@ -85,24 +86,30 @@ const ProjectImages = (props) => {
                     {
                         get_all_images_data.length ? get_all_images_data.map(all_image_items => {
                             return (
-                                <Card className="mb-2 bg-light" headStyle={{ "padding": "0px 10px" }} title={<div className="d-flex justify-content-between align-items-center">
+                                <Card className="mb-2 extra_radius_input document_section_contract" title={<div className="d-flex justify-content-between align-items-center">
                                     <div>{all_image_items['_id']}</div>
-                                    <div>
+                                    <div className="d-flex">
                                         <FileUpload onFileUpload={onFileUpload} custom_category={all_image_items['_id']} custom_class="contract_header_images"
                                         ></FileUpload>
                                     </div>
                                 </div>
                                 }>
+                                    <Row gutter={8}>
                                     {all_image_items.images.map(image_data => {
                                         return (
-                                            <Card.Grid className="imgHolder position-relative p-0 w-25 " onClick={() => { showImageModel(image_data) }}>
-                                                <img loading="lazy" className="img-fluid loading h-100" src={image_data.small_image} />
+                                        <Col md={{span:8}} className="gutter-row imgHolder position-relative cursor_point">
+                                            <div className="h-100">
+                                                <img loading="lazy" className="rounded w-100 img_cover img-fluid loading h-100" src={image_data.small_image} />
                                                 <span className="tags bold">{image_data.image_tag}</span>
+                                                <span className="edit" onClick={() => { showImageModel(image_data) }}><Icon type="edit" className='f_25' /></span>
                                                 <Popconfirm title="Sure to delete this image ?" onConfirm={() => delete_contract_images(image_data._id)}>
-                                                    <span className="delete"><Icon type="delete" theme="twoTone" twoToneColor="#52c41a" className='f_25' /></span>
+                                                    <span className="delete"><Icon type="delete" className='f_25' /></span>
                                                 </Popconfirm>
-                                            </Card.Grid>)
+                                            </div>
+                                        </Col>
+                                        )
                                     })}
+                                    </Row>
                                 </Card>
                             )
                         }) : <></>
