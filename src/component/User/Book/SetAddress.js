@@ -98,7 +98,6 @@ const SetAddress = (props) => {
                                                     <Empty className="m-5" description={false} />
                                                 </> :
                                                 <>
-                                                    {/* <div>SAVED ADDRESS</div> */}
                                                     <List
                                                         itemLayout="horizontal"
                                                         dataSource={data.user_address}

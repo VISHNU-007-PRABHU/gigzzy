@@ -59,6 +59,11 @@ export const GET_CONTRACT = gql`
             contract_ref
             biding_count
             created_at
+            currenct_milestone_id
+            currenct_milestone_status
+            ctob_billRef
+            ctob_shotcode
+            ctob
             get_contract_category{
                 category_name
                 subCategory_name
