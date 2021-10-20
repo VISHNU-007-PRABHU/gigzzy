@@ -10,6 +10,7 @@ const { createWriteStream, existsSync, mkdirSync } = require("fs");
 var getDistanceBetweenPoints = require('get-distance-between-points');
 const path = require("path");
 var fs = require('fs');
+const { AuthRegistrationsCredentialListMappingInstance } = require('twilio/lib/rest/api/v2010/account/sip/domain/authTypes/authRegistrationsMapping/authRegistrationsCredentialListMapping');
 var Biding_model = model.Biding;
 var Address_model = model.address
 var BidingImage_model = model.BidingImage;
@@ -69,11 +70,15 @@ module.exports.biding_count = async (root, args) => {
 module.exports.get_biding_detail = async (root, args) => {
     try {
         let fetch_query = {}
-        if (args['_id']) {
-            fetch_query['_id'] = args['_id']
-        }
-        if (args['contract_id']) {
-            fetch_query['contract_id'] = args['contract_id']
+        if(agrs['root']){
+            fetch_query['_id'] = root['biding_id']
+        }else{
+            if (args['_id']) {
+                fetch_query['_id'] = args['_id']
+            }
+            if (args['contract_id']) {
+                fetch_query['contract_id'] = args['contract_id']
+            }
         }
         var final_output = await Biding_model.findOne(fetch_query).lean();
         return final_output;

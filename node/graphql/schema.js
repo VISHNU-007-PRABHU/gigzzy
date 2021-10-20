@@ -291,6 +291,7 @@ const typeDefs = gql`
         contract_id:ID
         created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         data: JSON 
+        title:String
         biding_ref:String
         budget(code: String): String @currency
         admin_fee(code: String): String @currency
@@ -420,6 +421,7 @@ const typeDefs = gql`
         currenct_milestone_id:ID,
         currenct_milestone_status:Int
         milestones_status:Int
+        get_biding_detail(root:Boolean,all:Boolean):Biding
         find_kilometer(lat:Float,lng:Float,root:Boolean):Detail
     }
     type Company{

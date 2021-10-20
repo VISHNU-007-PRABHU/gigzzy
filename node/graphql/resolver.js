@@ -383,6 +383,7 @@ const resolvers = {
         biding_count: bidingResolver.biding_count,
         get_contract_address_detail: contractResolver.get_contract_address_detail,
         find_kilometer: contractResolver.find_kilometer,
+        get_biding_detail:bidingResolver.get_biding_detail,
     },
     CompanyImage: {
         get_contract_files: contractResolver.get_contract_files,
