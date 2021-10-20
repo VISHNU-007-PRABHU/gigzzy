@@ -13,6 +13,7 @@ import SetAddress from './SetAddress';
 import { GoChevronLeft } from "react-icons/go";
 import { Alert_msg } from "../../Comman/alert_msg";
 import includes from 'lodash/includes'
+import size from 'lodash/size'
 import { LocationContext, EditLocationContext } from "../../context/Location";
 const ADD_ADDRESS = gql`
   mutation add_address($company_id:ID,$location_code:String,$option: Int,$_id:ID,$user_id: String,$title: String,$flat_no: String ,$landmark: String,$address: String,$lat: String,$lng: String ) {
@@ -61,14 +62,23 @@ const Address = (props) => {
         if(JSON.parse(localStorage.getItem('user'))){
             local_user_id= JSON.parse(localStorage.getItem('user'))._id
         }
+        setservice_modal(props.visible);
+        setadd(false);
         if (props.user_id) {
             setuser_id(props.user_id)
         } else if (local_user_id) {
             setuser_id(local_user_id)
         }
+        
+        if(size(props.address_from))
+        {
+            edit_location(props.address_from)
+        }
+        
         if(props.address_id){
             setaddress_id(props.address_id) 
         }
+        
     }, [props])
     const [updateTodo] = useMutation(ADD_ADDRESS, {
         refetchQueries: [{ query: GET_ADDRESS, variables: { user_id } }],
@@ -76,11 +86,6 @@ const Address = (props) => {
     });
 
 
-    useEffect(() => {
-        console.log(props)
-        setservice_modal(props.visible);
-        setadd(false);
-    }, [props])
     const add_new = () => {
         setadd(true);
         setedit(false);
@@ -205,8 +210,9 @@ const Address = (props) => {
                     }
                     Alert_msg({ msg: "Address update saved", status: "success" });
                 } else {
-                    Alert_msg({ msg: "Address not update", status: "failed" });
+                    Alert_msg({ msg: "Address update failed", status: "failed" });
                 }
+                value.popup_closed()
             });
         } else {
             Alert_msg({ msg: "Please add mandatory field", status: 'failed' })
@@ -241,8 +247,8 @@ const Address = (props) => {
                                     className="new_modal maping"
                                     centered
                                     visible={service_modal}
-                                    onOk={() => setservice_modal(false)}
-                                    onCancel={() => setservice_modal(false)}
+                                    onOk={() => {setservice_modal(false);value.popup_closed()}}
+                                    onCancel={() => {setservice_modal(false);value.popup_closed()}}
                                     footer={
                                         add === false ?
                                             <Button value="large" type="dashed" onClick={add_new} className="w-100" style={{ borderRadius: '17px' }}>
@@ -261,7 +267,6 @@ const Address = (props) => {
                                                 </div>
                                                 <div className="my-2">
                                                     <div className="d-flex">
-                                                        <span className='m-1 primary_error'>*</span>
                                                         <PlacesAutocomplete
                                                             value={address}
                                                             onChange={handleChange1}
@@ -302,14 +307,14 @@ const Address = (props) => {
                                                             )}
                                                         </PlacesAutocomplete>
                                                     </div>
-                                                    <div className="my-2 ml-3">
+                                                    <div className="my-2">
                                                         <Input size='large' value={flat_no} placeholder="Enter Flat No" onChange={(event) => { setflat_no(event.target.value) }} />
                                                     </div>
-                                                    <div className="my-2 ml-3">
+                                                    <div className="my-2">
                                                         <Input size='large' value={landmark} placeholder="Enter LandMark" onChange={(event) => { setlandmark(event.target.value) }} />
                                                     </div>
                                                     <div className={title !== "Home" && title !== "Work" ? "my-2 d-flex" : "d-none"}>
-                                                        <span className='m-1 primary_error'>*</span>
+                                                        
                                                         <Input size='large' value={title} placeholder="Enter title" onChange={(event) => { settitle(event.target.value) }} />
                                                     </div>
                                                     <div className="my-2 d-flex justify-content-around">

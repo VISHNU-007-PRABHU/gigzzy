@@ -6,7 +6,7 @@ import { UPDATE_CONTRACT, GET_CONTRACT } from '../../../../graphql/User/contract
 import SetAddress from '../SetAddress';
 import useReactRouter from 'use-react-router';
 
-import { LocationContext } from '../../../context/Location'
+import { LocationContext,EditLocationContext } from '../../../context/Location'
 import Address from "../Address";
 import findIndex from 'lodash/findIndex';
 import size from 'lodash/size';
@@ -63,6 +63,7 @@ function ContractSteper(props) {
     const [stepsdetail, setSteps] = useState(original_steps);
     const [update_contract, { loading: removeLoading }] = useMutation(UPDATE_CONTRACT)
     const contract_detail = useQuery(GET_CONTRACT);
+    const [address_from, setaddress_from] = useState({});
 
     useEffect(async () => {
         if (localStorage.getItem('user')) {
@@ -168,7 +169,15 @@ function ContractSteper(props) {
 
         message.success('Processing complete!')
     }
+ 
+    const edit_location = (item) => {
+        setaddress_from(item)
+        set_add_address(true);
+    }
 
+    const on_popup_closed = () => {
+        set_add_address(false);
+    }
     const on_location_change = (item) => {
         set_address_id(item.user_address[0]._id);
     }
@@ -225,8 +234,9 @@ function ContractSteper(props) {
                         <div className={current === 1 ? '' : 'd-none'}>
                             <LocationContext.Provider value={{
                                 location_change: on_location_change,
+                                popup_closed: on_popup_closed
                             }}>
-                                <Button type="primary" className="mb-3 h-50x" onClick={() => { set_add_address(true) }}>
+                                <Button type="primary" className="mb-3 h-50x" onClick={() => {setaddress_from({}); set_add_address(true) }}>
                                     <div className="normal_font_size d-flex justify-content-around align-items-center">
                                         <div className="mr-3">
                                             Add new address
@@ -236,10 +246,12 @@ function ContractSteper(props) {
                                 </Button>
                                 <h4 className="text-center mb-5">My Saved Address</h4>
                                 <Col md={{ span: 18, offset: 3 }} className="extra_radius_input shadow-lg">
-                                    <SetAddress user_id={user_id} address_id={address_id} />
+                                    <EditLocationContext.Provider value={{ location_edit: edit_location}}>
+                                        <SetAddress user_id={user_id} address_id={address_id} />
+                                    </EditLocationContext.Provider>
                                 </Col>
+                                <Address address_from={address_from} visible={add_address}  />
                             </LocationContext.Provider>
-                                <Address visible={add_address}  />
                         </div>
                     </Suspense>
                     

@@ -107,7 +107,7 @@ const SetAddress = (props) => {
                                                                 className={props && props.address_id ?'cursor_point table-active':'cursor_point'}
                                                                 actions={[
                                                                     <Button type="link primary_color d-flex" size="small"
-                                                                        onClick={() => { values.location_edit(item) }} >
+                                                                        onClick={() => { console.log(values); values.location_edit(item) }} >
                                                                         <Icon type="edit" /> edit
                                                                     </Button>,
                                                                     <Button type="link primary_color d-flex" size="small" onClick={() => { delete_data(item) }}>
