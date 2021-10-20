@@ -360,7 +360,6 @@ app.use(async (req, res, next) => {
   ]
   const uriArray = url.split('/');
   if (!_.includes(SubURL, uriArray[1])) {
-    console.log("react run");
     const readFile = util.promisify(fs.readFile)
     try {
       var text = await readFile(cwd + '/build/index.html', 'utf8');
