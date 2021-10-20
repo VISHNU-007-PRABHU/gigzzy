@@ -209,8 +209,7 @@ exports.manage_milestone_booking = async (root, args) => {
             findBooking['msg'] = "contract has been started";
             findBooking['status'] = 'success';
             return findBooking
-        }
-        if (args.booking_status === 10 && preview_milestone_data.booking_status === 9) {
+        }else if (args.booking_status === 10 && preview_milestone_data.booking_status === 9) {
             if (!preview_milestone_data.pay_option) {
                 await BidingMilestone_model.updateOne({ _id: args._id }, { booking_status: 14,end_date:moment.utc().format() }).exec()
                 var findBooking = await BidingMilestone_model.findOne({ _id: args._id }).lean();
@@ -231,6 +230,18 @@ exports.manage_milestone_booking = async (root, args) => {
                     return { msg: "Milestone Payment failed", status: 'failed' }
                 }
             }
+        }else if(args.booking_status === 14){
+            let update_detail ={
+                title:"Complete",
+                booking_status:14,
+            }
+            let add_start_milestone = new BidingMilestone_model(update_detail)
+            await add_start_milestone.save()
+            await ContractJob_model.updateOne({_id:args['contract_id']}, {booking_status:commonHelper.bookink_status.COMPLETE}).exec()
+            //send notification
+            let findBooking ={}
+            findBooking['msg'] = "contract has been started";
+            findBooking['status'] = 'success';
         } else {
             return { msg: "Milestone Payment failed", status: 'failed' }
         }

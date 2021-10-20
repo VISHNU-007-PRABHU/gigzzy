@@ -924,7 +924,7 @@ exports.addUser = async (parent, args) => {
             }
         }
         if (args.option == "add") {
-            const get_role = await Detail_model.findOne({ _id: args._id });
+            const get_role = await Detail_model.findOne({ _id: args._id }).lean();
             //console.log(args.email);
             if (get_role.role == 1) {
                 args.role = 1;
