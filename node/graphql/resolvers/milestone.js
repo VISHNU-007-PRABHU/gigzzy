@@ -93,13 +93,13 @@ module.exports.update_milestone = async (root, args) => {
     try {
         let files = args['file']
         let update_detail = args['milestone_data'][0]
-        if (args['_id']) {
+        if (update_detail['_id']) {
             let find_query = {
-                _id: args["_id"]
+                _id: update_detail["_id"]
             }
             await BidingMilestone_model.updateOne(find_query, update_detail).exec()
             if (files && _.size(files)) {
-                args['milestone_id'] = args['_id']
+                args['milestone_id'] = update_detail['_id']
                 await this.uploading_milestone_files(files, args)
             }
             // if (args['booking_status'] === 9 && update_detail['biding_id']) {
