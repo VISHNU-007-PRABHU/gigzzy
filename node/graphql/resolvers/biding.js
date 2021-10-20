@@ -70,7 +70,7 @@ module.exports.biding_count = async (root, args) => {
 module.exports.get_biding_detail = async (root, args) => {
     try {
         let fetch_query = {}
-        if(agrs['root']){
+        if(args['root']){
             fetch_query['_id'] = root['biding_id']
         }else{
             if (args['_id']) {
