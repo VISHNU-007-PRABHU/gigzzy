@@ -143,6 +143,16 @@ const resolvers = {
                 }),
         },
 
+        get_my_milestone: {
+            subscribe: withFilter(
+                () => pubsub.asyncIterator([GET_MY_MILESTONE]),
+                (payload, variables) => {
+                    if (payload.get_my_milestone['_id'] == variables.milestone_id) {
+                        return true;
+                    }
+                }),
+        },
+
         send_contract_jobs_provider: {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([SEND_CONTRACT_JOB_MSG]),
@@ -290,8 +300,8 @@ const resolvers = {
         get_earnings_chart: adminResolver.get_earnings_chart,
         get_others_chart: adminResolver.get_others_chart,
         provider_rating_by_category: userResolver.provider_rating_by_category,
-        get_main_category_pagination:main_categoryResolver.get_main_category_pagination,
-        get_category_question:main_categoryResolver.get_category_question,
+        get_main_category_pagination: main_categoryResolver.get_main_category_pagination,
+        get_category_question: main_categoryResolver.get_category_question,
     },
 
     // Find sub_query under schema 
@@ -399,8 +409,8 @@ const resolvers = {
 
     Mutation: {
         adminLogin: adminResolver.adminlogin,
-        update_main_category:main_categoryResolver.update_main_category,
-        update_category_question:main_categoryResolver.update_category_question,
+        update_main_category: main_categoryResolver.update_main_category,
+        update_category_question: main_categoryResolver.update_category_question,
         // contract job
         update_contract: contractResolver.update_contract,
         update_currency: currencyResolver.update_currency,
@@ -653,7 +663,7 @@ const resolvers = {
             return [{ id: add_booking._id, location: args.location, description: args.description, provider: find_provider, hours: args.hours, user_image_url: new_data.user_image_url }];
         },
         //change the status in job booking 
-        manage_milestone_booking:milestoneResolver.manage_milestone_booking,
+        manage_milestone_booking: milestoneResolver.manage_milestone_booking,
         manage_contract_booking: contractResolver.manage_contract_booking,
         manage_booking: async (parent, args) => {
             //console.log("m_b");

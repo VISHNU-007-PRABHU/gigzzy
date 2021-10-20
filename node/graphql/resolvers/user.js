@@ -1079,6 +1079,7 @@ exports.addUser = async (parent, args) => {
             }
         }
     } catch (error) {
+        console.log("exports.addUser -> error", error)
         return {
             msg: "User Detail Update  Process Failed",
             status: "failed"
