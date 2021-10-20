@@ -39,9 +39,9 @@ module.exports.testinfmail = async (parent, args, context, info) => {
         }
         const ContractPayoutNotificationModule = require('../payment/ContractPayoutNotification')
 
-       let  contract_data={_id:"6164360ccf243632f2547145"}
+        let contract_data = { _id: "6164360ccf243632f2547145" }
         ContractPayoutNotificationModule.accept_payout_notification(contract_data)
-       console.log("module.exports.testinfmail -> contract_data", contract_data)
+        console.log("module.exports.testinfmail -> contract_data", contract_data)
         //    let result = await CommonFunction.currency_calculation(data)
         //    console.log("module.exports.testinfmail -> result", result)
         // let user_detail ={
@@ -563,29 +563,31 @@ module.exports.resend_otp = async (_, args) => {
 
 // check otp from user
 module.exports.checkOtp = async (parent, args) => {
-    var result = await Detail_model.findOne({ _id: args._id, otp: args.otp });
-    const otp_verified = await Detail_model.find({ _id: args._id, otp: args.otp });
-    // console.log(otp_verified);
-    if (otp_verified.length == 1) {
-        if (result['user_type'] === "company") {
-            let message = { pending_status: 0, company_register_status: 0 }
-            message['msg'] = "OTP verified";
-            message['status'] = "success";
-            let pre_company_result = await Company_model.findOne({ user_id: args._id }).lean()
-            message['company_id'] = pre_company_result['_id']
-            if (pre_company_result && _.size(pre_company_result) && !pre_company_result['company_name']) {
-                message['company_register_status'] = 1
-            } else if (pre_company_result && _.size(pre_company_result)) {
-                let pre_address_result = await Address_model.findOne({ company_id: pre_company_result._id }).lean()
-                if (!pre_address_result || !_.size(pre_address_result)) {
-                    message['company_register_status'] = 2
+    try {
+
+        var result = await Detail_model.findOne({ _id: args._id, otp: args.otp });
+        const otp_verified = await Detail_model.find({ _id: args._id, otp: args.otp });
+        if (otp_verified.length == 1) {
+            if (result['user_type'] === "company") {
+                let message = { pending_status: 0, company_register_status: 0 }
+                message['msg'] = "OTP verified";
+                message['status'] = "success";
+                let pre_company_result = await Company_model.findOne({ user_id: args._id }).lean()
+                message['company_id'] = pre_company_result['_id']
+                if (pre_company_result && _.size(pre_company_result) && !pre_company_result['company_name']) {
+                    message['company_register_status'] = 1
+                } else if (pre_company_result && _.size(pre_company_result)) {
+                    let pre_address_result = await Address_model.findOne({ company_id: pre_company_result._id }).lean()
+                    if (!pre_address_result || !_.size(pre_address_result)) {
+                        message['company_register_status'] = 2
+                    }
                 }
-            }
-            return { ...result._doc, ...message };
-        } else {
-            let message = {}
-            if(result.role == 2){
-                if (result.provider_subCategoryID.length == 0 && result.role == 2 && result.Upload_percentage == 50) {
+                return { ...result._doc, ...message };
+            } else {
+                let message = {}
+                if (!result.email) {
+                    message = { pending_status: 1, msg: "Go to registration page", status: "success" };
+                } else if (result.provider_subCategoryID.length == 0 && result.role == 2 && result.Upload_percentage == 50) {
                     message = { pending_status: 5, msg: " category not upload", status: "success" };
                 } else if (result.role == 2 && result.Upload_percentage == 50 && (result.personal_document == undefined || result.personal_document == '')) {
                     message = { pending_status: 6, msg: "personal_document not upload", status: "success" };
@@ -593,21 +595,20 @@ module.exports.checkOtp = async (parent, args) => {
                     message = { pending_status: 7, msg: "professional_document not upload", status: "success" };
                 } else { message = { pending_status: 0, msg: "OTP verified", status: "success" } };
                 result = { ...result._doc, ...message };
-            }else{
-                if (result.email) {
-                    message = { pending_status: 1, msg: "Go to registration page", status: "success" };
-                } 
-                result = { ...result._doc, ...message };
+
             }
-        }
 
     } else {
         //console.log("please check the data");
         let message = { msg: "Wrong OTP", status: 'failed' };
         result = { ...message };
     }
-    // console.log(result);
     return result;
+} catch (error) {
+    let message = { msg: "Checkotp Error", status: 'failed' };
+    return message;
+}
+
 };
 
 module.exports.sign_up = async (_, args) => {
