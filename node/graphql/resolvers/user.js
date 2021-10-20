@@ -605,6 +605,7 @@ module.exports.checkOtp = async (parent, args) => {
     }
     return result;
 } catch (error) {
+    console.log("module.exports.checkOtp -> error", error)
     let message = { msg: "Checkotp Error", status: 'failed' };
     return message;
 }

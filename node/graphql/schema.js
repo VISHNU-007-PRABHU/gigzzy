@@ -346,6 +346,7 @@ const typeDefs = gql`
         lat:Float
         lng:Float
         created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
+        updated_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         category_id:ID
         biding_id:ID
         category_type:Int
@@ -418,6 +419,7 @@ const typeDefs = gql`
         ctob_billRef:String
         currenct_milestone_id:ID,
         currenct_milestone_status:Int
+        milestones_status:Int
         find_kilometer(lat:Float,lng:Float,root:Boolean):Detail
     }
     type Company{

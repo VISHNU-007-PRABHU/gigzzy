@@ -109,7 +109,7 @@ var contractSchema = new Schema({
     currenct_local_rate: String,
     currenct_milestone_status:Number,
     currenct_milestone_id:String,
-
+    milestones_status:{type:Number,default:0}
 }, schemaOptions);
 
 contractSchema.virtual('uid').get(function () {

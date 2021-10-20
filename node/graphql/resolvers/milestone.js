@@ -196,7 +196,13 @@ exports.manage_milestone_booking = async (root, args) => {
     try {
         let preview_milestone_data = await BidingMilestone_model.findOne({ _id: args._id }).lean()
         
-        if(args.booking_status === 9){
+        if(args.milestones_status === 9){
+            await ContractJob_model.updateOne({_id:args['contract_id']}, {booking_status:commonHelper.bookink_status.ACCEPT}).exec()
+            let findBooking ={}
+            findBooking['msg'] = "contract milestone updated has been started";
+            findBooking['status'] = 'success';
+            return findBookin
+        }else if(args.booking_status === 9){
             let update_detail ={
                 title:"start",
                 booking_status:14,
