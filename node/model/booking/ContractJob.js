@@ -21,7 +21,7 @@ var contractSchema = new Schema({
     description: { type: String },
     budget: { type: String, default: "0" },
     timeline: { type: String, default: "0" },
-    timeline_type: { type: String },
+    timeline_type: { type: String ,default:"1"},
     terms_condition: { type: String },
     company_id: { type: mongoose.Schema.Types.ObjectId, ref: 'company' },
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },

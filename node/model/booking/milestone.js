@@ -27,7 +27,7 @@ var milestoneSchema = new Schema({
   description: String,
   budget: { type: Number, default: 0.00 },
   timeline: String,
-  timeline_type: String,
+  timeline_type: { type: String ,default:"1"},
   order:{ type: Number,default:2}, 
   delete: { type: Boolean, default: false },
   booking_status: { type: Number,default:9 },

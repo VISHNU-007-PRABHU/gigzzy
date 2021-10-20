@@ -28,7 +28,7 @@ var bidingSchema = new Schema({
   admin_fee: { type: Number, default: 0.00 },
   service_fee: { type: Number, default: 0.00 },
   timeline: String,
-  timeline_type: String,
+  timeline_type: { type: String ,default:"1"},
   cover_letter: String,
   description: String,
   experience: String,

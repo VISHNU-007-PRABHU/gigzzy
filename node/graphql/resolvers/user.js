@@ -598,17 +598,17 @@ module.exports.checkOtp = async (parent, args) => {
 
             }
 
-    } else {
-        //console.log("please check the data");
-        let message = { msg: "Wrong OTP", status: 'failed' };
-        result = { ...message };
+        } else {
+            //console.log("please check the data");
+            let message = { msg: "Wrong OTP", status: 'failed' };
+            result = { ...message };
+        }
+        return result;
+    } catch (error) {
+        console.log("module.exports.checkOtp -> error", error)
+        let message = { msg: "Checkotp Error", status: 'failed' };
+        return message;
     }
-    return result;
-} catch (error) {
-    console.log("module.exports.checkOtp -> error", error)
-    let message = { msg: "Checkotp Error", status: 'failed' };
-    return message;
-}
 
 };
 
@@ -709,32 +709,30 @@ module.exports.kilometer = async (parent, args, context, info) => {
     1.insert ,2.update, 3.delete
 */
 module.exports.modified_address = async (parent, args, context, info) => {
-    if (args.option == 1) {
-        delete args.option;
-        args.delete = 0;
-        const add_user_address = new Address_model(args);
-        var data = await add_user_address.save();
-        data.msg = "success";
-        data.status = "success";
-        return data
+    try {
 
-    } else if (args.option == 2) {
-        delete args.option;
-        const result = await Address_model.updateOne({ _id: args._id }, args, { new: true });
-        // console.log(result);
-        if (result.n == result.nModified) {
+        if (args.option == 1) {
+            delete args.option;
+            args.delete = 0;
+            const add_user_address = new Address_model(args);
+            var data = await add_user_address.save();
+            data.msg = "success";
+            data.status = "success";
+            return data
+
+        } else if (args.option == 2) {
+            delete args.option;
+            const result = await Address_model.updateOne({ _id: args._id }, args, { new: true });
             return { "status": "success", "msg": "update success" }
-        } else {
-            return { "status": 'failed', "msg": "update failed" }
-        }
-    } else if (args.option == 3) {
-        const result = await Address_model.updateOne({ _id: args._id }, { delete: 1 }, { new: true });
-        if (result.n == result.nModified) {
+          
+        } else if (args.option == 3) {
+            const result = await Address_model.updateOne({ _id: args._id }, { delete: 1 }, { new: true });
             return { "status": "success", "msg": "deleted success" }
-        } else {
-            return { "status": 'failed', "msg": "deleted failed" }
         }
+    } catch (error) {
+        return { "status": 'failed', "msg": "deleted failed" }
     }
+
 }
 
 module.exports.user_address = async (parent, args, context, info) => {
@@ -1011,8 +1009,8 @@ exports.addUser = async (parent, args) => {
             var data = await Detail_model.findOne({ _id: args._id });
             if (args['user_type'] && args['user_type'] === "company") {
                 let company_data = await Company_model.findOne({ user_id: data['_id'] }, { _id: 1 })
-                if ( _.size(company_data)) {
-                    data['company_id'] = company_data['_id'] 
+                if (_.size(company_data)) {
+                    data['company_id'] = company_data['_id']
                 } else {
                     let company_data = {
                         user_id: data['_id']
@@ -1020,7 +1018,7 @@ exports.addUser = async (parent, args) => {
                     let add_company_detail = new Company_model(company_data)
                     var added_com_detail = await add_company_detail.save()
                     data['company_id'] = added_com_detail['_id']
-                    console.log(" data['company_id']",  data['company_id'])
+                    console.log(" data['company_id']", data['company_id'])
                 }
             }
             data.msg = "User Detail Sucessfully Updated";
