@@ -1146,6 +1146,7 @@ const typeDefs = gql`
             hours:String,
             description:String,
             booking_status:Int,
+            milestones_status:Int,
             category_type:Int,
             stripe_token:String,
             payment_option:String,
