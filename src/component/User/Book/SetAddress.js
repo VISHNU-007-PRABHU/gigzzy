@@ -80,8 +80,6 @@ const SetAddress = (props) => {
         }
     }
 
-    console.log("SetAddress -> props-<oapdsujikl", props)
-
     return (
         <LocationContext.Consumer>
             {
@@ -90,6 +88,7 @@ const SetAddress = (props) => {
                         <EditLocationContext.Consumer>
                             {
                                 (values) => {
+                                    values.no_data(data.user_address)
                                     return (
                                         <>
                                             {data.user_address.length === 0 ?
@@ -99,18 +98,19 @@ const SetAddress = (props) => {
                                                 </> :
                                                 <>
                                                     <List
+                                                        className={(includes(['contract_booking'],location.pathname.split('/')[1]))?'contract_saved_address_list':''}
                                                         itemLayout="horizontal"
                                                         dataSource={data.user_address}
                                                         renderItem={item => (
                                                             <List.Item
-                                                                className={props && props.address_id ?'cursor_point table-active':'cursor_point'}
+                                                                className={props && props.address_id && props.address_id==item._id ?'cursor_point table-active':'cursor_point'}
                                                                 actions={[
                                                                     <Button type="link primary_color d-flex" size="small"
                                                                         onClick={() => { values.location_edit(item) }} >
-                                                                        <Icon type="edit" /> edit
+                                                                        <Icon type="edit" /> Edit
                                                                     </Button>,
                                                                     <Button type="link primary_color d-flex" size="small" onClick={() => { delete_data(item) }}>
-                                                                        <Icon type="delete" /> delete
+                                                                        <Icon type="delete" /> Delete
                                                                     </Button>
                                                                 ]}
                                                             >
@@ -118,9 +118,14 @@ const SetAddress = (props) => {
                                                                     <List.Item.Meta
                                                                         onClick={() => {
                                                                             let url_value=['profile']
-                                                                            if (!includes(url_value,location.pathname.split('/')[1])) {
+                                                                            let url_value_contract=['contract_booking']
+                                                                            if (includes(['contract_booking'],location.pathname.split('/')[1])) {
+                                                                                value.location_change(item);
+                                                                            }
+                                                                            else if (!includes(url_value,location.pathname.split('/')[1])) {
                                                                                 value.location_change(data);
                                                                             }
+                                                                            
                                                                         }}
                                                                         avatar={item.title === 'Work' ?
                                                                             <Icon className="f_25 ml-3 mt-1" type="shop" /> :

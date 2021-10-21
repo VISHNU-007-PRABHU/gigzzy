@@ -8,15 +8,17 @@ const ProjectDetail = (props) => {
     const [project_name_length, set_project_name_length] = useState("");
     useEffect(() => {
         set_contract_detail(props.contract_detail_data)
-        set_project_name_length(props.contract_detail_data.name)
-
-    }, [props])
+        if(props.contract_detail_data.name)
+        {
+            set_project_name_length(props.contract_detail_data.name)
+        }
+    }, [])
     
     return (
         <>
             <Row>
                 <Col span={24}>
-                    <label class="d-flex w-100">
+                    <label className="d-flex w-100">
                         <span className="ant-form-item-required font-weight-bold">Project Name</span>
                         <span className="ml-auto text-black-50">{project_name_length?.length}/50</span>
                     </label>
@@ -24,13 +26,13 @@ const ProjectDetail = (props) => {
                         {form.getFieldDecorator("name", {
                             initialValue: contract_detail_data?.name,
                             rules: [{ required: true ,message:'Project Name is required'}]
-                        })(<Input  maxLength={50} className="extra_radius_input h-50x" value={contract_detail_data?.name} onChange={(e)=>{set_project_name_length(e.target.value)}} placeholder={"e.g. i need a cleaner for my office"} />)}
+                        })(<Input  maxLength={50} className="extra_radius_input h-50x"  onChange={(e)=>{set_project_name_length(e.target.value)}} placeholder={"e.g. i need a cleaner for my office"} />)}
                     </Form.Item>
                 </Col>
             </Row>
             <Row>
                 <Col span={24}>
-                    <label class="d-flex w-100">
+                    <label className="d-flex w-100">
                         <span className="ant-form-item-required font-weight-bold">Project Description</span>
                     </label>
                     <Form.Item>
