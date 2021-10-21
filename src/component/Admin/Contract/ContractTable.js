@@ -28,6 +28,7 @@ class ContractTable extends React.Component {
         }
     }
     componentDidMount() {
+        console.log(this.props.booking_status)
         this.fetch_category();
     }
     handleTableChange = async pagination => {
@@ -36,7 +37,7 @@ class ContractTable extends React.Component {
         this.setState({ loading: true });
         await client.query({
             query: GET_CONTRACT_PAGINATION,
-            variables: { limit: pager.pageSize, page: pager.current, data: { is_parent: false } },
+            variables: { booking_status: this.props.booking_status, limit: pager.pageSize, page: pager.current, data: { is_parent: false } },
             fetchPolicy: 'no-cache',
         }).then(result => {
             const pagination = { ...this.state.pagination };
@@ -57,11 +58,12 @@ class ContractTable extends React.Component {
 
     fetch_category = async (data) => {
         this.setState({ loading: true });
-        let input = {};
-        input = data;
+        let input = {
+            booking_status: this.props.booking_status,
+        };
         await client.query({
             query: GET_CONTRACT_PAGINATION,
-            variables: { data: input },
+            variables: input,
             fetchPolicy: 'no-cache',
         }).then(result => {
             const pagination = { ...this.state.pagination };

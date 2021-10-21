@@ -11,17 +11,21 @@ const bill_data = [
     },
     {
         title: "Bill no.#",
+        data_view: true,
         main_class:"border-bottom py-3",
         data: "ref"
     },
     {
         title: "Milestone",
+        data_view: true,
         data: "budget"
     }, {
         title: "Other Cost",
-        data: "extra_price"
+        data_view: true,
+        data: "extra_fare"
     }, {
         title: "Total",
+        data_view: true,
         class: "py-3",
         data: "total"
     }
@@ -30,6 +34,7 @@ function MilestoneDetail(props) {
     const [data, set_data] = useState({})
     const [isStripePayment, set_isStripePayment] = useState(false)
     useEffect(() => {
+        console.log("MilestoneDetail -> props.data", props.data)
         if (props.data) {
             set_data(props.data)
         }
@@ -44,7 +49,7 @@ function MilestoneDetail(props) {
             <Row gutter={[12, 24]}>
                 <Col span={24}>
                     <Suspense fallback={<Skeleton active />}>
-                        <BannerSlider parent_images={data?.get_contract_all_files} />
+                        <BannerSlider parent_images={data?.get_milestone_all_images} />
                     </Suspense>
                 </Col>
             </Row>
@@ -67,8 +72,8 @@ function MilestoneDetail(props) {
                                 <div className={`align-items-center d-flex ${paydata.class}`}>
                                     {paydata.title}
                                 </div>
-                                {paydata['data_view'] && <div >
-                                    {data[paydata['ref']]}
+                                {paydata['data_view'] && <div className="text-body">
+                                    {data[paydata['data']]}
                                 </div>}
                             </div>
                         </Col>

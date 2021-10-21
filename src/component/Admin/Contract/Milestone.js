@@ -1,5 +1,5 @@
 import React, { useState, Suspense, useEffect } from 'react'
-import { Typography, Timeline, Tag, Modal, Form, Skeleton, Badge,Spin } from 'antd';
+import { Typography, Timeline, Tag, Modal, Form, Skeleton, Badge, Spin } from 'antd';
 import useReactRouter from 'use-react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { GET_MILESTONE_PAGINATION } from '../../../graphql/User/milestone'
@@ -30,40 +30,42 @@ function Milestone(props) {
     const { data, loading, error } = useQuery(GET_MILESTONE_PAGINATION, { variables: { contract_id: match.params.id, location_code: "IN" } });
 
     useEffect(() => {
-
         setSteps(data.get_biding_milestone)
     }, [data])
 
     return (
         <>
-            <Spin spinning={loading}>
-                <Title className="my-5" level={3}>Project Milestone</Title>
-                <Timeline>
-                    {stepsdetail && stepsdetail.map((data, i) => {
-                        return (
-                            <Timeline.Item color={data?.booking_status === 14 ? "green" :"gray"} className="pb-4">
-                                <div className="normal_font_size bold">Milestone {i}: {data?.title}</div>
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <div className="normal_font_size primary_color py-1">{data?.budget}</div>
-                                        <div className="d-flex">
-                                            <div className="bold">
-                                                <Badge status="success" /> {data?.created_at}
+            {(stepsdetail && stepsdetail.length > 0) && <>
+                <Spin spinning={loading}>
+                    <Title className="my-5" level={3}>Project Milestone</Title>
+                    <Timeline>
+                        {stepsdetail && stepsdetail.map((data, i) => {
+                            return (
+                                <Timeline.Item color={data?.booking_status === 14 ? "green" : "gray"} className="pb-4">
+                                    <div className="normal_font_size bold">Milestone {i}: {data?.title}</div>
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div className="normal_font_size primary_color py-1">{data?.budget}</div>
+                                            <div className="d-flex">
+                                                <div className="bold">
+                                                    <Badge status="success" /> {data?.created_at}
+                                                </div>
+                                                <div className="text-danger px-3">{payment_RoleViewFunctionstatus[data?.booking_status]}</div>
                                             </div>
-                                            <div className="text-danger px-3">{payment_status[data?.booking_status]}</div>
+                                        </div>
+                                        <div className="">
+                                            <Tag onClick={() => { set_current_steps_detail(data); set_milestone_price_visible(!milestone_price_visible) }} color="green" className="cursor_point normal_font_size p-2">
+                                                View Detail
+                                            </Tag>
                                         </div>
                                     </div>
-                                    <div className="">
-                                        <Tag onClick={() => { set_current_steps_detail(data); set_milestone_price_visible(!milestone_price_visible) }} color="green" className="cursor_point normal_font_size p-2">
-                                            View Detail
-                                        </Tag>
-                                    </div>
-                                </div>
-                            </Timeline.Item>
-                        )
-                    })}
-                </Timeline>
-            </Spin>
+                                </Timeline.Item>
+                            )
+                        })}
+                    </Timeline>
+                </Spin>
+            </>
+            }
 
             <Modal
                 visible={milestone_price_visible}
