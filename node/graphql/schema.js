@@ -1172,7 +1172,6 @@ const typeDefs = gql`
             provider_id:ID
             company_id:ID
             file:[Upload]
-            model_type:String
             booking_status:Int
             biding_data:JSON
             location_code:String,
@@ -1193,7 +1192,7 @@ const typeDefs = gql`
             milestone_data:JSON
             location_code:String,
             local_location_code:String,
-            pro_description:String
+            model_type:String
         ):Milestone
        
         UpdateCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
