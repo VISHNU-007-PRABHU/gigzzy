@@ -269,16 +269,16 @@ exports.manage_milestone_booking = async (root, args) => {
         if (args.milestones_status) {
             let final_output_data = await this.static_contract_by_milestone(args)
             return final_output_data
-        }   
+        }
 
         if (args.booking_status === 13) {
-                await BidingMilestone_model.updateOne({ _id: args._id }, { booking_status: 13, end_date: moment.utc().format() }).exec()
-                var findBooking = await BidingMilestone_model.findOne({ _id: args._id }).lean();
-                return findBooking
+            await BidingMilestone_model.updateOne({ _id: args._id }, { booking_status: 13, end_date: moment.utc().format() }).exec()
+            var findBooking = await BidingMilestone_model.findOne({ _id: args._id }).lean();
+            return findBooking
         } else if (args.booking_status === 14) {
-            if(preview_biding_data.extra_price){
+            if (preview_biding_data.extra_price) {
                 args['amount'] = preview_biding_data['total'];
-            }else{
+            } else {
                 args['amount'] = preview_biding_data['budget'];
             }
             let payment_data = await payment_choose.choose_milestone_payment(args, preview_milestone_data)
@@ -291,7 +291,7 @@ exports.manage_milestone_booking = async (root, args) => {
             } else {
                 return { msg: "Milestone Payment failed", status: 'failed' }
             }
-    
+
         } else {
             return { msg: "Milestone Payment failed", status: 'failed' }
         }
@@ -303,10 +303,9 @@ exports.manage_milestone_booking = async (root, args) => {
 
 
 exports.static_contract_by_milestone = async (args) => {
-    return new Promise(async function (resolve, reject) {
         try {
             if (args.milestones_status === 9) {
-                await this.static_start_milestone(args)
+                let final_output_data = await this.add_start_milestone(args)
                 await this.static_complete_milestone(args)
 
                 let updat_data = {
@@ -314,7 +313,7 @@ exports.static_contract_by_milestone = async (args) => {
                     booking_status: commonHelper.bookink_status.PENDING
                 }
                 await ContractJob_model.updateOne({ _id: args['contract_id'] }, updat_data).exec()
-                return resolve({ msg: "contract milestone updated has been started", status: 'success' })
+                return { msg: "contract milestone updated has been started", status: 'success' }
             }
 
             if (args.milestones_status === 4 || args.milestones_status === 14) {
@@ -326,20 +325,20 @@ exports.static_contract_by_milestone = async (args) => {
 
                 await BidingMilestone_model.updateOne({ _id: args._id }, mile_update_data).exec()
                 await ContractJob_model.updateOne({ _id: args['contract_id'] }, updat_data).exec()
-                return resolve({ msg: "contract milestone updated success", status: 'success' })
+                return { msg: "contract milestone updated success", status: 'success' }
             }
 
-            
+
         } catch (error) {
-            console.log("exports.static_contract_by_milestone -> error", )
+            console.log("exports.static_contract_by_milestone -> error",)
             console.log("", error)
-            return reject({ msg: "contract milestone updated has been failed", status: 'failed' })
+            return { msg: "contract milestone updated has been failed", status: 'failed' }
         }
-    })
 }
 
-exports.static_start_milestone = async (args) => {
-
+exports.add_start_milestone = async (args) => {
+    return new Promise(async function (resolve, reject) {
+        try {
             let update_detail = {
                 title: "start",
                 description: "Start the contract based on teams & condition",
@@ -354,21 +353,28 @@ exports.static_start_milestone = async (args) => {
             }
             let add_start_milestone = new BidingMilestone_model(update_detail)
             await add_start_milestone.save()
+            return resolve(true)
+
+        } catch (error) {
+            console.log("exports.add_start_milestone -> error", error)
+            return reject(false)
         }
+    })
+}
 
 exports.static_complete_milestone = async (args) => {
-            let update_detail = {
-                title: "Complete",
-                description: "Completed the contract based on teams & condition",
-                booking_status: 9,
-            }
-            if (args['contract_id']) {
-                update_detail['contract_id'] = args['contract_id']
-            }
-            if (args['biding_id']) {
-                update_detail['biding_id'] = args['biding_id']
-            }
-            let add_start_milestone = new BidingMilestone_model(update_detail)
-            await add_start_milestone.save()
-
-        }
+    let update_detail = {
+        title: "Complete",
+        description: "Completed the contract based on teams & condition",
+        booking_status: 9,
+    }
+    if (args['contract_id']) {
+        update_detail['contract_id'] = args['contract_id']
+    }
+    if (args['biding_id']) {
+        update_detail['biding_id'] = args['biding_id']
+    }
+    let add_start_milestone = new BidingMilestone_model(update_detail)
+    await add_start_milestone.save()
+    return true
+}
