@@ -241,12 +241,12 @@ exports.manage_milestone_booking = async (root, args) => {
             }
             let add_start_milestone = new BidingMilestone_model(update_detail)
             await add_start_milestone.save()
-            await ContractJob_model.updateOne({ _id: args['contract_id'] }, { milestones_status:9, booking_status: commonHelper.bookink_status.ACCEPT }).exec()
+            await ContractJob_model.updateOne({ _id: args['contract_id'] }, { milestones_status:9, booking_status: commonHelper.bookink_status.PENDING }).exec()
             add_start_milestone['msg'] = "contract milestone updated has been started";
             add_start_milestone['status'] = 'success';
             return add_start_milestone
         } else if (args.booking_status === 9) {
-            await BidingMilestone_model.updateOne({ _id: args._id }, { booking_status: 14, end_date: moment.utc().format() }).exec()
+            await BidingMilestone_model.updateOne({ _id: args._id }, { booking_status: 14, end_date: moment.utc().format() }).exec()    
             await ContractJob_model.updateOne({ _id: args['contract_id'] }, { milestones_status:10,booking_status: commonHelper.bookink_status.START }).exec()
             //send notification
             let findBooking = {}
