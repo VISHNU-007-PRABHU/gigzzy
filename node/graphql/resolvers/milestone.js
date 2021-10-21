@@ -42,7 +42,7 @@ module.exports.get_biding_milestone = async (root, args) => {
     try {
 
         let fetch_query = {
-            is_delete:false
+            delete:false
         }
         if (args['_id']) {
             fetch_query['_id'] = args['_id']
@@ -72,7 +72,7 @@ module.exports.delete_milestone = async (root, args) => {
             _id: args["_id"]
         }
         let update_detail = {
-            is_delete: true
+            delete: true
         }
         await BidingMilestone_model.updateOne(find_query, update_detail).exec()
         return { status: "success", msg: "Milestone removed success" }
