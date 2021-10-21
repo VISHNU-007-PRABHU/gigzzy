@@ -181,8 +181,13 @@ module.exports.get_contract_all_files = async (root, args) => {
             delete: false
         }
         let limit = args.limit || 1
-        if (args['contract_id']) {
-            match['contract_id'] = ObjectId(args['contract_id'])
+   
+        if(args.root){
+            match['contract_id'] = ObjectId(root['_id'])
+        }else{
+            if (args['contract_id']) {
+                match['contract_id'] = ObjectId(args['contract_id'])
+            }
         }
         if (args['image_type'] === "image") {
             match['doc_type'] = { $ne: 'pdf' }
