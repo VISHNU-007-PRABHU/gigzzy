@@ -331,6 +331,8 @@ exports.static_contract_by_milestone = async (args) => {
 
             
         } catch (error) {
+            console.log("exports.static_contract_by_milestone -> error", )
+            console.log("", error)
             return reject({ msg: "contract milestone updated has been failed", status: 'failed' })
         }
     })
