@@ -44,47 +44,7 @@ class ContractDetail extends React.Component {
         };
     }
 
-    componentDidMount() {
-        console.log("ContractDetail -> componentDidMount -> this.props", this.props.match.params.id)
-        // this.fetch_booking(this.props.match.params.id);
-    }
-
-    fetch_booking = (_id) => {
-        // client.query({
-        //     query: GET_PARTICULAR_CONTRACT,
-        //     variables: { _id },
-        //     fetchPolicy: 'no-cache',
-        // }).then(result => {
-        //     // console.log(result);
-        //     Geocode.setApiKey("AIzaSyDYRYnxipjEBUNazDUwUa_8BDvm8ON7TIk");
-        //     Geocode.enableDebug();
-        //     Geocode.fromLatLng(result?.data?.booking[0]?.lat, result?.data?.booking[0]?.lng).then(
-        //         response => {
-        //             // console.log(response.results);
-        //             this.setState({ address: response.results[0].formatted_address });
-        //         },
-        //         error => {
-        //             console.error(error);
-        //         }
-        //     );
-
-        //     this.setState({
-        //         booking: result.data.booking,
-        //         booking_category: result.data.booking[0].booking_category,
-        //         booking_user: result.data.booking[0].booking_user,
-        //         booking_provider: result.data.booking[0].booking_provider,
-        //         message: result.data.booking[0].get_booking_message,
-        //         u_rate: result.data.booking[0].user_rating,
-        //         p_rate: result.data.booking[0].provider_rating,
-        //     })
-        // });
-    }
-
     render() {
-        console.log(this.state.u_rate);
-        const { booking, booking_category, booking_provider, booking_user, u_rate } = this.state;
-        console.log(this.props);
-
 
         return (
             <Layout style={{ height: '100vh' }}>
@@ -100,16 +60,11 @@ class ContractDetail extends React.Component {
                             <Col lg={18} md={24}>
                                 <Card bordered={0}>
                                     <Suspense fallback={<Skeleton active />}>
-                                        <Milestone></Milestone>
-                                    </Suspense>
-                                    <Suspense fallback={<Skeleton active />}>
                                         <Biding></Biding>
                                     </Suspense>
-                                    <Card bordered={0} bodyStyle={padding_setting}>
-                                        <Suspense fallback={<Skeleton active />}>
-                                            <BidingList></BidingList>
-                                        </Suspense>
-                                    </Card>
+                                    <Suspense fallback={<Skeleton active />}>
+                                        <Milestone></Milestone>
+                                    </Suspense>
                                 </Card>
                             </Col>
                         </Row>

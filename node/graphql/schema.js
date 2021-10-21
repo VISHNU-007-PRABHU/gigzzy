@@ -98,14 +98,14 @@ const typeDefs = gql`
         # company detail
         get_company_detail(data:JSON,provider_search:JSON,search:JSON,_id:ID,page:Int,limit:Int,company_id:ID,user_id:ID,provider_id:ID):CompanyConnection
         get_parent_company_provider(provider_search:JSON,provider_id:Boolean,user_id:Boolean,company_id:ID):[CompanyProvider]
-        get_contract_files(location_code:String,company_id:ID,user_id:ID,provider_id:ID,contract_id:ID):[CompanyImage]
+        get_contract_files(location_code:String,company_id:ID,user_id:ID,provider_id:ID,contract_id:ID):[ContractImage]
         get_contracts(location_code:String,company_id:ID,contract_id:ID,provider_id:ID,user_id:ID):[ContractJob]
         get_contracts_pagination(location_code:String,booking_status:Int,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
-        get_contract_all_files(contract_id:ID,limit:Int,image_type:String):[CompanyImage]
+        get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
         get_currencys(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,pagination:Boolean,page:Int,limit:Int):CurrencyConnection
         get_currency(_id:ID,country_code:String,location_code:String):Currency
         get_biding_pagination(location_code:String,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int,contract_id:ID):BidingConnection
-        get_biding_all_files(contract_id:ID):[CompanyImage]
+        get_biding_all_files(contract_id:ID,root:Boolean):[BidingImage]
         get_biding_detail(_id:ID,location_code:String,contract_id:ID):Biding
         GetCategoryCurrency(pagination:Boolean,data:JSON,_id:ID,category_id:ID,country_code:String,country_id:ID):SubCategoryConnection
         get_biding_milestone_detail(location_code:String,_id:ID,contract_id:ID,biding_id:ID):Milestone
@@ -314,17 +314,14 @@ const typeDefs = gql`
         ctob_billRef:String
         get_contract_category(contract_id:ID,_id:ID,category_type:Int):[Category]
         get_user(root_parent:Boolean):[Detail]
-        get_biding_all_files(contract_id:ID,root:Boolean):[CompanyImage]
+        get_biding_all_files(contract_id:ID,root:Boolean):[BidingImage]
         get_company_root_detail(root:Boolean,provider_id:ID):Company
         get_parent_company_provider(user_id:ID,provider_id:ID):[CompanyProvider]
         provider_rating_by_category(_id:ID,root:Boolean,category_id:ID):Detail
         find_kilometer(root:Boolean,lat:Float,lng:Float):Detail
     }
 
-    type BidingImages{
-        _id:ID
-        data: JSON 
-    }
+
      
     type Milestone{
         _id:ID
@@ -352,7 +349,7 @@ const typeDefs = gql`
         biding_id:ID
         category_type:Int
         milestone_status:String
-        get_milestone_all_images(milestone_id:ID,_id:ID,root:Boolean):[CompanyImage]
+        get_milestone_all_images(milestone_id:ID,_id:ID,root:Boolean):[MilestoneImage]
         msg:String
         status:String
         total(code: String): String @currency
@@ -404,8 +401,8 @@ const typeDefs = gql`
         biding_count:Int
         get_contracts_pagination(location_code:String,booking_status:Int,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
         get_contract_category(contract_id:ID,_id:ID,category_type:Int):[Category]
-        get_contract_files(contract_id:ID):[CompanyImage]
-        get_contract_all_files(contract_id:ID,limit:Int,image_type:String):[CompanyImage]
+        get_contract_files(contract_id:ID):[ContractImage]
+        get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
         get_company_root_detail(root:Boolean):Company
         get_contract_address_detail(root:Boolean):UserAddress
         get_user:[Detail]
@@ -446,7 +443,7 @@ const typeDefs = gql`
         workers:[CompanyProvider]
         get_parent_company_provider(provider_search:JSON,company_id:ID,provider_id:ID,):[CompanyProvider]
         get_company_address_detail(company_id:ID,option:Int,type:String):[UserAddress]
-        get_company_images(company_id:ID,image_tag:String):[CompanyImage]
+        get_company_images(company_id:ID,image_tag:String,root:Boolean):[CompanyImage]
         get_company_user_detail(user_id:ID):[Detail]
         data: JSON 
         currency_code:String
@@ -470,7 +467,26 @@ const typeDefs = gql`
         get_company_detail(root:Boolean,data:JSON,provider_search:JSON,search:JSON,_id:ID,page:Int,limit:Int,company_id:ID,user_id:ID,provider_id:ID):CompanyConnection
 
     }
-    type CompanyImage{
+    type CompanyImage {
+        _id:ID
+        company_id: String,
+        biding_id:String,
+        small_image: String  @imgUrl(format: "company"),
+        large_image: String  @imgUrl(format: "company"),
+        image_tag: String,
+        doc_type: String,
+        doc_category: String,
+        doc_formate: String,
+        delete: Boolean,
+        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
+        data: JSON 
+        msg:String
+        status:String
+        images:[CompanyImage]
+        get_contract_files(contract_id:ID):[ContractImage]
+        get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
+    }
+    type ContractImage{
         _id:ID
         company_id: String,
         biding_id:String,
@@ -486,9 +502,48 @@ const typeDefs = gql`
         msg:String
         status:String
         images:[CompanyImage]
-        get_contract_files(contract_id:ID):[CompanyImage]
-        get_contract_all_files(contract_id:ID,limit:Int,image_type:String):[CompanyImage]
-
+        get_contract_files(contract_id:ID,root:Boolean):[ContractImage]
+        get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
+      
+    }
+    type MilestoneImage{
+        _id:ID
+        company_id: String,
+        biding_id:String,
+        small_image: String  @imgUrl(format: "milestone"),
+        large_image: String  @imgUrl(format: "milestone"),
+        image_tag: String,
+        doc_type: String,
+        doc_category: String,
+        doc_formate: String,
+        delete: Boolean,
+        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
+        data: JSON 
+        msg:String
+        status:String
+        images:[CompanyImage]
+        get_contract_files(contract_id:ID):[ContractImage]
+        get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
+    }
+    type BidingImage{
+        _id:ID
+        company_id: String,
+        biding_id:String,
+        small_image: String  @imgUrl(format: "biding"),
+        large_image: String  @imgUrl(format: "biding"),
+        image_tag: String,
+        doc_type: String,
+        doc_category: String,
+        doc_formate: String,
+        delete: Boolean,
+        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
+        data: JSON 
+        msg:String
+        status:String
+        images:[CompanyImage]
+        get_contract_files(contract_id:ID):[ContractImage]
+        get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
+      
     }
     type Admin{
         _id:ID

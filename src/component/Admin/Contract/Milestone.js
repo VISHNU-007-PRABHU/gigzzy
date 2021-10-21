@@ -1,9 +1,8 @@
-import React, { useState, Suspense } from 'react'
-import { Icon, Timeline, Tag, Modal, Typography, Form, Skeleton, Badge } from 'antd';
-import step0 from '../../../image/step0.png';
-import findIndex from 'lodash/findIndex';
-import size from 'lodash/size';
-const { Title } = Typography;
+import React, { useState, Suspense,useEffect } from 'react'
+import { Typography,Timeline, Tag, Modal, Form, Skeleton, Badge } from 'antd';
+import useReactRouter from 'use-react-router';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import {GET_MILESTONE_PAGINATION} from '../../../graphql/User/milestone'
 const original_steps = [
     {
         id: 1,
@@ -34,14 +33,21 @@ const original_steps = [
         status: "wait"
     },
 ];
-
+const Title =Typography;
 const MilestoneDetail = React.lazy(() => import('./MilestoneDetail'));
 
 function Milestone(props) {
+    const { history,match } = useReactRouter();
     const [milestone_price_visible, set_milestone_price_visible] = useState(false);
     const [current, setCurrent] = useState(0);
     const [stepsdetail, setSteps] = useState(original_steps);
     const [current_steps_detail, set_current_steps_detail] = useState({});
+    console.log("match.params.id", match.params.id)
+    const {data,loading,error} = useQuery(GET_MILESTONE_PAGINATION,{variables:{contract_id: match.params.id,location_code:"IN" }});
+
+    useEffect(() => {
+        console.log("data", data)
+    }, [data])
 
     return (
         <>
