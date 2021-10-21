@@ -423,6 +423,7 @@ const resolvers = {
         BidingFileUpload: bidingResolver.BidingFileUpload,
         update_milestone: milestoneResolver.update_milestone,
         delete_milestone:milestoneResolver.delete_milestone,
+        delete_milestone_image:milestoneResolver.delete_milestone_image,
         UpdateCategoryCurrency: categoryResolver.UpdateCategoryCurrency,
         DeleteCategoryCurrency: categoryResolver.DeleteCategoryCurrency,
         update_company_detail: userResolver.update_company_detail,

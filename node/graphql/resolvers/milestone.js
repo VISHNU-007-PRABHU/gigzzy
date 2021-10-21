@@ -81,6 +81,21 @@ module.exports.delete_milestone = async (root, args) => {
     }
 }
 
+module.exports.delete_milestone_image = async (root, args) => {
+    try {
+        let find_query = {
+            _id: args["_id"]
+        }
+        let update_detail = {
+            delete: true
+        }
+        await MilestoneImage_model.updateOne(find_query, update_detail).exec()
+        return { status: "success", msg: "Milestone images removed success" }
+    } catch (error) {
+        return { status: "failed", msg: "Milestone images removed failed" }
+    }
+}
+
 exports.get_milestone_all_images = async (root, args) => {
     try {
         let match = {
