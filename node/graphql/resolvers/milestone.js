@@ -241,10 +241,10 @@ exports.add_extra_fee = async (args) => {
                 payment_status: 4
             };
             if (args.extra_price) {
-                update_data['extra_price'] = String(parseFloat(args.extra_price).toFixed(2))
+                update_data['extra_fare'] = String(parseFloat(args.extra_price).toFixed(2))
                 update_data['total'] = String(parseFloat(Number(preview_milestone_data['budget']) + Number(args.extra_price)).toFixed(2))
             } else {
-                update_data['extra_price'] = 0
+                update_data['extra_fare'] = 0
                 update_data['total'] = String(parseFloat(Number(preview_milestone_data['budget']))).toFixed(2)
             }
             await BidingMilestone_model.updateOne({ _id: args['_id'] }, update_data);
