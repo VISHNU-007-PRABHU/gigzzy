@@ -39,9 +39,9 @@ module.exports.testinfmail = async (parent, args, context, info) => {
         }
         const ContractPayoutNotificationModule = require('../payment/ContractPayoutNotification')
 
-       let  contract_data={_id:"6164360ccf243632f2547145"}
+        let contract_data = { _id: "6164360ccf243632f2547145" }
         ContractPayoutNotificationModule.accept_payout_notification(contract_data)
-       console.log("module.exports.testinfmail -> contract_data", contract_data)
+        console.log("module.exports.testinfmail -> contract_data", contract_data)
         //    let result = await CommonFunction.currency_calculation(data)
         //    console.log("module.exports.testinfmail -> result", result)
         // let user_detail ={
@@ -563,44 +563,53 @@ module.exports.resend_otp = async (_, args) => {
 
 // check otp from user
 module.exports.checkOtp = async (parent, args) => {
-    var result = await Detail_model.findOne({ _id: args._id, otp: args.otp });
-    const otp_verified = await Detail_model.find({ _id: args._id, otp: args.otp });
-    // console.log(otp_verified);
-    if (otp_verified.length == 1) {
-        if (result['user_type'] === "company") {
-            let message = { pending_status: 0, company_register_status: 0 }
-            message['msg'] = "OTP verified";
-            message['status'] = "success";
-            let pre_company_result = await Company_model.findOne({ user_id: args._id }).lean()
-            message['company_id'] = pre_company_result['_id']
-            if (pre_company_result && _.size(pre_company_result) && !pre_company_result['company_name']) {
-                message['company_register_status'] = 1
-            } else if (pre_company_result && _.size(pre_company_result)) {
-                let pre_address_result = await Address_model.findOne({ company_id: pre_company_result._id }).lean()
-                if (!pre_address_result || !_.size(pre_address_result)) {
-                    message['company_register_status'] = 2
-                }
-            }
-            return { ...result._doc, ...message };
-        } else {
-            let message = {}
-            if (result.provider_subCategoryID.length == 0 && result.role == 2 && result.Upload_percentage == 50) {
-                message = { pending_status: 5, msg: " category not upload", status: "success" };
-            } else if (result.role == 2 && result.Upload_percentage == 50 && (result.personal_document == undefined || result.personal_document == '')) {
-                message = { pending_status: 6, msg: "personal_document not upload", status: "success" };
-            } else if (result.role == 2 && result.Upload_percentage == 50 && (result.professional_document == undefined || result.personal_document == '')) {
-                message = { pending_status: 7, msg: "professional_document not upload", status: "success" };
-            } else { message = { pending_status: 0, msg: "OTP verified", status: "success" } };
-            result = { ...result._doc, ...message };
-        }
+    try {
 
-    } else {
-        //console.log("please check the data");
-        let message = { msg: "Wrong OTP", status: 'failed' };
-        result = { ...message };
+        var result = await Detail_model.findOne({ _id: args._id, otp: args.otp });
+        const otp_verified = await Detail_model.find({ _id: args._id, otp: args.otp });
+        if (otp_verified.length == 1) {
+            if (result['user_type'] === "company") {
+                let message = { pending_status: 0, company_register_status: 0 }
+                message['msg'] = "OTP verified";
+                message['status'] = "success";
+                let pre_company_result = await Company_model.findOne({ user_id: args._id }).lean()
+                message['company_id'] = pre_company_result['_id']
+                if (pre_company_result && _.size(pre_company_result) && !pre_company_result['company_name']) {
+                    message['company_register_status'] = 1
+                } else if (pre_company_result && _.size(pre_company_result)) {
+                    let pre_address_result = await Address_model.findOne({ company_id: pre_company_result._id }).lean()
+                    if (!pre_address_result || !_.size(pre_address_result)) {
+                        message['company_register_status'] = 2
+                    }
+                }
+                return { ...result._doc, ...message };
+            } else {
+                let message = {}
+                if (!result.email) {
+                    message = { pending_status: 1, msg: "Go to registration page", status: "success" };
+                } else if (result.provider_subCategoryID.length == 0 && result.role == 2 && result.Upload_percentage == 50) {
+                    message = { pending_status: 5, msg: " category not upload", status: "success" };
+                } else if (result.role == 2 && result.Upload_percentage == 50 && (result.personal_document == undefined || result.personal_document == '')) {
+                    message = { pending_status: 6, msg: "personal_document not upload", status: "success" };
+                } else if (result.role == 2 && result.Upload_percentage == 50 && (result.professional_document == undefined || result.personal_document == '')) {
+                    message = { pending_status: 7, msg: "professional_document not upload", status: "success" };
+                } else { message = { pending_status: 0, msg: "OTP verified", status: "success" } };
+                result = { ...result._doc, ...message };
+
+            }
+
+        } else {
+            //console.log("please check the data");
+            let message = { msg: "Wrong OTP", status: 'failed' };
+            result = { ...message };
+        }
+        return result;
+    } catch (error) {
+        console.log("module.exports.checkOtp -> error", error)
+        let message = { msg: "Checkotp Error", status: 'failed' };
+        return message;
     }
-    // console.log(result);
-    return result;
+
 };
 
 module.exports.sign_up = async (_, args) => {
@@ -700,32 +709,30 @@ module.exports.kilometer = async (parent, args, context, info) => {
     1.insert ,2.update, 3.delete
 */
 module.exports.modified_address = async (parent, args, context, info) => {
-    if (args.option == 1) {
-        delete args.option;
-        args.delete = 0;
-        const add_user_address = new Address_model(args);
-        var data = await add_user_address.save();
-        data.msg = "success";
-        data.status = "success";
-        return data
+    try {
 
-    } else if (args.option == 2) {
-        delete args.option;
-        const result = await Address_model.updateOne({ _id: args._id }, args, { new: true });
-        // console.log(result);
-        if (result.n == result.nModified) {
+        if (args.option == 1) {
+            delete args.option;
+            args.delete = 0;
+            const add_user_address = new Address_model(args);
+            var data = await add_user_address.save();
+            data.msg = "success";
+            data.status = "success";
+            return data
+
+        } else if (args.option == 2) {
+            delete args.option;
+            const result = await Address_model.updateOne({ _id: args._id }, args, { new: true });
             return { "status": "success", "msg": "update success" }
-        } else {
-            return { "status": 'failed', "msg": "update failed" }
-        }
-    } else if (args.option == 3) {
-        const result = await Address_model.updateOne({ _id: args._id }, { delete: 1 }, { new: true });
-        if (result.n == result.nModified) {
+          
+        } else if (args.option == 3) {
+            const result = await Address_model.updateOne({ _id: args._id }, { delete: 1 }, { new: true });
             return { "status": "success", "msg": "deleted success" }
-        } else {
-            return { "status": 'failed', "msg": "deleted failed" }
         }
+    } catch (error) {
+        return { "status": 'failed', "msg": "deleted failed" }
     }
+
 }
 
 module.exports.user_address = async (parent, args, context, info) => {
@@ -924,7 +931,7 @@ exports.addUser = async (parent, args) => {
             }
         }
         if (args.option == "add") {
-            const get_role = await Detail_model.findOne({ _id: args._id });
+            const get_role = await Detail_model.findOne({ _id: args._id }).lean();
             //console.log(args.email);
             if (get_role.role == 1) {
                 args.role = 1;
@@ -1000,6 +1007,20 @@ exports.addUser = async (parent, args) => {
 
             await Detail_model.updateOne({ _id: args._id }, args);
             var data = await Detail_model.findOne({ _id: args._id });
+            if (args['user_type'] && args['user_type'] === "company") {
+                let company_data = await Company_model.findOne({ user_id: data['_id'] }, { _id: 1 })
+                if (_.size(company_data)) {
+                    data['company_id'] = company_data['_id']
+                } else {
+                    let company_data = {
+                        user_id: data['_id']
+                    }
+                    let add_company_detail = new Company_model(company_data)
+                    var added_com_detail = await add_company_detail.save()
+                    data['company_id'] = added_com_detail['_id']
+                    console.log(" data['company_id']", data['company_id'])
+                }
+            }
             data.msg = "User Detail Sucessfully Updated";
             data.status = "success";
             return data
@@ -1032,7 +1053,7 @@ exports.addUser = async (parent, args) => {
                 if (data.Upload_percentage == 25) {
                     data.msg = "New User"; data.status = 'success';
                 } else {
-                    data.msg = "otp no change", data.status = 'failed';
+                    data.msg = "otp no change", data.status = 'success';
                 }
                 await commonHelper.send_sms(data.country_code, data.phone_no, "otp", { otp: data.otp })
                 return data;

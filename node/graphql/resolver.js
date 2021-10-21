@@ -27,7 +27,8 @@ const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
 const payment_choose = require('./payment/choose')
-const MpesaCallback = require('./payment/MpesaCallback')
+const MpesaCallback = require('./payment/MpesaCallback');
+const milestone = require('../model/booking/milestone');
 dotenv.config();
 
 var Company_model = model.company;
@@ -139,6 +140,16 @@ const resolvers = {
                         if (payload.send_jobs_provider.available_provider[i] == variables._id) {
                             return true;
                         }
+                    }
+                }),
+        },
+
+        get_my_milestone: {
+            subscribe: withFilter(
+                () => pubsub.asyncIterator([GET_MY_MILESTONE]),
+                (payload, variables) => {
+                    if (payload.get_my_milestone['_id'] == variables.milestone_id) {
+                        return true;
                     }
                 }),
         },
@@ -290,8 +301,8 @@ const resolvers = {
         get_earnings_chart: adminResolver.get_earnings_chart,
         get_others_chart: adminResolver.get_others_chart,
         provider_rating_by_category: userResolver.provider_rating_by_category,
-        get_main_category_pagination:main_categoryResolver.get_main_category_pagination,
-        get_category_question:main_categoryResolver.get_category_question,
+        get_main_category_pagination: main_categoryResolver.get_main_category_pagination,
+        get_category_question: main_categoryResolver.get_category_question,
     },
 
     // Find sub_query under schema 
@@ -372,6 +383,7 @@ const resolvers = {
         biding_count: bidingResolver.biding_count,
         get_contract_address_detail: contractResolver.get_contract_address_detail,
         find_kilometer: contractResolver.find_kilometer,
+        get_biding_detail:bidingResolver.get_biding_detail,
     },
     CompanyImage: {
         get_contract_files: contractResolver.get_contract_files,
@@ -399,8 +411,8 @@ const resolvers = {
 
     Mutation: {
         adminLogin: adminResolver.adminlogin,
-        update_main_category:main_categoryResolver.update_main_category,
-        update_category_question:main_categoryResolver.update_category_question,
+        update_main_category: main_categoryResolver.update_main_category,
+        update_category_question: main_categoryResolver.update_category_question,
         // contract job
         update_contract: contractResolver.update_contract,
         update_currency: currencyResolver.update_currency,
@@ -410,7 +422,8 @@ const resolvers = {
         update_biding: bidingResolver.update_biding,
         BidingFileUpload: bidingResolver.BidingFileUpload,
         update_milestone: milestoneResolver.update_milestone,
-        // company detiail
+        delete_milestone:milestoneResolver.delete_milestone,
+        delete_milestone_image:milestoneResolver.delete_milestone_image,
         UpdateCategoryCurrency: categoryResolver.UpdateCategoryCurrency,
         DeleteCategoryCurrency: categoryResolver.DeleteCategoryCurrency,
         update_company_detail: userResolver.update_company_detail,
@@ -653,7 +666,7 @@ const resolvers = {
             return [{ id: add_booking._id, location: args.location, description: args.description, provider: find_provider, hours: args.hours, user_image_url: new_data.user_image_url }];
         },
         //change the status in job booking 
-        manage_milestone_booking:milestoneResolver.manage_milestone_booking,
+        manage_milestone_booking: milestoneResolver.manage_milestone_booking,
         manage_contract_booking: contractResolver.manage_contract_booking,
         manage_booking: async (parent, args) => {
             //console.log("m_b");

@@ -14,7 +14,7 @@ var schemaOptions = {
 };
 //create user schema 
 function url_path(data){
-  return commonHelper.url_path('contract',data)
+  return commonHelper.url_path('milestone',data)
 }
 var milestoneImageSchema = new Schema({
   milestone_id:{ type: mongoose.Schema.Types.ObjectId, ref: 'milestone' },

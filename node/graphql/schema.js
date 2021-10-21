@@ -28,7 +28,7 @@ const typeDefs = gql`
         send_contract_jobs_provider(_id:ID,online:Int,location_code:String):ContractJob
         get_my_contracts(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[ContractJob]
         get_my_biding(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[Biding]
-        get_my_milestone(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[Milestone]
+        get_my_milestone(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):Milestone
         accept_biding(biding_id:ID,online:Int,location_code:String):Biding
     }
     type Query {
@@ -291,6 +291,7 @@ const typeDefs = gql`
         contract_id:ID
         created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         data: JSON 
+        title:String
         biding_ref:String
         budget(code: String): String @currency
         admin_fee(code: String): String @currency
@@ -341,10 +342,12 @@ const typeDefs = gql`
         delete:Boolean,
         booking_status:Int,
         updatedAt:String,
+        pay_option:Boolean
         order:Int
         lat:Float
         lng:Float
         created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
+        updated_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         category_id:ID
         biding_id:ID
         category_type:Int
@@ -415,6 +418,10 @@ const typeDefs = gql`
         ctob:Boolean @payment
         ctob_shotcode:String
         ctob_billRef:String
+        currenct_milestone_id:ID,
+        currenct_milestone_status:Int
+        milestones_status:Int
+        get_biding_detail(root:Boolean,all:Boolean):Biding
         find_kilometer(lat:Float,lng:Float,root:Boolean):Detail
     }
     type Company{
@@ -1146,6 +1153,7 @@ const typeDefs = gql`
             hours:String,
             description:String,
             booking_status:Int,
+            milestones_status:Int,
             category_type:Int,
             stripe_token:String,
             payment_option:String,
@@ -1182,6 +1190,8 @@ const typeDefs = gql`
             option:Int,
             extra_fare_id:ID
         ):ContractJob
+        delete_milestone(_id:ID,option:Int):Milestone
+        delete_milestone_image(_id:ID,option:Int):Milestone
     }
 `;
 module.exports.typeDefs = typeDefs;

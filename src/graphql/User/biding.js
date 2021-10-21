@@ -64,6 +64,9 @@ export const GET_BIDING_DETAIL = gql`
                 timeline
                 timeline_type
                 add_to_shortlist
+                payment_type
+                ctob_shotcode
+                ctob_billRef
                 get_biding_all_files {
                     small_image
                 }

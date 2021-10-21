@@ -21,7 +21,7 @@ var contractSchema = new Schema({
     description: { type: String },
     budget: { type: String, default: "0" },
     timeline: { type: String, default: "0" },
-    timeline_type: { type: String },
+    timeline_type: { type: String ,default:"1"},
     terms_condition: { type: String },
     company_id: { type: mongoose.Schema.Types.ObjectId, ref: 'company' },
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
@@ -107,7 +107,9 @@ var contractSchema = new Schema({
     currency_id: String,
     default_currency_rate: String,
     currenct_local_rate: String,
-
+    currenct_milestone_status:Number,
+    currenct_milestone_id:String,
+    milestones_status:{type:Number,default:0}
 }, schemaOptions);
 
 contractSchema.virtual('uid').get(function () {

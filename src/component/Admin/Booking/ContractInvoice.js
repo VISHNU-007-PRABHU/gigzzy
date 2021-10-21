@@ -41,6 +41,8 @@ function ContractInvoice() {
     const [booking, set_booking] = useState([])
     const [booking_milestone, set_booking_milestone] = useState([])
     const [mpeas_payment_callback, set_mpeas_payment_callback] = useState(false)
+    const [mpesa_detail, set_mpesa_detail] = useState({})
+
     const contract_detail = useQuery(GET_CONTRACT);
     const get_biding_detail = useQuery(GET_BIDING_DETAIL);
     const get_biding_milestone = useQuery(GET_MILESTONE_PAGINATION);
@@ -60,6 +62,15 @@ function ContractInvoice() {
             set_booking_biding(accept_biding_data.data.get_biding_detail)
             let accept_milestone_data = await get_biding_milestone.refetch({ biding_id: finaldata.data.get_contracts[0].biding_id })
             set_booking_milestone(accept_milestone_data.data.get_biding_milestone)
+            if (finaldata.data.get_contracts[0].booking_status === 50) {
+                set_mpesa_detail(accept_biding_data.data.get_biding_detail)
+            } else if (finaldata.data.get_contracts[0].currenct_milestone_status) {
+                let current_mid = finaldata.data.get_contracts[0].currenct_milestone_id
+                let mid_result = _.find(booking_milestone, ['_id', current_mid])
+                if (_.size(mid_result)) {
+                    set_mpesa_detail(mid_result)
+                }
+            }
         }
     }
 
@@ -88,16 +99,17 @@ function ContractInvoice() {
                             </div>
                         </div>
                     </div>
-                    <div className={(booking.booking_status == 50 || mpeas_payment_callback == true) && booking?.payment_type == "c2b" ? "jumbotron p-1 mb-3 mx-3" : "d-none"}>
+
+                    <div className={(mpesa_detail?.booking_status === 50 && mpesa_detail?.payment_type == "c2b") ? "jumbotron p-1 mb-3 mx-3" : "d-none"}>
                         <Suspense fallback={
                             <div class="spinner-border text-success" role="status">
                                 <span class="sr-only">Loading...</span>
                             </div>
                         }>
                             <C2B_CONTENT
-                                BusinessNumber={booking?.ctob_shotcode}
-                                AmountNumber={booking?.ctob_billRef}
-                                Amount={mpeas_payment_callback ? booking?.extra_price : booking?.base_price} />
+                                BusinessNumber={mpesa_detail?.ctob_shotcode}
+                                AmountNumber={mpesa_detail?.ctob_billRef}
+                                Amount={mpesa_detail?.budget} />
                         </Suspense>
                     </div>
                     <div className="user_batch mx-3">
@@ -106,7 +118,7 @@ function ContractInvoice() {
                     </div>
                     <div className="total_fare">
                         <h5>TOTAL COST</h5>
-                        <h1><small></small>{booking?.budget}</h1>
+                        <h1><small></small>{booking_biding?.budget}</h1>
                         {/* <h6>TOTAL HOURS : asd</h6> */}
                     </div>
                     <div className="fare_estimation col-xs-12 col-md-12 col-sm-12 nopad d-print-block d-md-flex">
@@ -149,7 +161,7 @@ function ContractInvoice() {
                             </li>
                         </ul>
                     </div>
-                    {booking_milestone.length > 1 && <div className="booking_details col-xs-12 col-md-12 col-sm-12">
+                    {booking_milestone.length > 0 && <div className="booking_details col-xs-12 col-md-12 col-sm-12">
                         <p className="title">Milestone Details</p>
                         {booking_milestone.map((m_data, m_i) => {
                             return (

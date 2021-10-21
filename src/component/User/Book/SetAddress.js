@@ -97,7 +97,6 @@ const SetAddress = (props) => {
                                                     <Empty className="m-5" description={false} />
                                                 </> :
                                                 <>
-                                                    {/* <div>SAVED ADDRESS</div> */}
                                                     <List
                                                         className={(includes(['contract_booking'],location.pathname.split('/')[1]))?'contract_saved_address_list':''}
                                                         itemLayout="horizontal"
