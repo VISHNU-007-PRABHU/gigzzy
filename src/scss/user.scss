@@ -556,23 +556,45 @@ span.ant-form-item-children.d-block {
     width: -webkit-fill-available;
 }
 .imgHolder {
-    height: 115px;
-    width: 100px;
+    height: 150px;
     .tags {
         position: absolute;
         color: white;
         background-color: #99d332;
         padding: 0px 8px;
-        left: 0;
-        top: 0;
+        left: 4px;
+        top: 4px;
+        max-width: calc(100% - 8px);
     }
     .delete{
         position: absolute;
-        color: white;
-        padding: 0px 8px;
-        right: 0px;
-        bottom: 4px;
+        color: #fff;
+        padding: 5px 8px;
+        right: 10px;
+        bottom: 8px;
         cursor: pointer;
+        z-index: 999;
+        background: rgba(0,0,0,0.7);
+        border-radius: 5px;
+        &:hover
+        {
+            border:1px solid rgba(0,0,0,0.7);
+        }
+    }
+    .edit{
+        position: absolute;
+        color: #fff;
+        padding: 5px 8px;
+        right: 55px;
+        bottom: 8px;
+        cursor: pointer;
+        z-index: 999;
+        background: rgba(0,0,0,0.7);
+        border-radius: 5px;
+        &:hover
+        {
+            border:1px solid rgba(0,0,0,0.7);
+        }
     }
 }
 
@@ -580,11 +602,37 @@ span.ant-form-item-children.d-block {
     height: 0px;
     margin: 0px;
 }
-
+.document_section_contract
+{
+    .ant-card-body
+    {
+        padding:10px;
+    }
+    .ant-card-head
+    {
+        display: flex;
+    }
+    .ant-upload.ant-upload-select-picture-card
+    {
+        height: 0px;
+        margin: 0px;
+        width:auto !important;
+    }
+    .ant-upload-text
+    {
+        display: none;
+    }
+    .ant-card-head-title,.ant-upload-select span
+    {
+        padding:0px !important;
+    }
+    .ant-card-head-wrapper
+    {
+        width:100%;
+    }
+}
 .contract_images_section {
-    height: 350px !important;
-    overflow-y: scroll;
-    overflow-x: clip;
+    
     &::-webkit-scrollbar-track {
         border: 1px solid $primarycolor;
         background-color: #d3caca;
@@ -639,4 +687,17 @@ span.ant-form-item-children.d-block {
 .ant-btn-primary
 {
     text-shadow: none !important;
+}
+.contract_saved_address_list
+{
+    .ant-list-item {
+        border-bottom: 2px solid #e8e8e8 !important;
+        border: 2px solid #fff;
+    }
+    .table-active, .table-active>td, .table-active>th {
+        background-color: #fff !important;
+        border: 2px solid !important;
+        border-radius: 10px;
+        transition: border-color 1s ease;
+    }
 }

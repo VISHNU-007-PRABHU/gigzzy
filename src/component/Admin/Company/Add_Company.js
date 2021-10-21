@@ -156,7 +156,9 @@ class Add_Company extends React.Component {
             );
         }
     };
-
+    on_popup_closed = () => {
+    
+    }
     on_location_change = (data) => {
         if (data) {
             this.setState({ address_id: data.user_address[0]._id, visibleAddress: false })
@@ -342,6 +344,7 @@ class Add_Company extends React.Component {
 
                                         <LocationContext.Provider value={{
                                             location_change: this.on_location_change,
+                                            popup_closed: this.on_popup_closed
                                         }}>
                                             <Card onClick={() => { this.setState({ visibleAddress: true }) }}>
                                                 Address

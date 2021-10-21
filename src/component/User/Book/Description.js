@@ -484,7 +484,9 @@ class Description extends React.Component {
         let customDate = moment().subtract(1, 'day');
         return current && current < moment(customDate, "YYYY-MM-DD");
     }
+    on_popup_closed = () =>{
 
+    }
     on_location_change = (item) => {
         this.setState({ location_code: item.location_code, location: item.address, center: [item.lat, item.lng], location_modal: 0 });
     }
@@ -504,6 +506,7 @@ class Description extends React.Component {
             <LocationContext.Provider value={{
                 state: this.state,
                 location_change: this.on_location_change,
+                popup_closed: this.on_popup_closed
             }}>
 
                 <h2 className="bold mb-5 text-center">What do you need?</h2>

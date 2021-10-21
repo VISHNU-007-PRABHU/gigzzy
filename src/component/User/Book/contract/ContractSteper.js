@@ -6,7 +6,7 @@ import { UPDATE_CONTRACT, GET_CONTRACT } from '../../../../graphql/User/contract
 import SetAddress from '../SetAddress';
 import useReactRouter from 'use-react-router';
 
-import { LocationContext } from '../../../context/Location'
+import { LocationContext,EditLocationContext } from '../../../context/Location'
 import Address from "../Address";
 import findIndex from 'lodash/findIndex';
 import size from 'lodash/size';
@@ -55,14 +55,17 @@ function ContractSteper(props) {
     const { form } = props;
     const { history, match } = useReactRouter();
     const [add_address, set_add_address] = useState(false);
+    const [page_loading, set_page_loading] = useState(true);
     const [address_id, set_address_id] = useState("");
     const [current, setCurrent] = useState(0);
     const [contract_id, set_contract_id] = useState("");
     const [user_id, set_user_id] = useState("");
     const [contract_detail_data, set_contract_detail] = useState({});
+    const [user_all_address, set_user_all_address] = useState([]);
     const [stepsdetail, setSteps] = useState(original_steps);
     const [update_contract, { loading: removeLoading }] = useMutation(UPDATE_CONTRACT)
     const contract_detail = useQuery(GET_CONTRACT);
+    const [address_from, setaddress_from] = useState({});
 
     useEffect(async () => {
         if (localStorage.getItem('user')) {
@@ -71,22 +74,21 @@ function ContractSteper(props) {
         if (match.params.id) {
             let finaldata = await contract_detail.refetch({ contract_id: match.params.id })
             finaldata.data.get_contracts[0].current_page = finaldata.data.get_contracts[0].current_page || -1
-            if (finaldata.data.get_contracts[0].current_page == 5) {
-                history.push({ pathname: `/contract/view/${match.params.id}` })
-            } else {
-                var db_current_page = parseInt(finaldata.data.get_contracts[0].current_page)+1
-                let update_steps = original_steps.map(data => {
-                    if(db_current_page>=data.id)
-                    {
-                        return data.status = "finish"
-                    }
-                })
-                // setSteps(update_steps)
+            var db_current_page = parseInt(finaldata.data.get_contracts[0].current_page)+1
                 
-                set_contract_detail(finaldata.data.get_contracts[0])
-                set_address_id(finaldata.data.get_contracts[0]?.address_id)
-                setCurrent(Number(finaldata.data.get_contracts[0].current_page) + 1)
-            }
+            let update_steps = original_steps.map(data => {
+                if(db_current_page>=data.id)
+                {
+                    return data.status = "finish"
+                }
+            })
+            // setSteps(update_steps)
+            
+            set_contract_detail(finaldata.data.get_contracts[0])
+            set_address_id(finaldata.data.get_contracts[0]?.address_id)
+            setCurrent(Number(finaldata.data.get_contracts[0].current_page) + 1)
+            set_page_loading(false)
+            
         }
     }, [match.params.id])
     const next = (id) => {
@@ -97,17 +99,38 @@ function ContractSteper(props) {
                 if (match.params.id) {
                     input_data['_id'] = match.params.id
                 }
-                values['current_page'] = current
+                values['current_page'] = (current>=4)?4:current
                 switch (current) {
                     case 2:
-                        if ((!values['budget'] || !values['timeline'] || !values['timeline_type'])) {
-                            Alert_msg({ status: 'failed', msg: "Please fill all the data" })
+                        if ((!values['budget'] || values['budget']<=0 )) {
+                            Alert_msg({ status: 'failed', msg: "Please Enter the budget" })
                             return false
-                        }                        
+                        }
+                        if(values['timeline_type']=="2" || values['timeline_type']=="3")
+                        {
+                            if(values['timeline']<=0)
+                            {
+                                Alert_msg({ status: 'failed', msg: "Enter Timeline more than 1" })
+                                return false
+                            }
+                        }
                         break;
                     case 1:
-                        if (address_id) {
-                            values['address_id'] = address_id
+                        if (address_id=="" || address_id==null) {
+                            Alert_msg({ status: 'failed', msg: "Select any one address" })
+                            return false
+                        } 
+                        else if (address_id) {
+                            let index = findIndex(user_all_address, ['_id', address_id]);
+                            if(index==-1)
+                            {
+                                Alert_msg({ status: 'failed', msg: "Select any one address" })
+                                return false;
+                            }
+                            else
+                            {
+                                values['address_id'] = address_id
+                            }
                         }
                         break;
                     case 5:
@@ -121,32 +144,23 @@ function ContractSteper(props) {
                 }
                 let final_data = await update_contract({ variables: input_data });
                 Alert_msg(final_data.data.update_contract)
-                if (final_data.data.update_contract.status === "success") {
-                    if(current === 6)
-                    {
-                        let all_completed = original_steps.map(data => {
-                            return data.status = "finish"
-                        })
-                        setSteps(all_completed)
-                        setCurrent(4);
-                        message.success('Processing complete!')
-                    }
-                    else if (current === 6) {
-                        Modal.success({
-                            footer: (null),
-                            content: (
-                                <Suspense fallback={<Skeleton active />}>
-                                    <PostProjectSuccess id={input_data['_id']} />
-                                </Suspense>
-                            ),
-                        });
-                    } else {
-                        const newItems = [...stepsdetail];
-                        let index = findIndex(newItems, ['id', current+1]);
-                        newItems[index]['status'] = "finish";
-                        setSteps(newItems)
-                        setCurrent(current + 1);
-                    }
+                console.log(current)
+                if(current === 5 || current === 6)
+                {
+                    let all_completed = original_steps.map(data => {
+                        return data.status = "finish"
+                    })
+                    setSteps(all_completed)
+                    setCurrent(4);
+                    message.success('Processing complete!')
+                    history.push({ pathname: `/contract/view/${match.params.id}` })
+                }
+                else {
+                    const newItems = [...stepsdetail];
+                    let index = findIndex(newItems, ['id', current+1]);
+                    newItems[index]['status'] = "finish";
+                    setSteps(newItems)
+                    setCurrent(current + 1);
                 }
             }
         })
@@ -168,9 +182,19 @@ function ContractSteper(props) {
 
         message.success('Processing complete!')
     }
-
+ 
+    const edit_location = (item) => {
+        setaddress_from(item)
+        set_add_address(true);
+    }
+    const all_address = (data) => {
+        set_user_all_address(data);
+    }
+    const on_popup_closed = () => {
+        set_add_address(false);
+    }
     const on_location_change = (item) => {
-        set_address_id(item.user_address[0]._id);
+        set_address_id(item._id);
     }
     const stepperIcon = (item) =>{
         return <img src={require('../../../../image/step'+item.id+'.png')}/>;
@@ -185,15 +209,20 @@ function ContractSteper(props) {
     }
     const button_next_text = (item) =>{
         switch(item) {
+            case 3:
+                return "Save and Preview";
+            case 4:
+                return "Publish";
             case 5:
-                return "Post Preview";
+                return "Publish";
           default:
             return "Next";
         }
     }
     return (
-
-        <>
+        
+        <div>
+        { !page_loading && <>    
             <h4 className="text-center mb-5">
                 {(contract_detail_data?.get_contract_category?.[0]?.category_type==2)?contract_detail_data?.get_contract_category?.[0]?.subCategory_name:contract_detail_data?.get_contract_category?.[0]?.category_name}
             </h4>
@@ -205,17 +234,21 @@ function ContractSteper(props) {
             <div className="d-flex justify-content-center my-5">
                 <Form  {...layout} name="nest-messages" className="w-100">
                     <Suspense fallback={<Skeleton active />}>
-                        <div className={current === 5 ? '' : 'd-none'}>
+                        <div className={current === 4 || current === 5 ? '' : 'd-none'}>
                             <h4 className="text-center">Review and publish your project</h4>
                             <ProjectDetail contract_detail_data={contract_detail_data} current={current} customform={form} />
                             <ProjectBudget contract_detail_data={contract_detail_data} current={current} customform={form} />
                             <ProjectImages hide_common_upload={true} contract_detail_data={contract_detail_data} current={current} customform={form} />
                         </div>
                         <div className={current === 3 ? 'contract_images_section' : 'd-none'}>
-                            <ProjectImages contract_detail_data={contract_detail_data} current={current} customform={form} />
+                            <Col md={{ span: 18, offset: 3 }}>
+                                <ProjectImages contract_detail_data={contract_detail_data} current={current} customform={form} />
+                            </Col>
                         </div>
                         <div className={current === 2 ? '' : 'd-none'}>
-                            <ProjectBudget contract_detail_data={contract_detail_data} current={current} customform={form} />
+                            <Col md={{ span: 18, offset: 3 }}>
+                                <ProjectBudget contract_detail_data={contract_detail_data} current={current} customform={form} />
+                            </Col>
                         </div>
                         <div className={current === 0 ? '' : 'd-none'}>
                             <Col md={{ span: 18, offset: 3 }}>
@@ -225,21 +258,25 @@ function ContractSteper(props) {
                         <div className={current === 1 ? '' : 'd-none'}>
                             <LocationContext.Provider value={{
                                 location_change: on_location_change,
+                                popup_closed: on_popup_closed,
+                                popup_closed_option:true
                             }}>
-                                <Button type="primary" className="mb-3 h-50x" onClick={() => { set_add_address(true) }}>
+                                <Button type="primary" className="mb-3 h-50x" onClick={() => {setaddress_from({}); set_add_address(true) }}>
                                     <div className="normal_font_size d-flex justify-content-around align-items-center">
                                         <div className="mr-3">
-                                            Add new address
+                                            Add New Address
                                         </div>
                                         <Icon type="plus" />
                                     </div>
                                 </Button>
                                 <h4 className="text-center mb-5">My Saved Address</h4>
                                 <Col md={{ span: 18, offset: 3 }} className="extra_radius_input shadow-lg">
-                                    <SetAddress user_id={user_id} address_id={address_id} />
+                                    <EditLocationContext.Provider value={{ location_edit: edit_location,no_data:all_address}}>
+                                        <SetAddress user_id={user_id} address_id={address_id} />
+                                    </EditLocationContext.Provider>
                                 </Col>
+                                <Address address_from={address_from} visible={add_address}  />
                             </LocationContext.Provider>
-                                <Address visible={add_address}  />
                         </div>
                     </Suspense>
                     
@@ -261,7 +298,9 @@ function ContractSteper(props) {
                     </Row>
                 </Col>
             </div>
-        </>
+            </>
+            }
+        </div>
     )
 }
 
