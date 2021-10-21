@@ -100,7 +100,7 @@ exports.get_milestone_all_images = async (root, args) => {
     try {
         let match = {
             delete: false,
-            model_type:"milestone"
+            model_type: "milestone"
         }
 
         if (args.root) {
@@ -109,7 +109,7 @@ exports.get_milestone_all_images = async (root, args) => {
             }
         }
 
-        if(args['model_type']){
+        if (args['model_type']) {
             match['model_type'] = args['model_type']
         }
 
@@ -126,11 +126,16 @@ exports.get_milestone_all_images = async (root, args) => {
         return []
     }
 }
+
+
 module.exports.update_milestone = async (root, args) => {
     try {
         let files = args['file']
         let update_detail = args['milestone_data'][0]
         if (update_detail['_id']) {
+            if (args['option'] && args['option'] === "add_extra_fare") {
+                await this.add_extra_fee(update_detail)
+            }
             let find_query = {
                 _id: update_detail["_id"]
             }
@@ -203,8 +208,8 @@ exports.uploading_milestone_files = async (files, args) => {
                         doc_type: extension || "",
                         // doc_category: args['category'] || "others",
                     }
-                    if(args.model_type){
-                        img_data['model_type'] = "extra_fare"
+                    if (args['model_type']) {
+                        img_data['model_type'] = args['model_type']
                     }
                     let add_biding_image_job = new MilestoneImage_model(img_data)
                     await add_biding_image_job.save()
@@ -230,42 +235,26 @@ exports.uploading_milestone_files = async (files, args) => {
 exports.add_extra_fee = async (args) => {
     return new Promise(async function (resolve, reject) {
         try {
-            let preview_milestone_data = await BidingMilestone_model.findOne({ _id: args['milestone_id'] }).lean()
+            let preview_milestone_data = await BidingMilestone_model.findOne({ _id: args['_id'] }).lean()
             let update_data = {
                 extra_fare_reason: args.extra_fare_reason,
                 payment_status: 4
             };
             if (args.extra_price) {
                 update_data['extra_price'] = String(parseFloat(args.extra_price).toFixed(2))
-                update_data['total'] =  String(parseFloat(Number(preview_milestone_data['budget']) + Number(args.extra_price)).toFixed(2))
+                update_data['total'] = String(parseFloat(Number(preview_milestone_data['budget']) + Number(args.extra_price)).toFixed(2))
             } else {
                 update_data['extra_price'] = 0
-                update_data['total'] =   String(parseFloat(Number(preview_milestone_data['budget']))).toFixed(2)
+                update_data['total'] = String(parseFloat(Number(preview_milestone_data['budget']))).toFixed(2)
             }
-            await BidingMilestone_model.updateOne({ _id: args['milestone_id'] }, update_data);
+            await BidingMilestone_model.updateOne({ _id: args['_id'] }, update_data);
             return resolve(true)
         } catch (error) {
             return reject(false)
         }
     })
 }
-exports.milestone_extra_fare = async (root, args) => {
-    try {
-        if (args.option == 1) {
-            await this.add_extra_fee(args)
-            if(_.size(args.file)){
-                args['model_type'] = "extra_fare"
-                await this.uploading_milestone_files(args.file,args)
-            }
-            let preview_milestone_data = await BidingMilestone_model.findOne({ _id: args['milestone_id'] }).lean()
-            preview_milestone_data.msg = "Extra fee update success";
-            preview_milestone_data.status = 'success';
-        }
-    } catch (error) {
-        console.log("exports.manage_Milestone_booking -> error", error)
-        return { msg: "Milestone extra fare update failed", status: 'failed' }
-    }
-}
+
 
 /**
  * 

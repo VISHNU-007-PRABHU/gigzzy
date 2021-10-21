@@ -333,6 +333,7 @@ const typeDefs = gql`
         user_id:ID
         contract_id:ID
         description:String,
+        pro_description:String
         budget(code: String): String @currency,
         timeline: String,       
         timeline_type: String,
@@ -1171,6 +1172,7 @@ const typeDefs = gql`
             provider_id:ID
             company_id:ID
             file:[Upload]
+            model_type:String
             booking_status:Int
             biding_data:JSON
             location_code:String,
@@ -1191,19 +1193,9 @@ const typeDefs = gql`
             milestone_data:JSON
             location_code:String,
             local_location_code:String,
+            pro_description:String
         ):Milestone
-        milestone_extra_fare(
-            option:String  
-            milestone_id:ID
-            local_location_code:String
-            user_id: String
-            provider_id:ID
-            biding_id:ID
-            contract_id:ID
-            extra_price:String
-            extra_fare_reason:String
-            file:[Upload]
-        ):Milestone
+       
         UpdateCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
         DeleteCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
         manage_milestone_booking(
