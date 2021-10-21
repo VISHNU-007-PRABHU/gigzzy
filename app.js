@@ -349,7 +349,6 @@ app.post('/c2b_confirmation', async (req, res, next) => {
 })
 
 app.use(async (req, res, next) => {
-  const url = req.url;
   // console.log(url);
   let SubURL = ['graphql',
     'c2b_confirmation',
