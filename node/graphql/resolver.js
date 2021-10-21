@@ -53,7 +53,7 @@ const PROOF_STATUS = 'PROOF_STATUS';
 const REMOVE_USER = 'REMOVE_USER';
 const SEND_CONTRACT_JOB_MSG = 'SEND_CONTRACT_JOB_MSG';
 const GET_MY_CONTRACTS = "GET_MY_CONTRACTS"
-
+const GET_MY_MILESTONE = "GET_MY_MILESTONE"
 const resolvers = {
 
     Subscription: {

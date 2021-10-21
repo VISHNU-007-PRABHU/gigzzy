@@ -276,6 +276,11 @@ exports.manage_milestone_booking = async (root, args) => {
                 var findBooking = await BidingMilestone_model.findOne({ _id: args._id }).lean();
                 return findBooking
         } else if (args.booking_status === 14) {
+            if(preview_biding_data.extra_price){
+                args['amount'] = preview_biding_data['total'];
+            }else{
+                args['amount'] = preview_biding_data['budget'];
+            }
             let payment_data = await payment_choose.choose_milestone_payment(args, preview_milestone_data)
             if (payment_data.status) {
                 var findBooking = await BidingMilestone_model.findOne({ _id: args._id }).lean();

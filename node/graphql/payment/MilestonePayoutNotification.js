@@ -3,6 +3,7 @@ const model = require('../../model_data');
 const _ = require('lodash');
 const moment = require("moment");
 const commonHelper = require('../commonHelper')
+const PushNotification = require('../notification/PushNotification')
 var Detail_model = model.detail;
 var Payout_model = model.payout;
 var Contract_model = model.contract_job
@@ -36,9 +37,9 @@ exports.update_milestone_after_payment = async (args, charge, biding) => {
             }
 
             if (args.booking_status === 10) {
-                contract_data['accept_date'] = moment.utc().format();
+                milestone_data['accept_date'] = moment.utc().format();
                 if (args.payment_option === "mpesa") {
-                    contract_data['booking_status'] = 50;
+                    milestone_data['booking_status'] = 50;
                 } else {
                     milestone_data['booking_status'] = 10;
                     milestone_data['job_status'] = 10;
@@ -46,7 +47,7 @@ exports.update_milestone_after_payment = async (args, charge, biding) => {
                 }
             } else {
                 milestone_data['end_date'] = moment.utc().format();
-                if (args.payment_option === "mpesa") {
+                if (args.payment_option === "mpesa") {r
                     milestone_data['mpeas_payment_callback'] = true
                     if (args.payment_type !== "c2b") {
                         milestone_data['MerchantRequestID'] = charge.data.MerchantRequestID || 0;
@@ -110,7 +111,7 @@ exports.accept_milestone_payout_notification = async (milestone_data) => {
                 milestone_detail['msg_status'] = 'to_provider';
                 let  = milestone_detail
                 user_contract_data['msg_status'] = 'to_user';
-                await global.pubsub.publish("get_my_milestone", { get_my_milestone: user_contract_data });
+                await global.pubsub.publish("GET_MY_MILESTONE", { get_my_milestone: user_contract_data });
                 return resolve({ status: true, msg: "Payment Is success !", data: user_contract_data })
             }
 
