@@ -233,6 +233,12 @@ exports.manage_milestone_booking = async (root, args) => {
                 description: "Start the contract based on teams & condition",
                 booking_status: 9,
             }
+            if(args['contract_id']){
+                update_detail['contract_id'] = args['contract_id']
+            }
+            if(args['biding_id']){
+                update_detail['biding_id'] = args['biding_id']
+            }
             let add_start_milestone = new BidingMilestone_model(update_detail)
             await add_start_milestone.save()
             await ContractJob_model.updateOne({ _id: args['contract_id'] }, { booking_status: commonHelper.bookink_status.ACCEPT }).exec()
