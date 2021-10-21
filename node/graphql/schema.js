@@ -349,7 +349,7 @@ const typeDefs = gql`
         biding_id:ID
         category_type:Int
         milestone_status:String
-        get_milestone_all_images(milestone_id:ID,_id:ID,root:Boolean):[MilestoneImage]
+        get_milestone_all_images(milestone_id:ID,_id:ID,root:Boolean,model_type:String):[MilestoneImage]
         msg:String
         status:String
         total(code: String): String @currency
@@ -358,6 +358,8 @@ const typeDefs = gql`
         ctob_billRef:String
         payment_type:String
         payment_option(code:String):String @paymentOption
+        extra_fare(code: String): String @currency
+        extra_fare_reason: String,
     }
     type Currency{
         _id:ID,
@@ -521,6 +523,7 @@ const typeDefs = gql`
         data: JSON 
         msg:String
         status:String
+        model_type:String
         images:[CompanyImage]
         get_contract_files(contract_id:ID):[ContractImage]
         get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
@@ -1188,6 +1191,18 @@ const typeDefs = gql`
             milestone_data:JSON
             location_code:String,
             local_location_code:String,
+        ):Milestone
+        milestone_extra_fare(
+            option:String  
+            milestone_id:ID
+            local_location_code:String
+            user_id: String
+            provider_id:ID
+            biding_id:ID
+            contract_id:ID
+            extra_price:String
+            extra_fare_reason:String
+            file:[Upload]
         ):Milestone
         UpdateCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
         DeleteCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory

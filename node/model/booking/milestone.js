@@ -64,6 +64,8 @@ var milestoneSchema = new Schema({
   provider_fee: { type: String, default: 0.00 }, //provider fee
   final_payment: { type: String, default: 0.00 },
   extra_hour_price: { type: String, default: 0.00 },
+  extra_fare: {type: String, default: 0.00  },
+  extra_fare_reason: {type: String},
 }, schemaOptions);
 
 milestoneSchema.virtual('uid').get(function () {

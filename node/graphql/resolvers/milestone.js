@@ -42,7 +42,7 @@ module.exports.get_biding_milestone = async (root, args) => {
     try {
 
         let fetch_query = {
-            delete:false
+            delete: false
         }
         if (args['_id']) {
             fetch_query['_id'] = args['_id']
@@ -99,7 +99,8 @@ module.exports.delete_milestone_image = async (root, args) => {
 exports.get_milestone_all_images = async (root, args) => {
     try {
         let match = {
-            delete: false
+            delete: false,
+            model_type:"milestone"
         }
 
         if (args.root) {
@@ -107,6 +108,11 @@ exports.get_milestone_all_images = async (root, args) => {
                 match['milestone_id'] = ObjectId(root['_id'])
             }
         }
+
+        if(args['model_type']){
+            match['model_type'] = args['model_type']
+        }
+
         let pipeline = [
             {
                 $match: match
@@ -133,9 +139,6 @@ module.exports.update_milestone = async (root, args) => {
                 args['milestone_id'] = update_detail['_id']
                 await this.uploading_milestone_files(files, args)
             }
-            // if (args['booking_status'] === 9 && update_detail['biding_id']) {
-            //     await Biding_model.updateOne({ _id: update_detail['biding_id'] }, { milestone_status: 9, current_milestone_id: args['_id'] }).exec()
-            // }
             let fetch_bid = await BidingMilestone_model.findOne(find_query).lean()
             fetch_bid['status'] = "success";
             fetch_bid['msg'] = "Milestone update success"
@@ -156,9 +159,6 @@ module.exports.update_milestone = async (root, args) => {
                 args['milestone_id'] = added_bid['_id']
                 await this.uploading_milestone_files(files, args)
             }
-            // if (args['booking_status'] === 9 && update_detail['biding_id']) {
-            //     await Biding_model.updateOne({ _id: update_detail['biding_id'] }, { milestone_status: 9, current_milestone_id: added_bid['_id'] }).exec()
-            // }
             added_bid['status'] = "success";
             added_bid['msg'] = "Milestone added success"
             return added_bid
@@ -203,6 +203,9 @@ exports.uploading_milestone_files = async (files, args) => {
                         doc_type: extension || "",
                         // doc_category: args['category'] || "others",
                     }
+                    if(args.model_type){
+                        img_data['model_type'] = "extra_fare"
+                    }
                     let add_biding_image_job = new MilestoneImage_model(img_data)
                     await add_biding_image_job.save()
                 }
@@ -220,6 +223,53 @@ exports.uploading_milestone_files = async (files, args) => {
 /**
  * 
  * @param {*} root 
+ * @param {*} args  {amount,milestone,reason,file,}
+ * @param {*} args  {location_code}
+ */
+
+exports.add_extra_fee = async (args) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            let preview_milestone_data = await BidingMilestone_model.findOne({ _id: args['milestone_id'] }).lean()
+            let update_data = {
+                extra_fare_reason: args.extra_fare_reason,
+                payment_status: 4
+            };
+            if (args.extra_price) {
+                update_data['extra_price'] = String(parseFloat(args.extra_price).toFixed(2))
+                update_data['total'] =  String(parseFloat(Number(preview_milestone_data['budget']) + Number(args.extra_price)).toFixed(2))
+            } else {
+                update_data['extra_price'] = 0
+                update_data['total'] =   String(parseFloat(Number(preview_milestone_data['budget']))).toFixed(2)
+            }
+            await BidingMilestone_model.updateOne({ _id: args['milestone_id'] }, update_data);
+            return resolve(true)
+        } catch (error) {
+            return reject(false)
+        }
+    })
+}
+exports.milestone_extra_fare = async (root, args) => {
+    try {
+        if (args.option == 1) {
+            await this.add_extra_fee(args)
+            if(_.size(args.file)){
+                args['model_type'] = "extra_fare"
+                await this.uploading_milestone_files(args.file,args)
+            }
+            let preview_milestone_data = await BidingMilestone_model.findOne({ _id: args['milestone_id'] }).lean()
+            preview_milestone_data.msg = "Extra fee update success";
+            preview_milestone_data.status = 'success';
+        }
+    } catch (error) {
+        console.log("exports.manage_Milestone_booking -> error", error)
+        return { msg: "Milestone extra fare update failed", status: 'failed' }
+    }
+}
+
+/**
+ * 
+ * @param {*} root 
  * @param {*} args  {contract_id,user_id,biding_id,booking_status,payment_option,payment_type}
  * @param {*} args  {location_code}
  */
@@ -233,21 +283,21 @@ exports.manage_milestone_booking = async (root, args) => {
                 description: "Start the contract based on teams & condition",
                 booking_status: 9,
             }
-            if(args['contract_id']){
+            if (args['contract_id']) {
                 update_detail['contract_id'] = args['contract_id']
             }
-            if(args['biding_id']){
+            if (args['biding_id']) {
                 update_detail['biding_id'] = args['biding_id']
             }
             let add_start_milestone = new BidingMilestone_model(update_detail)
             await add_start_milestone.save()
-            await ContractJob_model.updateOne({ _id: args['contract_id'] }, { milestones_status:9, booking_status: commonHelper.bookink_status.PENDING }).exec()
+            await ContractJob_model.updateOne({ _id: args['contract_id'] }, { milestones_status: 9, booking_status: commonHelper.bookink_status.PENDING }).exec()
             add_start_milestone['msg'] = "contract milestone updated has been started";
             add_start_milestone['status'] = 'success';
             return add_start_milestone
         } else if (args.booking_status === 9) {
-            await BidingMilestone_model.updateOne({ _id: args._id }, { booking_status: 14, end_date: moment.utc().format() }).exec()    
-            await ContractJob_model.updateOne({ _id: args['contract_id'] }, { milestones_status:10,booking_status: commonHelper.bookink_status.START }).exec()
+            await BidingMilestone_model.updateOne({ _id: args._id }, { booking_status: 14, end_date: moment.utc().format() }).exec()
+            await ContractJob_model.updateOne({ _id: args['contract_id'] }, { milestones_status: 10, booking_status: commonHelper.bookink_status.START }).exec()
             //send notification
             let findBooking = {}
             findBooking['msg'] = "contract has been started";
@@ -280,15 +330,15 @@ exports.manage_milestone_booking = async (root, args) => {
                 description: "Completed the contract based on teams & condition",
                 booking_status: 14,
             }
-            if(args['contract_id']){
+            if (args['contract_id']) {
                 update_detail['contract_id'] = args['contract_id']
             }
-            if(args['biding_id']){
+            if (args['biding_id']) {
                 update_detail['biding_id'] = args['biding_id']
             }
             let add_start_milestone = new BidingMilestone_model(update_detail)
             await add_start_milestone.save()
-            await ContractJob_model.updateOne({ _id: args['contract_id'] }, { milestones_status:14,booking_status: commonHelper.bookink_status.COMPLETE }).exec()
+            await ContractJob_model.updateOne({ _id: args['contract_id'] }, { milestones_status: 14, booking_status: commonHelper.bookink_status.COMPLETE }).exec()
             //send notification
             let findBooking = {}
             findBooking['msg'] = "contract has been started";

@@ -1276,3 +1276,5 @@ module.exports.confrimation_company_worker = async (data) => {
         return { status: "failed", msg: "User acepted failed", link: error_link }
     }
 }
+
+
