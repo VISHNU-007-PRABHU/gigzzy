@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 const moment = require("moment");
+const shortid = require('shortid');
 const commonHelper = require('../../graphql/commonHelper');
 mongoose.set('useFindAndModify', false);
 var Schema = mongoose.Schema;
@@ -19,7 +20,7 @@ var milestoneSchema = new Schema({
   provider_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
   biding_id:String,
   contract_id:String,
-  milestone_ref: { type: String },
+  milestone_ref: { type: String, 'default': shortid.generate },
   start_date: String,
   end_date: String,
   title: String,
