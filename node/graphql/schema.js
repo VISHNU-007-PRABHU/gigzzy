@@ -501,7 +501,7 @@ const typeDefs = gql`
         data: JSON 
         msg:String
         status:String
-        images:[CompanyImage]
+        images:[ContractImage]
         get_contract_files(contract_id:ID,root:Boolean):[ContractImage]
         get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
       
