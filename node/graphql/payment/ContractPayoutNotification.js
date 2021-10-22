@@ -52,9 +52,9 @@ exports.update_contract_after_payment = async (args, charge, biding) => {
                 payment_option: args.payment_option,
                 payment_history: charge,
                 biding_id: args['biding_id'],
-                provider_id: biding.user_id
+                provider_id: biding['provider_id']
             }
-
+            
             if (args.booking_status === 10) {
                 contract_data['accept_date'] = moment.utc().format();
                 if (args.payment_option === "mpesa") {
