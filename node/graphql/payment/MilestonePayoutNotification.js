@@ -47,7 +47,7 @@ exports.update_milestone_after_payment = async (args, charge, biding) => {
                 }
             } else {
                 milestone_data['end_date'] = moment.utc().format();
-                if (args.payment_option === "mpesa") {r
+                if (args.payment_option === "mpesa") {
                     milestone_data['mpeas_payment_callback'] = true
                     if (args.payment_type !== "c2b") {
                         milestone_data['MerchantRequestID'] = charge.data.MerchantRequestID || 0;
@@ -65,6 +65,7 @@ exports.update_milestone_after_payment = async (args, charge, biding) => {
                 currenct_milestone_status: 10,
                 currenct_milestone_id: args['_id']
             }
+            console.log("exports.update_milestone_after_payment -> milestone_data", milestone_data)
             await Contract_model.updateOne({ _id: args.contract_id }, contract_data, { new: true });
             await BidingMilestone_model.updateOne({ _id: args._id }, milestone_data, { new: true });
             return resolve({ msg: "update success", status: true });

@@ -28,7 +28,8 @@ const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
 const payment_choose = require('./payment/choose')
 const MpesaCallback = require('./payment/MpesaCallback');
-const milestone = require('../model/booking/milestone');
+const BidingMilestone_model = require('../model/booking/milestone');
+const Contract_model = require('../model/booking/ContractJob');
 dotenv.config();
 
 var Company_model = model.company;
@@ -383,7 +384,7 @@ const resolvers = {
         biding_count: bidingResolver.biding_count,
         get_contract_address_detail: contractResolver.get_contract_address_detail,
         find_kilometer: contractResolver.find_kilometer,
-        get_biding_detail:bidingResolver.get_biding_detail,
+        get_biding_detail: bidingResolver.get_biding_detail,
     },
     CompanyImage: {
         get_contract_files: contractResolver.get_contract_files,
@@ -422,8 +423,8 @@ const resolvers = {
         update_biding: bidingResolver.update_biding,
         BidingFileUpload: bidingResolver.BidingFileUpload,
         update_milestone: milestoneResolver.update_milestone,
-        delete_milestone:milestoneResolver.delete_milestone,
-        delete_milestone_image:milestoneResolver.delete_milestone_image,
+        delete_milestone: milestoneResolver.delete_milestone,
+        delete_milestone_image: milestoneResolver.delete_milestone_image,
         UpdateCategoryCurrency: categoryResolver.UpdateCategoryCurrency,
         DeleteCategoryCurrency: categoryResolver.DeleteCategoryCurrency,
         update_company_detail: userResolver.update_company_detail,
@@ -1384,18 +1385,22 @@ module.exports.confrimation_call = async (body) => {
             update_details['payment_message'] = body["Body"]["stkCallback"]["ResultDesc"]
 
             let pre_contract_detail = await Contract_model.findOne({ CheckoutRequestID }).lean()
+            let pre_milestone_detail = await BidingMilestone_model.findOne({ CheckoutRequestID }).lean()
+            let confirmation_body = {
+                TransID: body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"],
+                TransTime: body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"],
+                TransAmount: body['TransAmount'],
+                CheckoutRequestID: CheckoutRequestID,
+                payment_type: "mpesa",
+                ResultCode: ResultCode,
+                payment_message: update_details['payment_message']
+            }
             if (_.size(pre_contract_detail)) {
-                let confirmation_body = {
-                    TransID: body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"],
-                    TransTime: body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"],
-                    TransAmount: body['TransAmount'],
-                    CheckoutRequestID: CheckoutRequestID,
-                    payment_type: "mpesa",
-                    ResultCode: ResultCode,
-                    payment_message: payment_message
-                }
-                await MpesaCallback.c2b_contract_confiramtion(confirmation_body);
+                let data = await MpesaCallback.c2b_contract_confiramtion(confirmation_body);
                 return resolve({ status: true, msg: "Payment Is success !", data })
+            } else if (_.size(pre_milestone_detail)) {
+                let data = await MpesaCallback.c2b_milestone_confiramtion(confirmation_body);
+                return resolve({ status: true, msg: "Milestone Payment Is success !", data })
             }
 
             let pre_booking_detail = await Booking_model.findOne({ CheckoutRequestID }).lean()
@@ -1591,18 +1596,22 @@ module.exports.c2b_confirmation = async (body) => {
 
 
             let pre_contract_detail = await Contract_model.findOne({ ctob_billRef }).lean()
+            let pre_milestone_detail = await BidingMilestone_model.findOne({ ctob_billRef }).lean()
+            let confirmation_body = {
+                TransID: body['TransID'],
+                TransAmount: body['TransAmount'],
+                TransTime: body['TransTime'],
+                ResultCode: ResultCode,
+                ctob_billRef: ctob_billRef,
+                payment_type: "c2b",
+                payment_message: update_details['payment_message']
+            }
             if (_.size(pre_contract_detail)) {
-                let confirmation_body = {
-                    TransID: body['TransID'],
-                    TransAmount: body['TransAmount'],
-                    TransTime: body['TransTime'],
-                    ResultCode: ResultCode,
-                    ctob_billRef: ctob_billRef,
-                    payment_type: "c2b",
-                    payment_message: payment_message
-                }
-                await MpesaCallback.c2b_contract_confiramtion(confirmation_body);
+                let data = await MpesaCallback.c2b_contract_confiramtion(confirmation_body);
                 return resolve({ status: true, msg: "Payment Is success !", data })
+            } else if (_.size(pre_milestone_detail)) {
+                let data = await MpesaCallback.c2b_milestone_confiramtion(confirmation_body);
+                return resolve({ status: true, msg: "Milestone Payment Is success !", data })
             }
 
             // check to next phase (vishnu)

@@ -68,6 +68,7 @@ var milestoneSchema = new Schema({
   extra_hour_price: { type: String, default: 0.00 },
   extra_fare: {type: String, default: 0.00  },
   extra_fare_reason: {type: String},
+  phone_number: {type: String},
 }, schemaOptions);
 
 milestoneSchema.virtual('uid').get(function () {

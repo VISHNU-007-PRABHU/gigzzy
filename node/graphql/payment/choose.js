@@ -79,6 +79,7 @@ exports.choose_contract_payment = async (args,contract_detail,biding_detail) => 
 exports.choose_milestone_payment = async (args,milestone_detail) => {
     return new Promise(async function (resolve, reject) {
         try {
+            console.log("exports.choose_milestone_payment -> args", args)
             switch (args.payment_option) {
                 case 'stripe':
                     let stripe_charge = await stripeModule.stripe_payment(args, milestone_detail )
@@ -96,7 +97,7 @@ exports.choose_milestone_payment = async (args,milestone_detail) => {
                     let mpesa_charge = await mpesaModule.mpesa_payment(args, milestone_detail)
                     if (mpesa_charge.charge.status == true) {
                         await MilestonePayoutNotificationModule.update_milestone_after_payment(args, mpesa_charge.charge,milestone_detail)
-                        return resolve({ msg: "mpesa payment success", status: true, data: contract_detail })
+                        return resolve({ msg: "mpesa payment success", status: true, data: milestone_detail })
                     } else {
                         await MilestonePayoutNotificationModule.error_payout_notification(milestone_detail);
                         return reject({ msg: "mpesa payment failed", status: false, data: {} })

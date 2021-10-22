@@ -344,7 +344,7 @@ exports.add_start_milestone = async (args) => {
                 title: "start",
                 description: "Start the contract based on teams & condition",
                 booking_status: 9,
-
+                order:1
             }
             if (args['contract_id']) {
                 update_detail['contract_id'] = args['contract_id']
@@ -367,7 +367,7 @@ exports.static_complete_milestone = async (args) => {
     let update_detail = {
         title: "Complete",
         description: "Completed the contract based on teams & condition",
-        booking_status: 9,
+        booking_status: 100,
     }
     if (args['contract_id']) {
         update_detail['contract_id'] = args['contract_id']
