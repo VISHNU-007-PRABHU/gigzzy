@@ -1027,7 +1027,7 @@ const typeDefs = gql`
         pay_admin_to_provider(booking_status:Int,status:Int,provider_id:ID):Booking
         # chat
         available_deleteBooking(_id:ID):Booking
-        addRating(comments:String,rating:Int,user_id:ID,provider_id:ID,booking_id:ID,role:Int):Booking
+        addRating(comments:String,rating:Int,user_id:ID,provider_id:ID,booking_id:ID,contract_id:ID,role:Int):Booking
         update_msg_is_read(role:Int,booking_id:ID):Booking
         update_site_img(_id:ID,file:Upload,option:Int):Site
         update_manual_payment(role:Int,booking_id:ID):Booking
