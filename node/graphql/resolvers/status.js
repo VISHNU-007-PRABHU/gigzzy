@@ -48,6 +48,8 @@ module.exports.update_msg_is_read = async (parent, args) => {
 module.exports.add_providerDocument = async (_, args, { file }) => {
     // console.log(args);
     // console.log(args.file.length);
+    try{
+
     if (args.user_id == undefined || args.user_id == '' || args.user_id == null) {
         return { msg: "please check user id", status: "failed" };
     }
@@ -102,6 +104,11 @@ module.exports.add_providerDocument = async (_, args, { file }) => {
     } else {
         return { msg: "upload failed", status: "failed" };
     }
+}catch(error){
+    console.log("module.exports.add_providerDocument -> error", error)
+    return { msg: "upload failed", status: "failed" };
+}
+
 };
 
 /*
