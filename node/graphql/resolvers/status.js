@@ -8,7 +8,7 @@ const { createWriteStream, existsSync, mkdirSync } = require("fs");
 const commonHelper = require('../commonHelper');
 const path = require("path");
 const express = require("express");
-const _ = requier('lodash')
+const _ = require('lodash')
 const files = [];
 
 module.exports.status = async (_, args) => {
