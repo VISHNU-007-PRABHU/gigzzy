@@ -23,12 +23,14 @@ var contractResolver = require('./resolvers/contract');
 var currencyResolver = require('./resolvers/currency');
 var bidingResolver = require('./resolvers/biding');
 var milestoneResolver = require('./resolvers/milestone');
+var chatResolver = require('./resolvers/chat');
 const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
 const payment_choose = require('./payment/choose')
 const MpesaCallback = require('./payment/MpesaCallback');
-const milestone = require('../model/booking/milestone');
+const BidingMilestone_model = require('../model/booking/milestone');
+const Contract_model = require('../model/booking/ContractJob');
 dotenv.config();
 
 var Company_model = model.company;
@@ -53,7 +55,7 @@ const PROOF_STATUS = 'PROOF_STATUS';
 const REMOVE_USER = 'REMOVE_USER';
 const SEND_CONTRACT_JOB_MSG = 'SEND_CONTRACT_JOB_MSG';
 const GET_MY_CONTRACTS = "GET_MY_CONTRACTS"
-
+const GET_MY_MILESTONE = "GET_MY_MILESTONE"
 const resolvers = {
 
     Subscription: {
@@ -93,6 +95,8 @@ const resolvers = {
                 () => pubsub.asyncIterator([MESSAGE_CREATED]),
                 (payload, variables) => {
                     if (payload.messageSent.booking_id == variables.booking_id) {
+                        return true;
+                    }else if(payload.messageSent.contract_id == variables.contract_id && payload.messageSent.provider_id == variables.provider_id){
                         return true;
                     }
                 })
@@ -206,6 +210,7 @@ const resolvers = {
         get_static: staticResolver.get_static,
         get_booking: bookingResolver.get_booking,
         get_message: staticResolver.get_message,
+        get_chat_message:chatResolver.get_chat_message,
         get_all_payout: bookingResolver.get_all_payout,
         get_review: bookingResolver.get_review,
 
@@ -383,7 +388,7 @@ const resolvers = {
         biding_count: bidingResolver.biding_count,
         get_contract_address_detail: contractResolver.get_contract_address_detail,
         find_kilometer: contractResolver.find_kilometer,
-        get_biding_detail:bidingResolver.get_biding_detail,
+        get_biding_detail: bidingResolver.get_biding_detail,
     },
     CompanyImage: {
         get_contract_files: contractResolver.get_contract_files,
@@ -422,8 +427,8 @@ const resolvers = {
         update_biding: bidingResolver.update_biding,
         BidingFileUpload: bidingResolver.BidingFileUpload,
         update_milestone: milestoneResolver.update_milestone,
-        delete_milestone:milestoneResolver.delete_milestone,
-        delete_milestone_image:milestoneResolver.delete_milestone_image,
+        delete_milestone: milestoneResolver.delete_milestone,
+        delete_milestone_image: milestoneResolver.delete_milestone_image,
         UpdateCategoryCurrency: categoryResolver.UpdateCategoryCurrency,
         DeleteCategoryCurrency: categoryResolver.DeleteCategoryCurrency,
         update_company_detail: userResolver.update_company_detail,
@@ -1273,52 +1278,8 @@ const resolvers = {
         update_site_img: settingResolver.update_site_img,
         modified_address: userResolver.modified_address,
         update_msg_is_read: statusResolver.update_msg_is_read,
-        add_message: async (parent, args, context, info) => {  //chat function
-            // console.log(args);
-            var msg_count_data = {};
-            args.message_date = moment.utc().format();
-            const add_msg = new message_model(args);
-            var data = await add_msg.save();
-            var booking = await Booking_model.findOne({ _id: args.booking_id });
-            if (args.role == 1) {
-                msg_count_data['provider_msg_count'] = Number(booking.provider_msg_count) + 1;
-                msg_count_data['provider_msg_is_read'] = 1;
-            } else if (args.role == 2) {
-                msg_count_data['user_msg_count'] = Number(booking.user_msg_count) + 1;
-                msg_count_data['user_msg_is_read'] = 1;
-            }
-
-            var msg_count = await Booking_model.findOneAndUpdate({ _id: args.booking_id }, msg_count_data, { new: true });
-            var datas = await message_model.findOne({ _id: data._id });
-            await pubsub.publish(MESSAGE_CREATED, { messageSent: datas });
-            var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: msg_count });
-            // ================= push_notifiy ================== //
-            var user_data = {};
-            if (args.role == 1) {
-                user_data = { _id: booking.provider_id }
-            } else if (args.role == 2) {
-                user_data = { _id: booking.user_id }
-            }
-            var user = await Detail_model.findOne(user_data);
-            msg_count_data['booking_id'] = args.booking_id;
-            var message = {
-                to: user.device_id,
-                collapse_key: 'your_collapse_key',
-                notification: {
-                    title: "Message",
-                    body: msg_count_data,
-                    click_action: ".activities.HomeActivity",
-                },
-                data: {
-                    my_key: commonHelper.chat,
-                    my_another_key: commonHelper.chat,
-                    booking_id: args.booking_id
-                }
-            };
-            var msg_notification = await commonHelper.push_notifiy(message);
-            // ================= push_notifiy ================== //  
-            return datas;
-        },
+        add_message:chatResolver.add_message,
+        live_chating:chatResolver.live_chating,
         provider_document_verified: async (parent, args) => {
             var document_verified = await Detail_model.updateOne({ _id: args._id }, { proof_status: args.proof_status });
             if (document_verified.n == document_verified.nModified) {
@@ -1384,18 +1345,22 @@ module.exports.confrimation_call = async (body) => {
             update_details['payment_message'] = body["Body"]["stkCallback"]["ResultDesc"]
 
             let pre_contract_detail = await Contract_model.findOne({ CheckoutRequestID }).lean()
+            let pre_milestone_detail = await BidingMilestone_model.findOne({ CheckoutRequestID }).lean()
+            let confirmation_body = {
+                TransID: body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"],
+                TransTime: body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"],
+                TransAmount: body['TransAmount'],
+                CheckoutRequestID: CheckoutRequestID,
+                payment_type: "mpesa",
+                ResultCode: ResultCode,
+                payment_message: update_details['payment_message']
+            }
             if (_.size(pre_contract_detail)) {
-                let confirmation_body = {
-                    TransID: body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"],
-                    TransTime: body["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"],
-                    TransAmount: body['TransAmount'],
-                    CheckoutRequestID: CheckoutRequestID,
-                    payment_type: "mpesa",
-                    ResultCode: ResultCode,
-                    payment_message: payment_message
-                }
-                await MpesaCallback.c2b_contract_confiramtion(confirmation_body);
+                let data = await MpesaCallback.c2b_contract_confiramtion(confirmation_body);
                 return resolve({ status: true, msg: "Payment Is success !", data })
+            } else if (_.size(pre_milestone_detail)) {
+                let data = await MpesaCallback.c2b_milestone_confiramtion(confirmation_body);
+                return resolve({ status: true, msg: "Milestone Payment Is success !", data })
             }
 
             let pre_booking_detail = await Booking_model.findOne({ CheckoutRequestID }).lean()
@@ -1591,18 +1556,22 @@ module.exports.c2b_confirmation = async (body) => {
 
 
             let pre_contract_detail = await Contract_model.findOne({ ctob_billRef }).lean()
+            let pre_milestone_detail = await BidingMilestone_model.findOne({ ctob_billRef }).lean()
+            let confirmation_body = {
+                TransID: body['TransID'],
+                TransAmount: body['TransAmount'],
+                TransTime: body['TransTime'],
+                ResultCode: ResultCode,
+                ctob_billRef: ctob_billRef,
+                payment_type: "c2b",
+                payment_message: update_details['payment_message']
+            }
             if (_.size(pre_contract_detail)) {
-                let confirmation_body = {
-                    TransID: body['TransID'],
-                    TransAmount: body['TransAmount'],
-                    TransTime: body['TransTime'],
-                    ResultCode: ResultCode,
-                    ctob_billRef: ctob_billRef,
-                    payment_type: "c2b",
-                    payment_message: payment_message
-                }
-                await MpesaCallback.c2b_contract_confiramtion(confirmation_body);
+                let data = await MpesaCallback.c2b_contract_confiramtion(confirmation_body);
                 return resolve({ status: true, msg: "Payment Is success !", data })
+            } else if (_.size(pre_milestone_detail)) {
+                let data = await MpesaCallback.c2b_milestone_confiramtion(confirmation_body);
+                return resolve({ status: true, msg: "Milestone Payment Is success !", data })
             }
 
             // check to next phase (vishnu)

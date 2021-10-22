@@ -89,7 +89,7 @@ class Biding extends React.Component {
                                     <ShowCategory parent_catgeory={catgeory} custom_class="font-weight-light m-0" custom_font={4} />
                                 </Suspense>
                                 <div className="px-3">{data?.biding_count || 0}Bids</div>
-                                <Tag color="green">green</Tag>
+                                <Tag color="green">{data?.created_at} </Tag>
                             </div>
                             <div>
                                 <div>{data?.budget}</div>

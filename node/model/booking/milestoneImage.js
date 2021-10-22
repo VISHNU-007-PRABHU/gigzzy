@@ -27,6 +27,7 @@ var milestoneImageSchema = new Schema({
   doc_type: { type: String, default: '' },
   doc_category: { type: String, default: '' },
   doc_formate: { type: String, default: '' },
+  model_type: { type: String, default: 'milestone' },
   delete: { type: Boolean, default: false },
 }, schemaOptions);
 

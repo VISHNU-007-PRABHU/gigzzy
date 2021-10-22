@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 const moment = require("moment");
+const shortid = require('shortid');
 const commonHelper = require('../../graphql/commonHelper');
 mongoose.set('useFindAndModify', false);
 var Schema = mongoose.Schema;
@@ -19,12 +20,13 @@ var milestoneSchema = new Schema({
   provider_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
   biding_id:String,
   contract_id:String,
-  milestone_ref: { type: String },
+  milestone_ref: { type: String, 'default': shortid.generate },
   start_date: String,
   end_date: String,
   title: String,
   pay_option:Boolean,
-  description: String,
+  description:  { type: String, default: "" },
+  pro_description: { type: String, default: ""} ,
   budget: { type: Number, default: 0.00 },
   timeline: String,
   timeline_type: { type: String ,default:"1"},
@@ -64,7 +66,9 @@ var milestoneSchema = new Schema({
   provider_fee: { type: String, default: 0.00 }, //provider fee
   final_payment: { type: String, default: 0.00 },
   extra_hour_price: { type: String, default: 0.00 },
-  is_delete: { type: Boolean, default: false },
+  extra_fare: {type: String, default: 0.00  },
+  extra_fare_reason: {type: String},
+  phone_number: {type: String},
 }, schemaOptions);
 
 milestoneSchema.virtual('uid').get(function () {

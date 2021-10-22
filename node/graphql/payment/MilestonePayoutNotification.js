@@ -3,6 +3,7 @@ const model = require('../../model_data');
 const _ = require('lodash');
 const moment = require("moment");
 const commonHelper = require('../commonHelper')
+const PushNotification = require('../notification/PushNotification')
 var Detail_model = model.detail;
 var Payout_model = model.payout;
 var Contract_model = model.contract_job
@@ -36,9 +37,9 @@ exports.update_milestone_after_payment = async (args, charge, biding) => {
             }
 
             if (args.booking_status === 10) {
-                contract_data['accept_date'] = moment.utc().format();
+                milestone_data['accept_date'] = moment.utc().format();
                 if (args.payment_option === "mpesa") {
-                    contract_data['booking_status'] = 50;
+                    milestone_data['booking_status'] = 50;
                 } else {
                     milestone_data['booking_status'] = 10;
                     milestone_data['job_status'] = 10;
@@ -64,6 +65,7 @@ exports.update_milestone_after_payment = async (args, charge, biding) => {
                 currenct_milestone_status: 10,
                 currenct_milestone_id: args['_id']
             }
+            console.log("exports.update_milestone_after_payment -> milestone_data", milestone_data)
             await Contract_model.updateOne({ _id: args.contract_id }, contract_data, { new: true });
             await BidingMilestone_model.updateOne({ _id: args._id }, milestone_data, { new: true });
             return resolve({ msg: "update success", status: true });
@@ -76,22 +78,22 @@ exports.update_milestone_after_payment = async (args, charge, biding) => {
 
 exports.accept_milestone_payout_notification = async (milestone_data) => {
     return new Promise(async function (resolve, reject) {
+        console.log("exports.accept_milestone_payout_notification -> milestone_data", milestone_data)
         try {
-            let booking_detail = await Contract_model.findOne({ _id: contract_data._id }).lean()
-            let milestone_detail = await Contract_model.findOne({ _id: contract_data._id }).lean()
+            let contract_data = await Contract_model.findOne({ _id: milestone_data['contract_id'] }).lean()
             let app_user_detail = await Detail_model.findOne({ _id: contract_data.user_id });
             let user_detail = await Detail_model.findOne({ _id: contract_data.provider_id });
 
             // send push notification to provider
             let notification_user_data = [{
                 user_id: user_detail.device_id,
-                booking_status: milestone_detail.booking_status,
-                booking_id: milestone_detail._id
+                booking_status: milestone_data.booking_status ,
+                booking_id: milestone_data._id
             }]
 
             await PushNotification.create_push_notification_msg(notification_user_data);
          
-            if (booking_detail.booking_status === 13) {
+            if (milestone_data.booking_status === 14) {
                 await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_finished", {})
                 return resolve({ job_status: 14, msg: "job is completed successfully", status: 'success' });
 
@@ -104,13 +106,13 @@ exports.accept_milestone_payout_notification = async (milestone_data) => {
                 // await global.pubsub.publish("APPOINTMENTS", { get_my_appointments: result });
 
                 //send current booking data using subcription
-                milestone_detail['user_parent'] = true;
-                milestone_detail['msg'] = "user accept the job ";
-                milestone_detail['status'] = 'success';
-                milestone_detail['msg_status'] = 'to_provider';
-                let  = milestone_detail
+                milestone_data['user_parent'] = true;
+                milestone_data['msg'] = "user accept the job ";
+                milestone_data['status'] = 'success';
+                milestone_data['msg_status'] = 'to_provider';
+                let user_contract_data = milestone_data
                 user_contract_data['msg_status'] = 'to_user';
-                await global.pubsub.publish("get_my_milestone", { get_my_milestone: user_contract_data });
+                await global.pubsub.publish("GET_MY_MILESTONE", { get_my_milestone: user_contract_data });
                 return resolve({ status: true, msg: "Payment Is success !", data: user_contract_data })
             }
 

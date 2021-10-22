@@ -109,8 +109,8 @@ class CompanyTable extends React.Component {
                 width: '25%',
                 render: (text, record) => {
                     return <div>
-                        <span title="Company Name">{record.get_company_user_detail[0].first_name}</span>
-                        <span title=""> {record.get_company_user_detail[0].last_name}</span>
+                        <span title="Company Name">{record.get_company_user_detail?.[0]?.first_name}</span>
+                        <span title=""> {record.get_company_user_detail?.[0]?.last_name}</span>
                     </div>
                 }
             },

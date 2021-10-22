@@ -4,6 +4,7 @@ import { Table, Modal, Form, Avatar, Popconfirm, Tag, Icon, Switch } from "antd"
 import { GET_CONTRACT_PAGINATION, UPDATE_CATEGORY, DELETE_CATEGORY } from '../../../graphql/Admin/contract';
 import { client } from "../../../apollo";
 import '../../../scss/template.scss';
+import size from 'lodash'
 import { Alert_msg } from '../../Comman/alert_msg';
 import Search from "antd/lib/input/Search";
 import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
@@ -28,6 +29,7 @@ class ContractTable extends React.Component {
         }
     }
     componentDidMount() {
+        console.log(this.props.booking_status)
         this.fetch_category();
     }
     handleTableChange = async pagination => {
@@ -36,7 +38,7 @@ class ContractTable extends React.Component {
         this.setState({ loading: true });
         await client.query({
             query: GET_CONTRACT_PAGINATION,
-            variables: { limit: pager.pageSize, page: pager.current, data: { is_parent: false } },
+            variables: { booking_status: this.props.booking_status, limit: pager.pageSize, page: pager.current, data: { is_parent: false } },
             fetchPolicy: 'no-cache',
         }).then(result => {
             const pagination = { ...this.state.pagination };
@@ -57,11 +59,16 @@ class ContractTable extends React.Component {
 
     fetch_category = async (data) => {
         this.setState({ loading: true });
-        let input = {};
-        input = data;
+        let input = {
+            booking_status: this.props.booking_status,
+        };
+        if(size(data)){
+            input['search']=data
+        }
+        
         await client.query({
             query: GET_CONTRACT_PAGINATION,
-            variables: { data: input },
+            variables: input,
             fetchPolicy: 'no-cache',
         }).then(result => {
             const pagination = { ...this.state.pagination };
@@ -79,28 +86,18 @@ class ContractTable extends React.Component {
         }).then((result, loading, error) => {
             Alert_msg(result.data.deleteCategory);
             if (result.data.deleteCategory.status === 'success') {
-                this.fetch_category({ is_parent: false });
+                this.fetch_category();
             }
         });
     }
 
-    change_future = async (data) => {
-        await client.mutate({
-            mutation: UPDATE_CATEGORY,
-            variables: data,
-        }).then((result, loading, error) => {
-            Alert_msg(result.data.updateCategory.info);
-            this.fetch_category({ is_parent: false });
-        });
-    }
-
     onFilter_Ref = async (data) => {
-        // if (data.target.value) {
-        //     var datas = { is_parent: false, 'category_name': { $regex: '.*' + data.target.value + '.*', $options: 'i' } }
-        //     this.fetch_category(datas);
-        // } else {
-        //     this.fetch_category({ is_parent: false });
-        // }
+        if (data.target.value) {
+            var datas = { 'contract_ref': { $regex: '.*' + data.target.value + '.*', $options: 'i' } }
+            this.fetch_category(datas);
+        } else {
+            this.fetch_category();
+        }
     }
 
     render() {

@@ -207,11 +207,11 @@ module.exports.get_contract_all_files = async (root, args) => {
                 return grouped_images
             }
         } else {
-            return []
+            return [{small_image:''}]
         }
     } catch (error) {
         console.log("module.exports.get_contract_files -> error", error)
-        return []
+        return [{small_image:''}]
     }
 }
 
@@ -222,6 +222,16 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         var offset = Number(page - 1) * Number(limit);
         var total = 0;
         let find_query = { is_delete: false }
+        let sort_option ={
+            created_at:-1
+        }
+
+        if(args.rating_sort ){
+            sort_option['rating'] = args.rating_sort
+        }else if(args.budget_sort ){
+            sort_option['budget'] = args.budget_sort
+        }
+
         if (args['search']) {
             find_query = { ...find_query, ...args['search'] }
         }
@@ -242,11 +252,15 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
             }
         }
         if (args['booking_status']) {
-            find_query['booking_status'] = args['booking_status']
+            if (args.booking_status === 4) {
+                find_query['booking_status'] = { $in: [13, 4] }
+            } else {
+                find_query['booking_status'] = args['booking_status']
+            }
         }
 
         total = await ContractJob_model.count(find_query);
-        let result = await ContractJob_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(Number(limit));
+        let result = await ContractJob_model.find(find_query).sort(sort_option).skip(Number(offset)).limit(Number(limit));
         var pageInfo = { totalDocs: total, page: args.page }
         return { data: result, pageInfo };
     } catch (error) {
@@ -307,7 +321,7 @@ module.exports.update_contract = async (root, args) => {
             await ContractJob_model.updateOne(find_query, contract_detail).exec()
             let fetch_contract = await ContractJob_model.findOne(find_query).lean()
             if (args['booking_status'] === 9) {
-                await this.find_provider(fetch_contract)
+                let datas = await this.find_provider(fetch_contract)
             }
             fetch_contract['status'] = "success";
             fetch_contract['msg'] = "contract job update success"
@@ -425,6 +439,7 @@ exports.find_provider = async (contract_data) => {
             provider_subCategoryID: { $in: [contract_data.category_id] },
         };
         let find_provider_data = await Detail_model.find(filter);
+        console.log("exports.find_provider -> find_provider_data", _.size(find_provider_data))
         var available_provider = []
         let notification_user_data = []
         for (let i = 0; i < find_provider_data.length; i++) {

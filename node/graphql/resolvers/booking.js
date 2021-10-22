@@ -15,7 +15,7 @@ var Booking_model = model.booking;
 var Payout_model = model.payout;
 var Extra_model = model.Extra_fee;
 var Currency_model = model.currency;
-
+var Contract_model = model.contract_job
 // const MESSAGE_CREATED = 'MESSAGE_CREATED';
 // const ACCEPT_MSG = 'ACCEPT_MSG';
 //get booking based on pagination
@@ -51,9 +51,9 @@ module.exports.get_payout = async (root, args) => {
         created_at: 1,
         bookingDate: 1,
         booking_date: 1,
-        symbol:1,
-        currency_id:1,
-        base_price:1
+        symbol: 1,
+        currency_id: 1,
+        base_price: 1
     };
     var wmatch = {
         provider_fee: { $ne: 'NaN' },
@@ -108,7 +108,7 @@ module.exports.get_payout = async (root, args) => {
 
     let default_currency = await Currency_model.findOne({ location: args.location_code }).lean()
     var total = await Booking_model.aggregate(total);
-    var datas = await CommonFunction.get_total_payout(args.provider_id,default_currency);
+    var datas = await CommonFunction.get_total_payout(args.provider_id, default_currency);
     console.log("module.exports.get_payout -> datas", datas)
     var data = await Booking_model.aggregate(filter);
     var pageInfo = { totalDocs: total.length, page: args.page, total_amount: datas ? `${default_currency.symbol} ${String(parseFloat(datas).toFixed(2))}` : "0.00" }
@@ -181,7 +181,7 @@ module.exports.find_payout_booking = async (parent, args) => {
 
 // get booking
 module.exports.booking = async (parent, args, context, info) => {
-    if(args.location_code){
+    if (args.location_code) {
         delete args.location_code
     }
     const result = await Booking_model.find(args);
@@ -301,25 +301,34 @@ module.exports.get_trending = async (parent, args) => {
 };
 
 module.exports.addRating = async (parent, args, context, info) => {
-    var data = {}
-    if (args.role == 1) {
-        data = {
-            user_rating: args.rating,
-            user_comments: args.comments,
-            user_rating_status: 1,
+    try {
+        var data = {}
+        if (args.role == 1) {
+            data = {
+                user_rating: args.rating,
+                user_comments: args.comments,
+                user_rating_status: 1,
+            }
+        } else if (args.role == 2) {
+            data = {
+                provider_rating: args.rating,
+                provider_comments: args.comments,
+                provider_rating_status: 1,
+            }
         }
-    } else if (args.role == 2) {
-        data = {
-            provider_rating: args.rating,
-            provider_comments: args.comments,
-            provider_rating_status: 1,
+        if(args.booking_id ){
+            await Booking_model.updateOne({ _id: args.booking_id }, data, { new: true });
         }
-    }
-    var add_rating = await Booking_model.update({ _id: args.booking_id }, data, { new: true });
-    if (add_rating.n == add_rating.nModified) {
-        return { ...data, ... { msg: "Rating Update Successfully", status: "success" } };
-    } else {
-        return { ...data, ... { msg: "Rating Update Failed", status: "failed" } };
+        if(args.contract_id ){
+            await Contract_model.updateOne({ _id: args.contract_id }, data, { new: true });
+        }
+        data['msg'] = "Rating Update Successfully";
+        data['status'] = "success";
+        return data
+
+    } catch (error) {
+        console.log("module.exports.addRating -> error", error)
+        return { msg: "Rating Update Successfully", status: "success" }
     }
 }
 

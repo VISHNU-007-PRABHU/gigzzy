@@ -14,6 +14,15 @@ export const GET_MILESTONE_PAGINATION = gql`
                 timeline_type
                 payment_option(code:$location_code)
                 booking_status
+                description
+                title
+                pro_description
+                extra_fare
+                extra_fare_reason
+                total(code:$location_code)
+                get_milestone_all_images(root:true){
+                    small_image
+                }
         }
     }
 `;

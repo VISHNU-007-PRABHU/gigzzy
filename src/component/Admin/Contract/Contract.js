@@ -14,12 +14,7 @@ class Contract extends React.Component {
         collapsed: false,
     };
 
-    onToggle = (val) => {
-        console.log(val);
-        this.setState({
-            collapsed: val,
-        });
-    };
+
 
     render() {
 
@@ -31,19 +26,16 @@ class Contract extends React.Component {
                     <Content className="main_frame">
                         <Tabs>
                             <TabPane tab="Picked Contract" key="1">
-                                <ContractTable />
+                                <ContractTable booking_status={10}/>
                             </TabPane>
                             <TabPane tab="Ongoing Contract" key="2">
-                                <ContractTable />
+                                <ContractTable booking_status={4}/>
                             </TabPane>
                             <TabPane tab="Completed Contract" key="3">
-                                <ContractTable />
+                                <ContractTable booking_status={14}/>
                             </TabPane>
                             <TabPane tab="Pending Contract" key="4">
-                                <ContractTable />
-                            </TabPane>
-                            <TabPane tab="Deleted Contract" key="5">
-                                <ContractTable />
+                                <ContractTable booking_status={9}/>
                             </TabPane>
                         </Tabs>
                     </Content>

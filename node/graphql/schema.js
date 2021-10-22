@@ -15,7 +15,6 @@ const typeDefs = gql`
     directive @imgUrl(format: String) on FIELD_DEFINITION
 
     type Subscription {
-        messageSent(limit: Int,page:Int,user_id:ID,provider_id:ID,booking_id:ID):Chat
         get_my_appointments(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[Booking]
         acceptedMessage(id:ID,online:Int): Booking   
         send_jobs_provider(_id:ID,online:Int,location_code:String): Booking
@@ -25,8 +24,6 @@ const typeDefs = gql`
         proof_status(_id:ID,role:Int,):Detail
         demo_account(_id:ID):Detail
 
-        send_contract_jobs_provider(_id:ID,online:Int,location_code:String):ContractJob
-        get_my_contracts(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[ContractJob]
         get_my_biding(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[Biding]
         get_my_milestone(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):Milestone
         accept_biding(biding_id:ID,online:Int,location_code:String):Biding
@@ -57,7 +54,7 @@ const typeDefs = gql`
         get_my_appointments(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):BookingConnection
         booking(_id:ID,location_code:String):[Booking]
         get_now_job(_id:ID,role:Int,booking_status:Int):[Booking]
-        get_message(booking_id:ID,user_id:ID,provider_id:ID):[Chat]
+       
         search_category(_id:ID,data:JSON):[Category] 
         search_category_mobile(data:String):[Category]
         get_trending(_id:ID):[Category]
@@ -98,10 +95,7 @@ const typeDefs = gql`
         # company detail
         get_company_detail(data:JSON,provider_search:JSON,search:JSON,_id:ID,page:Int,limit:Int,company_id:ID,user_id:ID,provider_id:ID):CompanyConnection
         get_parent_company_provider(provider_search:JSON,provider_id:Boolean,user_id:Boolean,company_id:ID):[CompanyProvider]
-        get_contract_files(location_code:String,company_id:ID,user_id:ID,provider_id:ID,contract_id:ID):[ContractImage]
-        get_contracts(location_code:String,company_id:ID,contract_id:ID,provider_id:ID,user_id:ID):[ContractJob]
-        get_contracts_pagination(location_code:String,booking_status:Int,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
-        get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
+
         get_currencys(data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,pagination:Boolean,page:Int,limit:Int):CurrencyConnection
         get_currency(_id:ID,country_code:String,location_code:String):Currency
         get_biding_pagination(location_code:String,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int,contract_id:ID):BidingConnection
@@ -138,11 +132,7 @@ const typeDefs = gql`
         data:[Company]
         pageInfo: PageInfo!
     }
-     # Company pagination data
-     type ContractConnection {
-        data:[ContractJob]
-        pageInfo: PageInfo!
-    }
+   
      # Company pagination data
      type BidingConnection {
         data:[Biding]
@@ -257,29 +247,7 @@ const typeDefs = gql`
         currency_code:String
         location_code:String
     }
-    type Chat{
-        id:ID
-        message:String
-        role:Int
-        createdAt: Date
-        msg_date:String @date(format: "DD MMMM YYYY")
-        msg_time:String @date(format: "hh:mm a")
-        updatedAt: Date
-        user(_id:ID):[Detail]
-        provider(_id:ID):[Detail]
-        booked(_id:ID):[Booking]
-        info:JSON
-        docs:[JSON]
-        totalDocs: Int
-        limit: Int
-        hasPrevPage:Boolean
-        hasNextPage: Boolean
-        page: Int
-        totalPages: Int
-        pagingCounter: Int
-        prevPage: String
-        nextPage: String
-    }
+  
     # biding schema
     type Biding{
         _id:ID
@@ -333,6 +301,7 @@ const typeDefs = gql`
         user_id:ID
         contract_id:ID
         description:String,
+        pro_description:String
         budget(code: String): String @currency,
         timeline: String,       
         timeline_type: String,
@@ -349,7 +318,7 @@ const typeDefs = gql`
         biding_id:ID
         category_type:Int
         milestone_status:String
-        get_milestone_all_images(milestone_id:ID,_id:ID,root:Boolean):[MilestoneImage]
+        get_milestone_all_images(milestone_id:ID,_id:ID,root:Boolean,model_type:String):[MilestoneImage]
         msg:String
         status:String
         total(code: String): String @currency
@@ -358,6 +327,8 @@ const typeDefs = gql`
         ctob_billRef:String
         payment_type:String
         payment_option(code:String):String @paymentOption
+        extra_fare(code: String): String @currency
+        extra_fare_reason: String,
     }
     type Currency{
         _id:ID,
@@ -375,52 +346,7 @@ const typeDefs = gql`
         msg:String   
     }
 
-    type ContractJob{
-        _id:ID
-        msg:String
-        status:String
-        name:String
-        website_url:String
-        address:String
-        address_id:ID
-        description:String
-        budget(code: String): String @currency, 
-        admin_fee(code: String): String @currency, 
-        timeline:String
-        timeline_type:String 
-        terms_condition: String 
-        lat:Float
-        lng:Float
-        contract_status:String
-        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
-        category_id:ID
-        biding_id:ID
-        booking_status:Int
-        category_type:Int
-        contract_ref:String
-        biding_count:Int
-        get_contracts_pagination(location_code:String,booking_status:Int,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
-        get_contract_category(contract_id:ID,_id:ID,category_type:Int):[Category]
-        get_contract_files(contract_id:ID):[ContractImage]
-        get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
-        get_company_root_detail(root:Boolean):Company
-        get_contract_address_detail(root:Boolean):UserAddress
-        get_user:[Detail]
-        get_provider_user:[Detail]
-        currency_code:String
-        location_code:String
-        current_page:String
-        service_fee(code: String): String @currency
-        total(code: String): String @currency
-        ctob:Boolean @payment
-        ctob_shotcode:String
-        ctob_billRef:String
-        currenct_milestone_id:ID,
-        currenct_milestone_status:Int
-        milestones_status:Int
-        get_biding_detail(root:Boolean,all:Boolean):Biding
-        find_kilometer(lat:Float,lng:Float,root:Boolean):Detail
-    }
+  
     type Company{
         _id:ID
         user_id:ID
@@ -486,26 +412,7 @@ const typeDefs = gql`
         get_contract_files(contract_id:ID):[ContractImage]
         get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
     }
-    type ContractImage{
-        _id:ID
-        company_id: String,
-        biding_id:String,
-        small_image: String  @imgUrl(format: "contract"),
-        large_image: String  @imgUrl(format: "contract"),
-        image_tag: String,
-        doc_type: String,
-        doc_category: String,
-        doc_formate: String,
-        delete: Boolean,
-        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
-        data: JSON 
-        msg:String
-        status:String
-        images:[CompanyImage]
-        get_contract_files(contract_id:ID,root:Boolean):[ContractImage]
-        get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
-      
-    }
+  
     type MilestoneImage{
         _id:ID
         company_id: String,
@@ -521,6 +428,7 @@ const typeDefs = gql`
         data: JSON 
         msg:String
         status:String
+        model_type:String
         images:[CompanyImage]
         get_contract_files(contract_id:ID):[ContractImage]
         get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
@@ -1045,9 +953,7 @@ const typeDefs = gql`
         update_booking_details(provider_id:ID,booking_id:ID,file:[Upload],option:Int,user_comments_status:Int):Booking
         pay_admin_to_provider(booking_status:Int,status:Int,provider_id:ID):Booking
         # chat
-        add_message(role:Int,booking_id:ID,user_id:ID,provider_id:ID,message:String):Chat
         available_deleteBooking(_id:ID):Booking
-        addRating(comments:String,rating:Int,user_id:ID,provider_id:ID,booking_id:ID,role:Int):Booking
         update_msg_is_read(role:Int,booking_id:ID):Booking
         update_site_img(_id:ID,file:Upload,option:Int):Site
         update_manual_payment(role:Int,booking_id:ID):Booking
@@ -1142,24 +1048,8 @@ const typeDefs = gql`
             logo_file:Upload,
             profile_file:Upload
         ):Company
-        # contract jobs
-        update_contract(
-            location_code:String,
-            local_location_code:String,
-            category_id:ID,
-            category_type:Int,
-            lat:Float,
-            lng:Float,
-            currency_code:String,
-            _id:ID,
-            contract_data:JSON,
-            search_data:JSON
-            booking_status:Int
-        ):ContractJob
         update_currency(_id:ID,currency_data:JSON):Currency
         delete_currency(_id:ID,currency_data:JSON):Currency
-        ContractJobFileUpload(_id:ID,contract_id:ID,category:String,image_tag:String,data:[JSON],file:[Upload]):CompanyImage
-        DeleteContractJobFile(_id:ID):ContractJob
         # update biding 
          update_biding(
             option:String  
@@ -1188,7 +1078,9 @@ const typeDefs = gql`
             milestone_data:JSON
             location_code:String,
             local_location_code:String,
+            model_type:String
         ):Milestone
+       
         UpdateCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
         DeleteCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
         manage_milestone_booking(
@@ -1219,32 +1111,7 @@ const typeDefs = gql`
             option:Int,
             extra_fare_id:ID
         ):Milestone
-        manage_contract_booking(
-            location_code:String,
-            role:Int,
-            contract_status:String
-            booking_id:ID,
-            contract_id:ID,
-            biding_id:ID,
-            user_id:ID,
-            provider_id:ID,
-            category_id:String,
-            lat:Float,
-            lng:Float,
-            weekday:JSON,
-            hours:String,
-            description:String,
-            booking_status:Int,
-            category_type:Int,
-            stripe_token:String,
-            payment_option:String,
-            payment_type:String
-            ,phone_number:String,
-            extra_fare:String,
-            extra_fare_reason:String,
-            option:Int,
-            extra_fare_id:ID
-        ):ContractJob
+      
         delete_milestone(_id:ID,option:Int):Milestone
         delete_milestone_image(_id:ID,option:Int):Milestone
     }
