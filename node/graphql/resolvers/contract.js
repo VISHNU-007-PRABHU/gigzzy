@@ -222,6 +222,16 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         var offset = Number(page - 1) * Number(limit);
         var total = 0;
         let find_query = { is_delete: false }
+        let sort_option ={
+            created_at:-1
+        }
+
+        if(args.rating_sort ){
+            sort_option['rating'] = args.rating_sort
+        }else if(args.budget_sort ){
+            sort_option['budget'] = args.budget_sort
+        }
+
         if (args['search']) {
             find_query = { ...find_query, ...args['search'] }
         }
@@ -250,7 +260,7 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         }
 
         total = await ContractJob_model.count(find_query);
-        let result = await ContractJob_model.find(find_query).sort({ created_at: -1 }).skip(Number(offset)).limit(Number(limit));
+        let result = await ContractJob_model.find(find_query).sort(sort_option).skip(Number(offset)).limit(Number(limit));
         var pageInfo = { totalDocs: total, page: args.page }
         return { data: result, pageInfo };
     } catch (error) {

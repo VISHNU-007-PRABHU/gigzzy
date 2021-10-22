@@ -31,8 +31,8 @@ export const CHNAGE_PARENT_BLOCK = gql`
 `;
 
 export const GET_CONTRACT_PAGINATION = gql`
- query GETCONTRACTPAGINATION($limit: Int,$page:Int,$booking_status:Int,$data:JSON) {
-    get_contracts_pagination(limit:$limit,page:$page,data:$data,booking_status:$booking_status) {
+ query GETCONTRACTPAGINATION($limit: Int,$page:Int,$booking_status:Int,$search:JSON) {
+    get_contracts_pagination(limit:$limit,page:$page,search:$search,booking_status:$booking_status) {
         pageInfo{
             totalDocs
             page
