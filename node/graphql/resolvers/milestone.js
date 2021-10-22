@@ -274,6 +274,8 @@ exports.manage_milestone_booking = async (root, args) => {
         if (args.booking_status === 13) {
             await BidingMilestone_model.updateOne({ _id: args._id }, { booking_status: 13, end_date: moment.utc().format() }).exec()
             var findBooking = await BidingMilestone_model.findOne({ _id: args._id }).lean();
+            findBooking['msg'] = "Milestone ended";
+            findBooking['status'] = 'success';
             return findBooking
         } else if (args.booking_status === 14) {
             if (preview_milestone_data.extra_price && Number(preview_milestone_data.extra_price)) {
