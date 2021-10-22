@@ -83,7 +83,6 @@ exports.choose_milestone_payment = async (args,milestone_detail) => {
             switch (args.payment_option) {
                 case 'stripe':
                     let stripe_charge = await stripeModule.stripe_payment(args, milestone_detail )
-                    console.log("exports.choose_milestone_payment -> stripe_charge", stripe_charge)
                     if (stripe_charge.charge.status == "succeeded" && stripe_charge.charge.paid == true) {
                         await MilestonePayoutNotificationModule.update_milestone_after_payment(args, stripe_charge.charge,milestone_detail)
                         await MilestonePayoutNotificationModule.update_milestone_provider_payout(milestone_detail)
