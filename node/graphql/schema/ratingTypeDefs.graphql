@@ -1,0 +1,25 @@
+const { gql } = require('apollo-server');
+
+module.exports = gql`
+  type Rating{
+        id:ID
+        message:String
+        role:Int
+        createdAt: Date
+        msg_date:String @date(format: "DD MMMM YYYY")
+        msg_time:String @date(format: "hh:mm a")
+        updatedAt: Date
+        user(_id:ID):[Detail]
+        provider(_id:ID):[Detail]
+        user_rating:Int
+        provider_rating:Int
+        provider_comments:String
+        user_comments:String
+    }
+ 
+    extend type Mutation {
+        addRating(comments:String,rating:Int,user_id:ID,provider_id:ID,booking_id:ID,contract_id:ID,role:Int):Booking
+    }
+`
+
+

@@ -12,6 +12,7 @@ const { defaultFieldResolver, GraphQLString } = require('graphql');
 const { typeDefs } = require('./node/graphql/schema');
 const categoryTypeDefs = require('./node/graphql/schema/categoryTypeDefs');
 const chatTypeDefs = require('./node/graphql/schema/chatTypeDefs');
+const ratingTypeDefs = require('./node/graphql/schema/ratingTypeDefs.graphql');
 
 const { resolvers, confrimation_call, c2b_confirmation, c2b_validation } = require('./node/graphql/resolver');
 const { confrimation_company_worker } = require('./node/graphql/resolvers/user')
@@ -217,7 +218,7 @@ const server = new ApolloServer({
     origin: '*',			// <- allow request from all domains
     credentials: true
   },
-  typeDefs: [typeDefs,categoryTypeDefs,chatTypeDefs],
+  typeDefs: [typeDefs,categoryTypeDefs,chatTypeDefs,ratingTypeDefs],
   resolvers: [resolvers],
   schemaDirectives: {
     currency: currencyDirective,

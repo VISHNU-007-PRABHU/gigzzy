@@ -307,7 +307,8 @@ module.exports.update_contract = async (root, args) => {
             await ContractJob_model.updateOne(find_query, contract_detail).exec()
             let fetch_contract = await ContractJob_model.findOne(find_query).lean()
             if (args['booking_status'] === 9) {
-                await this.find_provider(fetch_contract)
+                let datas = await this.find_provider(fetch_contract)
+                console.log("module.exports.update_contract -> datas", datas)
             }
             fetch_contract['status'] = "success";
             fetch_contract['msg'] = "contract job update success"
@@ -425,6 +426,7 @@ exports.find_provider = async (contract_data) => {
             provider_subCategoryID: { $in: [contract_data.category_id] },
         };
         let find_provider_data = await Detail_model.find(filter);
+        console.log("exports.find_provider -> find_provider_data", _.size(find_provider_data))
         var available_provider = []
         let notification_user_data = []
         for (let i = 0; i < find_provider_data.length; i++) {
