@@ -276,7 +276,7 @@ exports.manage_milestone_booking = async (root, args) => {
             var findBooking = await BidingMilestone_model.findOne({ _id: args._id }).lean();
             return findBooking
         } else if (args.booking_status === 14) {
-            if (preview_milestone_data.extra_price && Numner(preview_milestone_data.extra_price)) {
+            if (preview_milestone_data.extra_price && Number(preview_milestone_data.extra_price)) {
                 console.log("exports.manage_milestone_booking -> preview_milestone_data.extra_price", preview_milestone_data.extra_price)
                 args['amount'] = preview_milestone_data['total'];
             } else {
