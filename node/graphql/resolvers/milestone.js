@@ -319,7 +319,7 @@ exports.static_contract_by_milestone = async (args) => {
                 return { msg: "contract milestone updated has been started", status: 'success' }
             }
 
-            if (args.milestones_status === 4 || args.milestones_status === 14) {
+            if (args.milestones_status === 4 || args.milestones_status === 13) {
                 let updat_data = {
                     milestones_status: args['milestones_status'],
                     booking_status: args['milestones_status']

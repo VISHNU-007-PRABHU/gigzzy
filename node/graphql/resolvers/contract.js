@@ -242,7 +242,11 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
             }
         }
         if (args['booking_status']) {
-            find_query['booking_status'] = args['booking_status']
+            if (args.booking_status === 4) {
+                find_query['booking_status'] = { $in: [13, 4] }
+            } else {
+                find_query['booking_status'] = args['booking_status']
+            }
         }
 
         total = await ContractJob_model.count(find_query);
