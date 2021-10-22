@@ -8,6 +8,7 @@ const { createWriteStream, existsSync, mkdirSync } = require("fs");
 const commonHelper = require('../commonHelper');
 const path = require("path");
 const express = require("express");
+const _ = requier('lodash')
 const files = [];
 
 module.exports.status = async (_, args) => {
@@ -45,15 +46,15 @@ module.exports.update_msg_is_read = async (parent, args) => {
     return { msg: "refresh msg count", status: "success" }
 };
 
-module.exports.add_providerDocument = async (_, args, { file }) => {
-    // console.log(args);
-    // console.log(args.file.length);
+module.exports.add_providerDocument = async (parent, args, { file }) => {
+    
     try{
-
-    if (args.user_id == undefined || args.user_id == '' || args.user_id == null) {
+console.log(args);
+console.log(args.file.length);
+    if (!args.user_id) {
         return { msg: "please check user id", status: "failed" };
     }
-    if (args.file != '') {
+    if (args.file && _.size(args.file)) {
         var img_data = [];
         for (let i = 0; i < args.file.length; i++) {
             // console.log(i);
@@ -82,6 +83,8 @@ module.exports.add_providerDocument = async (_, args, { file }) => {
                 data.status = "success";
                 // console.log(data);
                 return data;
+            }else{
+                return { msg: "upload failed", status: "failed" };
             }
         } else if (args.option == "professional") {
             // console.log("professional");
@@ -98,6 +101,8 @@ module.exports.add_providerDocument = async (_, args, { file }) => {
                 data.status = "success";
                 // console.log(data);
                 return data;
+            }else{
+                return { msg: "upload failed", status: "failed" };
             }
         }
 
