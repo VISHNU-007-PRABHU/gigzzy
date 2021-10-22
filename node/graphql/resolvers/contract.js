@@ -207,11 +207,11 @@ module.exports.get_contract_all_files = async (root, args) => {
                 return grouped_images
             }
         } else {
-            return []
+            return [{small_image:''}]
         }
     } catch (error) {
         console.log("module.exports.get_contract_files -> error", error)
-        return []
+        return [{small_image:''}]
     }
 }
 
