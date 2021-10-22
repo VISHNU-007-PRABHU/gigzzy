@@ -297,7 +297,7 @@ module.exports.update_contract = async (root, args) => {
     try {
         let contract_detail = args['contract_data'][0]
         console.log("module.exports.update_contract -> contract_detail", contract_detail)
-        console.log("module.exports.update_contract -> (args['_id']", (args['_id'])
+        console.log("module.exports.update_contract -> args['_id']", args['_id'])
         if (args['_id']) {
             let find_query = {
                 _id: args["_id"]
