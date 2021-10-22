@@ -23,6 +23,8 @@ module.exports = gql`
         pagingCounter: Int
         prevPage: String
         nextPage: String
+        msg:String
+        status:String
     }
     extend type Subscription{
         messageSent(limit: Int,page:Int,user_id:ID,provider_id:ID,booking_id:ID,contract_id:ID):Chat
@@ -32,7 +34,7 @@ module.exports = gql`
         get_chat_message(contract_id:ID,booking_id:ID,user_id:ID,provider_id:ID):[Chat]
     }
     extend type Mutation {
-        live_chating(limit: Int,page:Int,user_id:ID,provider_id:ID,booking_id:ID,contract_id:ID):Chat
+        live_chating(role:Int,booking_id:ID,contract_id:ID,user_id:ID,provider_id:ID,message:String):Chat
         add_message(role:Int,booking_id:ID,user_id:ID,provider_id:ID,message:String):Chat
     }
 `

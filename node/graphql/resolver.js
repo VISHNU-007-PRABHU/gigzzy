@@ -96,6 +96,8 @@ const resolvers = {
                 (payload, variables) => {
                     if (payload.messageSent.booking_id == variables.booking_id) {
                         return true;
+                    }else if(payload.messageSent.contract_id == variables.contract_id && payload.messageSent.provider_id == variables.provider_id){
+                        return true;
                     }
                 })
         },

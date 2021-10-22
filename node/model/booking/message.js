@@ -19,6 +19,7 @@ const messageSchema = mongoose.Schema({
     booking_id: {type: mongoose.Schema.Types.ObjectId, ref: 'booking'},
     provider_id: {type: mongoose.Schema.Types.ObjectId,ref: 'detail' },
     user_id: {type: mongoose.Schema.Types.ObjectId,ref: 'detail'},
+    contract_id:{type: mongoose.Schema.Types.ObjectId,ref: 'contract'},
     message_date:String,
     role:{type:Number}
 }, schemaOptions);

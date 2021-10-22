@@ -7,7 +7,7 @@ const PushNotification = require('../notification/PushNotification')
 var Detail_model = model.detail;
 var Booking_model = model.booking;
 var Contract_model = model.contract_job;
-
+var message_model = model.message;
 
 exports.add_message = async (parent, args, context, info) => {
     try {
@@ -68,7 +68,11 @@ exports.live_chating = async (parent, args, context, info) => {
             msg_count_data['provider_msg_count'] = Number(booking.provider_msg_count) + 1;
             msg_count_data['provider_msg_is_read'] = 1;
         } else if (args.role == 2) {
-            msg_count_data['user_msg_count'] = Number(booking.user_msg_count) + 1;
+            if(booking.user_msg_count){
+                msg_count_data['user_msg_count'] = Number(booking.user_msg_count) + 1;
+            }else{
+                msg_count_data['user_msg_count'] = 1
+            }
             msg_count_data['user_msg_is_read'] = 1;
         }
         var msg_count = await Contract_model.findOneAndUpdate({ _id: args.contract_id }, msg_count_data, { new: true });
@@ -78,7 +82,7 @@ exports.live_chating = async (parent, args, context, info) => {
 
         msg_count_data['booking_id'] = args.contract_id;
         let notification_user_data = [{
-            user_id: user.device_id,
+            user_id: booking['device_id'],
             booking_status: "msg_1",
             booking_id: args['contract_id'],
             key: commonHelper.chat,
@@ -90,6 +94,7 @@ exports.live_chating = async (parent, args, context, info) => {
 
         return datas;
     } catch (error) {
+        console.log("exports.live_chating -> error", error)
         return { msg: "failed to sent message", status: "failed" }
     }
 }
@@ -102,6 +107,7 @@ exports.add_chating = (args) => {
             var data = await add_msg.save();
             return resolve(data)
         } catch (error) {
+            console.log("exports.add_chating -> error", error)
             return reject({ status: false, msg: 'message added failed' })
         }
     })
@@ -114,6 +120,12 @@ module.exports.get_chat_message = async (parent, args, context, info) => {
     }
     if (args['booking_id']) {
         find_data['booking_id'] = args['booking_id']
+    }
+    if (args['provider_id']) {
+        find_data['provider_id'] = args['provider_id']
+    }
+    if (args['user_id']) {
+        find_data['user_id'] = args['user_id']
     }
     var result = await message_model.find(find_data);
     return result;
