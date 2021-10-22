@@ -25,7 +25,6 @@ const typeDefs = gql`
         demo_account(_id:ID):Detail
 
         get_my_biding(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[Biding]
-        get_my_milestone(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):Milestone
         accept_biding(biding_id:ID,online:Int,location_code:String):Biding
     }
     type Query {
@@ -102,8 +101,7 @@ const typeDefs = gql`
         get_biding_all_files(contract_id:ID,root:Boolean):[BidingImage]
         get_biding_detail(_id:ID,location_code:String,contract_id:ID):Biding
         GetCategoryCurrency(pagination:Boolean,data:JSON,_id:ID,category_id:ID,country_code:String,country_id:ID):SubCategoryConnection
-        get_biding_milestone_detail(location_code:String,_id:ID,contract_id:ID,biding_id:ID):Milestone
-        get_biding_milestone(location_code:String,_id:ID,contract_id:ID,biding_id:ID):[Milestone]
+       
     }
 
     # sub category pagination data  
@@ -290,46 +288,6 @@ const typeDefs = gql`
     }
 
 
-     
-    type Milestone{
-        _id:ID
-        data: JSON 
-        milestone_ref:String,
-        start_date: String,
-        end_date: String,
-        title:String,
-        user_id:ID
-        contract_id:ID
-        description:String,
-        pro_description:String
-        budget(code: String): String @currency,
-        timeline: String,       
-        timeline_type: String,
-        delete:Boolean,
-        booking_status:Int,
-        updatedAt:String,
-        pay_option:Boolean
-        order:Int
-        lat:Float
-        lng:Float
-        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
-        updated_at:String  @date(format: "DD/MM/YYYY hh:mm a")
-        category_id:ID
-        biding_id:ID
-        category_type:Int
-        milestone_status:String
-        get_milestone_all_images(milestone_id:ID,_id:ID,root:Boolean,model_type:String):[MilestoneImage]
-        msg:String
-        status:String
-        total(code: String): String @currency
-        ctob:Boolean @payment
-        ctob_shotcode:String
-        ctob_billRef:String
-        payment_type:String
-        payment_option(code:String):String @paymentOption
-        extra_fare(code: String): String @currency
-        extra_fare_reason: String,
-    }
     type Currency{
         _id:ID,
         name:String,
@@ -412,27 +370,7 @@ const typeDefs = gql`
         get_contract_files(contract_id:ID):[ContractImage]
         get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
     }
-  
-    type MilestoneImage{
-        _id:ID
-        company_id: String,
-        biding_id:String,
-        small_image: String  @imgUrl(format: "milestone"),
-        large_image: String  @imgUrl(format: "milestone"),
-        image_tag: String,
-        doc_type: String,
-        doc_category: String,
-        doc_formate: String,
-        delete: Boolean,
-        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
-        data: JSON 
-        msg:String
-        status:String
-        model_type:String
-        images:[CompanyImage]
-        get_contract_files(contract_id:ID):[ContractImage]
-        get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
-    }
+
     type BidingImage{
         _id:ID
         company_id: String,
@@ -1065,56 +1003,10 @@ const typeDefs = gql`
         ):Biding
         BidingFileUpload(_id:ID,contract_id:ID,category:String,image_tag:String,data:[JSON],file:[Upload]):CompanyImage
 
-        update_milestone(
-            option:String  
-            _id:ID
-            local_location_code:String
-            user_id: String
-            provider_id:ID
-            biding_id:ID
-            contract_id:ID
-            file:[Upload]
-            booking_status:Int
-            milestone_data:JSON
-            location_code:String,
-            local_location_code:String,
-            model_type:String
-        ):Milestone
-       
+      
         UpdateCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
         DeleteCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
-        manage_milestone_booking(
-            location_code:String,
-            role:Int,
-            contract_status:String
-            _id:ID
-            booking_id:ID,
-            contract_id:ID,
-            biding_id:ID,
-            user_id:ID,
-            provider_id:ID,
-            category_id:String,
-            lat:Float,
-            lng:Float,
-            weekday:JSON,
-            hours:String,
-            description:String,
-            booking_status:Int,
-            milestones_status:Int,
-            category_type:Int,
-            stripe_token:String,
-            payment_option:String,
-            payment_type:String
-            ,phone_number:String,
-            extra_fare:String,
-            extra_fare_reason:String,
-            option:Int,
-            extra_fare_id:ID
-        ):Milestone
-      
-        delete_milestone(_id:ID,option:Int):Milestone
-        delete_milestone_image(_id:ID,option:Int):Milestone
-    }
+            }
 `;
 module.exports.typeDefs = typeDefs;
 module.exports.JSON = (data) => {
