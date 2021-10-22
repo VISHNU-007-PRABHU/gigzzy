@@ -50,7 +50,7 @@ function Milestone(props) {
                                                 <div className="bold">
                                                     <Badge status="success" /> {data?.created_at}
                                                 </div>
-                                                <div className="text-danger px-3">{payment_RoleViewFunctionstatus[data?.booking_status]}</div>
+                                                <div className="text-danger px-3">{payment_status[data?.booking_status]}</div>
                                             </div>
                                         </div>
                                         <div className="">

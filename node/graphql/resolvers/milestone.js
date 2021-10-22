@@ -282,6 +282,7 @@ exports.manage_milestone_booking = async (root, args) => {
                 args['amount'] = preview_milestone_data['budget'];
             }
             let payment_data = await payment_choose.choose_milestone_payment(args, preview_milestone_data)
+            console.log("exports.m -> payment_data", payment_data)
             if (payment_data.status) {
                 var findBooking = await BidingMilestone_model.findOne({ _id: args._id }).lean();
                 findBooking['user_parent'] = true;
