@@ -296,8 +296,6 @@ module.exports.get_contract_address_detail = async (root, args, context, info) =
 module.exports.update_contract = async (root, args) => {
     try {
         let contract_detail = args['contract_data'][0]
-        console.log("module.exports.update_contract -> contract_detail", contract_detail)
-        console.log("module.exports.update_contract -> args['_id']", args['_id'])
         if (args['_id']) {
             let find_query = {
                 _id: args["_id"]
@@ -310,7 +308,6 @@ module.exports.update_contract = async (root, args) => {
             let fetch_contract = await ContractJob_model.findOne(find_query).lean()
             if (args['booking_status'] === 9) {
                 let datas = await this.find_provider(fetch_contract)
-                console.log("module.exports.update_contract -> datas", datas)
             }
             fetch_contract['status'] = "success";
             fetch_contract['msg'] = "contract job update success"
