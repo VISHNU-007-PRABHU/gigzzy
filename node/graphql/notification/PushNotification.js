@@ -23,6 +23,12 @@ const static_notification_template = (type, data) => {
                 body: "Provider sent new biding proposal",
                 click_action: ".activities.HomeActivity",
             }
+        case 'msg_1':
+            return {
+                title: "Message",
+                body: data,
+                click_action: ".activities.HomeActivity",
+            }
         default:
             return {
                 title: '',
@@ -40,10 +46,10 @@ exports.create_push_notification_msg = async (user_data) => {
             if (_.size(user_detail) && user_detail.device_id) {
                 var message = {
                     to: user_detail.device_id,
-                    notification: static_notification_template(user_data[i]['booking_status']),
+                    notification: static_notification_template(user_data[i]['booking_status'], user_data[i]['option_data']),
                     data: {
-                        my_key: commonHelper.pending,
-                        my_another_key: commonHelper.pending,
+                        my_key: user_data[i]['key'] || commonHelper.pending,
+                        my_another_key: user_data[i]['another_key'] || commonHelper.pending,
                         booking_id: user_data[i]['booking_id']
                     }
                 };

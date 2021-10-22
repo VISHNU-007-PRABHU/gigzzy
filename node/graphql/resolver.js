@@ -23,6 +23,7 @@ var contractResolver = require('./resolvers/contract');
 var currencyResolver = require('./resolvers/currency');
 var bidingResolver = require('./resolvers/biding');
 var milestoneResolver = require('./resolvers/milestone');
+var chatResolver = require('./resolvers/chat');
 const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
 const safaricom = require('../graphql/safaricom');
@@ -207,6 +208,7 @@ const resolvers = {
         get_static: staticResolver.get_static,
         get_booking: bookingResolver.get_booking,
         get_message: staticResolver.get_message,
+        get_chat_message:chatResolver.get_chat_message,
         get_all_payout: bookingResolver.get_all_payout,
         get_review: bookingResolver.get_review,
 
@@ -1274,52 +1276,8 @@ const resolvers = {
         update_site_img: settingResolver.update_site_img,
         modified_address: userResolver.modified_address,
         update_msg_is_read: statusResolver.update_msg_is_read,
-        add_message: async (parent, args, context, info) => {  //chat function
-            // console.log(args);
-            var msg_count_data = {};
-            args.message_date = moment.utc().format();
-            const add_msg = new message_model(args);
-            var data = await add_msg.save();
-            var booking = await Booking_model.findOne({ _id: args.booking_id });
-            if (args.role == 1) {
-                msg_count_data['provider_msg_count'] = Number(booking.provider_msg_count) + 1;
-                msg_count_data['provider_msg_is_read'] = 1;
-            } else if (args.role == 2) {
-                msg_count_data['user_msg_count'] = Number(booking.user_msg_count) + 1;
-                msg_count_data['user_msg_is_read'] = 1;
-            }
-
-            var msg_count = await Booking_model.findOneAndUpdate({ _id: args.booking_id }, msg_count_data, { new: true });
-            var datas = await message_model.findOne({ _id: data._id });
-            await pubsub.publish(MESSAGE_CREATED, { messageSent: datas });
-            var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: msg_count });
-            // ================= push_notifiy ================== //
-            var user_data = {};
-            if (args.role == 1) {
-                user_data = { _id: booking.provider_id }
-            } else if (args.role == 2) {
-                user_data = { _id: booking.user_id }
-            }
-            var user = await Detail_model.findOne(user_data);
-            msg_count_data['booking_id'] = args.booking_id;
-            var message = {
-                to: user.device_id,
-                collapse_key: 'your_collapse_key',
-                notification: {
-                    title: "Message",
-                    body: msg_count_data,
-                    click_action: ".activities.HomeActivity",
-                },
-                data: {
-                    my_key: commonHelper.chat,
-                    my_another_key: commonHelper.chat,
-                    booking_id: args.booking_id
-                }
-            };
-            var msg_notification = await commonHelper.push_notifiy(message);
-            // ================= push_notifiy ================== //  
-            return datas;
-        },
+        add_message:chatResolver.add_message,
+        live_chating:chatResolver.live_chating,
         provider_document_verified: async (parent, args) => {
             var document_verified = await Detail_model.updateOne({ _id: args._id }, { proof_status: args.proof_status });
             if (document_verified.n == document_verified.nModified) {

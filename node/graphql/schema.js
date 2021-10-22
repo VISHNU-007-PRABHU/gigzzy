@@ -15,7 +15,6 @@ const typeDefs = gql`
     directive @imgUrl(format: String) on FIELD_DEFINITION
 
     type Subscription {
-        messageSent(limit: Int,page:Int,user_id:ID,provider_id:ID,booking_id:ID):Chat
         get_my_appointments(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[Booking]
         acceptedMessage(id:ID,online:Int): Booking   
         send_jobs_provider(_id:ID,online:Int,location_code:String): Booking
@@ -57,7 +56,7 @@ const typeDefs = gql`
         get_my_appointments(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):BookingConnection
         booking(_id:ID,location_code:String):[Booking]
         get_now_job(_id:ID,role:Int,booking_status:Int):[Booking]
-        get_message(booking_id:ID,user_id:ID,provider_id:ID):[Chat]
+       
         search_category(_id:ID,data:JSON):[Category] 
         search_category_mobile(data:String):[Category]
         get_trending(_id:ID):[Category]
@@ -257,29 +256,7 @@ const typeDefs = gql`
         currency_code:String
         location_code:String
     }
-    type Chat{
-        id:ID
-        message:String
-        role:Int
-        createdAt: Date
-        msg_date:String @date(format: "DD MMMM YYYY")
-        msg_time:String @date(format: "hh:mm a")
-        updatedAt: Date
-        user(_id:ID):[Detail]
-        provider(_id:ID):[Detail]
-        booked(_id:ID):[Booking]
-        info:JSON
-        docs:[JSON]
-        totalDocs: Int
-        limit: Int
-        hasPrevPage:Boolean
-        hasNextPage: Boolean
-        page: Int
-        totalPages: Int
-        pagingCounter: Int
-        prevPage: String
-        nextPage: String
-    }
+  
     # biding schema
     type Biding{
         _id:ID
@@ -1049,7 +1026,6 @@ const typeDefs = gql`
         update_booking_details(provider_id:ID,booking_id:ID,file:[Upload],option:Int,user_comments_status:Int):Booking
         pay_admin_to_provider(booking_status:Int,status:Int,provider_id:ID):Booking
         # chat
-        add_message(role:Int,booking_id:ID,user_id:ID,provider_id:ID,message:String):Chat
         available_deleteBooking(_id:ID):Booking
         addRating(comments:String,rating:Int,user_id:ID,provider_id:ID,booking_id:ID,role:Int):Booking
         update_msg_is_read(role:Int,booking_id:ID):Booking

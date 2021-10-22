@@ -11,6 +11,7 @@ const { ApolloServer, gql, SchemaDirectiveVisitor } = require('apollo-server-exp
 const { defaultFieldResolver, GraphQLString } = require('graphql');
 const { typeDefs } = require('./node/graphql/schema');
 const categoryTypeDefs = require('./node/graphql/schema/categoryTypeDefs');
+const chatTypeDefs = require('./node/graphql/schema/chatTypeDefs');
 
 const { resolvers, confrimation_call, c2b_confirmation, c2b_validation } = require('./node/graphql/resolver');
 const { confrimation_company_worker } = require('./node/graphql/resolvers/user')
@@ -216,7 +217,7 @@ const server = new ApolloServer({
     origin: '*',			// <- allow request from all domains
     credentials: true
   },
-  typeDefs: [typeDefs,categoryTypeDefs],
+  typeDefs: [typeDefs,categoryTypeDefs,chatTypeDefs],
   resolvers: [resolvers],
   schemaDirectives: {
     currency: currencyDirective,
