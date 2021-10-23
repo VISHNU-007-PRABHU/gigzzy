@@ -31,7 +31,6 @@ exports.update_booking_after_payment = async (args, charge) => {
             let booking_data = {
                 admin_fee: String(parseFloat(args.admin_fee).toFixed(2)),
                 provider_fee: String(parseFloat(args.provider_fee).toFixed(2)),
-                total: String(parseFloat(args.total).toFixed(2)),
                 phone_number: args.phone_number,
                 payment_type: args.payment_type,
                 payment_option: args.payment_option,
