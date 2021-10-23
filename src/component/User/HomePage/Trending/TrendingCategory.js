@@ -33,7 +33,7 @@ const TrendingCategory = (props) => {
                                         <div className="p-2">
                                             <img alt='gigzzy home banner'
                                                 src={data?.small_img_url}
-                                                loading="lazy" class="h-75 br_10 lazyload img-fluid w-100" />
+                                                loading="lazy" class="h-200x br_10 lazyload img-fluid w-100" />
                                             <div className="px-3 mt-n4">
                                                 <Button onClick={() => { open_model(data) }} className="py-4 align-items-center d-flex justify-content-center bold br_10 border-0 primary_blue_color table_shadow" size={"large"} block>
                                                     {data.category_type === 2 ? data?.subCategory_name : data?.category_name}

@@ -61,7 +61,7 @@ class ImgSizeDirective extends SchemaDirectiveVisitor {
           return imgurl
         }
       } else {
-        return '';
+        return `${commonHelper.no_image()}`;
       }
     };
     // The formatted Date becomes a String, so the field type must change:
