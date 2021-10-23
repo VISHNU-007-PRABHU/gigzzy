@@ -6,6 +6,7 @@ module.exports = gql`
         message:String
         role:Int
         createdAt: Date
+        payment_option(code:String):String @paymentOption
         msg_date:String @date(format: "DD MMMM YYYY")
         msg_time:String @date(format: "hh:mm a")
         updatedAt: Date

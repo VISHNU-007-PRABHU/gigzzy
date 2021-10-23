@@ -106,7 +106,7 @@ class Description extends React.Component {
         this.setState({ location_modal });
     }
     setLaterModal(book_later_modal) {
-        this.setState({ location_modal: 0, book_later_modal });
+        this.setState({ location_modal: false, book_later_modal });
     }
     setRequestingModal = async (book_requesting_modal) => {
         if (book_requesting_modal === false) {
@@ -151,7 +151,7 @@ class Description extends React.Component {
         super(props);
         this.state = {
             location_modal: false,
-            file_upload_modal: 0,
+            file_upload_modal: false,
             book_later_modal: false,
             book_requesting_modal: false,
             confirm_job_modal: false,
@@ -179,13 +179,13 @@ class Description extends React.Component {
             date: "",
             time: "0",
             hour: "0",
-            loading: 0,
+            loading: false,
             showIcon: {
                 showRemoveIcon: true,
                 showPreviewIcon: true,
                 showDownloadIcon: false,
             },
-            description_loading: 0,
+            description_loading: false,
             short_description: [],
             str: '#@image@#',
             location_code: "",
@@ -269,26 +269,32 @@ class Description extends React.Component {
         }
     };
     find_category = async (_id, type) => {
-        this.setState({ description_loading: 1 });
+        this.setState({ description_loading: true });
         await client.query({
             query: FIND_CATEGORY,
             variables: { _id },
             fetchPolicy: 'no-cache',
         }).then(result => {
             console.log(result.data.category[0].description);
-            this.setState({ description: result.data.category[0].description, short_description: result.data.category[0].description.split("#"), description_loading: 0 });
+            this.setState({ 
+                description: result.data.category[0].description, 
+                short_description: result.data.category[0].description.split("#"),
+                 description_loading: false });
         });
     }
 
     find_sub_category = async (_id, type) => {
-        this.setState({ description_loading: 1 });
+        this.setState({ description_loading: true });
         await client.query({
             query: FIND_SUBCATEGORY,
             variables: { _id },
             fetchPolicy: 'no-cache',
         }).then(result => {
             console.log(result);
-            this.setState({ description: result.data.sub_category[0].description, short_description: result.data.sub_category[0].description.split("#"), description_loading: 0 });
+            this.setState({
+                 description: result.data.sub_category[0].description,
+                  short_description: result.data.sub_category[0].description.split("#"),
+                   description_loading: false });
         });
     }
 
@@ -343,7 +349,7 @@ class Description extends React.Component {
         console.log(e);
     }
     change_label = async (fill_first, index) => {
-        this.setState({ location_modal: 0 });
+        this.setState({ location_modal: false });
         var current_index = fill_first.indexOf(this.state.label[index]);
         var new_index = current_index + 1;
         const { label } = this.state;
@@ -375,7 +381,7 @@ class Description extends React.Component {
     handleChange = ({ fileList }) => { this.setState({ fileList }) };
 
     book_now = async () => {
-        this.setState({ location_modal: 0 });
+        this.setState({ location_modal: false });
         var file_data = [];
         for (let i = 0; i < this.state.fileList.length; i++) {
             file_data.push(this.state.fileList[i].originFileObj);
@@ -384,15 +390,15 @@ class Description extends React.Component {
         let tag = document.getElementById('ee').outerHTML;
         tag = tag.replace(tag_change, this.state.str);
         const description = htmlToText.fromString(tag.toString(), { wordwrap: 130 });
-        if (localStorage.getItem("userLogin") === "success" && localStorage.getItem('currency') && localStorage.getItem('currency') !== "undefind") {
-            this.setState({ loading: 1 });
+        // if (localStorage.getItem("userLogin") === "success" && localStorage.getItem('currency') && localStorage.getItem('currency') !== "undefind") {
+            this.setState({ loading: true });
             await client.mutate({
                 mutation: ADD_BOOKING,
                 variables: {
                     booking_status: 12,
                     booking_type: 1,
                     location_code: this.state.location_code,
-                    local_location_code: JSON.parse(localStorage.getItem('currency')).location || 'KE',
+                    local_location_code:  localStorage.getItem('currency') ? JSON.parse(localStorage.getItem('currency')).location : 'KE',
                     lat: parseFloat(this.state.center[0]),
                     lng: parseFloat(this.state.center[1]),
                     description: description,
@@ -417,10 +423,10 @@ class Description extends React.Component {
                 }
             });
 
-        } else {
-            Alert_msg({ msg: "Sorry Login User Only Book The Job !", status: "success" })
-            this.props.history.push({ pathname: `/login` });
-        }
+        // } else {
+        //     Alert_msg({ msg: "Sorry Login User Only Book The Job !", status: "success" })
+        //     this.props.history.push({ pathname: `/login` });
+        // }
     }
 
     book_later = async () => {
@@ -437,7 +443,7 @@ class Description extends React.Component {
             return 0;
         }
         if (localStorage.getItem("userLogin") === "success") {
-            this.setState({ loading: 1 });
+            this.setState({ loading: true });
             await client.mutate({
                 mutation: ADD_BOOKING,
                 variables: {
@@ -456,7 +462,7 @@ class Description extends React.Component {
                     booking_hour: this.state.hour
                 },
             }).then(result => {
-                this.setState({ loading: 0 });
+                this.setState({ loading: false });
                 if (result.data.add_booking && result.data.add_booking[0].id) {
                     this.setState({ book_later_modal: 0, book_requesting_modal: 1, add_booking: result.data.add_booking, deadline: moment().add(2, 'minutes') });
                     this.DontReadTheComments(result.data.add_booking[0].id);
@@ -488,7 +494,8 @@ class Description extends React.Component {
 
     }
     on_location_change = (item) => {
-        this.setState({ location_code: item.location_code, location: item.address, center: [item.lat, item.lng], location_modal: 0 });
+        console.log("on_location_change -> item", item)
+        this.setState({ location_code: item.location_code, location: item.address, center: [item.lat, item.lng], location_modal: false});
     }
 
 
@@ -525,13 +532,13 @@ class Description extends React.Component {
                                                         return <div key={index} placeholder=" + description " className="description description_font_size mr-1" contentEditable="true"></div>
                                                     }
                                                     else if (value === "@image@") {
-                                                        return <div id="tag_change" className="tag_change d-inline-flex mb-3 mr-3">
-                                                            <Button key={index} type="primary" onClick={() => { this.setState({ location_modal: 0, file_upload_modal: 1 }) }} className="mr-0 img_btn a_hover" icon={this.state.fileList.length > 0 ? 'check-circle' : 'camera'}></Button>
+                                                        return <div key={index} id="tag_change" className="tag_change d-inline-flex mb-3 mr-3">
+                                                            <Button key={index} type="primary" onClick={() => { this.setState({ location_modal: false, file_upload_modal:true }) }} className="mr-0 img_btn a_hover" icon={this.state.fileList.length > 0 ? 'check-circle' : 'camera'}></Button>
                                                             <MinImage img={this.state.fileList} />
                                                         </div>
                                                     }
                                                     else if (value === "@location@") {
-                                                        return <Button key={index} type="primary" onClick={() => { this.setState({ location_modal: 1 }) }} className="location_btn a_hover w-auto" icon="environment">{this.state.location}</Button>
+                                                        return <Button key={index} type="primary" onClick={() => { this.setState({ location_modal: true }) }} className="location_btn a_hover w-auto" icon="environment">{this.state.location}</Button>
                                                     }
                                                     else {
                                                         var fill_data = value.slice(1, -1);
@@ -553,7 +560,14 @@ class Description extends React.Component {
                                         visible={this.state.location_modal}
                                     />
 
-                                    <Modal title="Upload Your Image" footer={<></>} className="new_modal upload_img" centered visible={this.state.file_upload_modal} onOk={() => this.setState({ file_upload_modal: false })} onCancel={() => this.setState({ file_upload_modal: false })}>
+                                    <Modal 
+                                        title="Upload Your Image" 
+                                        footer={<></>} 
+                                        className="new_modal upload_img"
+                                        centered 
+                                        visible={this.state.file_upload_modal}
+                                        onOk={() => this.setState({ file_upload_modal: false })}
+                                        onCancel={() => this.setState({ file_upload_modal: false })}>
                                         <div className={fileList.length === 0 ? "clearfix upload_content" : "clearfix"} >
                                             <Upload
                                                 action="https://www.mocky.io/v2/5cc8019d300000980a055e76"

@@ -59,8 +59,8 @@ const Address = (props) => {
 
     useEffect(() => {
         let local_user_id = ""
-        if(JSON.parse(localStorage.getItem('user'))){
-            local_user_id= JSON.parse(localStorage.getItem('user'))._id
+        if (JSON.parse(localStorage.getItem('user'))) {
+            local_user_id = JSON.parse(localStorage.getItem('user'))._id
         }
         setservice_modal(props.visible);
         setadd(false);
@@ -69,16 +69,15 @@ const Address = (props) => {
         } else if (local_user_id) {
             setuser_id(local_user_id)
         }
-        
-        if(size(props.address_from))
-        {
+
+        if (size(props.address_from)) {
             edit_location(props.address_from)
         }
-        
-        if(props.address_id){
-            setaddress_id(props.address_id) 
+
+        if (props.address_id) {
+            setaddress_id(props.address_id)
         }
-        
+
     }, [props])
     const [updateTodo] = useMutation(ADD_ADDRESS, {
         refetchQueries: [{ query: GET_ADDRESS, variables: { user_id } }],
@@ -86,21 +85,19 @@ const Address = (props) => {
     });
 
 
-    const add_new = (data=[]) => {
-        if(!data.length)
-        {
+    const add_new = (data = []) => {
+        if (!data.length) {
             setadd(true);
             setedit(false);
             setflat_no("");
             settitle('Others');
             setlandmark('');
-            setaddress("");   
+            setaddress("");
         }
     }
     const skip = () => { setadd(false) }
     const handleChange1 = address => { setaddress(address); };
     const handleSelect = address => {
-        console.log("skip -> address", address)
         setaddress(address);
         geocodeByAddress(address)
             .then(async results => {
@@ -133,7 +130,6 @@ const Address = (props) => {
         // Get address from latidude & longitude.
         await Geocode.fromLatLng(mouse.lat, mouse.lng).then(
             response => {
-                console.log("onCircleInteraction -> response", response)
                 if (response.results[0].address_components) {
                     response.results[0].address_components.map(data => {
                         if (data.types.includes("country")) {
@@ -165,7 +161,7 @@ const Address = (props) => {
             lng: String(lng),
             location_code: country_code
         };
-        if(props.company){
+        if (props.company) {
             data['company_id'] = localStorage.getItem('user_company_id')
         }
         if (data.lat === null || data.lat === '' || data.lng === '' || data.lng === null || data.address === '' || data.address === null || data.user_id === '' || data.user_id === null || data.title === '' || data.title === null) {
@@ -174,9 +170,8 @@ const Address = (props) => {
         } else {
             updateTodo({ variables: data }).then(results => {
                 if (results.data.modified_address.status === 'success') {
-                    let url_value=['/profile','/login']
-                    if (!includes(url_value,location.pathname.split('/')[1])) {
-                        value.location_change(data);
+                    if (value['location_change'] && typeof value['location_change'] === 'function') {
+                        value['location_change'](data);
                     }
                     Alert_msg({ msg: "Address saved", status: "success" });
                 } else {
@@ -198,16 +193,14 @@ const Address = (props) => {
             lng: String(lng),
             location_code: country_code
         };
-        console.log(data)
-        if(props.company){
-            console.log("edit_data -> props.company", props.company)
+        if (props.company) {
             data['company_id'] = localStorage.getItem('user_company_id')
         }
         if (data.lat !== null && data.lat !== '' && data.lng !== '' && data.lng !== null && data.address !== '' && data.address !== null && data._id !== '' && data._id !== null && data.title !== '' && data.title !== null) {
             updateTodo({ variables: data }).then(results => {
                 if (results.data.modified_address.status === 'success') {
-                    if (location.pathname !== '/profile' && location.pathname !== '/login') {
-                        value.location_change(data);
+                    if (value['location_change'] && typeof value['location_change'] === 'function') {
+                        value['location_change'](data);
                     }
                     Alert_msg({ msg: "Address update saved", status: "success" });
                 } else {
@@ -219,15 +212,13 @@ const Address = (props) => {
             Alert_msg({ msg: "Please add mandatory field", status: 'failed' })
         }
     }
-    const address_popup_close = (value) =>{
+    const address_popup_close = (value) => {
         setservice_modal(false);
-        if(value.popup_closed_option)
-        {
+        if (value.popup_closed_option) {
             value.popup_closed()
         }
     }
     const edit_location = (item) => {
-        console.log(item);
         set_id(item._id);
         setadd(true);
         setedit(true);
@@ -254,8 +245,8 @@ const Address = (props) => {
                                     className="new_modal maping"
                                     centered
                                     visible={service_modal}
-                                    onOk={()=>{address_popup_close(value)}}
-                                    onCancel={() => {address_popup_close(value)}}
+                                    onOk={() => { address_popup_close(value) }}
+                                    onCancel={() => { address_popup_close(value) }}
                                     footer={
                                         add === false ?
                                             <Button value="large" type="dashed" onClick={add_new} className="w-100" style={{ borderRadius: '17px' }}>
@@ -321,7 +312,7 @@ const Address = (props) => {
                                                         <Input size='large' value={landmark} placeholder="Enter LandMark" onChange={(event) => { setlandmark(event.target.value) }} />
                                                     </div>
                                                     <div className={title !== "Home" && title !== "Work" ? "my-2 d-flex" : "d-none"}>
-                                                        
+
                                                         <Input size='large' value={title} placeholder="Enter title" onChange={(event) => { settitle(event.target.value) }} />
                                                     </div>
                                                     <div className="my-2 d-flex justify-content-around">
@@ -351,7 +342,7 @@ const Address = (props) => {
                                     }
                                 >
                                     {add === false ? <div className="d-block map_modal">
-                                        <SetAddress user_id={user_id} address_id={address_id}/>
+                                        <SetAddress user_id={user_id} address_id={address_id} />
                                     </div> :
                                         <div className="d-block maps_modal">
                                             <div style={{ height: '30vh', width: '100%' }}>

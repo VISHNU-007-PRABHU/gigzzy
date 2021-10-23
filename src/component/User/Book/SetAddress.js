@@ -38,7 +38,6 @@ const SetAddress = (props) => {
     let location = useLocation();
     const [user_id, setuser_id] = useState("");
     useEffect(() => {
-        console.log("SetAddress -> props", props)
         if (props['user_id']) {
             setuser_id(props['user_id'])
         } else if(JSON.parse(localStorage.getItem('user'))){
@@ -60,13 +59,11 @@ const SetAddress = (props) => {
 
     //  delete saved address 
     const delete_data = (item) => {
-        console.log(item)
         var data = {
             option: 3,
             _id: item._id,
         };
         delete_address({ variables: data }).then(results => {
-            console.log(results)
             if (results.data.modified_address.status === 'success') {
                 Alert_msg({ msg: "Delete success", status: "success" });
             } else {
@@ -103,7 +100,7 @@ const SetAddress = (props) => {
                                                         dataSource={data.user_address}
                                                         renderItem={item => (
                                                             <List.Item
-                                                                className={props && props.address_id && props.address_id==item._id ?'cursor_point table-active':'cursor_point'}
+                                                                className={ (props && props.address_id && props.address_id === item._id) ?'cursor_point table-active':'cursor_point'}
                                                                 actions={[
                                                                     <Button type="link primary_color d-flex" size="small"
                                                                         onClick={() => { values.location_edit(item) }} >
@@ -117,15 +114,9 @@ const SetAddress = (props) => {
                                                                 <Skeleton avatar title={true} loading={item.loading} active>
                                                                     <List.Item.Meta
                                                                         onClick={() => {
-                                                                            let url_value=['profile']
-                                                                            let url_value_contract=['contract_booking']
-                                                                            if (includes(['contract_booking'],location.pathname.split('/')[1])) {
-                                                                                value.location_change(item);
+                                                                            if (value['location_change'] && typeof value['location_change'] === 'function') {
+                                                                                value['location_change'](item);
                                                                             }
-                                                                            else if (!includes(url_value,location.pathname.split('/')[1])) {
-                                                                                value.location_change(data);
-                                                                            }
-                                                                            
                                                                         }}
                                                                         avatar={item.title === 'Work' ?
                                                                             <Icon className="f_25 ml-3 mt-1" type="shop" /> :

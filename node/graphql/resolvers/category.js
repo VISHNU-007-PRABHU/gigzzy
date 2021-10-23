@@ -276,7 +276,7 @@ exports.ParentCategoryCurrency = async (root, args) => {
 exports.UpdateCategoryCurrency = async (root, args) => {
     try {
         if (args._id) {
-            var update_result = await CategoryCurrency_model.update({ _id: args._id }, args.data);
+            var update_result = await CategoryCurrency_model.updateOne({ _id: args._id }, args.data);
             var result = await CategoryCurrency_model.findOne({ _id: args._id }).lean();
             result["msg"] = "update process success"
             result['status'] = 'success'
@@ -284,7 +284,7 @@ exports.UpdateCategoryCurrency = async (root, args) => {
         } else {
             const add_currency_catgeory = new CategoryCurrency_model(args.data);
             const save = await add_currency_catgeory.save();
-            save["msg"] = "update process success"
+            save["msg"] = "Addes process success"
             save['status'] = 'success'
             return save
         }
