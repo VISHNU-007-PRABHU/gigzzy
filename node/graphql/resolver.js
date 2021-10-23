@@ -96,7 +96,7 @@ const resolvers = {
                 (payload, variables) => {
                     if (payload.messageSent.booking_id == variables.booking_id) {
                         return true;
-                    }else if(payload.messageSent.contract_id == variables.contract_id && payload.messageSent.provider_id == variables.provider_id){
+                    } else if (payload.messageSent.contract_id == variables.contract_id && payload.messageSent.provider_id == variables.provider_id) {
                         return true;
                     }
                 })
@@ -210,7 +210,7 @@ const resolvers = {
         get_static: staticResolver.get_static,
         get_booking: bookingResolver.get_booking,
         get_message: staticResolver.get_message,
-        get_chat_message:chatResolver.get_chat_message,
+        get_chat_message: chatResolver.get_chat_message,
         get_all_payout: bookingResolver.get_all_payout,
         get_review: bookingResolver.get_review,
 
@@ -674,531 +674,537 @@ const resolvers = {
         manage_milestone_booking: milestoneResolver.manage_milestone_booking,
         manage_contract_booking: contractResolver.manage_contract_booking,
         manage_booking: async (parent, args) => {
-            //console.log("m_b");
-            //console.log(args);
-            let booking_detail = await Booking_model.findOne({ _id: args.booking_id });
+            try {
 
-            // role 2 === provider && role 1 === User //
-            if (args.role == 2) {
-                if (args.booking_status == 9 && booking_detail.booking_status == 15) {
-                    return [{ ...booking_detail._doc, ...{ msg: "sorry this job is closed", status: 'success' } }];
-                }
-                // 9 == provider accept
-                if (args.booking_status == 9 && booking_detail.booking_status == 12) {
-                    var update_booking = await Booking_model.update({ _id: args.booking_id }, { booking_status: 9, job_status: 9, available_provider: [], provider_id: args.provider_id }, { new: true });
-                    if (update_booking.n == update_booking.nModified) {
-                        var data = {
-                            user_parent: true,
-                            ...booking_detail._doc
-                        }
-                        var send_provider = await pubsub.publish(SEND_JOB_MSG, { send_jobs_provider: data });
-                        let provider_detail = await Booking_model.findOne({ _id: args.booking_id });
+                //console.log("m_b");
+                //console.log(args);
+                let booking_detail = await Booking_model.findOne({ _id: args.booking_id });
 
-                        provider_detail.user_parent = true;
-                        provider_detail.status = "success";
-
-                        // ================= push_notifiy (to user)================== //
-                        // send to user 
-                        let user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
-                        var message = {
-                            to: user_detail.device_id,
-                            notification: {
-                                title: 'Accept',
-                                body: "JOB is accept a provider please confirm the job",
-                                click_action: ".activities.HomeActivity",
-                            },
-                            data: {
-                                my_key: commonHelper.home,
-                                my_another_key: commonHelper.home,
-                                booking_id: booking_detail._id
+                // role 2 === provider && role 1 === User //
+                if (args.role == 2) {
+                    if (args.booking_status == 9 && booking_detail.booking_status == 15) {
+                        return [{ ...booking_detail._doc, ...{ msg: "sorry this job is closed", status: 'success' } }];
+                    }
+                    // 9 == provider accept
+                    if (args.booking_status == 9 && booking_detail.booking_status == 12) {
+                        var update_booking = await Booking_model.update({ _id: args.booking_id }, { booking_status: 9, job_status: 9, available_provider: [], provider_id: args.provider_id }, { new: true });
+                        if (update_booking.n == update_booking.nModified) {
+                            var data = {
+                                user_parent: true,
+                                ...booking_detail._doc
                             }
-                        };
-                        var msg = await commonHelper.push_notifiy(message);
-                        // ================= push_notifiy ================== //
+                            var send_provider = await pubsub.publish(SEND_JOB_MSG, { send_jobs_provider: data });
+                            let provider_detail = await Booking_model.findOne({ _id: args.booking_id });
 
-                        var accept_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: provider_detail });
-                        return [{ ...booking_detail._doc, ...{ msg: "Waiting for user confrimation", status: 'success' } }];
-                    }
+                            provider_detail.user_parent = true;
+                            provider_detail.status = "success";
 
-                } else if (args.booking_status == 8 && booking_detail.booking_status == 9) {
-                    // console.log("oops ! provider cancel the booking !");
-                    let data = {
-                        msg: "oops ! provider cancel the booking !",
-                        ...args
-                    }
-                    // console.log(data);
-                    var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
-                    return [...booking_detail, ...{ msg: "", status: 'success' }];
-                } else if (args.booking_status == 8 && booking_detail.booking_status == 10) {
-                    // console.log("oops ! provider cancel the booking !");
-                    let data = {
-                        msg: "oops ! provider cancel the booking !",
-                        ...args
-                    }
-                    var refund_data = {
-                        charge: booking_detail.charge_id,
-                    }
+                            // ================= push_notifiy (to user)================== //
+                            // send to user 
+                            let user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
+                            var message = {
+                                to: user_detail.device_id,
+                                notification: {
+                                    title: 'Accept',
+                                    body: "JOB is accept a provider please confirm the job",
+                                    click_action: ".activities.HomeActivity",
+                                },
+                                data: {
+                                    my_key: commonHelper.home,
+                                    my_another_key: commonHelper.home,
+                                    booking_id: booking_detail._id
+                                }
+                            };
+                            var msg = await commonHelper.push_notifiy(message);
+                            // ================= push_notifiy ================== //
 
-                    try {
-                        // safaricom payemnt
-                        var charge = {
-                            status: "succeeded"
+                            var accept_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: provider_detail });
+                            return [{ ...booking_detail._doc, ...{ msg: "Waiting for user confrimation", status: 'success' } }];
                         }
-                        // var charge = await stripe.refunds.create(refund_data)
-                    } catch (err) {
-                        return [{ msg: "refund error", status: 'failed' }];
-                    };
 
-                    // console.log(charge);
-                    if (charge.status == "succeeded") {
-                        await Booking_model.update({ _id: args.booking_id }, { booking_status: 8, job_status: 8, payment_status: 6, manual_payment_status: true }, { new: true });
-                        await Payout_model.remove({ booking_id: args.booking_id });
-                        var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
-
-                        // ================= push_notifiy (to user)================== //
-                        let user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
-                        var message = {
-                            to: user_detail.device_id,
-                            notification: {
-                                title: 'Provider Cancel Job',
-                                body: "JOB Canceled the job",
-                                click_action: ".activities.HomeActivity",
-                            },
-                            data: {
-                                my_key: commonHelper.home,
-                                my_another_key: commonHelper.home
-                            }
-                        };
-                        var msg = await commonHelper.push_notifiy(message);
-                        // ================= push_notifiy ================== //
-
-                        return [{ job_status: 8, msg: "cancel successfull", status: 'success' }];
-                    } else {
-                        await Booking_model.update({ _id: args.booking_id }, { booking_status: 10, payment_status: 3 }, { new: true });
-                        return [{ msg: "cancel failed", status: 'failed' }];
-                    }
-
-                } else if (booking_detail.booking_status == 9) {
-                    //console.log("oops ! your are late ? already booked !");
-                    let data = {
-                        msg: "oops ! your are late ? already booked !",
-                        status: 'failed',
-                        ...args,
-                        msg_status: 'to_provider'
-                    }
-                    // console.log(data);
-                    var provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
-
-                    return [data];
-                } else if (booking_detail.booking_status == 11) {
-                    //console.log("oops !  user cancel for the booking !");
-                    let data = {
-                        msg: "oops ! user cancel for the booking !",
-                        status: 'success',
-                        ...args,
-                        msg_status: 'to_provider'
-                    }
-                    var provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
-
-                    return [data];
-
-                } else if (args.booking_status == 16) {
-                    var end_data = {};
-                    let s_extra_fare = 0
-                    console.log("args.extra_fare", args.extra_fare)
-                    if (args.extra_fare) {
-                        if (args.extra_fare && Number(args.extra_fare)) {
-                            s_extra_fare = args.extra_fare
-                            console.log("s_extra_fare", s_extra_fare)
-                        }
-                    }
-                    args.extra_fare = String(parseFloat(Number(s_extra_fare)).toFixed(2))
-                    if (args.option == 1) {
-                        //add extra_fee
-                        let provider_fee = Number(booking_detail.provider_fee) + Number(args.extra_fare);    // add extra_fare in provider fee
-                        let total = Number(booking_detail.total) + Number(args.extra_fare);                  // add extra_fare in total amount
-                        let extra_price = Number(booking_detail.extra_price) + Number(args.extra_fare);    // add extra_fare in extra price
-                        let final_payment = Number(booking_detail.final_payment) + Number(args.extra_fare);
+                    } else if (args.booking_status == 8 && booking_detail.booking_status == 9) {
+                        // console.log("oops ! provider cancel the booking !");
                         let data = {
-                            booking_id: args.booking_id,
-                            extra_fare: String(parseFloat(args.extra_fare).toFixed(2)),
-                            extra_fare_reason: args.extra_fare_reason,
+                            msg: "oops ! provider cancel the booking !",
+                            ...args
                         }
-                        let add_extra_fee = new Extra_fee_model(data);
-                        let extra_fee = await add_extra_fee.save();
-                        end_data = {
-                            provider_fee: String(parseFloat(provider_fee).toFixed(2)),
-                            total: String(parseFloat(total).toFixed(2)),
-                            extra_price: String(parseFloat(extra_price).toFixed(2)),
-                            final_payment: String(parseFloat(final_payment).toFixed(2)),
-                            payment_status: 4
+                        // console.log(data);
+                        var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
+                        return [...booking_detail, ...{ msg: "", status: 'success' }];
+                    } else if (args.booking_status == 8 && booking_detail.booking_status == 10) {
+                        // console.log("oops ! provider cancel the booking !");
+                        let data = {
+                            msg: "oops ! provider cancel the booking !",
+                            ...args
+                        }
+                        var refund_data = {
+                            charge: booking_detail.charge_id,
+                        }
+
+                        try {
+                            // safaricom payemnt
+                            var charge = {
+                                status: "succeeded"
+                            }
+                            // var charge = await stripe.refunds.create(refund_data)
+                        } catch (err) {
+                            return [{ msg: "refund error", status: 'failed' }];
                         };
-                        var end_result = await Booking_model.update({ _id: args.booking_id }, end_data, { new: true });
-                        if (end_result.n == end_result.nModified) {
-                            await Payout_model.update({ booking_id: args.booking_id }, {
-                                amount: String(parseFloat(Number(end_data.provider_fee)).toFixed(2))
-                            });
-                            var result_data = await Booking_model.findOne({ _id: args.booking_id });
-                            // console.log([{{ msg: "Extra fare added success", status: 'success' }}]);
-                            extra_fee.msg = "Extra fee add success";
-                            extra_fee.status = 'success';
-                            return [extra_fee];
+
+                        // console.log(charge);
+                        if (charge.status == "succeeded") {
+                            await Booking_model.update({ _id: args.booking_id }, { booking_status: 8, job_status: 8, payment_status: 6, manual_payment_status: true }, { new: true });
+                            await Payout_model.remove({ booking_id: args.booking_id });
+                            var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
+
+                            // ================= push_notifiy (to user)================== //
+                            let user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
+                            var message = {
+                                to: user_detail.device_id,
+                                notification: {
+                                    title: 'Provider Cancel Job',
+                                    body: "JOB Canceled the job",
+                                    click_action: ".activities.HomeActivity",
+                                },
+                                data: {
+                                    my_key: commonHelper.home,
+                                    my_another_key: commonHelper.home
+                                }
+                            };
+                            var msg = await commonHelper.push_notifiy(message);
+                            // ================= push_notifiy ================== //
+
+                            return [{ job_status: 8, msg: "cancel successfull", status: 'success' }];
                         } else {
-                            //  console.log([{ msg: "Extra fare added success", status: 'failed' }]);
-                            return [{ msg: "Extra added failed", status: 'failed' }];
+                            await Booking_model.update({ _id: args.booking_id }, { booking_status: 10, payment_status: 3 }, { new: true });
+                            return [{ msg: "cancel failed", status: 'failed' }];
                         }
-                    }
-                    if (args.option == 2) {
-                        //update extra_fee
-                        var find_extra_data = await Extra_fee_model.findOne({ _id: args.extra_fare_id }).lean();
-                        console.log("find_extra_data", find_extra_data)
-                        let provider_fee = Number(booking_detail.provider_fee) - Number(find_extra_data.extra_fare);         // sub extra_fare in provider fee
-                        let total = Number(booking_detail.total) - Number(find_extra_data.extra_fare);                       // sub extra_fare in total amount
-                        let extra_price = Number(booking_detail.extra_price) - Number(find_extra_data.extra_fare);           // sub extra_fare in extra price
-                        let final_payment = Number(booking_detail.final_payment) - Number(find_extra_data.extra_fare);
-                        end_data = {
-                            provider_fee: String(parseFloat(Number(provider_fee) + Number(args.extra_fare)).toFixed(2)),      //add update extra fare in pro_fee
-                            total: String(parseFloat(Number(total) + Number(args.extra_fare)).toFixed(2)),
-                            extra_price: String(parseFloat(Number(extra_price) + Number(args.extra_fare)).toFixed(2)),
-                            final_payment: String(parseFloat(Number(final_payment) + Number(args.extra_fare)).toFixed(2))
-                        };
-                        console.log("end_data", end_data)
-                        var extra_fare_update = { extra_fare: String(parseFloat(args.extra_fare).toFixed(2)), extra_fare_reason: args.extra_fare_reason };
-                        var update_extra_fee = await Extra_fee_model.update({ _id: args.extra_fare_id }, extra_fare_update, { new: true });
-                        if (update_extra_fee.n == update_extra_fee.nModified) {
+
+                    } else if (booking_detail.booking_status == 9) {
+                        //console.log("oops ! your are late ? already booked !");
+                        let data = {
+                            msg: "oops ! your are late ? already booked !",
+                            status: 'failed',
+                            ...args,
+                            msg_status: 'to_provider'
+                        }
+                        // console.log(data);
+                        var provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
+
+                        return [data];
+                    } else if (booking_detail.booking_status == 11) {
+                        //console.log("oops !  user cancel for the booking !");
+                        let data = {
+                            msg: "oops ! user cancel for the booking !",
+                            status: 'success',
+                            ...args,
+                            msg_status: 'to_provider'
+                        }
+                        var provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
+
+                        return [data];
+
+                    } else if (args.booking_status == 16) {
+                        var end_data = {};
+                        let s_extra_fare = 0
+                        console.log("args.extra_fare", args.extra_fare)
+                        if (args.extra_fare) {
+                            if (args.extra_fare && Number(args.extra_fare)) {
+                                s_extra_fare = args.extra_fare
+                                console.log("s_extra_fare", s_extra_fare)
+                            }
+                        }
+                        args.extra_fare = String(parseFloat(Number(s_extra_fare)).toFixed(2))
+                        if (args.option == 1) {
+                            //add extra_fee
+                            let provider_fee = Number(booking_detail.provider_fee) + Number(args.extra_fare);    // add extra_fare in provider fee
+                            let total = Number(booking_detail.total) + Number(args.extra_fare);                  // add extra_fare in total amount
+                            let extra_price = Number(booking_detail.extra_price) + Number(args.extra_fare);    // add extra_fare in extra price
+                            let final_payment = Number(booking_detail.final_payment) + Number(args.extra_fare);
+                            let data = {
+                                booking_id: args.booking_id,
+                                extra_fare: String(parseFloat(args.extra_fare).toFixed(2)),
+                                extra_fare_reason: args.extra_fare_reason,
+                            }
+                            let add_extra_fee = new Extra_fee_model(data);
+                            let extra_fee = await add_extra_fee.save();
+                            end_data = {
+                                provider_fee: String(parseFloat(provider_fee).toFixed(2)),
+                                total: String(parseFloat(total).toFixed(2)),
+                                extra_price: String(parseFloat(extra_price).toFixed(2)),
+                                final_payment: String(parseFloat(final_payment).toFixed(2)),
+                                payment_status: 4
+                            };
                             var end_result = await Booking_model.update({ _id: args.booking_id }, end_data, { new: true });
                             if (end_result.n == end_result.nModified) {
                                 await Payout_model.update({ booking_id: args.booking_id }, {
                                     amount: String(parseFloat(Number(end_data.provider_fee)).toFixed(2))
                                 });
                                 var result_data = await Booking_model.findOne({ _id: args.booking_id });
-                                extra_fare_update.msg = "Extra fee Update success";
-                                extra_fare_update.status = 'success';
-                                return [extra_fare_update];
+                                // console.log([{{ msg: "Extra fare added success", status: 'success' }}]);
+                                extra_fee.msg = "Extra fee add success";
+                                extra_fee.status = 'success';
+                                return [extra_fee];
+                            } else {
+                                //  console.log([{ msg: "Extra fare added success", status: 'failed' }]);
+                                return [{ msg: "Extra added failed", status: 'failed' }];
+                            }
+                        }
+                        if (args.option == 2) {
+                            //update extra_fee
+                            var find_extra_data = await Extra_fee_model.findOne({ _id: args.extra_fare_id }).lean();
+                            console.log("find_extra_data", find_extra_data)
+                            let provider_fee = Number(booking_detail.provider_fee) - Number(find_extra_data.extra_fare);         // sub extra_fare in provider fee
+                            let total = Number(booking_detail.total) - Number(find_extra_data.extra_fare);                       // sub extra_fare in total amount
+                            let extra_price = Number(booking_detail.extra_price) - Number(find_extra_data.extra_fare);           // sub extra_fare in extra price
+                            let final_payment = Number(booking_detail.final_payment) - Number(find_extra_data.extra_fare);
+                            end_data = {
+                                provider_fee: String(parseFloat(Number(provider_fee) + Number(args.extra_fare)).toFixed(2)),      //add update extra fare in pro_fee
+                                total: String(parseFloat(Number(total) + Number(args.extra_fare)).toFixed(2)),
+                                extra_price: String(parseFloat(Number(extra_price) + Number(args.extra_fare)).toFixed(2)),
+                                final_payment: String(parseFloat(Number(final_payment) + Number(args.extra_fare)).toFixed(2))
+                            };
+                            console.log("end_data", end_data)
+                            var extra_fare_update = { extra_fare: String(parseFloat(args.extra_fare).toFixed(2)), extra_fare_reason: args.extra_fare_reason };
+                            var update_extra_fee = await Extra_fee_model.update({ _id: args.extra_fare_id }, extra_fare_update, { new: true });
+                            if (update_extra_fee.n == update_extra_fee.nModified) {
+                                var end_result = await Booking_model.update({ _id: args.booking_id }, end_data, { new: true });
+                                if (end_result.n == end_result.nModified) {
+                                    await Payout_model.update({ booking_id: args.booking_id }, {
+                                        amount: String(parseFloat(Number(end_data.provider_fee)).toFixed(2))
+                                    });
+                                    var result_data = await Booking_model.findOne({ _id: args.booking_id });
+                                    extra_fare_update.msg = "Extra fee Update success";
+                                    extra_fare_update.status = 'success';
+                                    return [extra_fare_update];
+                                } else {
+                                    return [{ msg: "Extra fee Update failed", status: 'failed' }];
+                                }
                             } else {
                                 return [{ msg: "Extra fee Update failed", status: 'failed' }];
                             }
-                        } else {
-                            return [{ msg: "Extra fee Update failed", status: 'failed' }];
                         }
-                    }
-                    if (args.option == 3) {
+                        if (args.option == 3) {
 
-                        var find_extra = await Extra_fee_model.find({ booking_id: args.booking_id });
-                        var find_extra_data = await Extra_fee_model.findOne({ _id: args.extra_fare_id }).lean();
-                        if (find_extra.length == 0) {
-                            return [{ msg: "Extra feee Id Wrong", status: "failed" }]
-                        }
-                        let provider_fee = Number(booking_detail.provider_fee) - Number(find_extra_data.extra_fare);     // sub extra_fare in provider fee
-                        let total = Number(booking_detail.total) - Number(find_extra_data.extra_fare);                  // sub extra_fare in total amount
-                        let extra_price = Number(booking_detail.extra_price) - Number(find_extra_data.extra_fare);       // sub extra_fare in extra price
-                        let final_payment = Number(booking_detail.final_payment) - Number(find_extra_data.extra_fare);
-                        end_data = {
-                            provider_fee: String(parseFloat(provider_fee).toFixed(2)),
-                            total: String(parseFloat(total).toFixed(2)),
-                            extra_price: String(parseFloat(extra_price).toFixed(2)),
-                            final_payment: String(parseFloat(final_payment).toFixed(2))
-                        };
-                        if (find_extra.length == 1) {
-                            // console.log("jhweg");
-                            end_data.payment_status = 0;
-                        }
-                        var delete_extra_fee = await Extra_fee_model.remove({ _id: args.extra_fare_id });
-                        var end_result = await Booking_model.update({ _id: args.booking_id }, end_data, { new: true });
-                        //console.log(end_result);
-                        if (end_result.n == end_result.nModified) {
-                            await Payout_model.update({ booking_id: args.booking_id }, {
-                                amount: String(parseFloat(Number(end_data.provider_fee)).toFixed(2))
-                            });
-                            var result_data = await Booking_model.findOne({ _id: args.booking_id });
-                            result_data.msg = "Extra removed success";
-                            result_data.status = 'success';
-                            return [result_data];
-                        } else {
-                            return [{ msg: "Extra removed failed", status: 'failed' }];
-                        }
-                    }
-                } else if (args.booking_status == 13) {
-                    var end_data = {}
-                    let sms_notification = "job_finished"
-                    // provider end the job (13)
-                    end_data = { job_status: 13, booking_status: 13, jobEnd_time: moment.utc().format() };
-                    var end_result = await Booking_model.update({ _id: args.booking_id }, end_data, { new: true });
-                    var job_result = await Booking_model.findOne({ _id: args.booking_id });
-                    if (end_result.n == end_result.nModified) {
-                        var start = moment(job_result.jobStart_time);                                       //start date
-                        var end = moment(job_result.jobEnd_time);                                           // end date
-                        var duration = moment.duration(end.diff(start));
-                        var process_hours = parseInt(duration.asHours());
-                        var job_minutes = parseInt(duration.asMinutes()) - process_hours * 60;      //extra minutes
-                        var hour = Number(process_hours) - Number(job_result.hour_limit);           //extra hours
-                        var total = Number(job_result.total);
-                        var final_payment = Number(final_payment);
-                        var provider_fee = Number(job_result.provider_fee);
-                        var extra_hour_price = Number(job_result.extra_hour_price);
-                        if (job_result.price_type === "day") {
-                            // day vice job
-                            var process_days = parseInt(duration.asDays());
-                            if (process_days > 0) {
-                                var days = (Number(process_days) + 1) - Number(job_result.day_limit);           //extra day
-                                let day_amount = Number(days) * Number(job_result.day_price);                  // extra day *  hour fee
-                                provider_fee += Number(day_amount);                                         // update provider fee (add hour fee in provider amount)
-                                total += Number(day_amount);
-                                final_payment += Number(day_amount);                                        // update total fee (add hour fee in total amount)
-                                extra_hour_price += Number(day_amount);
+                            var find_extra = await Extra_fee_model.find({ booking_id: args.booking_id });
+                            var find_extra_data = await Extra_fee_model.findOne({ _id: args.extra_fare_id }).lean();
+                            if (find_extra.length == 0) {
+                                return [{ msg: "Extra feee Id Wrong", status: "failed" }]
                             }
-                        } else if (job_result.price_type === "hour") {
-                            if (hour > 0) {
-                                // console.log("hujbs");
-                                let hour_amount = Number(hour) * Number(job_result.hour_price);                  // extra hour *  hour fee
-                                provider_fee += Number(hour_amount);                                         // update provider fee (add hour fee in provider amount)
-                                total += Number(hour_amount);
-                                final_payment += Number(hour_amount);                                        // update total fee (add hour fee in total amount)
-                                extra_hour_price += Number(hour_amount);
-                            }
-                            if (job_minutes > 0) {
-                                // console.log("sknkj");
-                                let one_minutes_fee = Number(job_result.job_hour_price) / 60;                   //calculate 1 minutes base fee
-                                let minutes_amount = job_minutes * one_minutes_fee;                                 // extra minutes *  1 minutes fee
-                                provider_fee += Number(minutes_amount);                          // update provider fee (add minutes fee in provider amount)
-                                total += Number(minutes_amount);                                 // update total fee (add minutes fee in total amount)
-                                final_payment += Number(minutes_amount);                                // update final_payment fee (add hour fee in total amount)
-                                extra_hour_price += Number(minutes_amount);
-                            }
-                        }
-                        // console.log(job_result.total);
-                        if (Number(total) > (job_result.total)) {
-                            sms_notification = "pay_extra_fare"
-                            await Booking_model.update({ _id: args.booking_id }, {
+                            let provider_fee = Number(booking_detail.provider_fee) - Number(find_extra_data.extra_fare);     // sub extra_fare in provider fee
+                            let total = Number(booking_detail.total) - Number(find_extra_data.extra_fare);                  // sub extra_fare in total amount
+                            let extra_price = Number(booking_detail.extra_price) - Number(find_extra_data.extra_fare);       // sub extra_fare in extra price
+                            let final_payment = Number(booking_detail.final_payment) - Number(find_extra_data.extra_fare);
+                            end_data = {
                                 provider_fee: String(parseFloat(provider_fee).toFixed(2)),
                                 total: String(parseFloat(total).toFixed(2)),
-                                extra_hour_price: String(parseFloat(Number(extra_hour_price)).toFixed(2)),
-                                payment_status: 4
-                            }, { new: true });
-                            await Payout_model.update({ booking_id: args.booking_id }, {
-                                amount: String(parseFloat(Number(provider_fee)).toFixed(2)),
-                                booking_status: 13
-                            });
-                        }
-                        var final_result = await Booking_model.findOne({ _id: args.booking_id });
-                        // ================= push_notifiy (to user)================== //
-
-                        let user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
-                        let pro_user_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
-                        var message = {
-                            to: user_detail.device_id,
-                            notification: {
-                                title: 'Provider End the Job',
-                                body: "JOB is end for provider",
-                                click_action: ".activities.HomeActivity",
-                            },
-                            data: {
-                                my_key: commonHelper.on_going,
-                                my_another_key: commonHelper.on_going,
-                                booking_id: args.booking_id
+                                extra_price: String(parseFloat(extra_price).toFixed(2)),
+                                final_payment: String(parseFloat(final_payment).toFixed(2))
+                            };
+                            if (find_extra.length == 1) {
+                                // console.log("jhweg");
+                                end_data.payment_status = 0;
                             }
-                        };
-                        var msg = await commonHelper.push_notifiy(message);
-                        // ================= push_notifiy ================== //
-                        final_result.msg = "job is end";
-                        final_result.status = "success";
-                        // console.log(final_result);
-                        await commonHelper.send_sms(user_detail.country_code, user_detail.phone_no, "sms_notification", {})
-                        await commonHelper.send_sms(pro_user_detail.country_code, pro_user_detail.phone_no, "job_finished", {})
-
-                        var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: final_result });
-                        return [final_result];
-                    } else {
-                        return [{ msg: "job is ended failed", status: 'failed' }];
-                    }
-                } else if (args.booking_status == 4) {
-                    var result = await Booking_model.update({ _id: args.booking_id }, { job_status: 4, booking_status: 4, jobStart_time: moment.utc().format() }, { new: true });
-                    var job_result = await Booking_model.findOne({ _id: args.booking_id });
-                    if (result.n == result.nModified) {
-                        job_result.msg = "job is start";
-                        job_result.status = "success";
-                        // ================= push_notifiy (to user) ================== //
-                        let user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
-                        var message = {
-                            to: user_detail.device_id,
-                            notification: {
-                                title: 'Provider Start the Job',
-                                body: "JOB is start for provider",
-                                click_action: ".activities.HomeActivity",
-                            },
-                            data: {
-                                my_key: commonHelper.on_going,
-                                my_another_key: commonHelper.on_going,
-                                booking_id: args.booking_id
+                            var delete_extra_fee = await Extra_fee_model.remove({ _id: args.extra_fare_id });
+                            var end_result = await Booking_model.update({ _id: args.booking_id }, end_data, { new: true });
+                            //console.log(end_result);
+                            if (end_result.n == end_result.nModified) {
+                                await Payout_model.update({ booking_id: args.booking_id }, {
+                                    amount: String(parseFloat(Number(end_data.provider_fee)).toFixed(2))
+                                });
+                                var result_data = await Booking_model.findOne({ _id: args.booking_id });
+                                result_data.msg = "Extra removed success";
+                                result_data.status = 'success';
+                                return [result_data];
+                            } else {
+                                return [{ msg: "Extra removed failed", status: 'failed' }];
                             }
-                        };
-                        var msg = await commonHelper.push_notifiy(message);
-                        // ================= push_notifiy ================== //
-                        var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: job_result });
-                        return [job_result];
-                    } else {
-                        return [{ msg: "job start failed", status: 'failed' }];
-                    }
-
-                }
-            } else if (args.role == 1) {
-                // user_cancel 
-                if (args.booking_status == 11 && booking_detail.booking_status == 12) {
-                    var update_booking = await Booking_model.update({ _id: args.booking_id }, { job_status: 11, booking_status: 11, available_provider: [] }, { new: true });
-                    if (update_booking.n == update_booking.nModified) {
-                        var data = {
-                            user_parent: true,
-                            msg: "Booking Cancel Success",
-                            status: 'success',
-                            ...booking_detail._doc
                         }
-                        var send_provider = await pubsub.publish(SEND_JOB_MSG, { send_jobs_provider: data });
-                        return [{ msg: "Booking Cancel Success", status: 'success' }];
-                    } else {
-                        return [{ msg: "Booking Cancel Failed", status: 'failed' }];
-                    }
-                } else if (args.booking_status == 10 && booking_detail.booking_status == 9) {
-                    let base_amount = booking_detail.base_price;
-                    let service_fee = booking_detail.service_fee;
-                    let admin_fee = (service_fee / 100) * base_amount;              // store admin fee  ....
-                    let provider_fee = Number(base_amount) - Number(admin_fee);     //store provider fee ...
-                    let amount = Number(base_amount)                                // total fee eg : (100)
-                    args['admin_fee'] = admin_fee;
-                    args['provider_fee'] = provider_fee
-                    args['total'] = amount;
-                    args['amount'] = amount;
+                    } else if (args.booking_status == 13) {
+                        var end_data = {}
+                        let sms_notification = "job_finished"
+                        // provider end the job (13)
+                        end_data = { job_status: 13, booking_status: 13, jobEnd_time: moment.utc().format() };
+                        var end_result = await Booking_model.update({ _id: args.booking_id }, end_data, { new: true });
+                        var job_result = await Booking_model.findOne({ _id: args.booking_id });
+                        if (end_result.n == end_result.nModified) {
+                            var start = moment(job_result.jobStart_time);                                       //start date
+                            var end = moment(job_result.jobEnd_time);                                           // end date
+                            var duration = moment.duration(end.diff(start));
+                            var process_hours = parseInt(duration.asHours());
+                            var job_minutes = parseInt(duration.asMinutes()) - process_hours * 60;      //extra minutes
+                            var hour = Number(process_hours) - Number(job_result.hour_limit);           //extra hours
+                            var total = Number(job_result.total);
+                            var final_payment = Number(final_payment);
+                            var provider_fee = Number(job_result.provider_fee);
+                            var extra_hour_price = Number(job_result.extra_hour_price);
+                            if (job_result.price_type === "day") {
+                                // day vice job
+                                var process_days = parseInt(duration.asDays());
+                                if (process_days > 0) {
+                                    var days = (Number(process_days) + 1) - Number(job_result.day_limit);           //extra day
+                                    let day_amount = Number(days) * Number(job_result.day_price);                  // extra day *  hour fee
+                                    provider_fee += Number(day_amount);                                         // update provider fee (add hour fee in provider amount)
+                                    total += Number(day_amount);
+                                    final_payment += Number(day_amount);                                        // update total fee (add hour fee in total amount)
+                                    extra_hour_price += Number(day_amount);
+                                }
+                            } else if (job_result.price_type === "hour") {
+                                if (hour > 0) {
+                                    // console.log("hujbs");
+                                    let hour_amount = Number(hour) * Number(job_result.hour_price);                  // extra hour *  hour fee
+                                    provider_fee += Number(hour_amount);                                         // update provider fee (add hour fee in provider amount)
+                                    total += Number(hour_amount);
+                                    final_payment += Number(hour_amount);                                        // update total fee (add hour fee in total amount)
+                                    extra_hour_price += Number(hour_amount);
+                                }
+                                if (job_minutes > 0) {
+                                    // console.log("sknkj");
+                                    let one_minutes_fee = Number(job_result.job_hour_price) / 60;                   //calculate 1 minutes base fee
+                                    let minutes_amount = job_minutes * one_minutes_fee;                                 // extra minutes *  1 minutes fee
+                                    provider_fee += Number(minutes_amount);                          // update provider fee (add minutes fee in provider amount)
+                                    total += Number(minutes_amount);                                 // update total fee (add minutes fee in total amount)
+                                    final_payment += Number(minutes_amount);                                // update final_payment fee (add hour fee in total amount)
+                                    extra_hour_price += Number(minutes_amount);
+                                }
+                            }
+                            // console.log(job_result.total);
+                            if (Number(total) > (job_result.total)) {
+                                sms_notification = "pay_extra_fare"
+                                await Booking_model.update({ _id: args.booking_id }, {
+                                    provider_fee: String(parseFloat(provider_fee).toFixed(2)),
+                                    total: String(parseFloat(total).toFixed(2)),
+                                    extra_hour_price: String(parseFloat(Number(extra_hour_price)).toFixed(2)),
+                                    payment_status: 4
+                                }, { new: true });
+                                await Payout_model.update({ booking_id: args.booking_id }, {
+                                    amount: String(parseFloat(Number(provider_fee)).toFixed(2)),
+                                    booking_status: 13
+                                });
+                            }
+                            var final_result = await Booking_model.findOne({ _id: args.booking_id });
+                            // ================= push_notifiy (to user)================== //
 
-                    let payment_data = await payment_choose.choose_payment(args, booking_detail)
-                    console.log("payment_data", payment_data)
-                    if (payment_data.status) {
-                        var findBooking = await Booking_model.findOne({ _id: args.booking_id }).lean();
-                        findBooking['user_parent'] = true;
-                        findBooking['msg'] = "user accept the job ";
-                        findBooking['status'] = 'success';
-                        findBooking['msg_status'] = 'to_provider';
-                        // console.log("data", data)
-                        return [findBooking]
-                    } else {
-                        return [{ msg: "Booking Payment failed", status: 'failed' }]
-                    }
+                            let user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
+                            let pro_user_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
+                            var message = {
+                                to: user_detail.device_id,
+                                notification: {
+                                    title: 'Provider End the Job',
+                                    body: "JOB is end for provider",
+                                    click_action: ".activities.HomeActivity",
+                                },
+                                data: {
+                                    my_key: commonHelper.on_going,
+                                    my_another_key: commonHelper.on_going,
+                                    booking_id: args.booking_id
+                                }
+                            };
+                            var msg = await commonHelper.push_notifiy(message);
+                            // ================= push_notifiy ================== //
+                            final_result.msg = "job is end";
+                            final_result.status = "success";
+                            // console.log(final_result);
+                            await commonHelper.send_sms(user_detail.country_code, user_detail.phone_no, "sms_notification", {})
+                            await commonHelper.send_sms(pro_user_detail.country_code, pro_user_detail.phone_no, "job_finished", {})
 
-
-                } else if (args.booking_status == 11 && booking_detail.booking_status == 9) {
-                    var update_booking = await Booking_model.update({ _id: args.booking_id }, { booking_status: 11, job_status: 11 }, { new: true });
-                    var data = {
-                        user_parent: true,
-                        ...booking_detail._doc,
-                        msg: "Sorry ! user cancel the job ",
-                        msg_status: 'to_provider'
-                    }
-                    var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
-                    return [{ msg: "Booking Cancel Success", status: 'success' }];
-
-                } else if (args.booking_status == 11 && booking_detail.booking_status == 10) {
-                    // console.log("oops ! user canceled the Job");
-                    var updatedata = {};
-                    var refund_data = {};
-                    var amount = 0;
-                    // console.log("========================")
-                    // console.log("CANCEL TRNSCATIONS");
-                    if (booking_detail.job_status == 4) {
-                        amount = Number(booking_detail.total) - Number(admin_fee)
-                        refund_data = {
-                            charge: booking_detail.charge_id,
-                            amount: amount
+                            var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: final_result });
+                            return [final_result];
+                        } else {
+                            return [{ msg: "job is ended failed", status: 'failed' }];
                         }
-                    } else if (booking_detail.job_status == 10) {
-                        refund_data = {
-                            charge: booking_detail.charge_id,
+                    } else if (args.booking_status == 4) {
+                        var result = await Booking_model.update({ _id: args.booking_id }, { job_status: 4, booking_status: 4, jobStart_time: moment.utc().format() }, { new: true });
+                        var job_result = await Booking_model.findOne({ _id: args.booking_id });
+                        if (result.n == result.nModified) {
+                            job_result.msg = "job is start";
+                            job_result.status = "success";
+                            // ================= push_notifiy (to user) ================== //
+                            let user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
+                            var message = {
+                                to: user_detail.device_id,
+                                notification: {
+                                    title: 'Provider Start the Job',
+                                    body: "JOB is start for provider",
+                                    click_action: ".activities.HomeActivity",
+                                },
+                                data: {
+                                    my_key: commonHelper.on_going,
+                                    my_another_key: commonHelper.on_going,
+                                    booking_id: args.booking_id
+                                }
+                            };
+                            var msg = await commonHelper.push_notifiy(message);
+                            // ================= push_notifiy ================== //
+                            var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: job_result });
+                            return [job_result];
+                        } else {
+                            return [{ msg: "job start failed", status: 'failed' }];
                         }
-                    } else {
 
                     }
-                    // const charge = await stripe.refunds.create(refund_data);
-                    var charge = {
-                        status: "succeeded",
-                        refunded: true
-                    }
-                    if (charge.status == "succeeded" && charge.refunded == true) {
-                        await Booking_model.update({ _id: args.booking_id }, { booking_status: 11, job_status: 11, payment_status: 6, manual_payment_status: true }, { new: true });
-                        await Payout_model.remove({ booking_id: args.booking_id });
+                } else if (args.role == 1) {
+                    // user_cancel 
+                    if (args.booking_status == 11 && booking_detail.booking_status == 12) {
+                        var update_booking = await Booking_model.update({ _id: args.booking_id }, { job_status: 11, booking_status: 11, available_provider: [] }, { new: true });
+                        if (update_booking.n == update_booking.nModified) {
+                            var data = {
+                                user_parent: true,
+                                msg: "Booking Cancel Success",
+                                status: 'success',
+                                ...booking_detail._doc
+                            }
+                            var send_provider = await pubsub.publish(SEND_JOB_MSG, { send_jobs_provider: data });
+                            return [{ msg: "Booking Cancel Success", status: 'success' }];
+                        } else {
+                            return [{ msg: "Booking Cancel Failed", status: 'failed' }];
+                        }
+                    } else if (args.booking_status == 10 && booking_detail.booking_status == 9) {
+                        let base_amount = booking_detail.base_price;
+                        let service_fee = booking_detail.service_fee;
+                        let admin_fee = (service_fee / 100) * base_amount;              // store admin fee  ....
+                        let provider_fee = Number(base_amount) - Number(admin_fee);     //store provider fee ...
+                        let amount = Number(base_amount)                                // total fee eg : (100)
+                        args['admin_fee'] = admin_fee;
+                        args['provider_fee'] = provider_fee
+                        args['total'] = amount;
+                        args['amount'] = amount;
+
+                        let payment_data = await payment_choose.choose_payment(args, booking_detail)
+                        console.log("payment_data", payment_data)
+                        if (payment_data.status) {
+                            var findBooking = await Booking_model.findOne({ _id: args.booking_id }).lean();
+                            findBooking['user_parent'] = true;
+                            findBooking['msg'] = "user accept the job ";
+                            findBooking['status'] = 'success';
+                            findBooking['msg_status'] = 'to_provider';
+                            // console.log("data", data)
+                            return [findBooking]
+                        } else {
+                            return [{ msg: "Booking Payment failed", status: 'failed' }]
+                        }
+
+
+                    } else if (args.booking_status == 11 && booking_detail.booking_status == 9) {
+                        var update_booking = await Booking_model.update({ _id: args.booking_id }, { booking_status: 11, job_status: 11 }, { new: true });
                         var data = {
                             user_parent: true,
                             ...booking_detail._doc,
                             msg: "Sorry ! user cancel the job ",
                             msg_status: 'to_provider'
                         }
-                        // ================= push_notifiy (to provider)================== //
-                        let user_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
-                        var message = {
-                            to: user_detail.device_id,
-                            notification: {
-                                title: 'User Cancel the Job',
-                                body: "User Cancel the job",
-                                click_action: ".activities.HomeActivity",
-                            },
-                            data: {
-                                my_key: commonHelper.home,
-                                my_another_key: commonHelper.home
-                            }
-                        };
-                        var msg = await commonHelper.push_notifiy(message);
-                        // ================= push_notifiy ================== //
                         var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
-                        return [{ msg: "refund sucess", status: 'success' }];
-                    } else {
-                        return [{ msg: "refund failed", status: 'failed' }];
-                    }
+                        return [{ msg: "Booking Cancel Success", status: 'success' }];
 
-                } else if (args.booking_status == 14) {
-                    var final_job = await Booking_model.findOne({ _id: args.booking_id });
-                    if (final_job.payment_status == 4) {
-                        let admin_fee = (final_job.service_fee / 100) * final_job.final_payment;              // store admin fee  ....
-                        let provider_fee = Number(final_job.provider_fee) - Number(admin_fee);     //store provider fee ...
-                        args['admin_fee'] = Number(final_job.admin_fee) + Number(admin_fee);
-                        args['provider_fee'] = provider_fee;
-                        args['amount'] = Number(final_job.final_payment);
-                        try {
-                            let payment_data = await payment_choose.choose_payment(args, booking_detail)
-                            console.log("payment_data", payment_data)
-                            if (payment_data.status) {
-                                return [{ job_status: 14, msg: "job is completed successfully", status: 'success' }];
-                            } else {
-                                return [{ msg: "Booking Payment failed", status: 'failed' }]
+                    } else if (args.booking_status == 11 && booking_detail.booking_status == 10) {
+                        // console.log("oops ! user canceled the Job");
+                        var updatedata = {};
+                        var refund_data = {};
+                        var amount = 0;
+                        // console.log("========================")
+                        // console.log("CANCEL TRNSCATIONS");
+                        if (booking_detail.job_status == 4) {
+                            amount = Number(booking_detail.total) - Number(admin_fee)
+                            refund_data = {
+                                charge: booking_detail.charge_id,
+                                amount: amount
                             }
+                        } else if (booking_detail.job_status == 10) {
+                            refund_data = {
+                                charge: booking_detail.charge_id,
+                            }
+                        } else {
 
-                        } catch (err) {
-                            return [{ job_status: 14, msg: "job is completed failed", status: 'failed' }];
+                        }
+                        // const charge = await stripe.refunds.create(refund_data);
+                        var charge = {
+                            status: "succeeded",
+                            refunded: true
+                        }
+                        if (charge.status == "succeeded" && charge.refunded == true) {
+                            await Booking_model.update({ _id: args.booking_id }, { booking_status: 11, job_status: 11, payment_status: 6, manual_payment_status: true }, { new: true });
+                            await Payout_model.remove({ booking_id: args.booking_id });
+                            var data = {
+                                user_parent: true,
+                                ...booking_detail._doc,
+                                msg: "Sorry ! user cancel the job ",
+                                msg_status: 'to_provider'
+                            }
+                            // ================= push_notifiy (to provider)================== //
+                            let user_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
+                            var message = {
+                                to: user_detail.device_id,
+                                notification: {
+                                    title: 'User Cancel the Job',
+                                    body: "User Cancel the job",
+                                    click_action: ".activities.HomeActivity",
+                                },
+                                data: {
+                                    my_key: commonHelper.home,
+                                    my_another_key: commonHelper.home
+                                }
+                            };
+                            var msg = await commonHelper.push_notifiy(message);
+                            // ================= push_notifiy ================== //
+                            var cancel_provider_to_user = await pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: data });
+                            return [{ msg: "refund sucess", status: 'success' }];
+                        } else {
+                            return [{ msg: "refund failed", status: 'failed' }];
                         }
 
+                    } else if (args.booking_status == 14) {
+                        var final_job = await Booking_model.findOne({ _id: args.booking_id });
+                        if (final_job.payment_status == 4) {
+                            let admin_fee = (final_job.service_fee / 100) * final_job.final_payment;              // store admin fee  ....
+                            let provider_fee = Number(final_job.provider_fee) - Number(admin_fee);     //store provider fee ...
+                            args['admin_fee'] = Number(final_job.admin_fee) + Number(admin_fee);
+                            args['provider_fee'] = provider_fee;
+                            args['amount'] = Number(final_job.final_payment);
+                            try {
+                                let payment_data = await payment_choose.choose_payment(args, booking_detail)
+                                console.log("payment_data", payment_data)
+                                if (payment_data.status) {
+                                    return [{ job_status: 14, msg: "job is completed successfully", status: 'success' }];
+                                } else {
+                                    return [{ msg: "Booking Payment failed", status: 'failed' }]
+                                }
 
-                    } else {
-                        await Booking_model.update({ _id: args.booking_id }, { payment_status: 5, booking_status: 14, job_status: 14 }, { new: true });
-                        await Payout_model.update({ booking_id: args.booking_id }, { booking_status: 14 }, { new: true });
-                        // ================= push_notifiy (to provider) ================== //
-                        let user_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
-                        let app_user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
-
-                        var message = {
-                            to: user_detail.device_id,
-                            notification: {
-                                title: 'User Complete the Job',
-                                body: "User Complete the job",
-                                click_action: ".activities.HomeActivity",
-                            },
-                            data: {
-                                my_key: commonHelper.completed,
-                                my_another_key: commonHelper.completed,
-                                booking_id: args.booking_id
+                            } catch (err) {
+                                return [{ job_status: 14, msg: "job is completed failed", status: 'failed' }];
                             }
-                        };
-                        var msg = await commonHelper.push_notifiy(message);
-                        // ================= push_notifiy ================== //
-                        await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_finished", {})
-                        return [{ job_status: 14, msg: "job is completed successfully", status: 'success' }];
-                    }
 
+
+                        } else {
+                            await Booking_model.update({ _id: args.booking_id }, { payment_status: 5, booking_status: 14, job_status: 14 }, { new: true });
+                            await Payout_model.update({ booking_id: args.booking_id }, { booking_status: 14 }, { new: true });
+                            // ================= push_notifiy (to provider) ================== //
+                            let user_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
+                            let app_user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
+
+                            var message = {
+                                to: user_detail.device_id,
+                                notification: {
+                                    title: 'User Complete the Job',
+                                    body: "User Complete the job",
+                                    click_action: ".activities.HomeActivity",
+                                },
+                                data: {
+                                    my_key: commonHelper.completed,
+                                    my_another_key: commonHelper.completed,
+                                    booking_id: args.booking_id
+                                }
+                            };
+                            var msg = await commonHelper.push_notifiy(message);
+                            // ================= push_notifiy ================== //
+                            await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_finished", {})
+                            return [{ job_status: 14, msg: "job is completed successfully", status: 'success' }];
+                        }
+
+                    }
                 }
+            } catch (error) {
+                console.log("error mange book", error)
+                return [{ msg: "Update process failed", status: 'failed' }]
             }
         },
 
@@ -1278,8 +1284,8 @@ const resolvers = {
         update_site_img: settingResolver.update_site_img,
         modified_address: userResolver.modified_address,
         update_msg_is_read: statusResolver.update_msg_is_read,
-        add_message:chatResolver.add_message,
-        live_chating:chatResolver.live_chating,
+        add_message: chatResolver.add_message,
+        live_chating: chatResolver.live_chating,
         provider_document_verified: async (parent, args) => {
             var document_verified = await Detail_model.updateOne({ _id: args._id }, { proof_status: args.proof_status });
             if (document_verified.n == document_verified.nModified) {
