@@ -33,6 +33,7 @@ var sub_categorySchema = new mongoose.Schema({
   is_block: { type: Boolean, default: false },       // 1 == show , 2 == not show
   category_type: { type: Number, default: 2 },       // type 1 is category ,2 is subcategory
   delete: { type: Number, default: 0 },
+  contact_close_time: { type: Number, default: 0 },
 }, schemaOptions);
 
 sub_categorySchema.virtual('img_url').get(function () {

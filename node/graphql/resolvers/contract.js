@@ -181,10 +181,10 @@ module.exports.get_contract_all_files = async (root, args) => {
             delete: false
         }
         let limit = args.limit || 1
-   
-        if(args.root){
+
+        if (args.root) {
             match['contract_id'] = ObjectId(root['_id'])
-        }else{
+        } else {
             if (args['contract_id']) {
                 match['contract_id'] = ObjectId(args['contract_id'])
             }
@@ -207,11 +207,11 @@ module.exports.get_contract_all_files = async (root, args) => {
                 return grouped_images
             }
         } else {
-            return [{small_image:''}]
+            return [{ small_image: '' }]
         }
     } catch (error) {
         console.log("module.exports.get_contract_files -> error", error)
-        return [{small_image:''}]
+        return [{ small_image: '' }]
     }
 }
 
@@ -221,14 +221,17 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         var page = args.page || 1;
         var offset = Number(page - 1) * Number(limit);
         var total = 0;
-        let find_query = { is_delete: false }
-        let sort_option ={
-            created_at:-1
+        let find_query = {
+            is_delete: false,
+            close_date: { $lte: moment() }
+        }
+        let sort_option = {
+            created_at: -1
         }
 
-        if(args.rating_sort ){
+        if (args.rating_sort) {
             sort_option['rating'] = args.rating_sort
-        }else if(args.budget_sort ){
+        } else if (args.budget_sort) {
             sort_option['budget'] = args.budget_sort
         }
 
@@ -245,9 +248,9 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
             find_query['user_id'] = ObjectId(args['user_id'])
         }
         if (args.role && args.role == 2 && args['provider_id']) {
-            if(args['booking_status'] && args['booking_status'] === 9){
+            if (args['booking_status'] && args['booking_status'] === 9) {
                 find_query['available_provider'] = { $in: [args.provider_id] }
-            }else{
+            } else {
                 find_query['provider_id'] = ObjectId(args['provider_id'])
             }
         }
@@ -258,6 +261,8 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
                 find_query['booking_status'] = args['booking_status']
             }
         }
+
+
 
         total = await ContractJob_model.count(find_query);
         let result = await ContractJob_model.find(find_query).sort(sort_option).skip(Number(offset)).limit(Number(limit));
@@ -318,6 +323,13 @@ module.exports.update_contract = async (root, args) => {
             if (_.size(get_current_user_currency) && get_current_user_currency.status) {
                 contract_detail = { ...contract_detail, ...get_current_user_currency }
             }
+            if (args['category_id']) {
+                let get_category = get_catgeory_data(args);
+                if (get_category && get_category['status']) {
+                    let close_day = get_category['contract_close_day'] || 5;
+                    contract_detail['close_date'] = moment().add(close_day, 'days');
+                }
+            }
             await ContractJob_model.updateOne(find_query, contract_detail).exec()
             let fetch_contract = await ContractJob_model.findOne(find_query).lean()
             if (args['booking_status'] === 9) {
@@ -333,6 +345,14 @@ module.exports.update_contract = async (root, args) => {
             contract_detail['job_status'] = 12;
             contract_detail['booking_status'] = 9
             contract_detail['contract_status'] = 9
+            if (args['category_id']) {
+                let get_category = get_catgeory_data(args);
+                if (get_category && get_category['status']) {
+                    let close_day = get_category['contract_close_day'] || 5;
+                    contract_detail['close_date'] = moment().add(close_day, 'days');
+                }
+            }
+            contract_detail['contract_status'] = 9
             let add_contract_job = new ContractJob_model(contract_detail)
             let added_contract_job = await add_contract_job.save()
             added_contract_job['status'] = "success";
@@ -343,6 +363,27 @@ module.exports.update_contract = async (root, args) => {
         console.log("module.exports.update_contract -> error", error)
         return { status: "failed", msg: "contract job added failed" }
     }
+}
+
+
+exports.get_catgeory_data = async (detail) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            let response = {
+                status: true
+            }
+            var category_data = {}
+            if (detail.category_type === 1) {
+                category_data = await Category_model.findOne({ _id: detail.category_id }).lean()
+            } else if (detail.category_type === 2) {
+                category_data = await subCategory_model.findOne({ _id: detail.category_id }).lean()
+            }
+            category_data['status'] = true
+            return resolve(category_data)
+        } catch (error) {
+            return reject({ status: false })
+        }
+    })
 }
 
 exports.get_admin_fee = async (detail) => {
@@ -363,7 +404,7 @@ exports.get_admin_fee = async (detail) => {
                 service_fee = category_data['service_fee']
             }
             admin_fee = (service_fee / 100) * detail['budget'];
-            if(admin_fee < 1){
+            if (admin_fee < 1) {
                 admin_fee = 1
             }
             response['admin_fee'] = String(parseFloat(admin_fee || 0).toFixed(2));
@@ -519,7 +560,7 @@ module.exports.delete_biding = async (root, args) => {
 exports.manage_contract_booking = async (root, args) => {
     try {
         if (args['booking_status'] === commonHelper.bookink_status.CANCEL) {
-            await ContractJob_model.remove({ available_provider: { $in: [args.contract_id] } });
+            await Biding_model.updateOne({_id:args.biding_id },{is_delete:true});
             return { msg: "Contract rejected success", status: 'failed' }
         } else if (args['booking_status'] === 10) {
             let preview_contract_data = await ContractJob_model.findOne({ _id: args.contract_id }).lean()

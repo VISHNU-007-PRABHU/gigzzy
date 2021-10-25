@@ -24,6 +24,8 @@ module.exports = gql`
         lat:Float
         lng:Float
         contract_status:String
+        contract_close_day:String
+        close_date:String  @date(format: "DD/MM/YYYY hh:mm a")
         created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         category_id:ID
         biding_id:ID

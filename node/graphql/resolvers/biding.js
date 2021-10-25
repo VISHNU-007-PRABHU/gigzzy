@@ -61,7 +61,7 @@ module.exports.get_biding_pagination = async (root, args) => {
 
 module.exports.biding_count = async (root, args) => {
     try {
-        return await Biding_model.count({ contract_id: root._id });
+        return await Biding_model.count({ contract_id: root._id,is_delete:false });
     } catch (error) {
         return 0
     }
@@ -162,6 +162,13 @@ exports.BidingFileUpload = async (id, files) => {
     }
 }
 
+
+/**
+ * 
+ * @param {*} root 
+ * @param {*} args (file,_id,)
+ * @returns 
+ */
 module.exports.update_biding = async (root, args) => {
     try {
         let files = args['file']
@@ -222,6 +229,9 @@ module.exports.update_biding = async (root, args) => {
                     user_id: contract_data['user_id'],
                     booking_id: contract_data._id,
                     booking_status: "biding_9"
+                }
+                if(args['provider_id']){
+                    await ContractJob_model.updateOne({_id:contract_data._id},{$pull:{ available_provider: { $in: [args['provider_id']] }} });
                 }
                 await PushNotification.create_push_notification_msg(notification_user_data);
             }

@@ -49,6 +49,7 @@ var contractSchema = new Schema({
     contract_hour: String,
     start_date: String,
     end_date: String,
+    close_date:Date,
     data: [{}],
     base_price: { type: String, default: 0.00 },
     hour_price: { type: String, default: "0.00" },
@@ -122,6 +123,7 @@ contractSchema.pre('save', function (next, doc) {
     this.updated_at = currentDate;
     if (!this.created_at) {
         this.created_at = currentDate;
+        thi
     }
     next();
 });
@@ -224,6 +226,18 @@ contractSchema.virtual('actual_time').get(function () {
         return 'on going';
     }
 });
+
+contractSchema.virtual('contract_close_day').get(function () {
+    if (this.close_date) {
+        var start = moment();
+        var end = moment(this.close_date);
+        let diff_day = start.diff(end, 'days')
+        return diff_day;
+    } else {
+        return 0;
+    }
+});
+
 
 
 var contract = mongoose.model('contract', contractSchema);
