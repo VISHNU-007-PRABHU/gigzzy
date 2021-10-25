@@ -230,7 +230,7 @@ contractSchema.virtual('contract_close_day').get(function () {
     if (this.close_date) {
         var start = moment();
         var end = moment(this.close_date);
-        let diff_day = start.diff(end, 'days')
+        let diff_day = end.diff(start, 'days')+1 
         return diff_day;
     } else {
         return 0;
