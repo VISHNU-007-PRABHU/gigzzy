@@ -323,8 +323,8 @@ module.exports.update_contract = async (root, args) => {
             if (_.size(get_current_user_currency) && get_current_user_currency.status) {
                 contract_detail = { ...contract_detail, ...get_current_user_currency }
             }
-            if (args['category_id']) {
-                let get_category = this.get_catgeory_data(args);
+            if (contract_detail['category_id']) {
+                let get_category = this.get_catgeory_data(contract_detail);
                 if (get_category && get_category['status']) {
                     let close_day = get_category['contract_close_day'] || 5;
                     contract_detail['close_date'] = moment().add(close_day, 'days');
@@ -345,8 +345,8 @@ module.exports.update_contract = async (root, args) => {
             contract_detail['job_status'] = 12;
             contract_detail['booking_status'] = 9
             contract_detail['contract_status'] = 9
-            if (args['category_id']) {
-                let get_category = this.get_catgeory_data(args);
+            if (contract_detail['category_id']) {
+                let get_category = this.get_catgeory_data(contract_detail);
                 if (get_category && get_category['status']) {
                     let close_day = get_category['contract_close_day'] || 5;
                     contract_detail['close_date'] = moment().add(close_day, 'days');
