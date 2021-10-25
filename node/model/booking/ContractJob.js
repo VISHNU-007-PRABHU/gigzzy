@@ -123,7 +123,6 @@ contractSchema.pre('save', function (next, doc) {
     this.updated_at = currentDate;
     if (!this.created_at) {
         this.created_at = currentDate;
-        thi
     }
     next();
 });
