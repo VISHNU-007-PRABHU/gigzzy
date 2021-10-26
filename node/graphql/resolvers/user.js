@@ -692,6 +692,13 @@ module.exports.checkOtp = async (parent, args) => {
 
         var result = await Detail_model.findOne({ _id: args._id, otp: args.otp });
         const otp_verified = await Detail_model.find({ _id: args._id, otp: args.otp });
+        let pro_docs = await DetailImage_model.find({ user_id: args._id }).lean()
+        if (pro_docs && _.size(pro_docs)) {
+            var pro_docs_certificate = _.size(_.find(pro_docs, { model_type: "certificate" })) 
+            var pro_docs_license = _.size(_.find(pro_docs, { model_type: "license" }))
+            var pro_docs_legal_document = _.size(_.find(pro_docs, { model_type: "legal_document" }))
+        }
+
         if (otp_verified.length == 1) {
             if (result['user_type'] === "company") {
                 let message = { pending_status: 0, company_register_status: 0 }
@@ -708,18 +715,29 @@ module.exports.checkOtp = async (parent, args) => {
                     }
                 } else if (result.role == 2 && !result.provider_subCategory && !_.size(result.provider_subCategory)) {
                     message['company_register_status'] = 3
+                } else if (result.role == 2 && pro_docs_certificate) {
+                    message['company_register_status'] = 4
+                } else if (result.role == 2 && pro_docs_license) {
+                    message['company_register_status'] = 5
+                } else if (result.role == 2 && pro_docs_legal_document) {
+                    message['company_register_status'] = 6
                 }
                 return { ...result._doc, ...message };
             } else {
                 let message = {}
+                let user_address_result = await Address_model.findOne({ user_id: args._id }).lean()
                 if (!result.email) {
                     message = { pending_status: 1, msg: "Go to registration page", status: "success" };
+                } else if (!user_address_result || !_.size(user_address_result) && result.role == 2) {
+                    message = { pending_status: 2, msg: " address pending", status: "success" };
                 } else if (result.provider_subCategoryID.length == 0 && result.role == 2 && result.Upload_percentage == 50) {
-                    message = { pending_status: 5, msg: " category not upload", status: "success" };
-                } else if (result.role == 2 && result.Upload_percentage == 50 && (result.personal_document == undefined || result.personal_document == '')) {
-                    message = { pending_status: 6, msg: "personal_document not upload", status: "success" };
-                } else if (result.role == 2 && result.Upload_percentage == 50 && (result.professional_document == undefined || result.personal_document == '')) {
-                    message = { pending_status: 7, msg: "professional_document not upload", status: "success" };
+                    message = { pending_status: 3, msg: " category not upload", status: "success" };
+                } else if (result.role == 2 && pro_docs_certificate) {
+                    message = { pending_status: 4, msg: "pro_docs_certificate not upload", status: "success" };
+                } else if (result.role == 2 && pro_docs_license) {
+                    message = { pending_status: 5, msg: "pro_docs_license not upload", status: "success" };
+                } else if (result.role == 2 && pro_docs_legal_document) {
+                    message = { pending_status: 6, msg: "pro_docs_legal_document not upload", status: "success" };
                 } else { message = { pending_status: 0, msg: "OTP verified", status: "success" } };
                 result = { ...result._doc, ...message };
 
