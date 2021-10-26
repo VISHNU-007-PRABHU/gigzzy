@@ -726,7 +726,6 @@ module.exports.checkOtp = async (parent, args) => {
         let pro_docs = await DetailImage_model.find({ user_id: args._id }).lean()
         if (pro_docs && _.size(pro_docs)) {
             var pro_docs_certificate = _.size(_.find(pro_docs, { model_type: "certificate" }))
-            console.log("module.exports.checkOtp -> pro_docs_certificate", pro_docs_certificate)
             var pro_docs_license = _.size(_.find(pro_docs, { model_type: "license" }))
             var pro_docs_legal_document = _.size(_.find(pro_docs, { model_type: "legal_document" }))
         }
@@ -743,7 +742,7 @@ module.exports.checkOtp = async (parent, args) => {
                     message['company_register_status'] = 1
                 } else if (!pre_address_result || !_.size(pre_address_result)) {
                     message['company_register_status'] = 2
-                } else if (!result.provider_subCategory && !_.size(result.provider_subCategory)) {
+                } else if ( !_.size(result.provider_subCategoryID)) {
                     message['company_register_status'] = 3
                 } else if (!_.size(pro_docs)) {
                     message['company_register_status'] = 4
