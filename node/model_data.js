@@ -30,4 +30,5 @@ module.exports = {
     CategoryCurrency:require('./model/category/CategoryCurrency'),
     Milestone:require('./model/booking/milestone'),
     MilestoneImage:require('./model/booking/milestoneImage'),
+    DetailImage:require('./model/userDetail/detailImage')
 }

@@ -23,6 +23,7 @@ var Address_model = model.address;
 var Company_model = model.company;
 var CompanyImage_model = model.company_images;
 var CompanyProvider_model = model.companyProvider;
+var DetailImage_model = model.DetailImage
 module.exports.testmail = async (parent, args, context, info) => {
     return {
         msg: "test"
@@ -439,6 +440,130 @@ module.exports.update_profile = async (_, args, { file }) => {
     }
 };
 
+
+/**
+ * 
+ * @param {*} _  [file],_id,type,name,option,user_id,category,image_tag,model_type
+ * @param {*} args 
+ * @param {*} param2 
+ * @returns 
+ */
+
+
+
+exports.provider_uploading_files = async (files, args) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            _.forEach(files, async (file, i) => {
+                if (file) {
+                    const { createReadStream, filename } = await file;
+                    var extension = filename.split('.').pop();
+                    var file_name = `${args['user_id']}_${moment().valueOf()}_${filename}`;
+                    var small_file_name = `${args['user_id']}_${moment().valueOf()}_${filename}_small.jpg`;
+                    await new Promise(res =>
+                        createReadStream().pipe(createWriteStream(path.join(__dirname, "../../images/user/profile", file_name))).on("close", res)
+                    );
+                    args['image'] = file_name;
+                    var file_resize = await Jimp.read(path.join(__dirname, "../../images/user/profile", file_name))
+                        .then(image => {
+                            image.resize(260, Jimp.AUTO)
+                                .quality(30)
+                                .write(path.join(__dirname, "../../images/user/profile", small_file_name));
+                        })
+                        .catch(err => {
+                        });
+
+                    let img_data = {
+                        small_image: small_file_name,
+                        large_image: file_name,
+                        doc_type: extension || "",
+                    }
+                    await DetailImage_model.updateOne({ _id: args['_id'] }, img_data).exec()
+                }
+                if (_.size(files) === i + 1) {
+                    return resolve({ msg: "file update success", status: "success" });
+                }
+            })
+        } catch (error) {
+            reject(false)
+        }
+    })
+}
+
+module.exports.update_pro_profile_doc = async (parent, args, { file }) => {
+    try {
+        let files = args['file']
+        let update_detail = {
+            model_type: args['model_type'],
+            image_tag: args['image_tag'] || "",
+            user_id: args['user_id'],
+            doc_type: args['doc_type']
+        }
+        if (args['_id']) {
+            let find_query = {
+                _id: args["_id"]
+            }
+            await DetailImage_model.updateOne(find_query, update_detail).exec()
+            if (files && _.size(files)) {
+                await this.provider_uploading_files(files, args)
+            }
+            let add_pro_img_record = await DetailImage_model.findOne(find_query).lean()
+            add_pro_img_record['status'] = "success";
+            add_pro_img_record['msg'] = "Milestone update success"
+            return add_pro_img_record
+
+        } else {
+            let add_pro_img = new DetailImage_model(update_detail)
+            let add_pro_img_record = await add_pro_img.save()
+            if (files && _.size(files)) {
+                args['_id'] = add_pro_img_record["_id"]
+                await this.provider_uploading_files(files, args)
+            }
+            add_pro_img_record['status'] = "success";
+            add_pro_img_record['msg'] = "Milestone added success"
+            return add_pro_img_record
+        }
+
+    } catch (error) {
+        console.log("module.exports.update_pro_profile_doc -> error", error)
+        return { msg: "file update failed", status: "failed" };
+    }
+};
+
+
+module.exports.get_pro_profile_doc = async (parent, args) => {
+    try {
+        let match = {
+            delete: false
+        }
+        if (args['user_id']) {
+            match['user_id'] = ObjectId(args['user_id'])
+        }
+        if (args['model_type']) {
+            match['model_type'] = args['model_type']
+        }
+        let pipeline = [
+            {
+                $match: match
+            },
+            {
+                $group: {
+                    _id: "$doc_type",
+                    images: { $push: "$$ROOT" }
+                }
+            }
+        ]
+
+        let grouped_images = await DetailImage_model.aggregate(pipeline)
+        console.log("module.exports.get_pro_profile_doc -> grouped_images", grouped_images)
+        return grouped_images
+
+    } catch (error) {
+        console.log("module.exports.get_pro_profile_doc -> error", error)
+        return []
+    }
+};
+
 // add || update provider _availability
 module.exports.updateAvailability = async (parent, args) => {
     // console.log(args);
@@ -581,6 +706,8 @@ module.exports.checkOtp = async (parent, args) => {
                     if (!pre_address_result || !_.size(pre_address_result)) {
                         message['company_register_status'] = 2
                     }
+                } else if (result.role == 2 && !result.provider_subCategory && !_.size(result.provider_subCategory)) {
+                    message['company_register_status'] = 3
                 }
                 return { ...result._doc, ...message };
             } else {
@@ -724,7 +851,7 @@ module.exports.modified_address = async (parent, args, context, info) => {
             delete args.option;
             const result = await Address_model.updateOne({ _id: args._id }, args, { new: true });
             return { "status": "success", "msg": "update success" }
-          
+
         } else if (args.option == 3) {
             const result = await Address_model.updateOne({ _id: args._id }, { delete: 1 }, { new: true });
             return { "status": "success", "msg": "deleted success" }

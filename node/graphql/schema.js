@@ -43,6 +43,7 @@ const typeDefs = gql`
         search_category_only(data:JSON):[Category]
         search_sub_category_only(data:JSON):[subCategory]
         provider_rating_by_category(_id:ID,category_id:ID):Detail
+        get_pro_profile_doc(user_id:ID,root:Boolean,model_type:String,option:String,_id:ID):[ProImage]
         # find_provider(_id:ID,category_id:ID,online:String):Detail
         checkOtp(_id:ID,otp:String):Detail
         email_checkOtp(_id:ID,email_otp:String):Detail
@@ -351,6 +352,24 @@ const typeDefs = gql`
         get_company_detail(root:Boolean,data:JSON,provider_search:JSON,search:JSON,_id:ID,page:Int,limit:Int,company_id:ID,user_id:ID,provider_id:ID):CompanyConnection
 
     }
+    type ProImage {
+        _id:ID
+        user_id: String,
+        small_image: String  @imgUrl(format: "company"),
+        large_image: String  @imgUrl(format: "company"),
+        image_tag: String,
+        doc_type: String,
+        doc_category: String,
+        doc_formate: String,
+        delete: Boolean,
+        model_type:String
+        created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
+        data: JSON 
+        msg:String
+        status:String
+        images:[ProImage]
+    }
+
     type CompanyImage {
         _id:ID
         company_id: String,
@@ -587,6 +606,7 @@ const typeDefs = gql`
         get_currency(location_code:String,country_code:String,_id:ID,user_id:ID,root_location:Boolean):Currency
         get_company_root_detail(root:Boolean,provider_id:ID):Company
         provider_rating_by_category(_id:ID,root:Boolean,category_id:ID):Detail
+        get_pro_profile_doc(user_id:ID,root:Boolean,model_type:String,option:String,_id:ID):[ProImage]
     }
     
     type Account{
@@ -858,6 +878,7 @@ const typeDefs = gql`
         delete_providerDocument(user_id:ID,filename:String,option:String):Detail
         updateCategory(_id:ID,is_block:Boolean,is_future:Boolean,category_name:String,file:Upload,description:String,base_price:String,day_price:String,hour_price:String,price_type:String,day_limit:String,hour_limit:String,service_fee:String,is_parent:Boolean,certificates:[ID]):Category
         update_profile(file:Upload,_id:ID):Detail
+        update_pro_profile_doc(doc_type:String,user_id:String,category:String,image_tag:String,model_type:String,file:[Upload],_id:ID,option:String,type:String,name:String):Detail
         updatesubCategory(_id:ID,is_block:Boolean,is_future:Boolean,file: Upload,_id:ID,category_id:ID,subCategory_name:String,base_price:String,day_price:String,hour_price:String,price_type:String,day_limit:String,hour_limit:String,service_fee:String,description:String,certificates:[ID]):subCategory
         updateAvailability(user_id: ID,weekday:JSON):Detail
         removeAvailability(user_id: ID,weekday:JSON):Detail

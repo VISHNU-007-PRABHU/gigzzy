@@ -213,6 +213,7 @@ const resolvers = {
         get_chat_message: chatResolver.get_chat_message,
         get_all_payout: bookingResolver.get_all_payout,
         get_review: bookingResolver.get_review,
+        get_pro_profile_doc:userResolver.get_pro_profile_doc,
 
         user: userResolver.user,
         category: categoryResolver.category,
@@ -358,7 +359,6 @@ const resolvers = {
         detail: userResolver.details,
         category: categoryResolver.category,
         sub_category: categoryResolver.subcategory,
-
     },
     Detail: {
         category: categoryResolver.category,
@@ -367,6 +367,7 @@ const resolvers = {
         provider_rate: userResolver.provider_rate,
         get_currency: currencyResolver.get_currency,
         get_company_root_detail: userResolver.get_company_root_detail,
+        get_pro_profile_doc:userResolver.get_pro_profile_doc,
     },
     Company: {
         get_parent_company_provider: userResolver.get_parent_company_provider,
@@ -1248,6 +1249,7 @@ const resolvers = {
         updateCategory: categoryResolver.updateCategory,
         updatesubCategory: categoryResolver.updatesubCategory,
         update_profile: userResolver.update_profile,
+        update_pro_profile_doc:userResolver.update_pro_profile_doc,
         updateAvailability: userResolver.updateAvailability,
         removeAvailability: userResolver.removeAvailability,
 
