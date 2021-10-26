@@ -531,6 +531,37 @@ module.exports.update_pro_profile_doc = async (parent, args, { file }) => {
 };
 
 
+
+module.exports.delete_pro_doc = async (root, args) => {
+    try {
+        let find_query = {
+            doc_type: args["doc_type"]
+        }
+        let update_detail = {
+            delete: true
+        }
+        await DetailImage_model.updateOne(find_query, update_detail).exec()
+        return { status: "success", msg: "Milestone removed success" }
+    } catch (error) {
+        return { status: "failed", msg: "Milestone removed failed" }
+    }
+}
+
+module.exports.delete_pro_doc_image = async (root, args) => {
+    try {
+        let find_query = {
+            _id: args["_id"]
+        }
+        let update_detail = {
+            delete: true
+        }
+        await DetailImage_model.updateOne(find_query, update_detail).exec()
+        return { status: "success", msg: "Milestone images removed success" }
+    } catch (error) {
+        return { status: "failed", msg: "Milestone images removed failed" }
+    }
+}
+
 module.exports.get_pro_profile_doc = async (parent, args) => {
     try {
         let match = {

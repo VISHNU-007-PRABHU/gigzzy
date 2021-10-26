@@ -419,6 +419,8 @@ const resolvers = {
         adminLogin: adminResolver.adminlogin,
         update_main_category: main_categoryResolver.update_main_category,
         update_category_question: main_categoryResolver.update_category_question,
+        delete_pro_doc_image:userResolver.delete_pro_doc_image,
+        delete_pro_doc:userResolver.delete_pro_doc,
         // contract job
         update_contract: contractResolver.update_contract,
         update_currency: currencyResolver.update_currency,

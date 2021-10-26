@@ -1027,6 +1027,8 @@ const typeDefs = gql`
       
         UpdateCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
         DeleteCategoryCurrency(data:JSON,_id:ID,currency_code:String,currency_id:ID):subCategory
+        delete_pro_doc_image(_id:ID,option:String,doc_type:String):Detail
+        delete_pro_doc(_id:ID,option:String,doc_type:String):Detail
             }
 `;
 module.exports.typeDefs = typeDefs;
