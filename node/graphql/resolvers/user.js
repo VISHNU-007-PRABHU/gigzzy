@@ -735,6 +735,7 @@ module.exports.checkOtp = async (parent, args) => {
 
         if (otp_verified.length == 1) {
             if (result['user_type'] === "company") {
+                console.log("module.exports.checkOtp -> result['user_type'] ", result['user_type'] )
                 let message = { pending_status: 0, company_register_status: 0 }
                 message['msg'] = "OTP verified";
                 message['status'] = "success";
@@ -750,8 +751,10 @@ module.exports.checkOtp = async (parent, args) => {
                 } else if (!result.provider_subCategory && !_.size(result.provider_subCategory)) {
                     message['company_register_status'] = 3
                 } else if (!_.size(pro_docs)) {
+                    console.log("module.exports.checkOtp -> !_.size(pro_docs)", !_.size(pro_docs))
                     message['company_register_status'] = 4
                 } else if (!pro_docs_certificate) {
+                    console.log("module.exports.checkOtp -> !pro_docs_certificate", !pro_docs_certificate)
                     message['company_register_status'] = 4
                 } else if (!pro_docs_license) {
                     message['company_register_status'] = 5
