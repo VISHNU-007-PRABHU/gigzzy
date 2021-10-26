@@ -758,6 +758,7 @@ module.exports.checkOtp = async (parent, args) => {
                 } else if (!pro_docs_legal_document) {
                     message['company_register_status'] = 6
                 }
+                console.log("module.exports.checkOtp -> message", message)
                 return { ...result._doc, ...message };
             } else {
                 let message = {}
