@@ -720,14 +720,12 @@ module.exports.resend_otp = async (_, args) => {
 // check otp from user
 module.exports.checkOtp = async (parent, args) => {
     try {
-        
+
         var result = await Detail_model.findOne({ _id: args._id, otp: args.otp });
         const otp_verified = await Detail_model.find({ _id: args._id, otp: args.otp });
         let pro_docs = await DetailImage_model.find({ user_id: args._id }).lean()
-        console.log("module.exports.checkOtp -> _.size(pro_docs)", _.size(pro_docs))
-        console.log("module.exports.checkOtp -> !_.size(pro_docs)", !_.size(pro_docs))
         if (pro_docs && _.size(pro_docs)) {
-            var pro_docs_certificate = _.size(_.find(pro_docs, { model_type: "certificate" })) 
+            var pro_docs_certificate = _.size(_.find(pro_docs, { model_type: "certificate" }))
             console.log("module.exports.checkOtp -> pro_docs_certificate", pro_docs_certificate)
             var pro_docs_license = _.size(_.find(pro_docs, { model_type: "license" }))
             var pro_docs_legal_document = _.size(_.find(pro_docs, { model_type: "legal_document" }))
@@ -735,33 +733,28 @@ module.exports.checkOtp = async (parent, args) => {
 
         if (otp_verified.length == 1) {
             if (result['user_type'] === "company") {
-                console.log("module.exports.checkOtp -> result['user_type'] ", result['user_type'] )
                 let message = { pending_status: 0, company_register_status: 0 }
                 message['msg'] = "OTP verified";
                 message['status'] = "success";
                 let pre_company_result = await Company_model.findOne({ user_id: args._id }).lean()
                 message['company_id'] = pre_company_result['_id']
+                let pre_address_result = await Address_model.findOne({ company_id: pre_company_result._id }).lean()
                 if (pre_company_result && _.size(pre_company_result) && !pre_company_result['company_name']) {
                     message['company_register_status'] = 1
-                } else if (pre_company_result && _.size(pre_company_result)) {
-                    let pre_address_result = await Address_model.findOne({ company_id: pre_company_result._id }).lean()
-                    if (!pre_address_result || !_.size(pre_address_result)) {
-                        message['company_register_status'] = 2
-                    }
+                } else if (!pre_address_result || !_.size(pre_address_result)) {
+                    message['company_register_status'] = 2
                 } else if (!result.provider_subCategory && !_.size(result.provider_subCategory)) {
                     message['company_register_status'] = 3
                 } else if (!_.size(pro_docs)) {
-                    console.log("module.exports.checkOtp -> !_.size(pro_docs)", !_.size(pro_docs))
                     message['company_register_status'] = 4
                 } else if (!pro_docs_certificate) {
-                    console.log("module.exports.checkOtp -> !pro_docs_certificate", !pro_docs_certificate)
                     message['company_register_status'] = 4
                 } else if (!pro_docs_license) {
                     message['company_register_status'] = 5
                 } else if (!pro_docs_legal_document) {
                     message['company_register_status'] = 6
                 }
-                console.log("module.exports.checkOtp -> message", message)
+
                 return { ...result._doc, ...message };
             } else {
                 let message = {}
@@ -772,9 +765,9 @@ module.exports.checkOtp = async (parent, args) => {
                     message = { pending_status: 2, msg: " address pending", status: "success" };
                 } else if (result.provider_subCategoryID.length == 0 && result.role == 2 && result.Upload_percentage == 50) {
                     message = { pending_status: 3, msg: " category not upload", status: "success" };
-                } else if (result.role == 2 && !_.size(pro_docs) ) {
+                } else if (result.role == 2 && !_.size(pro_docs)) {
                     message = { pending_status: 4, msg: "pro_docs_certificate not upload", status: "success" };
-                }  else if (result.role == 2 && !pro_docs_certificate ) {
+                } else if (result.role == 2 && !pro_docs_certificate) {
                     message = { pending_status: 4, msg: "pro_docs_certificate not upload", status: "success" };
                 } else if (result.role == 2 && !pro_docs_license) {
                     message = { pending_status: 5, msg: "pro_docs_license not upload", status: "success" };
