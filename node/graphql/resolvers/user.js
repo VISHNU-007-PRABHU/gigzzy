@@ -724,8 +724,10 @@ module.exports.checkOtp = async (parent, args) => {
         var result = await Detail_model.findOne({ _id: args._id, otp: args.otp });
         const otp_verified = await Detail_model.find({ _id: args._id, otp: args.otp });
         let pro_docs = await DetailImage_model.find({ user_id: args._id }).lean()
+        console.log("module.exports.checkOtp -> _.size(pro_docs)", _.size(pro_docs))
         if (pro_docs && _.size(pro_docs)) {
             var pro_docs_certificate = _.size(_.find(pro_docs, { model_type: "certificate" })) 
+            console.log("module.exports.checkOtp -> pro_docs_certificate", pro_docs_certificate)
             var pro_docs_license = _.size(_.find(pro_docs, { model_type: "license" }))
             var pro_docs_legal_document = _.size(_.find(pro_docs, { model_type: "legal_document" }))
         }
