@@ -746,13 +746,13 @@ module.exports.checkOtp = async (parent, args) => {
                     if (!pre_address_result || !_.size(pre_address_result)) {
                         message['company_register_status'] = 2
                     }
-                } else if (result.role == 2 && !result.provider_subCategory && !_.size(result.provider_subCategory)) {
+                } else if (!result.provider_subCategory && !_.size(result.provider_subCategory)) {
                     message['company_register_status'] = 3
-                } else if (result.role == 2 && !_.size(pro_docs) || !pro_docs_certificate) {
+                } else if (!_.size(pro_docs) || !pro_docs_certificate) {
                     message['company_register_status'] = 4
-                } else if (result.role == 2 && !pro_docs_license) {
+                } else if ( !pro_docs_license) {
                     message['company_register_status'] = 5
-                } else if (result.role == 2 && !pro_docs_legal_document) {
+                } else if ( !pro_docs_legal_document) {
                     message['company_register_status'] = 6
                 }
                 return { ...result._doc, ...message };
