@@ -748,11 +748,11 @@ module.exports.checkOtp = async (parent, args) => {
                     }
                 } else if (result.role == 2 && !result.provider_subCategory && !_.size(result.provider_subCategory)) {
                     message['company_register_status'] = 3
-                } else if (result.role == 2 && pro_docs_certificate) {
+                } else if (result.role == 2 && !_.size(pro_docs) || !pro_docs_certificate) {
                     message['company_register_status'] = 4
-                } else if (result.role == 2 && pro_docs_license) {
+                } else if (result.role == 2 && !pro_docs_license) {
                     message['company_register_status'] = 5
-                } else if (result.role == 2 && pro_docs_legal_document) {
+                } else if (result.role == 2 && !pro_docs_legal_document) {
                     message['company_register_status'] = 6
                 }
                 return { ...result._doc, ...message };
@@ -765,7 +765,7 @@ module.exports.checkOtp = async (parent, args) => {
                     message = { pending_status: 2, msg: " address pending", status: "success" };
                 } else if (result.provider_subCategoryID.length == 0 && result.role == 2 && result.Upload_percentage == 50) {
                     message = { pending_status: 3, msg: " category not upload", status: "success" };
-                } else if (result.role == 2 && pro_docs_certificate) {
+                } else if (result.role == 2 &&  !_.size(pro_docs) || pro_docs_certificate) {
                     message = { pending_status: 4, msg: "pro_docs_certificate not upload", status: "success" };
                 } else if (result.role == 2 && pro_docs_license) {
                     message = { pending_status: 5, msg: "pro_docs_license not upload", status: "success" };
