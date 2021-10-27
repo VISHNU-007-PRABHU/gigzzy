@@ -355,8 +355,8 @@ const typeDefs = gql`
     type ProImage {
         _id:ID
         user_id: String,
-        small_image: String  @imgUrl(format: "company"),
-        large_image: String  @imgUrl(format: "company"),
+        small_image: String  @imgUrl(format: "user/profile"),
+        large_image: String  @imgUrl(format: "user/profile"),
         image_tag: String,
         doc_type: String,
         doc_category: String,
