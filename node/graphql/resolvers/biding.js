@@ -224,7 +224,7 @@ module.exports.update_biding = async (root, args) => {
 
                 let filesUpload = await this.uploading_files(files, args)
             }
-            if (args['booking_status'] === "9") {
+            if (args['booking_status'] === 9) {
                 let notification_user_data = {
                     user_id: contract_data['user_id'],
                     booking_id: contract_data._id,
