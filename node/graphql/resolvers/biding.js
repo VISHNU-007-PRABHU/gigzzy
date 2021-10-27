@@ -231,10 +231,10 @@ module.exports.update_biding = async (root, args) => {
                     booking_id: contract_data._id,
                     booking_status: "biding_9"
                 }
-                if (args['provider_id']) {
+                if (update_detail['provider_id']) {
                     let update_data = {
-                        $pull: { available_provider: { $in: [args['provider_id']] } },
-                        $push: { applied_provider: args['provider_id'] }
+                        $pull: { available_provider: { $in: [update_detail['provider_id']] } },
+                        $push: { applied_provider: update_detail['provider_id'] }
                     }
                     await ContractJob_model.updateOne({ _id: contract_data._id }, update_data);
                 }
