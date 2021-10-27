@@ -29,6 +29,8 @@ module.exports = gql`
         created_at:String  @date(format: "DD/MM/YYYY hh:mm a")
         category_id:ID
         biding_id:ID
+        user_id:ID
+        provider_id:ID
         booking_status:Int
         category_type:Int
         contract_ref:String
