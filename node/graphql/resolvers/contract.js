@@ -250,6 +250,8 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         if (args.role && args.role == 2 && args['provider_id']) {
             if (args['booking_status'] && args['booking_status'] === 9) {
                 find_query['available_provider'] = { $in: [args.provider_id] }
+            } else if (args['booking_status'] && args['booking_status'] === commonHelper.bookink_status.BOOKING) {
+                find_query['applied_provider'] = { $in: [args.provider_id] }
             } else {
                 find_query['provider_id'] = ObjectId(args['provider_id'])
             }
@@ -324,7 +326,7 @@ module.exports.update_contract = async (root, args) => {
                 contract_detail = { ...contract_detail, ...get_current_user_currency }
             }
             if (contract_detail['category_id']) {
-                let get_category =await this.get_catgeory_data(contract_detail);
+                let get_category = await this.get_catgeory_data(contract_detail);
                 if (get_category && get_category['status']) {
                     let close_day = get_category['contract_close_day'] || 5;
                     contract_detail['close_date'] = moment().add(close_day, 'days');
@@ -346,7 +348,7 @@ module.exports.update_contract = async (root, args) => {
             contract_detail['booking_status'] = 9
             contract_detail['contract_status'] = 9
             if (contract_detail['category_id']) {
-                let get_category =await this.get_catgeory_data(contract_detail);
+                let get_category = await this.get_catgeory_data(contract_detail);
                 if (get_category && get_category['status']) {
                     let close_day = get_category['contract_close_day'] || 5;
                     contract_detail['close_date'] = moment().add(close_day, 'days');
@@ -560,7 +562,7 @@ module.exports.delete_biding = async (root, args) => {
 exports.manage_contract_booking = async (root, args) => {
     try {
         if (args['booking_status'] === commonHelper.bookink_status.CANCEL) {
-            await Biding_model.updateOne({_id:args.biding_id },{is_delete:true});
+            await Biding_model.updateOne({ _id: args.biding_id }, { is_delete: true });
             return { msg: "Contract rejected success", status: 'failed' }
         } else if (args['booking_status'] === 10) {
             let preview_contract_data = await ContractJob_model.findOne({ _id: args.contract_id }).lean()

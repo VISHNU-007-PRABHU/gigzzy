@@ -42,6 +42,7 @@ var contractSchema = new Schema({
     current_page: { type: String, },
     contract_status: { type: Number},  // c1.pending,c2.job posted,c3.admin-approved,c4
     availability: [],
+    applied_provider:[],
     hours: { type: String },
     contract_date: Date,
     contract_cron_date: String,

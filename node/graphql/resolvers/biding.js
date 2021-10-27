@@ -61,7 +61,7 @@ module.exports.get_biding_pagination = async (root, args) => {
 
 module.exports.biding_count = async (root, args) => {
     try {
-        return await Biding_model.count({ contract_id: root._id,is_delete:false });
+        return await Biding_model.count({ contract_id: root._id, is_delete: false });
     } catch (error) {
         return 0
     }
@@ -70,9 +70,9 @@ module.exports.biding_count = async (root, args) => {
 module.exports.get_biding_detail = async (root, args) => {
     try {
         let fetch_query = {}
-        if(args['root']){
+        if (args['root']) {
             fetch_query['_id'] = root['biding_id']
-        }else{
+        } else {
             if (args['_id']) {
                 fetch_query['_id'] = args['_id']
             }
@@ -230,8 +230,12 @@ module.exports.update_biding = async (root, args) => {
                     booking_id: contract_data._id,
                     booking_status: "biding_9"
                 }
-                if(args['provider_id']){
-                    await ContractJob_model.updateOne({_id:contract_data._id},{$pull:{ available_provider: { $in: [args['provider_id']] }} });
+                if (args['provider_id']) {
+                    let update_data = {
+                        $pull: { available_provider: { $in: [args['provider_id']] } },
+                        $push: { applied_provider: args['provider_id'] }
+                    }
+                    await ContractJob_model.updateOne({ _id: contract_data._id }, update_data);
                 }
                 await PushNotification.create_push_notification_msg(notification_user_data);
             }
@@ -342,7 +346,7 @@ exports.find_kilometer = async (parent, args) => {
             } else {
 
                 var distanceInMeters = getDistanceBetweenPoints.getDistanceBetweenPoints(
-                    contract_address.lat,contract_address.lng, // Lat, Long of point A
+                    contract_address.lat, contract_address.lng, // Lat, Long of point A
                     pro_address.lat, pro_address.lng// Lat, Long of point B
                 );
                 if (distanceInMeters) {
