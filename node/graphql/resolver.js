@@ -96,7 +96,7 @@ const resolvers = {
                 (payload, variables) => {
                     if (payload.messageSent.booking_id == variables.booking_id) {
                         return true;
-                    } else if (payload.messageSent.contract_id == variables.contract_id && payload.messageSent.provider_id == variables.provider_id) {
+                    } else if (payload.messageSent.contract_id == variables.contract_id && (payload.messageSent.user_id == variables.user_id || payload.messageSent.provider_id == variables.provider_id)) {
                         return true;
                     }
                 })
@@ -213,7 +213,7 @@ const resolvers = {
         get_chat_message: chatResolver.get_chat_message,
         get_all_payout: bookingResolver.get_all_payout,
         get_review: bookingResolver.get_review,
-        get_pro_profile_doc:userResolver.get_pro_profile_doc,
+        get_pro_profile_doc: userResolver.get_pro_profile_doc,
 
         user: userResolver.user,
         category: categoryResolver.category,
@@ -367,7 +367,7 @@ const resolvers = {
         provider_rate: userResolver.provider_rate,
         get_currency: currencyResolver.get_currency,
         get_company_root_detail: userResolver.get_company_root_detail,
-        get_pro_profile_doc:userResolver.get_pro_profile_doc,
+        get_pro_profile_doc: userResolver.get_pro_profile_doc,
     },
     Company: {
         get_parent_company_provider: userResolver.get_parent_company_provider,
@@ -419,8 +419,8 @@ const resolvers = {
         adminLogin: adminResolver.adminlogin,
         update_main_category: main_categoryResolver.update_main_category,
         update_category_question: main_categoryResolver.update_category_question,
-        delete_pro_doc_image:userResolver.delete_pro_doc_image,
-        delete_pro_doc:userResolver.delete_pro_doc,
+        delete_pro_doc_image: userResolver.delete_pro_doc_image,
+        delete_pro_doc: userResolver.delete_pro_doc,
         // contract job
         update_contract: contractResolver.update_contract,
         update_currency: currencyResolver.update_currency,
@@ -1251,7 +1251,7 @@ const resolvers = {
         updateCategory: categoryResolver.updateCategory,
         updatesubCategory: categoryResolver.updatesubCategory,
         update_profile: userResolver.update_profile,
-        update_pro_profile_doc:userResolver.update_pro_profile_doc,
+        update_pro_profile_doc: userResolver.update_pro_profile_doc,
         updateAvailability: userResolver.updateAvailability,
         removeAvailability: userResolver.removeAvailability,
 
