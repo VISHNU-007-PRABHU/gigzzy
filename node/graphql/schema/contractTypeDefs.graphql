@@ -84,7 +84,7 @@ module.exports = gql`
     extend type Query{
         get_contract_files(location_code:String,company_id:ID,user_id:ID,provider_id:ID,contract_id:ID):[ContractImage]
         get_contracts(location_code:String,company_id:ID,contract_id:ID,provider_id:ID,user_id:ID):[ContractJob]
-        get_contracts_pagination(rating_sort:Int,budget_sort:Int,location_code:String,booking_status:Int,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
+        get_contracts_pagination(rating_sort:Int,budget_sort:Int,location_code:String,page_option:String,booking_status:Int,data:JSON,contract_search:JSON,search:JSON,company_id:ID,_id:ID,role:Int,provider_id:ID,user_id:ID,page:Int,limit:Int):ContractConnection
         get_contract_all_files(contract_id:ID,limit:Int,image_type:String,root:Boolean):[ContractImage]
     }
 
