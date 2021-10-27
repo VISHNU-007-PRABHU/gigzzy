@@ -11,6 +11,7 @@ var getDistanceBetweenPoints = require('get-distance-between-points');
 const path = require("path");
 var fs = require('fs');
 const { AuthRegistrationsCredentialListMappingInstance } = require('twilio/lib/rest/api/v2010/account/sip/domain/authTypes/authRegistrationsMapping/authRegistrationsCredentialListMapping');
+const PushNotification = require('../notification/PushNotification') 
 var Biding_model = model.Biding;
 var Address_model = model.address
 var BidingImage_model = model.BidingImage;
