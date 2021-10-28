@@ -345,7 +345,7 @@ exports.find_kilometer = async (parent, args) => {
         var pro_address = await Address_model.findOne({ user_id: parent.provider_id });
 
         if (_.size(contract_address) && _.size(pro_address) && contract_address.lat && contract_address.lng && pro_address.lat && pro_address.lng) {
-            if (pro_address.lat == address['lat'] && pro_address.lng == address['lng']) {
+            if (pro_address.lat == contract_address['lat'] && pro_address.lng == contract_address['lng']) {
                 return { kilometre: 0 };
             } else {
 
