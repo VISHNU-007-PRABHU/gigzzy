@@ -249,7 +249,7 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         }
 
         if (args.role && args.role == 2 && args['provider_id']) {
-            if (args['booking_status'] && args['booking_status'] === commonHelper.booking_status.ACCEPT) {
+            if (args['booking_status'] && args['booking_status'] === commonHelper.bookink_status.ACCEPT) {
                 if (args['page_option'] && args['page_option'] === "bids") {
                     find_query['applied_provider'] = { $in: [args.provider_id] }
                 } else {
