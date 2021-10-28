@@ -999,7 +999,15 @@ exports.get_company_root_detail = async (parent, args, context, info) => {
             let final_result = await Company_model.findOne(find_query).lean();
             return final_result
         } else {
-            return { msg: "error in company detail", status: "failed" }
+            let own = {
+                user_id: parent['_id']
+            }
+            let final_result = await Company_model.findOne(own).lean();
+            if (_.size(final_result)) {
+                return final_result
+            } else {
+                return {}
+            }
         }
     } catch (error) {
         return { msg: "error in company detail", status: "failed" }
