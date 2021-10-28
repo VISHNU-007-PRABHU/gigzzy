@@ -77,6 +77,9 @@ module.exports.get_biding_detail = async (root, args) => {
             if (args['_id']) {
                 fetch_query['_id'] = args['_id']
             }
+            if (args['provider_id']) {
+                fetch_query['provider_id'] = args['provider_id']
+            }
             if (args['contract_id']) {
                 fetch_query['contract_id'] = args['contract_id']
             }
@@ -341,7 +344,7 @@ exports.find_kilometer = async (parent, args) => {
         var contract_address = await Address_model.findOne({ _id: result['address_id'] });
         var pro_address = await Address_model.findOne({ user_id: parent.provider_id });
 
-        if (_.size(contract_address) && _.size(pro_address) && contract_address.lat && address.lng && pro_address.lat && pro_address.lng) {
+        if (_.size(contract_address) && _.size(pro_address) && contract_address.lat && contract_address.lng && pro_address.lat && pro_address.lng) {
             if (pro_address.lat == address['lat'] && pro_address.lng == address['lng']) {
                 return { kilometre: 0 };
             } else {
