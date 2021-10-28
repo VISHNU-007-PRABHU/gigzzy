@@ -54,7 +54,7 @@ module.exports = gql`
         currenct_milestone_id:ID,
         currenct_milestone_status:Int
         milestones_status:Int
-        get_biding_detail(root:Boolean,all:Boolean):Biding
+        get_biding_detail(root:Boolean,all:Boolean,provider_id:ID):Biding
         find_kilometer(lat:Float,lng:Float,root:Boolean):Detail
     }
 

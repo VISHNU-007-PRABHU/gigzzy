@@ -39,14 +39,17 @@ const transporter = nodemailer.createTransport({
 
 exports.bookink_status = {
   PROVIDER_ROLE : 2,
-  START : 4,
-  END : 13,
-  CANCEL : 8,
+  PROVIDER_ROLE : 2,
+  WAITING_ADMIN : 15,
+  WAITING_PAYMENT : 50,
+  ACCEPT : 9,
   BOOKING : 12,
   PENDING : 10,
+  START : 4,
   ONGOING : 4,
+  CANCEL : 8,
+  END : 13,
   COMPLETE : 14,
-  ACCEPT : 9,
 }
 
 module.exports.home = 0;

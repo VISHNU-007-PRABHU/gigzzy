@@ -247,11 +247,12 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         if (args.role && args.role == 1 && args['user_id']) {
             find_query['user_id'] = ObjectId(args['user_id'])
         }
+
         if (args.role && args.role == 2 && args['provider_id']) {
-            if (args['booking_status'] && args['booking_status'] === 9) {
+            if (args['booking_status'] && args['booking_status'] === commonHelper.booking_status.ACCEPT) {
                 if (args['page_option'] && args['page_option'] === "bids") {
                     find_query['applied_provider'] = { $in: [args.provider_id] }
-                }else{
+                } else {
                     find_query['available_provider'] = { $in: [args.provider_id] }
                 }
             } else {
@@ -259,14 +260,16 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
             }
         }
         if (args['booking_status']) {
-            if (args.booking_status === 4) {
-                find_query['booking_status'] = { $in: [13, 4] }
+            if (args.booking_status === commonHelper.bookink_status.START) {
+                find_query['booking_status'] = { $in: [commonHelper.bookink_status.END, commonHelper.bookink_status.START] }
+            } else if (args.role == 1 && args.booking_status === commonHelper.booking_status.ACCEPT) {
+                find_query['booking_status'] = { $in: [commonHelper.booking_status.ACCEPT, commonHelper.booking_status.WAITING_ADMIN] }
+            } else if (args.booking_status === commonHelper.bookink_status.COMPLETE) {
+                find_query['booking_status'] = { $in: [commonHelper.bookink_status.COMPLETE, commonHelper.bookink_status.CANCEL] }
             } else {
                 find_query['booking_status'] = args['booking_status']
             }
         }
-
-
 
         total = await ContractJob_model.count(find_query);
         let result = await ContractJob_model.find(find_query).sort(sort_option).skip(Number(offset)).limit(Number(limit));
@@ -336,9 +339,6 @@ module.exports.update_contract = async (root, args) => {
             }
             await ContractJob_model.updateOne(find_query, contract_detail).exec()
             let fetch_contract = await ContractJob_model.findOne(find_query).lean()
-            if (args['booking_status'] === 9) {
-                let datas = await this.find_provider(fetch_contract)
-            }
             fetch_contract['status'] = "success";
             fetch_contract['msg'] = "contract job update success"
             return fetch_contract
@@ -566,6 +566,10 @@ exports.manage_contract_booking = async (root, args) => {
         if (args['booking_status'] === commonHelper.bookink_status.CANCEL) {
             await Biding_model.updateOne({ _id: args.biding_id }, { is_delete: true });
             return { msg: "Contract rejected success", status: 'failed' }
+        } else if (args['booking_status'] === commonHelper.bookink_status.ACCEPT) {
+            let fetch_contract = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
+            await this.find_provider(fetch_contract)
+            return { msg: "Contract updated success", status: 'success' }
         } else if (args['booking_status'] === 10) {
             let preview_contract_data = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
             let preview_biding_data = await Biding_model.findOne({ _id: args.biding_id }).lean()
