@@ -368,6 +368,7 @@ const resolvers = {
         get_currency: currencyResolver.get_currency,
         get_company_root_detail: userResolver.get_company_root_detail,
         get_pro_profile_doc: userResolver.get_pro_profile_doc,
+        get_address:userResolver.get_address,
     },
     Company: {
         get_parent_company_provider: userResolver.get_parent_company_provider,

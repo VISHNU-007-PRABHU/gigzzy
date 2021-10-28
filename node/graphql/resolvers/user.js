@@ -742,7 +742,7 @@ module.exports.checkOtp = async (parent, args) => {
                     message['company_register_status'] = 1
                 } else if (!pre_address_result || !_.size(pre_address_result)) {
                     message['company_register_status'] = 2
-                } else if ( !_.size(result.provider_subCategoryID)) {
+                } else if (!_.size(result.provider_subCategoryID)) {
                     message['company_register_status'] = 3
                 } else if (!_.size(pro_docs)) {
                     message['company_register_status'] = 4
@@ -1457,3 +1457,20 @@ module.exports.confrimation_company_worker = async (data) => {
 }
 
 
+exports.get_address = async (root, args) => {
+    try {
+        var response = {
+            msg: "fetch address",
+            status: "success"
+        }
+        if (args['root'] && args['role'] === 2) {
+            let pre_address_result = await Address_model.findOne({ user_id: root['provider_id'], is_default: 1 }).lean()
+            if (pre_address_result && _.size(pre_address_result)) {
+                response = pre_address_result
+            }
+        }
+        return response
+    } catch (error) {
+        return { msg: "error in fetch address", status: "failed" }
+    }
+}

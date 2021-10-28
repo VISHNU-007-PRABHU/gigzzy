@@ -73,6 +73,7 @@ var detailSchema = new Schema({
   branch_name:{ type: String },
   routing_name:{ type: String },
   location_code:{ type: String,default:"" },
+  address_id:"",
   currency_id:String
 }, schemaOptions);
 

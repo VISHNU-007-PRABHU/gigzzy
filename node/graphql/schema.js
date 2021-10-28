@@ -525,6 +525,8 @@ const typeDefs = gql`
         password:String
         name:String
         address:String
+        address_id:ID
+        get_address(_id:ID,user_id:ID,root:Boolean,user_type:String,role:Int):UserAddress
         country_code:String
         bank_name:String
         ifsc_code:String
