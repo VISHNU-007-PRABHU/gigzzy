@@ -742,15 +742,15 @@ module.exports.checkOtp = async (parent, args) => {
                     message['company_register_status'] = 1
                 } else if (!pre_address_result || !_.size(pre_address_result)) {
                     message['company_register_status'] = 2
-                } else if (!_.size(result.provider_subCategoryID)) {
+                } else if (result.role == 2  && !_.size(result.provider_subCategoryID)) {
                     message['company_register_status'] = 3
-                } else if (!_.size(pro_docs)) {
+                } else if (result.role == 2  && !_.size(pro_docs)) {
                     message['company_register_status'] = 4
-                } else if (!pro_docs_certificate) {
+                } else if (result.role == 2  & !pro_docs_certificate) {
                     message['company_register_status'] = 4
-                } else if (!pro_docs_license) {
+                } else if (result.role == 2  && !pro_docs_license) {
                     message['company_register_status'] = 5
-                } else if (!pro_docs_legal_document) {
+                } else if (result.role == 2  && !pro_docs_legal_document) {
                     message['company_register_status'] = 6
                 }
 
