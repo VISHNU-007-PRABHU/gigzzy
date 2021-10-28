@@ -249,7 +249,7 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
         }
 
         if (args.role && args.role == 2 && args['provider_id']) {
-            if (args['booking_status'] && args['booking_status'] === commonHelper.bookink_status.ACCEPT) {
+            if (args['booking_status'] && args['booking_status'] === commonHelper.booking_status.ACCEPT) {
                 if (args['page_option'] && args['page_option'] === "bids") {
                     find_query['applied_provider'] = { $in: [args.provider_id] }
                 } else {
@@ -260,12 +260,12 @@ module.exports.get_contracts_pagination = async (parent, args, context, info) =>
             }
         }
         if (args['booking_status']) {
-            if (args.booking_status === commonHelper.bookink_status.START) {
-                find_query['booking_status'] = { $in: [commonHelper.bookink_status.END, commonHelper.bookink_status.START] }
+            if (args.booking_status === commonHelper.booking_status.START) {
+                find_query['booking_status'] = { $in: [commonHelper.booking_status.END, commonHelper.booking_status.START] }
             } else if (args.role == 1 && args.booking_status === commonHelper.booking_status.ACCEPT) {
                 find_query['booking_status'] = { $in: [commonHelper.booking_status.ACCEPT, commonHelper.booking_status.WAITING_ADMIN] }
-            } else if (args.booking_status === commonHelper.bookink_status.COMPLETE) {
-                find_query['booking_status'] = { $in: [commonHelper.bookink_status.COMPLETE, commonHelper.bookink_status.CANCEL] }
+            } else if (args.booking_status === commonHelper.booking_status.COMPLETE) {
+                find_query['booking_status'] = { $in: [commonHelper.booking_status.COMPLETE, commonHelper.booking_status.CANCEL] }
             } else {
                 find_query['booking_status'] = args['booking_status']
             }
@@ -563,10 +563,10 @@ module.exports.delete_biding = async (root, args) => {
  */
 exports.manage_contract_booking = async (root, args) => {
     try {
-        if (args['booking_status'] === commonHelper.bookink_status.CANCEL) {
+        if (args['booking_status'] === commonHelper.booking_status.CANCEL) {
             await Biding_model.updateOne({ _id: args.biding_id }, { is_delete: true });
             return { msg: "Contract rejected success", status: 'failed' }
-        } else if (args['booking_status'] === commonHelper.bookink_status.ACCEPT) {
+        } else if (args['booking_status'] === commonHelper.booking_status.ACCEPT) {
             let fetch_contract = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
             await this.find_provider(fetch_contract)
             return { msg: "Contract updated success", status: 'success' }

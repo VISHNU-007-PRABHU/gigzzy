@@ -37,7 +37,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-exports.bookink_status = {
+exports.booking_status = {
   PROVIDER_ROLE : 2,
   PROVIDER_ROLE : 2,
   WAITING_ADMIN : 15,

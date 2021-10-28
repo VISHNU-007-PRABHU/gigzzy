@@ -314,8 +314,8 @@ exports.static_contract_by_milestone = async (args) => {
                 await this.static_complete_milestone(args)
 
                 let updat_data = {
-                    milestones_status: commonHelper.bookink_status.ACCEPT,
-                    booking_status: commonHelper.bookink_status.PENDING
+                    milestones_status: commonHelper.booking_status.ACCEPT,
+                    booking_status: commonHelper.booking_status.PENDING
                 }
                 await ContractJob_model.updateOne({ _id: args['contract_id'] }, updat_data).exec()
                 return { msg: "contract milestone updated has been started", status: 'success' }
