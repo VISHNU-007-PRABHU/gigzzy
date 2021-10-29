@@ -22,7 +22,8 @@ var companyProviderSchema = new Schema({
   register_status: { type: String, },
   register_link_status:{ type: String, },
   provider_id:{ type: mongoose.Schema.Types.ObjectId, ref: 'detail' },
-  role: { type: Number, },             // 1->user, 2->provider
+  role: { type: Number, }, 
+  user_type : { type: String,default:"" },          
   name: { type: String, },
   password: { type: String, },
   email: { type: String, },

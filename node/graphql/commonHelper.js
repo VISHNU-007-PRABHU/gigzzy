@@ -24,6 +24,7 @@ const africa = require("africastalking")({
 const sms = africa.SMS;
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+console.log("rocess.env.SENDGRID_API_KEY", process.env.SENDGRID_API_KEY)
 
 
 const transporter = nodemailer.createTransport({
@@ -38,18 +39,18 @@ const transporter = nodemailer.createTransport({
 
 
 exports.booking_status = {
-  PROVIDER_ROLE : 2,
-  PROVIDER_ROLE : 2,
-  WAITING_ADMIN : 15,
-  WAITING_PAYMENT : 50,
-  ACCEPT : 9,
-  BOOKING : 12,
-  PENDING : 10,
-  START : 4,
-  ONGOING : 4,
-  CANCEL : 8,
-  END : 13,
-  COMPLETE : 14,
+  PROVIDER_ROLE: 2,
+  PROVIDER_ROLE: 2,
+  WAITING_ADMIN: 15,
+  WAITING_PAYMENT: 50,
+  ACCEPT: 9,
+  BOOKING: 12,
+  PENDING: 10,
+  START: 4,
+  ONGOING: 4,
+  CANCEL: 8,
+  END: 13,
+  COMPLETE: 14,
 }
 
 module.exports.home = 0;
@@ -259,14 +260,14 @@ module.exports.send_mail_sendgrid = async (email, type, datas) => {
     let data = await sgMail.send(mail_msg);
     return true
   } catch (error) {
-    console.log("module.exports.send_mail_sendgrid -> error", error.response)
+    console.log("module.exports.send_mail_sendgrid -> error", error.response.body)
     return false
   }
 }
 
 
 module.exports.genrate_random = async () => {
-  try{
+  try {
     var random = Math.floor(Math.random() * 90000) + 10000;
     var chars = "abcdefghijklmnopqrstufwxyzABCDEFGHIJKLMNOPQRSTUFWXYZ1234567890"
     var random = _.join(_.sampleSize(chars, 20), "")
@@ -276,7 +277,7 @@ module.exports.genrate_random = async () => {
       await this.genrate_random()
     }
     return digit;
-  }catch(err){
+  } catch (err) {
     console.log("exports.genrate_random -> err", err)
     return "";
   }

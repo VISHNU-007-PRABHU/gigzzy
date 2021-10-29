@@ -731,10 +731,12 @@ module.exports.checkOtp = async (parent, args) => {
         }
 
         if (otp_verified.length == 1) {
-            if (result['user_type'] === "company") {
+            let is_company_owner = await CompanyProvider_model.findOne({ provider_id: args._id }).lean()
+            if (result['user_type'] === "company" && is_company_owner && _.size(is_company_owner) && is_company_owner['user_type'] === "owner") {
                 let message = { pending_status: 0, company_register_status: 0 }
                 message['msg'] = "OTP verified";
                 message['status'] = "success";
+
                 let pre_company_result = await Company_model.findOne({ user_id: args._id }).lean()
                 message['company_id'] = pre_company_result['_id']
                 let pre_address_result = await Address_model.findOne({ company_id: pre_company_result._id }).lean()
@@ -742,15 +744,15 @@ module.exports.checkOtp = async (parent, args) => {
                     message['company_register_status'] = 1
                 } else if (!pre_address_result || !_.size(pre_address_result)) {
                     message['company_register_status'] = 2
-                } else if (result.role == 2  && !_.size(result.provider_subCategoryID)) {
+                } else if (result.role == 2 && !_.size(result.provider_subCategoryID)) {
                     message['company_register_status'] = 3
-                } else if (result.role == 2  && !_.size(pro_docs)) {
+                } else if (result.role == 2 && !_.size(pro_docs)) {
                     message['company_register_status'] = 4
-                } else if (result.role == 2  & !pro_docs_certificate) {
+                } else if (result.role == 2 & !pro_docs_certificate) {
                     message['company_register_status'] = 4
-                } else if (result.role == 2  && !pro_docs_license) {
+                } else if (result.role == 2 && !pro_docs_license) {
                     message['company_register_status'] = 5
-                } else if (result.role == 2  && !pro_docs_legal_document) {
+                } else if (result.role == 2 && !pro_docs_legal_document) {
                     message['company_register_status'] = 6
                 }
 
@@ -1200,11 +1202,25 @@ exports.addUser = async (parent, args) => {
                     data['company_id'] = company_data['_id']
                 } else {
                     let company_data = {
-                        user_id: data['_id']
+                        user_id: data['_id'],
+                        role:data['role']
                     }
                     let add_company_detail = new Company_model(company_data)
                     var added_com_detail = await add_company_detail.save()
+                    //add user
+                    let update_query = {
+                        email: data['email'],
+                        role:data['role'],
+                        provider_id: ObjectId(company_data['user_id']),
+                        company_id: ObjectId(added_detail['_id']),
+                        register_link_status: "accepted",
+                        register_status: "success",
+                        user_type: "owner"
+                    }
+                    let defaul_user = new CompanyProvider_model(update_query)
+                    await defaul_user.save()
                     data['company_id'] = added_com_detail['_id']
+
                     console.log(" data['company_id']", data['company_id'])
                 }
             }
@@ -1355,32 +1371,36 @@ module.exports.CompanyFileUpload = async (parent, args, context, info) => {
 module.exports.update_company_detail = async (parent, args, context, info) => {
     try {
         let company_data = args['company_data'][0]
-        console.log("module.exports.update_company_detail -> company_data", company_data)
         if (!_.size(company_data)) {
             return { msg: "Invalid company data", status: 'failed' };
         }
         if (args['_id']) {
             let find_query = { _id: args['_id'] }
             if (company_data['provider_email'] && _.size(company_data['provider_email'])) {
-                let CompanyProviderDetail = await this.SendCompanyProviders(args['_id'], company_data['provider_email'])
+              let data =  await this.SendCompanyProviders(args['_id'], company_data)
             }
-            let update_company_detail = await Company_model.updateOne(find_query, company_data).exec()
+         
+            let update_company_detail = await Company_model.updateOne(find_query, company_data,{new:true}).exec()
             let fetch_data = await Company_model.findOne(find_query).lean()
             fetch_data['msg'] = "updated success"
             fetch_data['status'] = "success"
             return fetch_data;
         } else {
+            /**
+             * is not used now (vishnu)
+             */
             let add_company_detail = new Company_model(company_data)
             let added_detail = await add_company_detail.save()
 
             let update_query = {
                 email: "",
-                provider_id: ObjectId(company_data['user_id']),
                 company_id: ObjectId(added_detail['_id']),
                 register_link_status: "accepted",
                 register_status: "success",
-                user_type: "Owner"
+                user_type: "owner"
             }
+            // if(){}
+            // provider_id: ObjectId(company_data['user_id']),
             let defaul_user = new CompanyProvider_model(update_query)
             await defaul_user.save()
             if (company_data['provider_email'] && _.size(company_data['provider_email'])) {
@@ -1397,19 +1417,23 @@ module.exports.update_company_detail = async (parent, args, context, info) => {
     }
 }
 
-exports.SendCompanyProviders = (company_id, emails) => {
+exports.SendCompanyProviders = (company_id, company_data) => {
     try {
+        let emails = company_data['provider_email']
         _.forEach(emails, async emailData => {
             let find_query = {
+                role:company_data['role'],
                 email: _.trim(emailData),
                 company_id: company_id,
                 delete: false,
             }
             let update_query = {
+                role:company_data['role'],
                 email: _.trim(emailData),
                 company_id: company_id,
                 register_link_status: "Pending",
                 register_status: "Pending",
+                user_type:"employee"
             }
             let fetch_data = await CompanyProvider_model.findOne(find_query).lean()
             if (_.size(fetch_data)) {
@@ -1424,6 +1448,7 @@ exports.SendCompanyProviders = (company_id, emails) => {
         })
         return true
     } catch (error) {
+        console.log("exports.SendCompanyProviders -> error", error)
         return false
     }
 }
@@ -1431,7 +1456,7 @@ exports.SendCompanyProviders = (company_id, emails) => {
 module.exports.confrimation_company_worker = async (data) => {
     try {
         let { sid } = data
-        let link = '/provider_login'
+        let link = '/'
         let error_link = '/ops'
         let find_query = { _id: sid }
         let update_query = { register_link_status: "accepted" }
@@ -1439,6 +1464,7 @@ module.exports.confrimation_company_worker = async (data) => {
         let fetch_provider_by_email = await CompanyProvider_model.findOne({
             register_link_status: "accepted",
             register_status: "success",
+            role:fetch_provider['role'],
             email: fetch_provider['email'],
             delete: false
         }).lean()
@@ -1448,10 +1474,11 @@ module.exports.confrimation_company_worker = async (data) => {
         if (fetch_provider && _.size(fetch_provider)) {
             let detail_find_query = {
                 email: fetch_provider['email'],
-                role: 2
+                role: fetch_provider['role']
             }
             let fetch_pro_detail = await Detail_model.findOne(detail_find_query).lean()
             if (fetch_pro_detail && _.size(fetch_pro_detail)) {
+                await Detail_model.updateOne({_id:fetch_pro_detail['_id']},{user_type:company}).lean()
                 update_query['provider_id'] = fetch_pro_detail['_id']
                 update_query['register_status'] = "success"
             }
