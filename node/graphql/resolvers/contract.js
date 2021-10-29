@@ -603,18 +603,14 @@ exports.manage_contract_booking = async (root, args) => {
 
                 let update_contract_res = await this.update_contract_status(args, update_contract_data)
                 let update_biding_res = await this.update_biding_status(args, biding_data)
-                if (payment_data.status) {
-                    var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
-                    findBooking['user_parent'] = true;
-                    findBooking['msg'] = "user accept the contract";
-                    findBooking['status'] = 'success';
-                    findBooking['removed_users'] = removed_users;
-                    await ContractPayoutNotificationModule.accept_payout_notification(findBooking)
+                var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
+                findBooking['user_parent'] = true;
+                findBooking['msg'] = "user accept the contract";
+                findBooking['status'] = 'success';
+                findBooking['removed_users'] = removed_users;
+                await ContractPayoutNotificationModule.accept_payout_notification(findBooking)
+                return findBooking
 
-                    return findBooking
-                } else {
-                    return { msg: "Contract update failed", status: 'failed' }
-                }
             } else {
                 return { msg: "Contract update failed", status: 'failed' }
             }
