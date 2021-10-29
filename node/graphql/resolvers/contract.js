@@ -348,8 +348,8 @@ module.exports.update_contract = async (root, args) => {
             contract_detail['booking_ref'] = String(Math.floor(1000 + Math.random() * 9000));
             contract_detail['base_price'] = String(parseFloat(contract_detail.budget).toFixed(2));
             contract_detail['job_status'] = 12;
-            contract_detail['booking_status'] = 9
-            contract_detail['contract_status'] = 9
+            contract_detail['booking_status'] = 15
+            contract_detail['contract_status'] = 15
             if (contract_detail['category_id']) {
                 let get_category = await this.get_catgeory_data(contract_detail);
                 if (get_category && get_category['status']) {
