@@ -36,7 +36,7 @@ var contractSchema = new Schema({
         coordinates: []
     },
     find_kilometer: { type: Number, default: 0 },
-    find_kilometer_type: { type: Number, default: "KM" },
+    find_kilometer_type: { type: String, default: "KM" },
     booking_status: { type: Number },  // 12.booking,11.user_cancel,8.provider_accept,no_provider],10.user_accept,4.start,13.end,14.completed,15.not available
     booked: { type: String },
     location_code: { type: String, },
