@@ -103,7 +103,7 @@ exports.accept_payout_notification = async (contract_data) => {
             let provider_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
 
             let notification_user_data = [{
-                user_id: provider_detail.device_id,
+                user_id: provider_detail._id,
                 booking_status: booking_detail.booking_status,
                 booking_id: booking_detail._id
             }]
