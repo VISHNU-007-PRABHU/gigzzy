@@ -21,7 +21,7 @@ var contractSchema = new Schema({
     description: { type: String },
     budget: { type: String, default: "0" },
     timeline: { type: String, default: "0" },
-    timeline_type: { type: String ,default:"1"},
+    timeline_type: { type: String, default: "1" },
     terms_condition: { type: String },
     company_id: { type: mongoose.Schema.Types.ObjectId, ref: 'company' },
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user', unique: false },
@@ -35,14 +35,16 @@ var contractSchema = new Schema({
         type: { type: String },
         coordinates: []
     },
+    find_kilometer: { type: Number, default: 0 },
+    find_kilometer_type: { type: Number, default: "KM" },
     booking_status: { type: Number },  // 12.booking,11.user_cancel,8.provider_accept,no_provider],10.user_accept,4.start,13.end,14.completed,15.not available
     booked: { type: String },
     location_code: { type: String, },
     currency_code: { type: String, },
     current_page: { type: String, },
-    contract_status: { type: Number},  // c1.pending,c2.job posted,c3.admin-approved,c4
+    contract_status: { type: Number },  // c1.pending,c2.job posted,c3.admin-approved,c4
     availability: [],
-    applied_provider:[],
+    applied_provider: [],
     hours: { type: String },
     contract_date: Date,
     contract_cron_date: String,
@@ -50,7 +52,7 @@ var contractSchema = new Schema({
     contract_hour: String,
     start_date: String,
     end_date: String,
-    close_date:Date,
+    close_date: Date,
     data: [{}],
     base_price: { type: String, default: 0.00 },
     hour_price: { type: String, default: "0.00" },
@@ -109,9 +111,9 @@ var contractSchema = new Schema({
     currency_id: String,
     default_currency_rate: String,
     currenct_local_rate: String,
-    currenct_milestone_status:Number,
-    currenct_milestone_id:String,
-    milestones_status:{type:Number,default:0}
+    currenct_milestone_status: Number,
+    currenct_milestone_id: String,
+    milestones_status: { type: Number, default: 0 }
 }, schemaOptions);
 
 contractSchema.virtual('uid').get(function () {
@@ -231,7 +233,7 @@ contractSchema.virtual('contract_close_day').get(function () {
     if (this.close_date) {
         var start = moment();
         var end = moment(this.close_date);
-        let diff_day = end.diff(start, 'days')+1 
+        let diff_day = end.diff(start, 'days') + 1
         return diff_day;
     } else {
         return 0;

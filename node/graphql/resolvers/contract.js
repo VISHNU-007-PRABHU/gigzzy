@@ -476,16 +476,16 @@ exports.genrate_mpesa_ref = async (args) => {
  * @param {*} contract_data 
  * @returns 
  */
-exports.find_provider = async (contract_data) => {
+exports.find_provider = async (contract_data,address) => {
     try {
         var filter = {
             role: 2,
             delete: 0,
             proof_status: 1,
             provider_subCategoryID: { $in: [contract_data.category_id] },
+            location: { $near: { $maxDistance: 81 * 1000, $geometry: { type: "Point", coordinates: [parseFloat(address.lng),parseFloat(address.lat)] } } },
         };
         let find_provider_data = await Detail_model.find(filter);
-        console.log("exports.find_provider -> find_provider_data", _.size(find_provider_data))
         var available_provider = []
         let notification_user_data = []
         for (let i = 0; i < find_provider_data.length; i++) {
@@ -569,7 +569,8 @@ exports.manage_contract_booking = async (root, args) => {
             return { msg: "Contract rejected success", status: 'failed' }
         } else if (args['booking_status'] === commonHelper.booking_status.ACCEPT) {
             let fetch_contract = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
-            await this.find_provider(fetch_contract)
+            let address = await Address_model.findOne({ _id: fetch_contract.address_id }).lean()
+            await this.find_provider(fetch_contract,address)
             return { msg: "Contract updated success", status: 'success' }
         } else if (args['booking_status'] === 10) {
             let preview_contract_data = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
