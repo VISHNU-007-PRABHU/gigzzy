@@ -122,7 +122,7 @@ module.exports.push_notifiy = async (message) => {
  * @returns string of message
  */
 
-const static_sms_template = (type, data) => {
+exports.static_sms_template = (type, data) => {
   let { otp, msg, link } = data
   switch (type) {
     case "otp":
@@ -152,7 +152,7 @@ const static_sms_template = (type, data) => {
 
 module.exports.send_sms = async (country_code, phone_no, type, data) => {
   try {
-    let message = await static_sms_template(type, data)
+    let message = await this.static_sms_template(type, data)
     let phone_number = `${country_code}${phone_no}`
 
     if (process.env.SMS_GATEWAY && process.env.SMS_GATEWAY === "africastalking") {
@@ -187,7 +187,7 @@ module.exports.send_sms = async (country_code, phone_no, type, data) => {
   }
 };
 
-const static_mail_template = (type, data) => {
+exports.static_mail_template = (type, data) => {
   let { otp, msg, link } = data
   switch (type) {
     case "otp":
@@ -234,6 +234,7 @@ const static_mail_template = (type, data) => {
       }
     case "new_company_register":
       return {
+        template:"New company register invitation",
         subject: "GIGZZY PRO✔",
         text: "Please accept your company request through  below the link",
         html: `<b>${link}</b>`
@@ -251,7 +252,7 @@ const static_mail_template = (type, data) => {
 module.exports.send_mail_sendgrid = async (email, type, datas) => {
   try {
 
-    let email_temp = await static_mail_template(type, datas)
+    let email_temp = await this.static_mail_template(type, datas)
     const mail_msg = {
       to: email,
       from: senderAddress,

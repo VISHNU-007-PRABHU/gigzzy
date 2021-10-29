@@ -69,15 +69,13 @@ class ContractDetail extends React.Component {
     change_status = async () => {
         this.setState({ loading: true })
         let input_data = { contract_id: this.props.match.params.id, booking_status: 9 }
-        await client.query({
+        await client.mutate({
             mutation: MANAGE_CONTRACT_BOOKING,
             variables: input_data,
         }).then((result, loading, error) => {
             Alert_msg(result.data.manage_contract_booking);
-            if (result.data.manage_contract_booking.status === 'success') {
-                this.setState({ approved: true })
-            }
             this.setState({ loading: false })
+            this.getData()
         });
     }
 
@@ -111,7 +109,7 @@ class ContractDetail extends React.Component {
                                             <Button onClick={() => { this.change_status() }} type="danger" size={"large"} block>
                                                 Waiting for approved
                                             </Button></> : <>
-                                            <Button  type="dashed" size={"large"} className="text-success" block disabled> 
+                                            <Button type="dashed" size={"large"} className="text-success" block disabled>
                                                 {BOOKING_STATUS_REVERSE[this.state.booking_status]}
                                             </Button></>
                                         }

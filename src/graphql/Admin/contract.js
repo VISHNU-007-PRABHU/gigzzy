@@ -93,7 +93,7 @@ export const DELETE_CATEGORY = gql`
 
 export const MANAGE_CONTRACT_BOOKING = gql`
     mutation MANAGECONTRACTBOOKING($contract_id:ID,$booking_status:Int){
-        manage_contract_booking(contract_id:$_id,booking_status:$booking_status) {
+        manage_contract_booking(contract_id:$contract_id,booking_status:$booking_status) {
             msg
             status
         }
