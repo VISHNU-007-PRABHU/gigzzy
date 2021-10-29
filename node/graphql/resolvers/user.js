@@ -1436,17 +1436,18 @@ exports.SendCompanyProviders = (company_id, company_data) => {
                 register_status: "Pending",
                 user_type:"employee"
             }
-            // let fetch_data = await CompanyProvider_model.findOne(find_query).lean()
-            // if (_.size(fetch_data)) {
-            //     console.log("already send register link in this email in same company")
-            // } else {
-            //     console.log("new send register link in this email")
-            //     let add_email = new CompanyProvider_model(update_query)
-            //     let added_detail = await add_email.save()
-                // let link = `${process.env.APP_URL}/company_user_accepted?sid=${added_detail['_id']}`
-                let link =""
-                await MAILCHIMP.sendMailchimpTemplate(emailData, "new_company_register", { link });
-            // }
+            let fetch_data = await CompanyProvider_model.findOne(find_query).lean()
+            if (_.size(fetch_data)) {
+                console.log("already send register link in this email in same company")
+                let link = `${process.env.APP_URL}/company_user_accepted?sid=${fetch_data['_id']}`
+                await MAILCHIMP.sendMailchimpMessage(emailData, "new_company_register", { link });
+            } else {
+                console.log("new send register link in this email")
+                let add_email = new CompanyProvider_model(update_query)
+                let added_detail = await add_email.save()
+                let link = `${process.env.APP_URL}/company_user_accepted?sid=${added_detail['_id']}`
+                await MAILCHIMP.sendMailchimpMessage(emailData, "new_company_register", { link });
+            }
         })
         return true
     } catch (error) {
