@@ -580,6 +580,8 @@ exports.manage_contract_booking = async (root, args) => {
             return { msg: "Contract updated success", status: 'success' }
         } else if (args['booking_status'] === 10) {
             let preview_contract_data = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
+            let biding = await Biding_model.findOne({ _id: args.biding_id }).lean()
+
             if (args.booking_status === 10 && preview_contract_data.booking_status === 9) {
                 let removed_users = [
                     ...preview_contract_data.applied_provider,
