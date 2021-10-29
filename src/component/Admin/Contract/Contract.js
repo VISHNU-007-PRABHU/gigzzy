@@ -12,30 +12,37 @@ const { TabPane } = Tabs;
 class Contract extends React.Component {
     state = {
         collapsed: false,
+        booking_status: 15
     };
 
 
-
+    callback = (key) => {
+        this.setState({
+            booking_status:Number(key)
+        })
+    }
     render() {
-
         return (
             <Layout style={{ height: '100vh' }}>
                 <AdminSider update_collapsed={this.state.collapsed} />
                 <Layout>
                     <AdminHeader />
                     <Content className="main_frame">
-                        <Tabs>
-                            <TabPane tab="Picked Contract" key="1">
-                                <ContractTable booking_status={10}/>
+                        <Tabs onChange={this.callback}>
+                            <TabPane tab="Un-Approved Contract" key="15">
+                                <ContractTable booking_status={this.state.booking_status} />
                             </TabPane>
-                            <TabPane tab="Ongoing Contract" key="2">
-                                <ContractTable booking_status={4}/>
+                            <TabPane tab="Approved Contract" key="9">
+                                <ContractTable booking_status={this.state.booking_status} />
                             </TabPane>
-                            <TabPane tab="Completed Contract" key="3">
-                                <ContractTable booking_status={14}/>
+                            <TabPane tab="Award Contract" key="10">
+                                <ContractTable booking_status={this.state.booking_status} />
                             </TabPane>
-                            <TabPane tab="Pending Contract" key="4">
-                                <ContractTable booking_status={9}/>
+                            <TabPane tab="Ongoing Contract" key="4">
+                                <ContractTable booking_status={this.state.booking_status} />
+                            </TabPane>
+                            <TabPane tab="Completed Contract" key="14">
+                                <ContractTable booking_status={this.state.booking_status} />
                             </TabPane>
                         </Tabs>
                     </Content>
@@ -46,4 +53,4 @@ class Contract extends React.Component {
 }
 
 
-export default Contract;
+export default React.memo(Contract);

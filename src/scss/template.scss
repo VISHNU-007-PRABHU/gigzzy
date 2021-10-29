@@ -32,6 +32,13 @@ $zero: 0px;
     font-weight: bold;
 }
 
+.ant-menu-dark .ant-menu-submenu-title .ant-menu-submenu-arrow::after,
+.ant-menu-dark .ant-menu-sub .ant-menu-submenu-title .ant-menu-submenu-arrow::after,
+.ant-menu-dark .ant-menu-submenu-title .ant-menu-submenu-arrow::before,
+.ant-menu-dark .ant-menu-sub .ant-menu-submenu-title .ant-menu-submenu-arrow::before {
+    background-color: $primaryBlueColor !important;
+}
+
 .ant-menu-item .ant-menu-item-active .ant-menu-item-selected {
     background-color: $primarycolor !important;
     color: black !important;
@@ -1522,4 +1529,4 @@ p.ant-scroll-number-only-unit.current {
     width: -webkit-fill-available;
     justify-content: center;
     display: flex;
-  }
+}

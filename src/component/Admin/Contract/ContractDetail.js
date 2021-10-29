@@ -1,16 +1,19 @@
 import React, { Suspense } from "react";
 import { withRouter } from "react-router";
 import { client } from "../../../apollo";
-import { Layout, Form, Card, Row, Col, Skeleton, BackTop } from 'antd';
+import { Layout, Form, Card, Row, Col, Skeleton, Button, Spin, Tag } from 'antd';
 import 'antd/dist/antd.css';
 import '../../../scss/template.scss';
+import { Alert_msg } from '../../Comman/alert_msg';
+import { BOOKING_STATUS_REVERSE } from '../../Comman/booking_status'
+import { GET_CONTRACT } from '../../../graphql/User/contract';
+import { MANAGE_CONTRACT_BOOKING } from '../../../graphql/Admin/contract'
 const { Content } = Layout;
-const padding_setting = { padding: "0px" }
 const Biding = React.lazy(() => import('./biding'));
-const BidingList = React.lazy(() => import('./BidingList'));
 const Milestone = React.lazy(() => import('./Milestone'));
 const AdminSider = React.lazy(() => import('../Layout/AdminSider'));
 const AdminHeader = React.lazy(() => import('../Layout/AdminHeader'));
+
 class ContractDetail extends React.Component {
     constructor(props) {
         super(props);
@@ -38,10 +41,44 @@ class ContractDetail extends React.Component {
             booking_user: [],
             booking_provider: [],
             booking_category: [],
+            booking_status: 15,
             nav_text: ['', ''],
             u_rate: 0,
             p_rate: 0,
         };
+    }
+
+    componentDidMount() {
+        this.getData()
+    }
+    getData = async () => {
+        this.setState({ loading: true, });
+        let input_data = { contract_id: this.props.match.params.id }
+        client.query({
+            query: GET_CONTRACT,
+            variables: input_data,
+            fetchPolicy: 'no-cache',
+        }).then(result => {
+            this.setState({
+                loading: false,
+                update_data: result.data.get_contracts[0],
+                booking_status: result.data.get_contracts[0].booking_status,
+            });
+        })
+    };
+    change_status = async () => {
+        this.setState({ loading: true })
+        let input_data = { contract_id: this.props.match.params.id, booking_status: 9 }
+        await client.query({
+            mutation: MANAGE_CONTRACT_BOOKING,
+            variables: input_data,
+        }).then((result, loading, error) => {
+            Alert_msg(result.data.manage_contract_booking);
+            if (result.data.manage_contract_booking.status === 'success') {
+                this.setState({ approved: true })
+            }
+            this.setState({ loading: false })
+        });
     }
 
     render() {
@@ -56,18 +93,33 @@ class ContractDetail extends React.Component {
                         <AdminHeader />
                     </Suspense>
                     <Content className="main_frame" style={{ background: 'none' }}>
-                        <Row gutter={12}>
-                            <Col lg={18} md={24}>
-                                <Card bordered={0}>
-                                    <Suspense fallback={<Skeleton active />}>
-                                        <Biding></Biding>
-                                    </Suspense>
-                                    <Suspense fallback={<Skeleton active />}>
-                                        <Milestone></Milestone>
-                                    </Suspense>
-                                </Card>
-                            </Col>
-                        </Row>
+                        <Spin size="large" spinning={this.state.loading}>
+                            <Row gutter={12}>
+                                <Col lg={18} md={24}>
+                                    <Card bordered={0}>
+                                        <Suspense fallback={<Skeleton active />}>
+                                            <Biding></Biding>
+                                        </Suspense>
+                                        <Suspense fallback={<Skeleton active />}>
+                                            <Milestone></Milestone>
+                                        </Suspense>
+                                    </Card>
+                                </Col>
+                                <Col lg={6} md={24}>
+                                    <Card bordered={0}>
+                                        {this.state.booking_status === 15 ? <>
+                                            <Button onClick={() => { this.change_status() }} type="danger" size={"large"} block>
+                                                Waiting for approved
+                                            </Button></> : <>
+                                            <Button  type="dashed" size={"large"} className="text-success" block disabled> 
+                                                {BOOKING_STATUS_REVERSE[this.state.booking_status]}
+                                            </Button></>
+                                        }
+
+                                    </Card>
+                                </Col>
+                            </Row>
+                        </Spin>
                     </Content>
                 </Layout>
             </Layout>

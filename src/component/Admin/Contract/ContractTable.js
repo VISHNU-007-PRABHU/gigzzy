@@ -1,6 +1,6 @@
 import * as React from "react";
 import { withRouter } from "react-router-dom";
-import { Table, Modal, Form, Avatar, Popconfirm, Tag, Icon, Switch } from "antd";
+import { Table, Modal, Form, Avatar, Popconfirm, Tag, Icon, Typography } from "antd";
 import { GET_CONTRACT_PAGINATION, UPDATE_CATEGORY, DELETE_CATEGORY } from '../../../graphql/Admin/contract';
 import { client } from "../../../apollo";
 import '../../../scss/template.scss';
@@ -8,29 +8,50 @@ import size from 'lodash'
 import { Alert_msg } from '../../Comman/alert_msg';
 import Search from "antd/lib/input/Search";
 import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
+const { Paragraph } = Typography;
 class ContractTable extends React.Component {
-    state = {
-        modalVisible: false,
-        dataSource: [],
-        update_data: {},
-        update: 0,
-        loading: false,
-        loading_img: false,
-        imageUrl: '',
-        file: {},
-        previewVisible: false,
-        previewImage: '',
-        view_img: '',
-        pagination: {
-            pageSize: 10,
-            total: 0,
-            current: 1,
-            simple: true,
+    constructor(props) {
+        super(props);
+        this.state = {
+            modalVisible: false,
+            dataSource: [],
+            update_data: {},
+            update: 0,
+            loading: false,
+            loading_img: false,
+            imageUrl: '',
+            file: {},
+            previewVisible: false,
+            previewImage: '',
+            view_img: '',
+            booking_status: 15,
+            pagination: {
+                pageSize: 10,
+                total: 0,
+                current: 1,
+                simple: true,
+            }
         }
     }
+
+    static getDerivedStateFromProps(props, state) {
+        if (props.booking_status !== state.booking_status) {
+            return {
+                booking_status: props.booking_status,
+            };
+        }
+        return null;
+    }
+
     componentDidMount() {
-        console.log(this.props.booking_status)
         this.fetch_category();
+    }
+
+    componentDidUpdate(prevProps){
+        if (this.props.booking_status !== prevProps.booking_status) {
+            this.fetch_category();
+          }
+        
     }
     handleTableChange = async pagination => {
         const pager = { ...pagination };
@@ -38,7 +59,7 @@ class ContractTable extends React.Component {
         this.setState({ loading: true });
         await client.query({
             query: GET_CONTRACT_PAGINATION,
-            variables: { booking_status: this.props.booking_status, limit: pager.pageSize, page: pager.current, data: { is_parent: false } },
+            variables: { booking_status: this.state.booking_status, limit: pager.pageSize, page: pager.current, data: { is_parent: false } },
             fetchPolicy: 'no-cache',
         }).then(result => {
             const pagination = { ...this.state.pagination };
@@ -60,12 +81,11 @@ class ContractTable extends React.Component {
     fetch_category = async (data) => {
         this.setState({ loading: true });
         let input = {
-            booking_status: this.props.booking_status,
+            booking_status: this.state.booking_status,
         };
-        if(size(data)){
-            input['search']=data
+        if (size(data)) {
+            input['search'] = data
         }
-        
         await client.query({
             query: GET_CONTRACT_PAGINATION,
             variables: input,
@@ -106,7 +126,9 @@ class ContractTable extends React.Component {
                 title: <span>Contract Ref</span>,
                 width: '15%',
                 render: (text, record) => {
-                    return <span title="Contract Ref">{record.contract_ref}</span>;
+                    return <span title="Contract Ref">
+                        <Paragraph copyable>{record.contract_ref}</Paragraph>
+                    </span>;
                 }
             },
             {
@@ -120,7 +142,11 @@ class ContractTable extends React.Component {
                 title: <span>Description</span>,
                 width: '15%',
                 render: (text, record) => {
-                    return <span title="Biding Category">{record.description}</span>;
+                    return <span title="Biding Category">
+                        <Paragraph ellipsis={{ rows: 2, expandable: false, symbol: '...' }}>
+                            {record.description}
+                        </Paragraph>
+                    </span >;
                 }
             },
             {
