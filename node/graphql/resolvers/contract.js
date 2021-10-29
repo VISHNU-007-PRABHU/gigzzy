@@ -571,7 +571,7 @@ exports.manage_contract_booking = async (root, args) => {
             let update_contract_data = {
                 booking_status: 9
             }
-            await update_contract_status(args, update_contract_data)
+            await this.update_contract_status(args, update_contract_data)
 
             let fetch_contract = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
             let address = await Address_model.findOne({ _id: fetch_contract.address_id }).lean()
@@ -600,8 +600,8 @@ exports.manage_contract_booking = async (root, args) => {
                     payment_status: "paid"
                 }
 
-                let update_contract_res = await update_contract_status(args, update_contract_data)
-                let update_biding_res = await update_biding_status(args, biding_data)
+                let update_contract_res = await this.update_contract_status(args, update_contract_data)
+                let update_biding_res = await this.update_biding_status(args, biding_data)
                 if (payment_data.status) {
                     var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
                     findBooking['user_parent'] = true;
