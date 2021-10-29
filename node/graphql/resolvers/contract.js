@@ -8,6 +8,7 @@ var commonHelper = require('../commonHelper');
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 const payment_choose = require('../payment/choose')
 const PushNotification = require('../notification/PushNotification')
+const ContractPayoutNotificationModule = require('../payment/ContractPayoutNotification')
 var getDistanceBetweenPoints = require('get-distance-between-points');
 const path = require("path");
 var fs = require('fs');
@@ -572,22 +573,43 @@ exports.manage_contract_booking = async (root, args) => {
             return { msg: "Contract updated success", status: 'success' }
         } else if (args['booking_status'] === 10) {
             let preview_contract_data = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
-            let preview_biding_data = await Biding_model.findOne({ _id: args.biding_id }).lean()
             if (args.booking_status === 10 && preview_contract_data.booking_status === 9) {
-                let base_amount = preview_biding_data.budget;
-                args['amount'] = preview_biding_data['admin_fee'];
-                let payment_data = await payment_choose.choose_contract_payment(args, preview_contract_data, preview_biding_data)
+                let removed_users =[
+                    ...preview_contract_data.applied_provider,
+                    ...preview_contract_data.available_provider
+                ]
+                let update_contract_data = {
+                    biding_id: args['biding_id'],
+                    provider_id: biding['provider_id'],
+                    accept_date : moment.utc().format(),
+                    booking_status : 10,
+                    job_status : 10,
+                    payment_status :1,
+                    applied_provider:[],
+                    available_provider:[]
+                }
+          
+                let biding_data = {
+                    booking_status: 10,
+                    payment_status: "paid"
+                }
+                
+                let update_contract_res =  await update_contract_status(args,update_contract_data)
+                let update_biding_res =  await update_biding_status(args,biding_data)
                 if (payment_data.status) {
                     var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
                     findBooking['user_parent'] = true;
                     findBooking['msg'] = "user accept the contract";
                     findBooking['status'] = 'success';
+                    findBooking['removed_users'] = removed_users;
+                    await ContractPayoutNotificationModule.accept_payout_notification(findBooking)
+
                     return findBooking
                 } else {
-                    return { msg: "Contract Payment failed", status: 'failed' }
+                    return { msg: "Contract update failed", status: 'failed' }
                 }
             } else {
-                return { msg: "Contract Payment failed", status: 'failed' }
+                return { msg: "Contract update failed", status: 'failed' }
             }
         } else if (args['booking_status'] === 4) {
             let input_data = {
@@ -620,14 +642,23 @@ exports.manage_contract_booking = async (root, args) => {
 exports.update_contract_status = async (args, data) => {
     return new Promise(async function (resolve, reject) {
         try {
-            await ContractJob_model.updateOne({ _id: args.contract_id }, data)
+            await ContractJob_model.updateOne({ _id: args.contract_id }, data, { new: true }).exec()
             return resolve(true)
         } catch (error) {
             return reject(false)
         }
     })
 }
-
+exports.update_biding_status = async (args, data) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            await Biding_model.updateOne({ _id: args.biding_id }, data, { new: true }).exec();
+            return resolve(true)
+        } catch (error) {
+            return reject(false)
+        }
+    })
+}
 
 exports.manage_milestone_booking = async (root, args) => {
     try {

@@ -118,6 +118,9 @@ exports.accept_payout_notification = async (contract_data) => {
                 // await commonHelper.send_sms(provider_detail.country_code || 0, provider_detail.phone_no, "job_assign", {})
                 // await commonHelper.send_sms(app_user_detail.country_code || 0, app_user_detail.phone_no, "job_placed", {})
 
+                if(contract_data.booking_status === 10){
+                    await global.pubsub.publish("GET_MY_CONTRACTS", { get_my_contracts: [contract_data] });
+                }
                 //send my appoinment
                 let find_socket_result = {
                     provider_id: booking_detail.provider_id,

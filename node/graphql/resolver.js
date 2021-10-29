@@ -175,10 +175,11 @@ const resolvers = {
                 () => pubsub.asyncIterator([GET_MY_CONTRACTS]),
                 (payload, variables) => {
                     for (let i = 0; i <= payload.get_my_contracts.length; i++) {
-                        if (payload.get_my_contracts[i].provider_id == variables._id) {
-                            if (variables.booking_status === 10) {
-                                return true;
-                            }
+                        if (payload.get_my_contracts[i].provider_id == variables._id && variables.booking_status === 10) {
+                            return true;
+                        }
+                        if (variables.booking_status === 9 && _.includes(payload.get_my_contracts[i].removed_users, variables._id)) {
+                            return true;
                         }
                     }
                 }),
@@ -368,7 +369,7 @@ const resolvers = {
         get_currency: currencyResolver.get_currency,
         get_company_root_detail: userResolver.get_company_root_detail,
         get_pro_profile_doc: userResolver.get_pro_profile_doc,
-        get_address:userResolver.get_address,
+        get_address: userResolver.get_address,
     },
     Company: {
         get_parent_company_provider: userResolver.get_parent_company_provider,
