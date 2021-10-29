@@ -476,14 +476,14 @@ exports.genrate_mpesa_ref = async (args) => {
  * @param {*} contract_data 
  * @returns 
  */
-exports.find_provider = async (contract_data,address) => {
+exports.find_provider = async (contract_data, address) => {
     try {
         var filter = {
             role: 2,
             delete: 0,
             proof_status: 1,
             provider_subCategoryID: { $in: [contract_data.category_id] },
-            location: { $near: { $maxDistance: 81 * 1000, $geometry: { type: "Point", coordinates: [parseFloat(address.lng),parseFloat(address.lat)] } } },
+            location: { $near: { $maxDistance: 81 * 1000, $geometry: { type: "Point", coordinates: [parseFloat(address.lng), parseFloat(address.lat)] } } },
         };
         let find_provider_data = await Detail_model.find(filter);
         var available_provider = []
@@ -568,35 +568,40 @@ exports.manage_contract_booking = async (root, args) => {
             await Biding_model.updateOne({ _id: args.biding_id }, { is_delete: true });
             return { msg: "Contract rejected success", status: 'failed' }
         } else if (args['booking_status'] === commonHelper.booking_status.ACCEPT) {
+            let update_contract_data = {
+                booking_status: 9
+            }
+            await update_contract_status(args, update_contract_data)
+
             let fetch_contract = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
             let address = await Address_model.findOne({ _id: fetch_contract.address_id }).lean()
-            await this.find_provider(fetch_contract,address)
+            await this.find_provider(fetch_contract, address)
             return { msg: "Contract updated success", status: 'success' }
         } else if (args['booking_status'] === 10) {
             let preview_contract_data = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
             if (args.booking_status === 10 && preview_contract_data.booking_status === 9) {
-                let removed_users =[
+                let removed_users = [
                     ...preview_contract_data.applied_provider,
                     ...preview_contract_data.available_provider
                 ]
                 let update_contract_data = {
                     biding_id: args['biding_id'],
                     provider_id: biding['provider_id'],
-                    accept_date : moment.utc().format(),
-                    booking_status : 10,
-                    job_status : 10,
-                    payment_status :1,
-                    applied_provider:[],
-                    available_provider:[]
+                    accept_date: moment.utc().format(),
+                    booking_status: 10,
+                    job_status: 10,
+                    payment_status: 1,
+                    applied_provider: [],
+                    available_provider: []
                 }
-          
+
                 let biding_data = {
                     booking_status: 10,
                     payment_status: "paid"
                 }
-                
-                let update_contract_res =  await update_contract_status(args,update_contract_data)
-                let update_biding_res =  await update_biding_status(args,biding_data)
+
+                let update_contract_res = await update_contract_status(args, update_contract_data)
+                let update_biding_res = await update_biding_status(args, biding_data)
                 if (payment_data.status) {
                     var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
                     findBooking['user_parent'] = true;
