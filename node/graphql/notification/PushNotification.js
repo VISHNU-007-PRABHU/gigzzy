@@ -17,6 +17,12 @@ const static_notification_template = (type, data) => {
                 body: "User Accept The Job",
                 click_action: ".activities.HomeActivity",
             }
+        case 9:
+            return {
+                title: 'New Job Invitation',
+                body: "User post a new contract",
+                click_action: ".activities.HomeActivity",
+            }
         case 'biding_9':
             return {
                 title: 'New Biding',
