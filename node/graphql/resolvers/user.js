@@ -1442,8 +1442,7 @@ exports.SendCompanyProviders = (company_id, company_data) => {
             let fetch_data = await CompanyProvider_model.findOne(find_query).lean()
             if (_.size(fetch_data)) {
                 console.log("already send register link in this email in same company")
-                // let link = `${process.env.APP_URL}/company_user_accepted?sid=${fetch_data['_id']}`
-                let link = `http://localhost:8990/company_user_accepted?sid=${fetch_data['_id']}`
+                let link = `${process.env.APP_URL}/company_user_accepted?sid=${fetch_data['_id']}`
                 await SENDGRID.send_mail_sendgrid(emailData, "new_company_register", { link });
             } else {
                 console.log("new send register link in this email")
