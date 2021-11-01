@@ -120,14 +120,15 @@ exports.accept_payout_notification = async (contract_data) => {
 
                 if(contract_data.booking_status === 10){
                     await global.pubsub.publish("GET_MY_CONTRACTS", { get_my_contracts: [contract_data] });
+                }else{
+                    //send my appoinment
+                    let find_socket_result = {
+                        provider_id: booking_detail.provider_id,
+                        booking_status: booking_detail.booking_status
+                    }
+                    const result = await Contract_model.find(find_socket_result).sort({ created_at: -1 });
+                    await global.pubsub.publish("GET_MY_CONTRACTS", { get_my_contracts: result });
                 }
-                //send my appoinment
-                let find_socket_result = {
-                    provider_id: booking_detail.provider_id,
-                    booking_status: booking_detail.booking_status
-                }
-                const result = await Contract_model.find(find_socket_result).sort({ created_at: -1 });
-                await global.pubsub.publish("GET_MY_CONTRACTS", { get_my_contracts: result });
 
                 //send current booking data using subcription
                 booking_detail['user_parent'] = true;

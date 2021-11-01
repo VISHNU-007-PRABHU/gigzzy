@@ -485,7 +485,7 @@ exports.find_provider = async (contract_data, address) => {
             delete: 0,
             proof_status: 1,
             provider_subCategoryID: { $in: [contract_data.category_id] },
-            // location: { $near: { $maxDistance: 81 * 1000, $geometry: { type: "Point", coordinates: [parseFloat(address.lng), parseFloat(address.lat)] } } },
+            location: { $near: { $maxDistance: 81 * 1000, $geometry: { type: "Point", coordinates: [parseFloat(address.lng), parseFloat(address.lat)] } } },
         };
         let find_provider_data = await Detail_model.find(filter);
         console.log("exports.find_provider -> find_provider_data", _.size(find_provider_data))
@@ -612,7 +612,7 @@ exports.manage_contract_booking = async (root, args) => {
                 findBooking['msg'] = "user accept the contract";
                 findBooking['status'] = 'success';
                 findBooking['removed_users'] = removed_users;
-                await ContractPayoutNotificationModule.accept_payout_notification(findBooking)
+                let data = await ContractPayoutNotificationModule.accept_payout_notification(findBooking)
                 return findBooking
 
             } else {

@@ -175,7 +175,7 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([GET_MY_CONTRACTS]),
                 (payload, variables) => {
-                    for (let i = 0; i <= payload.get_my_contracts.length; i++) {
+                    for (let i = 0; i < payload.get_my_contracts.length; i++) {
                         if (payload.get_my_contracts[i].provider_id && payload.get_my_contracts[i].provider_id == variables._id
                             && variables.booking_status === 10) {
                             console.log("payload GET_MY_CONTRACTS", payload.get_my_contracts[i].provider_id)
