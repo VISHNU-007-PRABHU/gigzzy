@@ -161,11 +161,14 @@ exports.particular_contract_notification = async (contract_data) => {
                 user_id: app_user_detail._id,
                 booking_status: booking_detail.booking_status,
                 booking_id: booking_detail._id
-            },{
-                user_id: provider_detail._id,
-                booking_status: booking_detail.booking_status,
-                booking_id: booking_detail._id
             }]
+            if(provider_detail){
+                notification_user_data.push({
+                    user_id: provider_detail._id,
+                    booking_status: booking_detail.booking_status,
+                    booking_id: booking_detail._id
+                })
+            }
 
             await PushNotification.create_push_notification_msg(notification_user_data);
             await global.pubsub.publish("CONTRACT_DETAIL", { contract_details: contract_data });
