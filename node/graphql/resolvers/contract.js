@@ -478,6 +478,7 @@ exports.genrate_mpesa_ref = async (args) => {
  */
 exports.find_provider = async (contract_data, address) => {
     try {
+
         var filter = {
             role: 2,
             delete: 0,

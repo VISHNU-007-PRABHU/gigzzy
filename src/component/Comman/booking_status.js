@@ -18,7 +18,7 @@ export const BOOKING_STATUS_REVERSE = {
     2: "PROVIDER ROLE",
     15: 'WAITING ADMIN',
     50: 'WAITING PAYMENT',
-    9: 'ACCEPT',
+    9: 'APPROVED',
     12: 'BOOKING',
     10: 'PENDING',
     4: 'START',

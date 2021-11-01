@@ -26,6 +26,7 @@ var milestoneResolver = require('./resolvers/milestone');
 var chatResolver = require('./resolvers/chat');
 const dotenv = require('dotenv');
 const commonHelper = require('../graphql/commonHelper');
+const SENDGRID = require('./notification/SendGrid')
 const safaricom = require('../graphql/safaricom');
 const payment_choose = require('./payment/choose')
 const MpesaCallback = require('./payment/MpesaCallback');
@@ -163,7 +164,7 @@ const resolvers = {
                 () => pubsub.asyncIterator([SEND_CONTRACT_JOB_MSG]),
                 (payload, variables) => {
                     for (let i = 0; i <= payload.send_contract_jobs_provider.available_provider.length; i++) {
-                        if (payload.send_contract_jobs_provider.available_provider[i] == variables._id) {
+                        if (payload.send_contract_jobs_provider.available_provider[i] == variables._id && variables.online === 1 && variables.booking_status === 9) {
                             return true;
                         }
                     }
@@ -505,7 +506,7 @@ const resolvers = {
                             };
                             var msg_notification = await commonHelper.push_notifiy(message);
                             // ================= push_notifiy ================== //  
-                            var send_verification = await commonHelper.send_mail_sendgrid(user_deails.email, "admin_approved", { msg });
+                            var send_verification = await SENDGRID.send_mail_sendgrid(user_deails.email, "admin_approved", { msg });
                             await commonHelper.send_sms(user_deails.country_code, user_deails.phone_no, "admin_apporved", {})
                             await pubsub.publish(PROOF_STATUS, { proof_status: 0, _id: args._id });
                             break;
@@ -1317,7 +1318,7 @@ const resolvers = {
                 };
                 var msg_notification = await commonHelper.push_notifiy(message);
                 // ================= push_notifiy ================== //  
-                var send_verification = await commonHelper.send_mail_sendgrid(user.email, "admin_approved", { msg });
+                var send_verification = await SENDGRID.send_mail_sendgrid(user.email, "admin_approved", { msg });
                 var send_sms_verification = await commonHelper.send_sms(user.country_code, user.phone_no, "admin_apporved", {})
                 await pubsub.publish(PROOF_STATUS, { proof_status: user });
                 return { info: { "msg": "Status Update Success", status: 'success' } };

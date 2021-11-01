@@ -289,13 +289,11 @@ app.use('/static', express.static(__dirname + '/public'));
 
 app.get('/company_user_accepted', async (req, res, next) => {
   try {
-    if (req.query['sid']) {
-      res.redirect(301, '/errors');
-    }
     let { status, msg, link } = await confrimation_company_worker(req.query)
-    res.redirect(301, link);
+    return res.redirect(301, link);
   } catch (error) {
-    res.redirect(301, '/errors');
+    console.log("error register page", error)
+    res.redirect(301, '/');
   }
 })
 

@@ -22,9 +22,7 @@ const africa = require("africastalking")({
   username: process.env.AFRICASTALKING_API_USERNAME,
 });
 const sms = africa.SMS;
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-console.log("rocess.env.SENDGRID_API_KEY", process.env.SENDGRID_API_KEY)
+
 
 
 const transporter = nodemailer.createTransport({
@@ -187,84 +185,6 @@ module.exports.send_sms = async (country_code, phone_no, type, data) => {
   }
 };
 
-exports.static_mail_template = (type, data) => {
-  let { otp, msg, link } = data
-  switch (type) {
-    case "otp":
-      return {
-        subject: "GIGZZY OTP ✔",
-        text: "OTP?",
-        html: `<b>GIGZZY OTP : ${otp} </b>`
-      }
-    case "mail_register":
-      return {
-        subject: "GIGZZY Email Verification ✔",
-        text: "Email verification otp?",
-        html: `<b>GIGZZY EMAIL OTP : ${otp} </b>`
-      }
-    case "admin_approved":
-      return {
-        subject: "GIGZZY Profile verification ✔",
-        text: "Please wait, admin will verified you profile?",
-        html: `<b>${msg}</b>`
-      }
-    case "book_later":
-      return {
-        subject: "GIGZZY ✔",
-        text: "Your job is booked successfully",
-        html: `<b>Thanks for booking job, If any query please contact to our support team</b>`
-      }
-    case "schedule_job":
-      return {
-        subject: "GIGZZY ✔",
-        text: "Your job is almost ready",
-        html: `<b>${msg}</b>`
-      }
-    case "job_finished":
-      return {
-        subject: "GIGZZY ✔",
-        text: "Job finished?",
-        html: `<b>Your job is succesfully completed</b>`
-      }
-    case "reset_pwd":
-      return {
-        subject: "GIGZZY ✔",
-        text: "Your reset password link",
-        html: `<b>${link}</b>`
-      }
-    case "new_company_register":
-      return {
-        template:"New company register invitation",
-        subject: "GIGZZY PRO✔",
-        text: "Please accept your company request through  below the link",
-        html: `<b>${link}</b>`
-      }
-    default:
-      return {
-        subject: "GIGZZY ✔",
-        text: "Thanks for using gizzy",
-        html: `<b>Thank's for using gizzy </b>`
-      }
-  }
-
-}
-
-module.exports.send_mail_sendgrid = async (email, type, datas) => {
-  try {
-
-    let email_temp = await this.static_mail_template(type, datas)
-    const mail_msg = {
-      to: email,
-      from: senderAddress,
-      ...email_temp
-    };
-    let data = await sgMail.send(mail_msg);
-    return true
-  } catch (error) {
-    console.log("module.exports.send_mail_sendgrid -> error", error.response.body)
-    return false
-  }
-}
 
 
 module.exports.genrate_random = async () => {

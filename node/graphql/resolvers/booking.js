@@ -4,6 +4,7 @@ const model = require('../../model_data');
 var ObjectId = require('mongodb').ObjectID;
 var CronJob = require('cron').CronJob;
 var commonHelper = require('../commonHelper');
+const SENDGRID =  require('../notification/SendGrid');
 var CommonFunction = require('../CommonFunction');
 // const pubsub = new PubSub();
 var Category_model = model.category;
@@ -404,7 +405,7 @@ const job_reminder = new CronJob('* * * * * *', async () => {
         var minutes = Math.abs(Number(m) - Number(data[1]));
         if (Number(minutes) <= 15) {
             let user_detail = await Detail_model.findOne({ _id: booking[i].provider_id });
-            var email = await commonHelper.send_mail_sendgrid(user_detail.email, "schedule_job", { msg: 'your next job almost ready ..' });
+            var email = await SENDGRID.send_mail_sendgrid(user_detail.email, "schedule_job", { msg: 'your next job almost ready ..' });
             await commonHelper.send_sms(user_detail.country_code, user_detail.phone_no, "scheduled_job", {})
             // (to provider)
             var message = {
