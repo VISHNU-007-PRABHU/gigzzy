@@ -727,15 +727,19 @@ const contract_job_closing = new CronJob('* * * * * *', async () => {
     var allow_job = await ContractJob_model.find(allow_query);
     for (let i = 0; i < allow_job.length; i++) {
         let user_detail = await Detail_model.findOne({ _id: allow_job[i].user_id });
-        await SENDGRID.send_mail_sendgrid(user_detail.email, "schedule_job", { msg: 'your job closed for due to no more action ..' });
+        if(user_detail){
+            if(user_detail.error_mpesa_detail){
+                await SENDGRID.send_mail_sendgrid(user_detail.email, "schedule_job", { msg: 'your job closed for due to no more action ..' });
+            }
+            let notification_user_data = [{
+                user_id: user_detail._id,
+                booking_status: "job_closed",
+                booking_id: allow_job[i]._id
+            }]
+    
+            await PushNotification.create_push_notification_msg(notification_user_data);
+        }
 
-        let notification_user_data = [{
-            user_id: user_detail._id,
-            booking_status: "job_closed",
-            booking_id: allow_job[i]._id
-        }]
-
-        await PushNotification.create_push_notification_msg(notification_user_data);
         await ContractJob_model.updateOne({ _id: allow_job[i]._id }, { booking_status: 8 }, { new: true });
     }
 });
