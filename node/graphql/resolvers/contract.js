@@ -7,7 +7,7 @@ var CronJob = require('cron').CronJob;
 var commonHelper = require('../commonHelper');
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 const payment_choose = require('../payment/choose')
-const SENDGRID =  require('../notification/SendGrid');
+const SENDGRID = require('../notification/SendGrid');
 const PushNotification = require('../notification/PushNotification')
 const ContractPayoutNotificationModule = require('../payment/ContractPayoutNotification')
 var getDistanceBetweenPoints = require('get-distance-between-points');
@@ -332,13 +332,18 @@ module.exports.update_contract = async (root, args) => {
             if (_.size(get_current_user_currency) && get_current_user_currency.status) {
                 contract_detail = { ...contract_detail, ...get_current_user_currency }
             }
-           
+            if (contract_detail['category_id']) {
+                contract_detail['category_id'] = ObjectId(contract_detail['category_id'])
+            }
             await ContractJob_model.updateOne(find_query, contract_detail).exec()
             let fetch_contract = await ContractJob_model.findOne(find_query).lean()
             fetch_contract['status'] = "success";
             fetch_contract['msg'] = "contract job update success"
             return fetch_contract
         } else {
+            if (contract_detail['category_id']) {
+                contract_detail['category_id'] = ObjectId(contract_detail['category_id'])
+            }
             contract_detail['location'] = { coordinates: [args.lng, args.lat] }
             contract_detail['booking_ref'] = String(Math.floor(1000 + Math.random() * 9000));
             contract_detail['base_price'] = String(parseFloat(contract_detail.budget).toFixed(2));
@@ -474,7 +479,7 @@ exports.find_provider = async (contract_data, address) => {
             role: 2,
             delete: 0,
             proof_status: 1,
-            provider_subCategoryID: { $in: [contract_data.category_id] },
+            provider_subCategoryID: { $in: [ObjectId(contract_data.category_id)] },
             location: { $near: { $maxDistance: 81 * 1000, $geometry: { type: "Point", coordinates: [parseFloat(address.lng), parseFloat(address.lat)] } } },
         };
         let find_provider_data = await Detail_model.find(filter);
@@ -716,13 +721,13 @@ const contract_job_closing = new CronJob('* * * * * *', async () => {
     var allow_query = {
         close_date: { '$lte': moment.utc().format("YYYY-MM-DD") },
         // booking_status:10,
-        booking_status: {$in:[15,10,9]},
+        booking_status: { $in: [15, 10, 9] },
     }
     var allow_job = await ContractJob_model.find(allow_query);
     for (let i = 0; i < allow_job.length; i++) {
         let user_detail = await Detail_model.findOne({ _id: allow_job[i].user_id });
-        if(user_detail){
-            if(user_detail.error_mpesa_detail){
+        if (user_detail) {
+            if (user_detail.error_mpesa_detail) {
                 await SENDGRID.send_mail_sendgrid(user_detail.email, "schedule_job", { msg: 'your job closed for due to no more action ..' });
             }
             let notification_user_data = [{
@@ -730,7 +735,7 @@ const contract_job_closing = new CronJob('* * * * * *', async () => {
                 booking_status: "job_closed",
                 booking_id: allow_job[i]._id
             }]
-    
+
             await PushNotification.create_push_notification_msg(notification_user_data);
         }
 
