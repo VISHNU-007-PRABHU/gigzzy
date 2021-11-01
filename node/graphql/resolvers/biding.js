@@ -12,6 +12,7 @@ const path = require("path");
 var fs = require('fs');
 const { AuthRegistrationsCredentialListMappingInstance } = require('twilio/lib/rest/api/v2010/account/sip/domain/authTypes/authRegistrationsMapping/authRegistrationsCredentialListMapping');
 const PushNotification = require('../notification/PushNotification') 
+const ContractPayoutNotificationModule = require('../payment/ContractPayoutNotification')
 var Biding_model = model.Biding;
 var Address_model = model.address
 var BidingImage_model = model.BidingImage;
@@ -190,6 +191,9 @@ module.exports.update_biding = async (root, args) => {
 
             fetch_bid['status'] = "success";
             fetch_bid['msg'] = "Biding update success"
+            let contract_id = fetch_bid['contract_id']
+            let contract_data = await this.fetch_contract_detail(contract_id)
+            await ContractPayoutNotificationModule.particular_contract_notification(contract_data)
             return fetch_bid
 
         } else {
@@ -243,6 +247,7 @@ module.exports.update_biding = async (root, args) => {
                 }
                 await PushNotification.create_push_notification_msg(notification_user_data);
             }
+            await ContractPayoutNotificationModule.particular_contract_notification(contract_data)
             added_bid['status'] = "success";
             added_bid['msg'] = "Biding added success"
             return added_bid

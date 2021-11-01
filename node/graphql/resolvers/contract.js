@@ -332,13 +332,7 @@ module.exports.update_contract = async (root, args) => {
             if (_.size(get_current_user_currency) && get_current_user_currency.status) {
                 contract_detail = { ...contract_detail, ...get_current_user_currency }
             }
-            if (contract_detail['category_id']) {
-                let get_category = await this.get_catgeory_data(contract_detail);
-                if (get_category && get_category['status']) {
-                    let close_day = get_category['contract_close_day'] || 5;
-                    contract_detail['close_date'] = moment().add(close_day, 'days');
-                }
-            }
+           
             await ContractJob_model.updateOne(find_query, contract_detail).exec()
             let fetch_contract = await ContractJob_model.findOne(find_query).lean()
             fetch_contract['status'] = "success";
