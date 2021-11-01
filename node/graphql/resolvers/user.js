@@ -39,10 +39,10 @@ module.exports.testinfmail = async (parent, args, context, info) => {
         //     convert_code: 'INR',
         //     amount: "500"
         // }
-        const ContractPayoutNotificationModule = require('../payment/ContractPayoutNotification')
+        // const ContractPayoutNotificationModule = require('../payment/ContractPayoutNotification')
 
-        let contract_data = { _id: "6164360ccf243632f2547145",booking_status:10 }
-        ContractPayoutNotificationModule.accept_payout_notification(contract_data)
+        // let contract_data = { _id: "6164360ccf243632f2547145",booking_status:10 }
+        // ContractPayoutNotificationModule.accept_payout_notification(contract_data)
         // console.log("module.exports.testinfmail -> contract_data", contract_data)
         //    let result = await CommonFunction.currency_calculation(data)
         //    console.log("module.exports.testinfmail -> result", result)
@@ -57,7 +57,7 @@ module.exports.testinfmail = async (parent, args, context, info) => {
         // console.log("module.exports.testinfmail -> data", data)
         // let msg = "testing email template"
         let otp = 9890
-    //    await require('./contract').find_provider()
+       await require('./contract').find_provider()
 
         // var send_verification = await SENDGRID.send_mail_sendgrid("vishnu@waioz.com", "otp", {otp});
         // console.log("module.exports.testinfmail -> send_verification", send_verification)
