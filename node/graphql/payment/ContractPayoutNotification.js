@@ -158,6 +158,10 @@ exports.particular_contract_notification = async (contract_data) => {
             let provider_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
 
             let notification_user_data = [{
+                user_id: app_user_detail._id,
+                booking_status: booking_detail.booking_status,
+                booking_id: booking_detail._id
+            },{
                 user_id: provider_detail._id,
                 booking_status: booking_detail.booking_status,
                 booking_id: booking_detail._id
