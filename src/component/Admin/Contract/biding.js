@@ -102,7 +102,7 @@ class Biding extends React.Component {
                         <Title level={4}>{"Project description"}</Title>
                         <div>
                             <Paragraph ellipsis={{ rows: 3, expandable: true }}>
-                                {data?.description}
+                                <div dangerouslySetInnerHTML={{ __html: data?.description }}></div>
                             </Paragraph>
                         </div>
 

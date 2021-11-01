@@ -51,6 +51,7 @@ exports.booking_status = {
   COMPLETE: 14,
 }
 
+module.exports.contract_close_day =7;
 module.exports.home = 0;
 module.exports.pending = 1;
 module.exports.on_going = 2;

@@ -5,7 +5,7 @@ var Detail_model = model.detail;
 
 const static_notification_template = (type, data) => {
     switch (type) {
-        case 13:
+        case 14:
             return {
                 title: 'Complete',
                 body: "User Complete the job",
@@ -23,6 +23,30 @@ const static_notification_template = (type, data) => {
                 body: "User post a new contract",
                 click_action: ".activities.HomeActivity",
             }
+        case 4:
+            return {
+                title: 'User start the job',
+                body: "User start the job",
+                click_action: ".activities.HomeActivity",
+            }
+        case 13:
+            return {
+                title: 'Provider end the job',
+                body: "Provider end the job",
+                click_action: ".activities.HomeActivity",
+            }
+        case 8:
+            return {
+                title: 'You job cancelled',
+                body: "You job cancelled",
+                click_action: ".activities.HomeActivity",
+            }
+        case "miles_start":
+            return {
+                title: 'Your milestone start',
+                body: "Your milestone start",
+                click_action: ".activities.HomeActivity",
+            }
         case 'biding_9':
             return {
                 title: 'New Biding',
@@ -33,6 +57,12 @@ const static_notification_template = (type, data) => {
             return {
                 title: "Message",
                 body: data,
+                click_action: ".activities.HomeActivity",
+            }
+        case 'job_closed':
+            return {
+                title: 'Job closed ',
+                body: "Your job is closed for due no  more action ",
                 click_action: ".activities.HomeActivity",
             }
         default:

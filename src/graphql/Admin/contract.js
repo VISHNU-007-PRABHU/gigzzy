@@ -45,6 +45,13 @@ export const GET_CONTRACT_PAGINATION = gql`
            contract_ref
            category_id
            category_type
+           get_contract_address_detail {
+                address
+            }
+            get_user {
+                first_name
+                last_name
+            }
            get_contract_category{
                 subCategory_name
                 category_name

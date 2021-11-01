@@ -4,6 +4,7 @@ const _ = require('lodash');
 const moment = require("moment");
 const commonHelper = require('../commonHelper')
 const PushNotification = require('../notification/PushNotification')
+const ContractPayoutNotificationModule = require('./ContractPayoutNotification')
 var Detail_model = model.detail;
 var Payout_model = model.payout;
 var Contract_model = model.contract_job
@@ -86,8 +87,8 @@ exports.accept_milestone_payout_notification = async (milestone_data) => {
 
             // send push notification to provider
             let notification_user_data = [{
-                user_id: user_detail.device_id,
-                booking_status: milestone_data.booking_status ,
+                user_id: user_detail._id,
+                booking_status: milestone_data.booking_status,
                 booking_id: milestone_data._id
             }]
 
@@ -95,15 +96,12 @@ exports.accept_milestone_payout_notification = async (milestone_data) => {
          
             if (milestone_data.booking_status === 14) {
                 await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_finished", {})
+                await ContractPayoutNotificationModule.particular_contract_notification(contract_data)
                 return resolve({ job_status: 14, msg: "job is completed successfully", status: 'success' });
 
             } else {
-                // send sms for accept booking
-                // await commonHelper.send_sms(user_detail.country_code || 0, user_detail.phone_no, "job_assign", {})
-                // await commonHelper.send_sms(app_user_detail.country_code || 0, app_user_detail.phone_no, "job_placed", {})
-                //send my appoinment
-                // const result = await Booking_model.find({ provider_id: booking_detail.provider_id, booking_status: 10 }).sort({ created_at: -1 });
-                // await global.pubsub.publish("APPOINTMENTS", { get_my_appointments: result });
+   
+                await ContractPayoutNotificationModule.particular_contract_notification(contract_data)
 
                 //send current booking data using subcription
                 milestone_data['user_parent'] = true;

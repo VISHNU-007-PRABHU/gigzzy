@@ -350,13 +350,8 @@ module.exports.update_contract = async (root, args) => {
             contract_detail['job_status'] = 12;
             contract_detail['booking_status'] = 15
             contract_detail['contract_status'] = 15
-            if (contract_detail['category_id']) {
-                let get_category = await this.get_catgeory_data(contract_detail);
-                if (get_category && get_category['status']) {
-                    let close_day = get_category['contract_close_day'] || 5;
-                    contract_detail['close_date'] = moment().add(close_day, 'days');
-                }
-            }
+            let close_day = commonHelper.contract_close_day;
+            contract_detail['close_date'] = moment().add(close_day, 'days');
             contract_detail['contract_status'] = 9
             let add_contract_job = new ContractJob_model(contract_detail)
             let added_contract_job = await add_contract_job.save()
@@ -479,7 +474,7 @@ exports.genrate_mpesa_ref = async (args) => {
 exports.find_provider = async (contract_data, address) => {
     try {
         console.log("exports.find_provider -> contract_data", contract_data)
-        
+
         var filter = {
             role: 2,
             delete: 0,
@@ -568,7 +563,9 @@ module.exports.delete_biding = async (root, args) => {
 exports.manage_contract_booking = async (root, args) => {
     try {
         if (args['booking_status'] === commonHelper.booking_status.CANCEL) {
+            var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
             await Biding_model.updateOne({ _id: args.biding_id }, { is_delete: true });
+            await ContractPayoutNotificationModule.particular_contract_notification(findBooking)
             return { msg: "Contract rejected success", status: 'failed' }
         } else if (args['booking_status'] === commonHelper.booking_status.ACCEPT) {
             let update_contract_data = {
@@ -627,6 +624,7 @@ exports.manage_contract_booking = async (root, args) => {
             findBooking['user_parent'] = true;
             findBooking['msg'] = "start the contract";
             findBooking['status'] = 'success';
+            let data = await ContractPayoutNotificationModule.particular_contract_notification(findBooking)
             return findBooking
         } else if (args['booking_status'] === 13) {
             let input_data = {
@@ -637,6 +635,7 @@ exports.manage_contract_booking = async (root, args) => {
             findBooking['user_parent'] = true;
             findBooking['msg'] = "start the contract";
             findBooking['status'] = 'success';
+            let data = await ContractPayoutNotificationModule.particular_contract_notification(findBooking)
             return findBooking
         }
 
@@ -715,3 +714,28 @@ exports.find_kilometer = async (parent, args) => {
         return { kilometre: 0 };
     }
 }
+
+
+
+const contract_job_closing = new CronJob('* * * * * *', async () => {
+    var allow_query = {
+        close_date: { '$lte': moment.utc().format("YYYY-MM-DD") },
+        // booking_status:10,
+        booking_status: {$in:[15,10,9]},
+    }
+    var allow_job = await ContractJob_model.find(allow_query);
+    for (let i = 0; i < allow_job.length; i++) {
+        let user_detail = await Detail_model.findOne({ _id: allow_job[i].user_id });
+        await SENDGRID.send_mail_sendgrid(user_detail.email, "schedule_job", { msg: 'your job closed for due to no more action ..' });
+
+        let notification_user_data = [{
+            user_id: user_detail._id,
+            booking_status: "job_closed",
+            booking_id: allow_job[i]._id
+        }]
+
+        await PushNotification.create_push_notification_msg(notification_user_data);
+        await ContractJob_model.updateOne({ _id: allow_job[i]._id }, { booking_status: 8 }, { new: true });
+    }
+});
+contract_job_closing.start();

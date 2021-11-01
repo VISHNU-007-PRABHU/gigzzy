@@ -8,6 +8,8 @@ var commonHelper = require('../commonHelper');
 var contractResolver = require('../resolvers/contract');
 const payment_choose = require('../payment/choose')
 const PushNotification = require('../notification/PushNotification')
+const MilestonePayoutNotification = require('../payment/MilestonePayoutNotification')
+
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 const path = require("path");
 var fs = require('fs');
@@ -276,6 +278,7 @@ exports.manage_milestone_booking = async (root, args) => {
             var findBooking = await BidingMilestone_model.findOne({ _id: args._id }).lean();
             findBooking['msg'] = "Milestone ended";
             findBooking['status'] = 'success';
+            await MilestonePayoutNotification.accept_milestone_payout_notification(findBooking)
             return findBooking
         } else if (args.booking_status === 14) {
             if (preview_milestone_data.extra_price && Number(preview_milestone_data.extra_price)) {

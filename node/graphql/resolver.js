@@ -57,6 +57,7 @@ const REMOVE_USER = 'REMOVE_USER';
 const SEND_CONTRACT_JOB_MSG = 'SEND_CONTRACT_JOB_MSG';
 const GET_MY_CONTRACTS = "GET_MY_CONTRACTS"
 const GET_MY_MILESTONE = "GET_MY_MILESTONE"
+const CONTRACT_DETAIL = "CONTRACT_DETAIL"
 const resolvers = {
 
     Subscription: {
@@ -153,7 +154,7 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([GET_MY_MILESTONE]),
                 (payload, variables) => {
-                    if (payload.get_my_milestone['_id'] == variables.milestone_id) {
+                    if (payload.get_my_milestone['_id'] == variables._id) {
                         return true;
                     }
                 }),
@@ -196,6 +197,16 @@ const resolvers = {
                 () => pubsub.asyncIterator([BOOK_MSG]),
                 (payload, variables) => {
                     if (payload.booking_details._id == variables.booking_id) {
+                        return true;
+                    }
+                }),
+        },
+
+        contract_details: {
+            subscribe: withFilter(
+                () => pubsub.asyncIterator([CONTRACT_DETAIL]),
+                (payload, variables) => {
+                    if (payload.contract_details._id == variables._id) {
                         return true;
                     }
                 }),

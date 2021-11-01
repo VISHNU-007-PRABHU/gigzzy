@@ -47,11 +47,11 @@ class ContractTable extends React.Component {
         this.fetch_category();
     }
 
-    componentDidUpdate(prevProps){
+    componentDidUpdate(prevProps) {
         if (this.props.booking_status !== prevProps.booking_status) {
             this.fetch_category();
-          }
-        
+        }
+
     }
     handleTableChange = async pagination => {
         const pager = { ...pagination };
@@ -132,32 +132,38 @@ class ContractTable extends React.Component {
                 }
             },
             {
-                title: <span>Name</span>,
+                title: <span>User Name</span>,
                 width: '15%',
                 render: (text, record) => {
-                    return <span title="Biding Category">{record.name}</span>;
+                    return <span title="User Name">{record.get_user?.[0]?.first_name + record.get_user?.[0]?.last_name}</span>;
                 }
             },
             {
-                title: <span>Description</span>,
+                title: <span>Name</span>,
                 width: '15%',
                 render: (text, record) => {
-                    return <span title="Biding Category">
-                        <Paragraph ellipsis={{ rows: 2, expandable: false, symbol: '...' }}>
-                            {record.description}
-                        </Paragraph>
-                    </span >;
+                    return <span title="Name">{record.name}</span>;
                 }
             },
             {
                 title: <span>Budget</span>,
-                width: '15%',
+                width: '10%',
                 render: (text, record) => {
-                    return <span title="Type">{record.budget}</span>;
+                    return <span title="Budget">{record.budget}</span>;
+                },
+            }, {
+                title: <span>Location</span>,
+                width: '35%',
+                render: (text, record) => {
+                    return <span title="Location">
+                        <Paragraph ellipsis={{ rows: 2, expandable: false, symbol: '...' }}>
+                            {record.get_contract_address_detail?.address}
+                        </Paragraph>
+                    </span>
                 },
             }, {
                 title: <span>Category</span>,
-                width: '15%',
+                width: '10%',
                 render: (text, record) => {
                     if (record && record.get_contract_category && record.get_contract_category[0]?.category_type === 1) {
                         return <span title="Category">

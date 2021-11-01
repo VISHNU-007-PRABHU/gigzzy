@@ -85,6 +85,7 @@ module.exports = gql`
     extend type Subscription{
         send_contract_jobs_provider(_id:ID,booking_status:Int,online:Int,location_code:String):ContractJob
         get_my_contracts(_id:ID,location_code:String,role:Int,booking_status:Int,limit:Int,page:Int):[ContractJob]
+        contract_details(_id:ID,booking_status:Int,online:Int,location_code:String):ContractJob
     }
 
     extend type Query{

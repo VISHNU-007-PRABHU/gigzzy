@@ -64,6 +64,9 @@ export const GET_CONTRACT = gql`
             ctob_billRef
             ctob_shotcode
             ctob
+            get_contract_address_detail {
+                address
+            }
             get_contract_category{
                 category_name
                 subCategory_name

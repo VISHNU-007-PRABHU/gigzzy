@@ -13,7 +13,7 @@ const Biding = React.lazy(() => import('./biding'));
 const Milestone = React.lazy(() => import('./Milestone'));
 const AdminSider = React.lazy(() => import('../Layout/AdminSider'));
 const AdminHeader = React.lazy(() => import('../Layout/AdminHeader'));
-
+const { Meta } = Card;
 class ContractDetail extends React.Component {
     constructor(props) {
         super(props);
@@ -26,7 +26,7 @@ class ContractDetail extends React.Component {
             loading_img: false,
             imageUrl: '',
             file: {},
-            address: '',
+            address: {},
             diffDuration: 0,
             previewVisible: false,
             previewImage: '',
@@ -63,6 +63,8 @@ class ContractDetail extends React.Component {
                 loading: false,
                 update_data: result.data.get_contracts[0],
                 booking_status: result.data.get_contracts[0].booking_status,
+                booking_user: result.data.get_contracts[0].get_user,
+                address: result.data.get_contracts[0].get_contract_address_detail,
             });
         })
     };
@@ -107,7 +109,7 @@ class ContractDetail extends React.Component {
                                     <Card bordered={0}>
                                         {this.state.booking_status === 15 ? <>
                                             <Button onClick={() => { this.change_status() }} type="danger" size={"large"} block>
-                                                Waiting for approved
+                                                Waiting for approval
                                             </Button></> : <>
                                             <Button type="dashed" size={"large"} className="text-success" block disabled>
                                                 {BOOKING_STATUS_REVERSE[this.state.booking_status]}
@@ -115,12 +117,37 @@ class ContractDetail extends React.Component {
                                         }
 
                                     </Card>
+                                    <Card
+                                        className="mt-2"
+                                        hoverable
+                                        title="Job Location"
+                                    >
+                                        {this.state.address?.address}
+                                    </Card>
+                                    <Card
+                                        className="mt-2"
+                                        hoverable
+                                        cover={<img alt="gigzzy user img" src={this.state.booking_user?.[0]?.img_url} />}
+                                    >
+                                        <Meta
+                                            className="d-flex"
+                                            title={this.state.booking_user?.[0]?.first_name + this.state.booking_user?.[0]?.last_name}
+                                            description={this.state.booking_user?.[0]?.email} />
+                                        <div className="d-flex w-100 justify-content-between mt-4">
+                                            <div className="w-50"> Phone </div>
+                                            <div className="w-50">: {this.state.booking_user?.[0]?.phone_no}</div>
+                                        </div>
+                                        <div className="d-flex w-100 justify-content-between mt-4">
+                                            <div className="w-50"> User Type </div>
+                                            <div className="w-50">:{this.state.booking_user?.[0]?.user_type}</div>
+                                        </div>
+                                    </Card>
                                 </Col>
                             </Row>
                         </Spin>
                     </Content>
                 </Layout>
-            </Layout>
+            </Layout >
         );
     }
 }

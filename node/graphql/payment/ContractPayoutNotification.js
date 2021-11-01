@@ -3,7 +3,7 @@ const model = require('../../model_data');
 const _ = require('lodash');
 const moment = require("moment");
 const commonHelper = require('../commonHelper')
-const PushNotification = require('../notification/PushNotification') 
+const PushNotification = require('../notification/PushNotification')
 var Detail_model = model.detail;
 var Booking_model = model.booking;
 var Payout_model = model.payout;
@@ -54,7 +54,7 @@ exports.update_contract_after_payment = async (args, charge, biding) => {
                 biding_id: args['biding_id'],
                 provider_id: biding['provider_id']
             }
-            
+
             if (args.booking_status === 10) {
                 contract_data['accept_date'] = moment.utc().format();
                 if (args.payment_option === "mpesa") {
@@ -118,9 +118,9 @@ exports.accept_payout_notification = async (contract_data) => {
                 // await commonHelper.send_sms(provider_detail.country_code || 0, provider_detail.phone_no, "job_assign", {})
                 // await commonHelper.send_sms(app_user_detail.country_code || 0, app_user_detail.phone_no, "job_placed", {})
 
-                if(contract_data.booking_status === 10){
+                if (contract_data.booking_status === 10) {
                     await global.pubsub.publish("GET_MY_CONTRACTS", { get_my_contracts: [contract_data] });
-                }else{
+                } else {
                     //send my appoinment
                     let find_socket_result = {
                         provider_id: booking_detail.provider_id,
@@ -149,6 +149,30 @@ exports.accept_payout_notification = async (contract_data) => {
     })
 }
 
+
+exports.particular_contract_notification = async (contract_data) => {
+    return new Promise(async function (resolve, reject) {
+        try {
+            let booking_detail = await Contract_model.findOne({ _id: contract_data._id }).lean()
+            let app_user_detail = await Detail_model.findOne({ _id: booking_detail.user_id });
+            let provider_detail = await Detail_model.findOne({ _id: booking_detail.provider_id });
+
+            let notification_user_data = [{
+                user_id: provider_detail._id,
+                booking_status: booking_detail.booking_status,
+                booking_id: booking_detail._id
+            }]
+
+            await PushNotification.create_push_notification_msg(notification_user_data);
+            await global.pubsub.publish("CONTRACT_DETAIL", { contract_details: contract_data });
+            return resolve({ status: true, msg: "Payment Is success !" })
+
+        } catch (error) {
+            console.log("exports.accept_payout_notification -> error", error)
+            return reject({ msg: "Error in payment notification", status: false })
+        }
+    })
+}
 
 exports.error_payout_notification = async (booking_data) => {
     return new Promise(async function (resolve, reject) {
@@ -181,7 +205,7 @@ exports.error_payout_notification = async (booking_data) => {
                 status: 'failed',
                 msg_status: 'to_user'
             }
-            let error_payment_issues = await global.pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: error_invoice_user_data });
+            await global.pubsub.publish(SEND_ACCEPT_MSG, { send_accept_msg: error_invoice_user_data });
             return resolve({ status: true, msg: "Mpesa Payment failed !" })
 
         } catch (error) {
