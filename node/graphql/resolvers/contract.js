@@ -7,6 +7,7 @@ var CronJob = require('cron').CronJob;
 var commonHelper = require('../commonHelper');
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 const payment_choose = require('../payment/choose')
+const SENDGRID =  require('../notification/SendGrid');
 const PushNotification = require('../notification/PushNotification')
 const ContractPayoutNotificationModule = require('../payment/ContractPayoutNotification')
 var getDistanceBetweenPoints = require('get-distance-between-points');
