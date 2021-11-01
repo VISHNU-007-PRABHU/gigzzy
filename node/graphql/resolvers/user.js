@@ -4,7 +4,7 @@ var ObjectId = require('mongodb').ObjectID;
 const { createWriteStream, existsSync, mkdirSync, fs } = require("fs");
 var Jimp = require('jimp');
 const path = require("path");
-const MAILCHIMP =  require('../notification/Mailchimp');
+const SENDGRID =  require('../notification/SendGrid');
 const _ = require("lodash");
 var commonHelper = require('../commonHelper');
 var CommonFunction = require('../CommonFunction');
@@ -34,16 +34,16 @@ module.exports.testmail = async (parent, args, context, info) => {
 module.exports.testinfmail = async (parent, args, context, info) => {
     try {
         // let data = await saf.safaricom_ctob_register();
-        let data = {
-            currency_code: 'EUR',
-            convert_code: 'INR',
-            amount: "500"
-        }
+        // let data = {
+        //     currency_code: 'EUR',
+        //     convert_code: 'INR',
+        //     amount: "500"
+        // }
         const ContractPayoutNotificationModule = require('../payment/ContractPayoutNotification')
 
-        let contract_data = { _id: "6164360ccf243632f2547145" }
+        let contract_data = { _id: "6164360ccf243632f2547145",booking_status:10 }
         ContractPayoutNotificationModule.accept_payout_notification(contract_data)
-        console.log("module.exports.testinfmail -> contract_data", contract_data)
+        // console.log("module.exports.testinfmail -> contract_data", contract_data)
         //    let result = await CommonFunction.currency_calculation(data)
         //    console.log("module.exports.testinfmail -> result", result)
         // let user_detail ={
@@ -56,15 +56,17 @@ module.exports.testinfmail = async (parent, args, context, info) => {
         // let data =  await saf.safaricom_ctob_simulate('254705924459',"20")
         // console.log("module.exports.testinfmail -> data", data)
         // let msg = "testing email template"
-        // let otp = 9890
-        // var send_verification = await commonHelper.send_mail_sendgrid("vishnu@waioz.com", "otp", {otp});
+        let otp = 9890
+    //    await require('./contract').find_provider()
+
+        // var send_verification = await SENDGRID.send_mail_sendgrid("vishnu@waioz.com", "otp", {otp});
         // console.log("module.exports.testinfmail -> send_verification", send_verification)
 
         // let chargePayment = await commonHelper.send_sms("254","705924459","otp",{otp:9213})
         // console.log("module.exports.testinfmail -> chargePayment", chargePayment)
         return { price: "500" };
     } catch (error) {
-        // console.log("module.exports.testinfmail -> error", error)
+        console.log("module.exports.testinfmail -> error", error)
         return { msg: error.msg };
     }
 };
@@ -101,7 +103,7 @@ module.exports.confirm_email = async (parent, args, context, info) => {
         let link = `<a> ${process.env.APP_URL}/confrim_password/${msg}</a>`;
         var update_reset_link = await Detail_model.updateOne({ _id: result._id }, { email_reset_link: String(msg) });
         if (update_reset_link.n == update_reset_link.nModified) {
-            var send_resset_link = await commonHelper.send_mail_sendgrid(args.email, "reset_pwd", { link });
+            var send_resset_link = await SENDGRID.send_mail_sendgrid(args.email, "reset_pwd", { link });
             return { msg: "Reset password link send to your E-mail", status: "success" };
         } else {
             return { msg: "Oops Error !", status: "failed" };
@@ -388,7 +390,7 @@ module.exports.addDetails = async (parent, args) => {
         if (args.email != '') {
             let otp = String(Math.floor(100000 + Math.random() * 900000));
             const update_opt = await Detail_model.updateOne({ _id: args.user_id }, { email_otp: otp, last_email_otp_verification: moment.utc().format() });
-            var send_otp = await commonHelper.send_mail_sendgrid(args.email, "mail_register", { otp })
+            var send_otp = await SENDGRID.send_mail_sendgrid(args.email, "mail_register", { otp })
             return { ...args, msg: "send opt in your email", success: "success" }
         }
     }
@@ -701,7 +703,7 @@ module.exports.resend_otp = async (_, args) => {
     if (otp_time_diff <= 15) {
         //console.log("otp is not change");
         const update_result = await Detail_model.findOne({ _id: args._id });
-        commonHelper.send_mail_sendgrid(update_result.email, "otp", { otp: update_result.email_otp });
+        SENDGRID.send_mail_sendgrid(update_result.email, "otp", { otp: update_result.email_otp });
         return update_result;
     }
     else {
@@ -712,7 +714,7 @@ module.exports.resend_otp = async (_, args) => {
         const update_opt_time = await Detail_model.updateOne({ _id: args._id }, { email_otp: otp, last_email_otp_verification: moment.utc().format() });
         const update_result = await Detail_model.findOne({ _id: args._id });
         // console.log(send_otp);
-        commonHelper.send_mail_sendgrid(update_result.email, "otp", { otp });
+        SENDGRID.send_mail_sendgrid(update_result.email, "otp", { otp });
         return update_result;
     }
 
@@ -733,7 +735,8 @@ module.exports.checkOtp = async (parent, args) => {
 
         if (otp_verified.length == 1) {
             let is_company_owner = await CompanyProvider_model.findOne({ provider_id: args._id }).lean()
-            if (result['user_type'] === "company" && is_company_owner && _.size(is_company_owner) && is_company_owner['user_type'] === "owner") {
+            if (result['user_type'] === "company") {
+            // if (result['user_type'] === "company" && is_company_owner && _.size(is_company_owner) && is_company_owner['user_type'] === "owner") {
                 let message = { pending_status: 0, company_register_status: 0 }
                 message['msg'] = "OTP verified";
                 message['status'] = "success";
@@ -1147,7 +1150,7 @@ exports.addUser = async (parent, args) => {
                     let otp = String(Math.floor(100000 + Math.random() * 900000));
                     args.email_otp = otp;
                     args.last_email_otp_verification = moment.utc().format();
-                    // var send_otp = await commonHelper.send_mail_sendgrid(args.email, 'otp', { otp });
+                    // var send_otp = await SENDGRID.send_mail_sendgrid(args.email, 'otp', { otp });
                 }
             }
             if (args.old_password) {
@@ -1187,7 +1190,7 @@ exports.addUser = async (parent, args) => {
                         };
                         await commonHelper.push_notifiy(message);
                         // ================= push_notifiy ================== //  
-                        var send_verification = await commonHelper.send_mail_sendgrid(get_role.email, "admin_approved", { msg });
+                        var send_verification = await SENDGRID.send_mail_sendgrid(get_role.email, "admin_approved", { msg });
                         await commonHelper.send_sms(get_role.country_code, get_role.phone_no, "admin_apporved", {})
                         await global.pubsub.publish("PROOF_STATUS", { proof_status: 0, _id: args._id });
                         break;
@@ -1439,14 +1442,15 @@ exports.SendCompanyProviders = (company_id, company_data) => {
             let fetch_data = await CompanyProvider_model.findOne(find_query).lean()
             if (_.size(fetch_data)) {
                 console.log("already send register link in this email in same company")
-                let link = `${process.env.APP_URL}/company_user_accepted?sid=${fetch_data['_id']}`
-                await MAILCHIMP.sendMailchimpMessage(emailData, "new_company_register", { link });
+                // let link = `${process.env.APP_URL}/company_user_accepted?sid=${fetch_data['_id']}`
+                let link = `http://localhost:8990/company_user_accepted?sid=${fetch_data['_id']}`
+                await SENDGRID.send_mail_sendgrid(emailData, "new_company_register", { link });
             } else {
                 console.log("new send register link in this email")
                 let add_email = new CompanyProvider_model(update_query)
                 let added_detail = await add_email.save()
                 let link = `${process.env.APP_URL}/company_user_accepted?sid=${added_detail['_id']}`
-                await MAILCHIMP.sendMailchimpMessage(emailData, "new_company_register", { link });
+                await SENDGRID.send_mail_sendgrid(emailData, "new_company_register", { link });
             }
         })
         return true
@@ -1459,8 +1463,9 @@ exports.SendCompanyProviders = (company_id, company_data) => {
 module.exports.confrimation_company_worker = async (data) => {
     try {
         let { sid } = data
+        console.log("module.exports.confrimation_company_worker -> sid", sid)
         let link = '/'
-        let error_link = '/ops'
+        let error_link = '/'
         let find_query = { _id: sid }
         let update_query = { register_link_status: "accepted" }
         let fetch_provider = await CompanyProvider_model.findOne(find_query).lean()
@@ -1489,7 +1494,8 @@ module.exports.confrimation_company_worker = async (data) => {
         let update_email_data = await CompanyProvider_model.updateOne(find_query, update_query).exec()
         return { status: "success", msg: "User acepted", link }
     } catch (error) {
-        let error_link = '/ops'
+        console.log("module.exports.confrimation_company_worker -> error", error)
+        let error_link = '/'
         return { status: "failed", msg: "User acepted failed", link: error_link }
     }
 }
