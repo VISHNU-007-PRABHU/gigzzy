@@ -51,8 +51,6 @@ exports.update_contract_after_payment = async (args, charge, biding) => {
                 payment_type: args.payment_type,
                 payment_option: args.payment_option,
                 payment_history: charge,
-                biding_id: args['biding_id'],
-                provider_id: biding['provider_id']
             }
 
             if (args.booking_status ===4) {
