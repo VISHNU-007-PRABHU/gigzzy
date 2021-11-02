@@ -208,6 +208,7 @@ const resolvers = {
                 () => pubsub.asyncIterator([CONTRACT_DETAIL]),
                 (payload, variables) => {
                     console.log("payload.contract_details._id ", payload.contract_details._id )
+                    console.log("variables._id", variables._id)
                     if (payload.contract_details._id == variables._id) {
                         return true;
                     }

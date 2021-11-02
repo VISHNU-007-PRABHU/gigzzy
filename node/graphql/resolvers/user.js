@@ -5,6 +5,7 @@ const { createWriteStream, existsSync, mkdirSync, fs } = require("fs");
 var Jimp = require('jimp');
 const path = require("path");
 const SENDGRID =  require('../notification/SendGrid');
+const ContractPayoutNotificationModule = require('../payment/ContractPayoutNotification')
 const _ = require("lodash");
 var commonHelper = require('../commonHelper');
 var CommonFunction = require('../CommonFunction');
@@ -25,6 +26,7 @@ var Company_model = model.company;
 var CompanyImage_model = model.company_images;
 var CompanyProvider_model = model.companyProvider;
 var DetailImage_model = model.DetailImage
+var ContractJob_model = model.contract_job
 module.exports.testmail = async (parent, args, context, info) => {
     return {
         msg: "test"
@@ -57,8 +59,9 @@ module.exports.testinfmail = async (parent, args, context, info) => {
         // console.log("module.exports.testinfmail -> data", data)
         // let msg = "testing email template"
         let otp = 9890
-       await require('./contract').find_provider()
-
+        var findBooking = await ContractJob_model.findOne({ _id:"617fb509cbe3ba12b95f657b"}).lean();
+        await ContractPayoutNotificationModule.particular_contract_notification(findBooking)
+        return { msg: "contract milestone updated has been started", status: 'success' }
         // var send_verification = await SENDGRID.send_mail_sendgrid("vishnu@waioz.com", "otp", {otp});
         // console.log("module.exports.testinfmail -> send_verification", send_verification)
 

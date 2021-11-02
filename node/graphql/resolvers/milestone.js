@@ -314,9 +314,6 @@ exports.manage_milestone_booking = async (root, args) => {
 exports.static_contract_by_milestone = async (args) => {
         try {
             if (args.milestones_status === 9) {
-                let final_output_data = await this.add_start_milestone(args)
-                await this.static_complete_milestone(args)
-
                 let updat_data = {
                     milestones_status: commonHelper.booking_status.ACCEPT,
                 }
@@ -331,6 +328,8 @@ exports.static_contract_by_milestone = async (args) => {
                     milestones_status: args['milestones_status'],
                     booking_status: args['milestones_status']
                 }
+                let final_output_data = await this.add_start_milestone(args)
+                await this.static_complete_milestone(args)
                 let mile_update_data = { booking_status: args['milestones_status'], end_date: moment.utc().format() }
 
                 await BidingMilestone_model.updateOne({ _id: args._id }, mile_update_data).exec()
