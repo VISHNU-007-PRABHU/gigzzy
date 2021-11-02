@@ -586,6 +586,7 @@ exports.manage_contract_booking = async (root, args) => {
                     ...preview_contract_data.applied_provider,
                     ...preview_contract_data.available_provider
                 ]
+                let close_day = commonHelper.contract_close_day;
                 let update_contract_data = {
                     biding_id: args['biding_id'],
                     provider_id: biding['provider_id'],
@@ -594,7 +595,8 @@ exports.manage_contract_booking = async (root, args) => {
                     job_status: 10,
                     payment_status: 1,
                     applied_provider: [],
-                    available_provider: []
+                    available_provider: [],
+                    close_date: moment().add(close_day, 'days')
                 }
 
                 let biding_data = {
@@ -732,7 +734,7 @@ const contract_job_closing = new CronJob('* * * * * *', async () => {
     var allow_query = {
         close_date: { '$lte': moment.utc().format("YYYY-MM-DD") },
         // booking_status:10,
-        booking_status: { $in: [15, 10, 9] },
+        booking_status: { $in: [ 15,10, 9] },
     }
     var allow_job = await ContractJob_model.find(allow_query);
     for (let i = 0; i < allow_job.length; i++) {
