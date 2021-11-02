@@ -301,6 +301,15 @@ span.ant-form-item-children.d-block {
 //     display: contents;
 // }
 
+
+li.ant-menu-submenu.ant-menu-submenu-inline.ant-menu-submenu-open {
+    background: $light_grey;
+}
+
+.ant-menu-submenu-title{
+    margin: 0px !important;
+}
+
 .ant-timeline-item-head-green {
     color: $primarycolor;
     border-color: $primarycolor !important;
@@ -314,7 +323,7 @@ span.ant-form-item-children.d-block {
     border: 3px solid transparent;
 }
 .ant-timeline-item-tail {
-    border-left: 2px solid ;
+    border-left: 2px solid $light_grey !important ;
 }
 .upload_content .ant-upload-list.ant-upload-list-picture-card:after {
     content: "Click + to add images";

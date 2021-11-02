@@ -126,25 +126,28 @@ class ContractDetail extends React.Component {
                                     >
                                         {this.state.address?.address}
                                     </Card>
-                                    <Card
-                                        className="mt-2"
-                                        hoverable
-                                        title="Provider"
-                                        cover={<img alt="gigzzy user img" src={this.state.get_provider_user?.[0]?.img_url} />}
-                                    >
-                                        <Meta
-                                            className="d-flex"
-                                            title={this.state.get_provider_user?.[0]?.first_name + this.state.get_provider_user?.[0]?.last_name}
-                                            description={this.state.get_provider_user?.[0]?.email} />
-                                        <div className="d-flex w-100 justify-content-between mt-4">
-                                            <div className="w-50"> Phone </div>
-                                            <div className="w-50">: {this.state.get_provider_user?.[0]?.phone_no}</div>
-                                        </div>
-                                        <div className="d-flex w-100 justify-content-between mt-4">
-                                            <div className="w-50"> User Type </div>
-                                            <div className="w-50">:{this.state.get_provider_user?.[0]?.user_type}</div>
-                                        </div>
-                                    </Card>
+                                    {this.state.get_provider_user.length > 0 && <>
+                                        <Card
+                                            className="mt-2"
+                                            hoverable
+                                            title="Provider"
+                                            cover={<img alt="gigzzy user img" src={this.state.get_provider_user?.[0]?.img_url} />}
+                                        >
+                                            <Meta
+                                                className="d-flex"
+                                                title={this.state.get_provider_user?.[0]?.first_name + this.state.get_provider_user?.[0]?.last_name}
+                                                description={this.state.get_provider_user?.[0]?.email} />
+                                            <div className="d-flex w-100 justify-content-between mt-4">
+                                                <div className="w-50"> Phone </div>
+                                                <div className="w-50">: {this.state.get_provider_user?.[0]?.phone_no}</div>
+                                            </div>
+                                            <div className="d-flex w-100 justify-content-between mt-4">
+                                                <div className="w-50"> User Type </div>
+                                                <div className="w-50">:{this.state.get_provider_user?.[0]?.user_type}</div>
+                                            </div>
+                                        </Card>
+                                    </>
+                                    }
                                     <Card
                                         className="mt-2"
                                         hoverable
