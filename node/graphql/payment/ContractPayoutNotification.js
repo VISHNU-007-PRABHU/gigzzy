@@ -171,6 +171,7 @@ exports.particular_contract_notification = async (contract_data) => {
             }
 
             await PushNotification.create_push_notification_msg(notification_user_data);
+            console.log("exports.particular_contract_notification -> CONTRACT_DETAIL")
             await global.pubsub.publish("CONTRACT_DETAIL", { contract_details: contract_data });
             return resolve({ status: true, msg: "Payment Is success !" })
 
