@@ -251,6 +251,8 @@ exports.add_extra_fee = async (args) => {
                 update_data['total'] = String(parseFloat(Number(preview_milestone_data['budget']))).toFixed(2)
             }
             await BidingMilestone_model.updateOne({ _id: args['_id'] }, update_data);
+            let res_data = await BidingMilestone_model.findOne({ _id: args['_id'] }).lean()
+            await MilestonePayoutNotification.accept_milestone_payout_notification(res_data)
             return resolve(true)
         } catch (error) {
             return reject(false)
