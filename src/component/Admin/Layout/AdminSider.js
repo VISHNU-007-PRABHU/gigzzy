@@ -4,17 +4,54 @@ import { BrowserRouter as Router, Link, withRouter } from "react-router-dom";
 import main from "../../../image/Gigzzy.png";
 import "../../../scss/template.scss";
 import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
+import _ from "lodash";
 const { Sider } = Layout;
 const { SubMenu } = Menu;
+
 class AdminSider extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       collapsed: true,
       change: 1,
+      openKeys: [],
+      mainKey: []
     };
   }
+
+  componentDidMount() {
+    console.log(this.props.location.pathname)
+    console.log("AdminSider -> componentDidMount -> _.split(this.props.location.pathname, '/')", _.split(this.props.location.pathname, '/'))
+    this.setState({
+      mainKey: [`/${_.split(this.props.location.pathname, '/')[1]}`]
+    })
+    let jobsarray = ['jobs', 'contract', 'booking', 'request']
+    let categorysarray = ['category', 'subcategory',]
+
+    const jobsarrayresult = jobsarray.some(term => this.props.location.pathname.includes(term))
+    const categorysarrayresult = categorysarray.some(term => this.props.location.pathname.includes(term))
+
+
+    if (jobsarrayresult) {
+      this.setState({
+        openKeys: ['jobs']
+      })
+    } else if (categorysarrayresult) {
+      this.setState({
+        openKeys: ['category']
+      })
+    }
+  }
+
+  onSelect = (e) => {
+    if (e && _.size(e)) {
+      this.setState({
+        openKeys: e
+      })
+    }
+  }
   render() {
+    console.log("AdminSider -> openKeys", this.state.openKeys)
     return (
       <div>
         <Sider
@@ -36,8 +73,10 @@ class AdminSider extends React.Component {
           </div>
           <Menu
             theme="dark"
-            selectedKeys={[this.props.location.pathname]}
+            selectedKeys={this.state.mainKey}
             mode="inline"
+            openKeys={this.state.openKeys}
+            onOpenChange={this.onSelect}
           >
             <Menu.Item key="/admin-dashboard">
               <Icon type="dashboard" />

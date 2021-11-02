@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { withRouter } from "react-router";
 import { client } from "../../../apollo";
-import { Layout, Form, Card, Row, Col, Skeleton, Button, Spin, Tag } from 'antd';
+import { Layout, Form, Card, Row, Col, Skeleton, Button, Spin, Affix } from 'antd';
 import 'antd/dist/antd.css';
 import '../../../scss/template.scss';
 import { Alert_msg } from '../../Comman/alert_msg';
@@ -39,6 +39,7 @@ class ContractDetail extends React.Component {
             message: [],
             booking: [],
             booking_user: [],
+            get_provider_user: [],
             booking_provider: [],
             booking_category: [],
             booking_status: 15,
@@ -64,6 +65,7 @@ class ContractDetail extends React.Component {
                 update_data: result.data.get_contracts[0],
                 booking_status: result.data.get_contracts[0].booking_status,
                 booking_user: result.data.get_contracts[0].get_user,
+                get_provider_user: result.data.get_contracts[0].get_provider_user,
                 address: result.data.get_contracts[0].get_contract_address_detail,
             });
         })
@@ -127,6 +129,26 @@ class ContractDetail extends React.Component {
                                     <Card
                                         className="mt-2"
                                         hoverable
+                                        title="Provider"
+                                        cover={<img alt="gigzzy user img" src={this.state.get_provider_user?.[0]?.img_url} />}
+                                    >
+                                        <Meta
+                                            className="d-flex"
+                                            title={this.state.get_provider_user?.[0]?.first_name + this.state.get_provider_user?.[0]?.last_name}
+                                            description={this.state.get_provider_user?.[0]?.email} />
+                                        <div className="d-flex w-100 justify-content-between mt-4">
+                                            <div className="w-50"> Phone </div>
+                                            <div className="w-50">: {this.state.get_provider_user?.[0]?.phone_no}</div>
+                                        </div>
+                                        <div className="d-flex w-100 justify-content-between mt-4">
+                                            <div className="w-50"> User Type </div>
+                                            <div className="w-50">:{this.state.get_provider_user?.[0]?.user_type}</div>
+                                        </div>
+                                    </Card>
+                                    <Card
+                                        className="mt-2"
+                                        hoverable
+                                        title="User"
                                         cover={<img alt="gigzzy user img" src={this.state.booking_user?.[0]?.img_url} />}
                                     >
                                         <Meta

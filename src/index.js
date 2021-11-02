@@ -196,8 +196,8 @@ ReactDOM.render(
             <PrivateRoute exact path="/admin-category/add" component={Add_Category} />
             <PrivateRoute exact path="/admin-category/add/:id" component={Add_Category} />
             <PrivateRoute exact path="/admin-category" component={Category} />
-            <PrivateRoute exact path="/admin-add-subcategory/:id" component={Add_Subcategory} />
-            <PrivateRoute exact path="/admin-add-subcategory" component={Add_Subcategory} />
+            <PrivateRoute exact path="/admin-subcategory/add/:id" component={Add_Subcategory} />
+            <PrivateRoute exact path="/admin-subcategory/add" component={Add_Subcategory} />
             <PrivateRoute exact path="/admin-subcategory" component={Subcategory} />
             <PrivateRoute exact path="/admin-booking" component={Booking} />
             <PrivateRoute exact path="/admin-booking-detail" component={Booking_Details} />

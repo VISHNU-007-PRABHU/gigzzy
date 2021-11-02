@@ -32,6 +32,18 @@ $zero: 0px;
     font-weight: bold;
 }
 
+.ant-tabs-nav .ant-tabs-tab:hover,
+.ant-tabs-nav .ant-tabs-tab-active {
+    color: $primarycolor;
+}
+.ant-typography-copy:hover,
+.ant-typography-copy{
+    color: $primarycolor;
+}
+.ant-tabs-ink-bar {
+    background-color: $secondarycolor;
+}
+
 .ant-menu-dark .ant-menu-submenu-title .ant-menu-submenu-arrow::after,
 .ant-menu-dark .ant-menu-sub .ant-menu-submenu-title .ant-menu-submenu-arrow::after,
 .ant-menu-dark .ant-menu-submenu-title .ant-menu-submenu-arrow::before,

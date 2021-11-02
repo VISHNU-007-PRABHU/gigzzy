@@ -226,7 +226,7 @@ class EditableTable extends React.Component {
                     this.state.dataSource.length >= 1 ? (
                         <span title="...." className="d-inline d-md-flex justify-content-around">
                             <RoleView permission="edit_subcatgeory">
-                                <span className="cursor-point" onClick={() => { this.props.history.push(`/admin-add-subcategory/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
+                                <span className="cursor-point" onClick={() => { this.props.history.push(`/admin-subcategory/add/${record._id}`); }}><Icon type="edit" theme="twoTone" twoToneColor="#52c41a" className='mx-3 f_25' /></span>
                             </RoleView>
                             <RoleView permission="delete_subcatgeory">
                                 <Popconfirm title="Sure to delete because may be under some more bookings ?" onConfirm={() => this.handleDelete(record._id)}>
@@ -243,7 +243,7 @@ class EditableTable extends React.Component {
             <div>
                 <RoleView permission="add_subcatgeory">
                     <div className='my-3'>
-                        <Button type="primary" onClick={() => { this.props.history.push('/admin-add-subcategory'); }}>
+                        <Button type="primary" onClick={() => { this.props.history.push('/admin-subcategory/add'); }}>
                             Add Sub Category
                         </Button>
                     </div>

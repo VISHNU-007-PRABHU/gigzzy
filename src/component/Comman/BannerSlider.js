@@ -50,7 +50,7 @@ const BannerSlider = (props) => {
                 {fileList.map(data => {
                     return (
                         <>
-                            <img key={data?.small_image} alt='' src={data?.small_image} loading="lazy" className="h_18_em w-100 br_14 img_cover lazyload" />
+                            <img key={data?.small_image} alt='' src={data?.small_image} loading="lazy" className="h_18_em w-100 br_14 object_fit lazyload" />
                         </>
                     )
                 })}
