@@ -176,15 +176,16 @@ const resolvers = {
             subscribe: withFilter(
                 () => pubsub.asyncIterator([GET_MY_CONTRACTS]),
                 (payload, variables) => {
+                    console.log(" payload.get_my_contracts.length",  payload.get_my_contracts.length)
                     for (let i = 0; i < payload.get_my_contracts.length; i++) {
                         if (payload.get_my_contracts[i].provider_id && payload.get_my_contracts[i].provider_id == variables._id||
                             payload.get_my_contracts[i].provider_id && payload.get_my_contracts[i].user_id == variables._id) {
-                            console.log("payload GET_MY_CONTRACTS", payload.get_my_contracts[i].provider_id)
+                            // console.log("payload GET_MY_CONTRACTS", payload.get_my_contracts[i].provider_id)
                             return true;
                         }
                         for (let j = 0; j <= payload.get_my_contracts[i].removed_users.length; j++) {
                             if (variables.booking_status === 9 && payload.get_my_contracts[i].removed_users[j] == variables._id) {
-                                console.log("Remvove GET_MY_CONTRACTS", payload.get_my_contracts[i].removed_users)
+                                // console.log("Remvove GET_MY_CONTRACTS", payload.get_my_contracts[i].removed_users)
                                 return true;
                             }
                         }
@@ -297,7 +298,7 @@ const resolvers = {
                     }
                 }
                 const result = await Booking_model.find(data).sort({ created_at: -1 }).skip(Number(offset)).limit(args.limit);
-                console.log("result", result.length)
+                // console.log("result", result.length)
                 var total = await Booking_model.count(data);
                 var pageInfo = { totalDocs: total, page: args.page }
                 return { data: result, pageInfo };
