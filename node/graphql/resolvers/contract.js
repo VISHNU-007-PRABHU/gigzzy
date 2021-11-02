@@ -616,16 +616,27 @@ exports.manage_contract_booking = async (root, args) => {
                 return { msg: "Contract update failed", status: 'failed' }
             }
         } else if (args['booking_status'] === 4) {
-            let input_data = {
-                booking_status: 4
+
+            let preview_contract_data = await ContractJob_model.findOne({ _id: args.contract_id }).lean()
+            let preview_biding_data = await Biding_model.findOne({ _id: args.biding_id }).lean()
+            if (args.booking_status === 4 && preview_contract_data.booking_status === 10) {
+                let base_amount = preview_biding_data.budget;
+                args['amount'] = preview_biding_data['admin_fee'];
+                let payment_data = await payment_choose.choose_contract_payment(args, preview_contract_data, preview_biding_data)
+                if (payment_data.status) {
+                    var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
+                    findBooking['user_parent'] = true;
+                    findBooking['msg'] = "user accept the contract";
+                    findBooking['status'] = 'success';
+                    return findBooking
+                } else {
+                    return { msg: "Contract Payment failed", status: 'failed' }
+                }
+            } else {
+                return { msg: "Contract Payment failed", status: 'failed' }
             }
-            var update_contract_status = await this.update_contract_status(args, input_data);
-            var findBooking = await ContractJob_model.findOne({ _id: args.contract_id }).lean();
-            findBooking['user_parent'] = true;
-            findBooking['msg'] = "start the contract";
-            findBooking['status'] = 'success';
-            let data = await ContractPayoutNotificationModule.particular_contract_notification(findBooking)
-            return findBooking
+            
+           
         } else if (args['booking_status'] === 13) {
             let input_data = {
                 booking_status: 13

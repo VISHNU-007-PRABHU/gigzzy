@@ -55,12 +55,12 @@ exports.update_contract_after_payment = async (args, charge, biding) => {
                 provider_id: biding['provider_id']
             }
 
-            if (args.booking_status === 10) {
+            if (args.booking_status ===4) {
                 contract_data['accept_date'] = moment.utc().format();
                 if (args.payment_option === "mpesa") {
                     contract_data['booking_status'] = 50;
                 } else {
-                    contract_data['booking_status'] = 10;
+                    contract_data['booking_status'] = 4;
                     contract_data['job_status'] = 10;
                     contract_data['payment_status'] = 1;
                 }
@@ -81,7 +81,7 @@ exports.update_contract_after_payment = async (args, charge, biding) => {
             }
 
             let biding_data = {
-                booking_status: 10,
+                booking_status: 4,
                 service_fee: String(parseFloat(args.amount).toFixed(2)),
                 payment_status: "paid"
             }
