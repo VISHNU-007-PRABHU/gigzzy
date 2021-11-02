@@ -49,8 +49,8 @@ module.exports.update_msg_is_read = async (parent, args) => {
 module.exports.add_providerDocument = async (parent, args, { file }) => {
     
     try{
-console.log(args);
-console.log(args.file.length);
+// console.log(args);
+// console.log(args.file.length);
     if (!args.user_id) {
         return { msg: "please check user id", status: "failed" };
     }

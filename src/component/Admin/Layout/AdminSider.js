@@ -44,11 +44,9 @@ class AdminSider extends React.Component {
   }
 
   onSelect = (e) => {
-    if (e && _.size(e)) {
       this.setState({
         openKeys: e
       })
-    }
   }
   render() {
     console.log("AdminSider -> openKeys", this.state.openKeys)

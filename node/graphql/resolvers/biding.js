@@ -20,7 +20,7 @@ var BidingMilestone_model = model.Milestone;
 var MilestoneImage_model = model.MilestoneImage
 var ContractJob_model = model.contract_job
 module.exports.get_biding_pagination = async (root, args) => {
-    console.log(args);
+    // console.log(args);
     try {
 
         var limits = args.limit || 10;
