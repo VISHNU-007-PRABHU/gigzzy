@@ -177,8 +177,8 @@ const resolvers = {
                 () => pubsub.asyncIterator([GET_MY_CONTRACTS]),
                 (payload, variables) => {
                     for (let i = 0; i < payload.get_my_contracts.length; i++) {
-                        if (payload.get_my_contracts[i].provider_id && payload.get_my_contracts[i].provider_id == variables._id
-                            && variables.booking_status === 10) {
+                        if (payload.get_my_contracts[i].provider_id && payload.get_my_contracts[i].provider_id == variables._id||
+                            payload.get_my_contracts[i].provider_id && payload.get_my_contracts[i].user_id == variables._id) {
                             console.log("payload GET_MY_CONTRACTS", payload.get_my_contracts[i].provider_id)
                             return true;
                         }
