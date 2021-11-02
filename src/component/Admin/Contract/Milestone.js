@@ -1,9 +1,9 @@
 import React, { useState, Suspense, useEffect } from 'react'
-import { Typography, Timeline, Tag, Modal, Form, Skeleton, Badge, Spin } from 'antd';
 import useReactRouter from 'use-react-router';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import {useQuery} from '@apollo/react-hooks/lib/useQuery';
 import { GET_MILESTONE_PAGINATION } from '../../../graphql/User/milestone'
-
+import includes from 'lodash/includes'
+import { Typography, Timeline, Tag, Modal, Form, Skeleton, Badge, Spin } from 'antd';
 const Title = Typography;
 const MilestoneDetail = React.lazy(() => import('./MilestoneDetail'));
 
@@ -40,12 +40,15 @@ function Milestone(props) {
                     <Title className="my-5" level={3}>Project Milestone</Title>
                     <Timeline>
                         {stepsdetail && stepsdetail.map((data, i) => {
+                            console.log(data?.title !== "started")
                             return (
-                                <Timeline.Item color={data?.booking_status === 14 ? "green" : "gray"} className="pb-4">
+                                <Timeline.Item key={data?.title} color={data?.booking_status === 14 ? "green" : "gray"} className="pb-4">
                                     <div className="normal_font_size bold">Milestone {i}: {data?.title}</div>
                                     <div className="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div className="normal_font_size primary_color py-1">{data?.budget}</div>
+                                            {!includes(["started", "Complete"], data?.title) &&
+                                                <div className="normal_font_size primary_color py-1">{data?.budget}</div>
+                                            }
                                             <div className="d-flex">
                                                 <div className="bold">
                                                     <Badge status="success" /> {data?.created_at}

@@ -1,14 +1,17 @@
 import * as React from "react";
 import { withRouter } from "react-router-dom";
-import { Table, Modal, Form, Avatar, Popconfirm, Tag, Icon, Typography } from "antd";
-import { GET_CONTRACT_PAGINATION, UPDATE_CATEGORY, DELETE_CATEGORY } from '../../../graphql/Admin/contract';
+import Table from 'antd/es/table';
+import Tag from 'antd/es/tag';
+import Paragraph from 'antd/es/typography/Paragraph'
+import Icon from 'antd/es/icon'
+import Form from 'antd/es/form'
+import { GET_CONTRACT_PAGINATION, DELETE_CATEGORY } from '../../../graphql/Admin/contract';
 import { client } from "../../../apollo";
 import '../../../scss/template.scss';
-import size from 'lodash'
+import size from 'lodash/size'
 import { Alert_msg } from '../../Comman/alert_msg';
 import Search from "antd/lib/input/Search";
 import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
-const { Paragraph } = Typography;
 class ContractTable extends React.Component {
     constructor(props) {
         super(props);

@@ -5,7 +5,8 @@ import '../../../scss/template.scss';
 import AdminSider from '../Layout/AdminSider';
 import AdminHeader from '../Layout/AdminHeader';
 import ContractTable from './ContractTable';
-import { Layout, Tabs, Button } from 'antd';
+import Layout from 'antd/es/layout'
+import Tabs from 'antd/es/tabs'
 import RoleView, { RoleViewFunction } from '../../Comman/roles_permission_view'
 const { Content } = Layout;
 const { TabPane } = Tabs;

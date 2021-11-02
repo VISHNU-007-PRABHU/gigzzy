@@ -1,7 +1,14 @@
 import React, { Suspense } from "react";
 import { withRouter } from "react-router";
 import { client } from "../../../apollo";
-import { Layout, Form, Card, Row, Col, Skeleton, Button, Spin, Affix } from 'antd';
+import Button from 'antd/es/button';
+import Skeleton from 'antd/es/skeleton';
+import Spin from 'antd/es/spin'
+import Layout from 'antd/es/layout'
+import Form from 'antd/es/form'
+import Card from 'antd/es/card'
+import Row from 'antd/es/row'
+import Col from 'antd/es/col';
 import 'antd/dist/antd.css';
 import '../../../scss/template.scss';
 import { Alert_msg } from '../../Comman/alert_msg';

@@ -1,7 +1,10 @@
 import React, { useState, useEffect, Suspense } from 'react'
-import { Row, Col, Form, Skeleton, Typography } from 'antd';
-const { Title, Paragraph } = Typography;
-const ShowCategory = React.lazy(() => import('../../Comman/ShowCategory'));
+import Skeleton from 'antd/es/skeleton';
+import Form from 'antd/es/form'
+import Row from 'antd/es/row'
+import Col from 'antd/es/col';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
 const BannerSlider = React.lazy(() => import('../../Comman/BannerSlider'));
 const bill_data = [
     {
