@@ -319,7 +319,6 @@ exports.static_contract_by_milestone = async (args) => {
 
                 let updat_data = {
                     milestones_status: commonHelper.booking_status.ACCEPT,
-                    booking_status: commonHelper.booking_status.PENDING
                 }
                 await ContractJob_model.updateOne({ _id: args['contract_id'] }, updat_data).exec()
                 var findBooking = await ContractJob_model.findOne({ _id:args['contract_id'] }).lean();
