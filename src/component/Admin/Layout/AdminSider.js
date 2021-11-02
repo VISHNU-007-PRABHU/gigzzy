@@ -59,7 +59,7 @@ class AdminSider extends React.Component {
           collapsible
           collapsed={this.props.update_collapsed}
         >
-          <div className="logo">
+          <div className="logo d-flex justify-content-around">
             <img
               src={main}
               alt={"gigzzy"}

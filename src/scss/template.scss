@@ -1,4 +1,4 @@
-$primarycolor: #99d332;
+$primarycolor: #34a108;
 $secondarycolor: #84cb07;
 $optioncolor: #3504eb;
 $light_black: #474747;
@@ -11,7 +11,7 @@ $screen-xs-min: 599px;
 $xsm-width: 700px;
 $zero: 0px;
 .bg-gradient {
-    background: linear-gradient(87deg, hsl(90, 58%, 35%), $primarycolor) !important;
+    background:linear-gradient(230deg, #598d25, $primarycolor) !important;
     // background: white;
 }
 .br_10 {
