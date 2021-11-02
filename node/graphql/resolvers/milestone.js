@@ -351,9 +351,9 @@ exports.add_start_milestone = async (args) => {
     return new Promise(async function (resolve, reject) {
         try {
             let update_detail = {
-                title: "start",
+                title: "started",
                 description: "Start the contract based on teams & condition",
-                booking_status: 9,
+                booking_status: 14,
                 order:1
             }
             if (args['contract_id']) {
