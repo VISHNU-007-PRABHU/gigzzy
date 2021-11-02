@@ -60,7 +60,7 @@ exports.update_contract_after_payment = async (args, charge, biding) => {
                 } else {
                     contract_data['booking_status'] = 4;
                     contract_data['job_status'] = 10;
-                    contract_data['milestones_status'] = commonHelper.booking_status.ACCEPT,
+                    contract_data['milestones_status'] = commonHelper.booking_status.PENDING,
                     contract_data['payment_status'] = 1;
                 }
             } else {

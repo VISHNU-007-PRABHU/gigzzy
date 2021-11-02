@@ -322,6 +322,8 @@ exports.static_contract_by_milestone = async (args) => {
                     booking_status: commonHelper.booking_status.PENDING
                 }
                 await ContractJob_model.updateOne({ _id: args['contract_id'] }, updat_data).exec()
+                var findBooking = await ContractJob_model.findOne({ _id:args['contract_id'] }).lean();
+                await ContractPayoutNotificationModule.particular_contract_notification(findBooking)
                 return { msg: "contract milestone updated has been started", status: 'success' }
             }
 
