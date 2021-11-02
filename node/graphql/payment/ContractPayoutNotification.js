@@ -119,6 +119,7 @@ exports.accept_payout_notification = async (contract_data) => {
                 // await commonHelper.send_sms(app_user_detail.country_code || 0, app_user_detail.phone_no, "job_placed", {})
 
                 if (contract_data.booking_status === 10) {
+                    console.log("exports.accept_payout_notification -> GET_MY_CONTRACTS")
                     await global.pubsub.publish("GET_MY_CONTRACTS", { get_my_contracts: [contract_data] });
                 } else {
                     //send my appoinment
