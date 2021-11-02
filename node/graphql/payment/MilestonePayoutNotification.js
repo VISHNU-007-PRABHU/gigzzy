@@ -79,7 +79,6 @@ exports.update_milestone_after_payment = async (args, charge, biding) => {
 
 exports.accept_milestone_payout_notification = async (milestone_data) => {
     return new Promise(async function (resolve, reject) {
-        console.log("exports.accept_milestone_payout_notification -> milestone_data", milestone_data)
         try {
             let contract_data = await Contract_model.findOne({ _id: milestone_data['contract_id'] }).lean()
             let app_user_detail = await Detail_model.findOne({ _id: contract_data.user_id });
@@ -88,21 +87,18 @@ exports.accept_milestone_payout_notification = async (milestone_data) => {
             // send push notification to provider
             let notification_user_data = [{
                 user_id: user_detail._id,
-                booking_status: milestone_data.booking_status,
+                booking_status: `milestone_${milestone_data.booking_status}`,
                 booking_id: milestone_data._id
             }]
 
             await PushNotification.create_push_notification_msg(notification_user_data);
          
+            await ContractPayoutNotificationModule.particular_contract_notification(contract_data)
             if (milestone_data.booking_status === 14) {
                 await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_finished", {})
-                await ContractPayoutNotificationModule.particular_contract_notification(contract_data)
                 return resolve({ job_status: 14, msg: "job is completed successfully", status: 'success' });
 
             } else {
-   
-                await ContractPayoutNotificationModule.particular_contract_notification(contract_data)
-
                 //send current booking data using subcription
                 milestone_data['user_parent'] = true;
                 milestone_data['msg'] = "user accept the job ";

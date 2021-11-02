@@ -41,10 +41,22 @@ const static_notification_template = (type, data) => {
                 body: "You job cancelled",
                 click_action: ".activities.HomeActivity",
             }
-        case "miles_start":
+        case "milestone_4":
             return {
                 title: 'Your milestone start',
                 body: "Your milestone start",
+                click_action: ".activities.HomeActivity",
+            }
+        case "milestone_13":
+            return {
+                title: 'Your milestone end',
+                body: "Your milestone end from provider",
+                click_action: ".activities.HomeActivity",
+            }
+        case "milestone_14":
+            return {
+                title: 'Your milestone completed',
+                body: "Your milestone completed",
                 click_action: ".activities.HomeActivity",
             }
         case 'biding_9':
