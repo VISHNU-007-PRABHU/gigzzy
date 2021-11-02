@@ -9,6 +9,7 @@ var contractResolver = require('../resolvers/contract');
 const payment_choose = require('../payment/choose')
 const PushNotification = require('../notification/PushNotification')
 const MilestonePayoutNotification = require('../payment/MilestonePayoutNotification')
+const ContractPayoutNotificationModule = require('../payment/ContractPayoutNotification')
 
 const { createWriteStream, existsSync, mkdirSync } = require("fs");
 const path = require("path");
@@ -333,6 +334,8 @@ exports.static_contract_by_milestone = async (args) => {
 
                 await BidingMilestone_model.updateOne({ _id: args._id }, mile_update_data).exec()
                 await ContractJob_model.updateOne({ _id: args['contract_id'] }, updat_data).exec()
+                var findBooking = await ContractJob_model.findOne({ _id:args['contract_id'] }).lean();
+                await ContractPayoutNotificationModule.particular_contract_notification(findBooking)
                 return { msg: "contract milestone updated success", status: 'success' }
             }
 
