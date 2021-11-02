@@ -108,7 +108,7 @@ exports.accept_payout_notification = async (contract_data) => {
             }]
 
             await PushNotification.create_push_notification_msg(notification_user_data);
-            await this.particular_contract_notification(booking_detail)
+            await global.pubsub.publish("CONTRACT_DETAIL", { contract_details: contract_data });
 
             if (booking_detail.booking_status === 13) {
                 await commonHelper.send_sms(app_user_detail.country_code, app_user_detail.phone_no, "job_finished", {})
