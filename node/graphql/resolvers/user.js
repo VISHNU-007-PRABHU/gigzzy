@@ -1219,7 +1219,7 @@ exports.addUser = async (parent, args) => {
                         email: data['email'],
                         role:data['role'],
                         provider_id: ObjectId(company_data['user_id']),
-                        company_id: ObjectId(added_detail['_id']),
+                        company_id: ObjectId(added_com_detail['_id']),
                         register_link_status: "accepted",
                         register_status: "success",
                         user_type: "owner"
