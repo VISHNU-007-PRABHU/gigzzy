@@ -104,7 +104,7 @@
     },
     "devDependencies": {
         "@babel/plugin-proposal-optional-chaining": "^7.8.3",
-        "node-sass": "^6.0.0",
+        "node-sass": "^4.14",
         "react-styleguidist": "^11.0.0",
         "sass-loader": "^7.1.0"
     },
@@ -118,5 +118,8 @@
         "development": [
             "last 1 version"
         ]
-    }
+    },
+    "engines": {
+        "node": "14.17.4"
+      }
 }
