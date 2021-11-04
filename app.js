@@ -386,9 +386,10 @@ app.use(async (req, res, next) => {
 
 
 
-mongoose.connect(process.env.DB_LINK).then(() => {
+const uri = "mongodb+srv://olx:olx@cluster0.yusf6.mongodb.net/Gigzzy?retryWrites=true&w=majority";
+mongoose.connect(uri).then(() => {
 }).catch((err) => {
-  // console.log("Not Connected to Database ERROR! ", err);
+  console.log("Not Connected to Database ERROR! ", err);
 });
 
 
