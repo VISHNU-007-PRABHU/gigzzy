@@ -6,7 +6,7 @@ import { split } from 'apollo-link';
 import { getMainDefinition } from 'apollo-utilities';
 const local = false
 const ssl = local ? 'http' : 'https'
-const socket_ssl = local ? 'ws' :'ws'
+const socket_ssl = local ? 'ws' :'wss'
 const uri_link = local ? 'localhost:8990':'gigzzy.herokuapp.com' // GX5wA]6e~/@T&2>]
 
 const uri = `${ssl}://${uri_link}`;
