@@ -394,16 +394,10 @@ mongoose.connect(process.env.DB_LINK).then(() => {
 // const httpHost = process.env.HTTP_HOST || 'localhost';
 const PORT = process.env.HTTP_PORT || 8990;
 
-// const httpServer = https.createServer(
-//   {
-//     key:  fs.readFileSync(process.env.HTTPS_KEY),
-//     cert:  fs.readFileSync(process.env.HTTPS_CERT)
-//   },
-//   app
-// )
-const httpServer = http.createServer(app);
+const httpServer = https.createServer(app)
+// const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
-httpServer.listen(PORT, () => {
+httpServer.listen(() => {
   console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`)
   console.log(`🚀 Subscriptions ready at ws://localhost:${PORT}${server.subscriptionsPath}`)
 })
