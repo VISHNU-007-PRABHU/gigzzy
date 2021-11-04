@@ -36,6 +36,9 @@ var Currency_model = model.currency;
 var Booking_model = model.booking;
 
 dotenv.config();
+var cors = require('cors');
+app.use(cors({ origin: 'http://localhost:3000' }));
+
 class refDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field) {
     const { resolve = defaultFieldResolver } = field;
@@ -380,8 +383,6 @@ app.use(async (req, res, next) => {
 });
 
 // use it before all route definitions
-var cors = require('cors');
-app.use(cors({ origin: 'http://localhost:3000' }));
 
 
 

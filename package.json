@@ -4,13 +4,11 @@
     "description": "user select work and provider is done the work and admin is manage",
     "main": "app.js",
     "scripts": {
-        "start": "serve -s build",
         "analyze": "source-map-explorer 'build/static/js/*.js'",
-        "watch-serve": "nodemon app.js",
+        "start": "nodemon app.js",
         "watch-app": "react-scripts start",
         "build-app": "react-scripts --max_old_space_size=4096 build && compress-cra",
-        "test": "react-scripts test",
-        "heroku-postbuild": "npm run build-app"
+        "test": "react-scripts test"
     },
     "keywords": [
         "jiffy"
