@@ -4,11 +4,13 @@
     "description": "user select work and provider is done the work and admin is manage",
     "main": "app.js",
     "scripts": {
+        "start": "serve -s build",
         "analyze": "source-map-explorer 'build/static/js/*.js'",
         "watch-serve": "nodemon app.js",
         "watch-app": "react-scripts start",
         "build-app": "react-scripts --max_old_space_size=4096 build && compress-cra",
-        "test": "react-scripts test"
+        "test": "react-scripts test",
+        "heroku-postbuild": "npm run build"
     },
     "keywords": [
         "jiffy"
@@ -90,6 +92,7 @@
         "react-scrollspy": "^3.4.2",
         "react-share": "^4.4.0",
         "react-slick": "^0.25.2",
+        "serve": "^12.0.1",
         "shortid": "^2.2.16",
         "slick-carousel": "^1.8.1",
         "source-map-explorer": "^2.4.0",
