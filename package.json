@@ -10,7 +10,7 @@
         "watch-app": "react-scripts start",
         "build-app": "react-scripts --max_old_space_size=4096 build && compress-cra",
         "test": "react-scripts test",
-        "heroku-postbuild": "npm run build"
+        "heroku-postbuild": "npm run build-app"
     },
     "keywords": [
         "jiffy"
