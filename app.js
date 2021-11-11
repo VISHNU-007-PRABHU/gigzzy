@@ -260,7 +260,7 @@ const server = new ApolloServer({
 
 server.applyMiddleware({ app });
 
-const buildPath = path.join(__dirname, '..', 'build');
+const buildPath1 = path.join(__dirname, '..', 'build');
 app.use(
   '/',
   expressStaticGzip('./build', {
@@ -268,6 +268,7 @@ app.use(
     orderPreference: ['br', 'gz']
   })
 );
+const buildPath = path.join(__dirname, '..', 'dist');
 
 // app.use('/', express.static('./build'));
 
@@ -367,7 +368,7 @@ app.use(async (req, res, next) => {
   if (!_.includes(SubURL, uriArray[1])) {
     const readFile = util.promisify(fs.readFile)
     try {
-      var text = await readFile(cwd + '/build/index.html', 'utf8');
+      var text = await readFile(cwd + '/dist/index.html', 'utf8');
       return res.send(text);
     } catch (error) {
       return res.send(error.message)
